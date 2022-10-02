@@ -9,7 +9,7 @@ module.exports = class RandomData {
   //👇🏻 Generates a random boolean
   fetchBoolean = () => Math.random() >= 0.5;
   //👇🏻 Generates a random date
-  fetchDate = () => new Date();
+  fetchDate = () => new Date().toUTCString();
   //👇🏻 Generates a random meaningful comment string
   fetchText = () => {
     const comments = [
@@ -62,7 +62,7 @@ module.exports = class RandomData {
   };
   ///👇🏻 Generates a random comment object
   fetchComment = () => ({
-    id: this.fetchID(),
+    userId: this.fetchID(),
     name: this.fetchName(),
     text: this.fetchText(),
     date: this.fetchDate(),

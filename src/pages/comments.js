@@ -5,13 +5,26 @@ import { useParams } from "react-router-dom";
 const socket = socketIO.connect("http://localhost:4000");
 
 const Comments = () => {
+  const { category, id } = useParams();
   const [comment, setComment] = useState("");
+  const [commentList, setCommentList] = useState([]);
+
+  //👇🏻 Listens to the comments event
+  useEffect(() => {
+    socket.on("comments", (data) => setCommentList(data));
+  }, []);
 
   const addComment = (e) => {
     e.preventDefault();
-    console.log({
+    /*
+      sends the comment, the task category, item's id and the userID.
+     */
+    socket.emit("addComment", {
       comment,
+      category,
+      id,
       userId: localStorage.getItem("userId"),
+      date: new Date().toUTCString(),
     });
     setComment("");
   };
@@ -32,9 +45,17 @@ const Comments = () => {
         <button className="commentBtn">ADD COMMENT</button>
       </form>
 
+      {/** 👇🏻 Displays all the available comments*/}
       <div className="comments__section">
         <h2>Existing Comments</h2>
-        <div></div>
+        {commentList.map((comment) => (
+          <div key={comment.id}>
+            <p>
+              <span style={{ fontWeight: "bold" }}>{comment.text} </span>by{" "}
+              {comment.name}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );

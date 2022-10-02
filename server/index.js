@@ -71,6 +71,27 @@ socket.on("connection", (socket) => {
     socket.emit("tasks", tasks);
   });
 
+  socket.on("addComment", (data) => {
+    const { category, userId, comment, id, date } = data;
+    console.log("Comment", data);
+    //👇🏻 Gets the items in the task's category
+    const taskItems = tasks[category].items;
+    //👇🏻 Loops through the list of items to find a matching ID
+    for (let i = 0; i < taskItems.length; i++) {
+      if (taskItems[i].id === id) {
+        //👇🏻 Then adds the comment to the list of comments under the item (task)
+        taskItems[i].comments.push({
+          name: userId,
+          text: comment,
+          id: randomData.fetchID(),
+          date: date,
+        });
+        //👇🏻 sends a new event to the React app
+        socket.emit("comments", taskItems[i].comments);
+      }
+    }
+  });
+
   socket.on("disconnect", () => {
     socket.disconnect();
     console.log("🔥: A user disconnected");
