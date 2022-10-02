@@ -54,6 +54,23 @@ socket.on("connection", (socket) => {
       console.log(tasks);
     }
   });
+  socket.on("createTask", (data) => {
+    // 👇🏻 Constructs an object according to the data structure
+    const newTask = {
+      id: randomData.fetchID(),
+      title: data.task,
+      comments: [],
+      data: randomData.fetchDate(),
+      isComplete: false,
+      isArchived: false,
+      isDeleted: false,
+    };
+    // 👇🏻 Adds the task to the pending category
+    tasks["pending"].items.push(newTask);
+    /* Fires the tasks event for update*/
+    socket.emit("tasks", tasks);
+  });
+
   socket.on("disconnect", () => {
     socket.disconnect();
     console.log("🔥: A user disconnected");
