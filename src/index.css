@@ -1,3 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  height: 100vh;
+}
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
@@ -5,11 +12,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
@@ -24,16 +26,12 @@ body {
   margin: 0;
   padding: 0;
 }
-.navbar {
-  width: 100%;
-  background-color: #f1f7ee;
-  height: 10vh;
-  border-bottom: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
+.customDropdown:focus-within .dropdown-menu {
+  opacity: 1;
+  transform: translate(0) scale(1);
+  visibility: visible;
 }
+
 .form__input {
   min-height: 20vh;
   display: flex;
@@ -106,51 +104,6 @@ body {
   border-radius: 5px;
   margin-bottom: 10px;
   padding: 15px;
-}
-.comment {
-  text-align: right;
-  font-size: 14px;
-  cursor: pointer;
-  color: rgb(85, 85, 199);
-}
-.comment:hover {
-  text-decoration: underline;
-}
-.comments__container {
-  padding: 20px;
-}
-.comment__form {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  margin-bottom: 30px;
-}
-.comment__form > label {
-  margin-bottom: 15px;
-}
-.comment__form textarea {
-  width: 80%;
-  padding: 15px;
-  margin-bottom: 15px;
-}
-.commentBtn {
-  padding: 10px;
-  width: 200px;
-  background-color: #367e18;
-  outline: none;
-  border: none;
-  color: #fff;
-  height: 45px;
-  cursor: pointer;
-}
-.comments__section {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
 }
 
 .login__form {

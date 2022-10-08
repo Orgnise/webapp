@@ -20,7 +20,7 @@ const server = app.listen(port, () => {
 
 const socket = socketIO(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
     methods: ["GET", "POST"],
   },
 });
@@ -69,8 +69,17 @@ socket.on("connection", (socket) => {
     tasks["pending"].items.push(newTask);
     /* Fires the tasks event for update*/
     socket.emit("tasks", tasks);
+    socket.emit("createTask", data);
   });
-
+  socket.on("fetchComments", (data) => {
+    const { category, id } = data;
+    const taskItems = tasks[category].items;
+    for (let i = 0; i < taskItems.length; i++) {
+      if (taskItems[i].id === id) {
+        socket.emit("comments", taskItems[i].comments);
+      }
+    }
+  });
   socket.on("addComment", (data) => {
     const { category, userId, comment, id, date } = data;
     console.log("Comment", data);
