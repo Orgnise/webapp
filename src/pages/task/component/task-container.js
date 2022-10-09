@@ -53,19 +53,22 @@ const TasksContainer = () => {
   }
   // console.log("🚀: TasksContainer -> tasks", Object.entries(tasks));
   return (
-    <section className="w-full">
-      <div className="max-w-screen-lg m-auto">
-        <div className="flex flex-col sm:flex-row">
+    <section className="w-full pt-12 flex-grow">
+      <div className="max-w-screen-xl m-auto  ">
+        <div className="flex flex-col md:flex-row space-x-2">
           <DragDropContext onDragEnd={handleDragEnd}>
             {Object.entries(tasks).map((task) => (
               <div
-                className={`w-full sm:w-1/3 select-none`}
+                className={`w-full sm:w-1/3 select-none bg-slate-100 rounded`}
                 key={task[1].title}
               >
-                <h3 className="font-bold text-lg first-letter:uppercase m-2">
-                  {task[1].title} Tasks
+                <h3 className="font-bold text-lg first-letter:uppercase p-5 sticky top-0 bg-slate-100 rounded">
+                  {task[1].title}
                 </h3>
-                <div className="border p-2 h-full m-2">
+                <div
+                  className=" px-2 h-full"
+                  // style={{ maxHeight: "calc(100vh-150px)" }}
+                >
                   {/** --- 👇🏻 Droppable --- */}
                   <Droppable droppableId={task[1].title}>
                     {(provided) => (

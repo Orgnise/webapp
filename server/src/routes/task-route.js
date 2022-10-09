@@ -52,9 +52,9 @@ module.exports = function() {
         socket.emit("tasks", this.tasks);
         console.log("🚀: handleDragEnd -> this.tasks");
       } catch (error) {
-        console.log("Source", source.droppableId);
+        console.log("Source", this.tasks[destination.droppableId]);
         console.log(error);
-        console.log(this.tasks);
+        console.table(this.tasks["todo"]);
       }
     });
     socket.on("createTask", (data) => {

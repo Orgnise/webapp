@@ -9,7 +9,7 @@ const AddTask = ({ setVisible = () => {} }) => {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("low");
-  const [status, setStatus] = useState("todo");
+  const [status, setStatus] = useState();
   const [error, setError] = useState({});
   const [state, setState, socket] = useSocket(["createTask"], {});
 
@@ -32,10 +32,43 @@ const AddTask = ({ setVisible = () => {} }) => {
     setVisible(false);
   };
 
+  const statusType = [
+    {
+      label: "Todo",
+      disabled: false,
+      value: "Todo",
+    },
+    {
+      label: "In Progress",
+      disabled: false,
+      value: "Inprogress",
+    },
+    {
+      label: "Done",
+      disabled: false,
+      value: "Done",
+    },
+    {
+      label: "In Review",
+      disabled: false,
+      value: "InReview",
+    },
+  ];
+
   return (
     <form className="max-w-lg min-w-full" onSubmit={handleAddTodo}>
       <div id="content-4a" className="flex-1">
         <div className="flex flex-col gap-6">
+          <DropDown
+            options={statusType}
+            className="w-1/2"
+            value={status}
+            onChange={(value) => {
+              setStatus(value);
+              console.table(value);
+            }}
+          />
+
           {/* <!-- Title --> */}
           <div className="relative">
             <input

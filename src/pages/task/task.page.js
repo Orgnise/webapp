@@ -14,7 +14,7 @@ import useLocalStorage from "../../hooks/use-local-storage";
 const Task = () => {
   const [storedValue, setValue] = useLocalStorage("user");
   return (
-    <div className="flex flex-col space-y-12">
+    <div className="flex flex-col h-screen">
       <Nav />
       <TasksContainer />
     </div>

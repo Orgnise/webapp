@@ -29,8 +29,8 @@ const Nav = () => {
   }, [visible]);
 
   return (
-    <nav className="w-full bg-slate-100 ">
-      <div className="max-w-screen-lg flex items-center place-content-between m-auto h-14 px-2">
+    <nav className="w-full bg-slate-100 flex-none">
+      <div className="max-w-screen-xl flex items-center place-content-between m-auto h-14 px-2">
         <h2 className="font-bold text-lg">React Kanban</h2>
 
         <div className="">

@@ -26,10 +26,10 @@ function DropDown({
     >
       <button
         className={cx(
-          "inline-flex items-center space-x-1 justify-between w-full px-4 py-2 text-sm font-medium leading-5 transition duration-150 ease-in-out border theme-border-default rounded-md ",
+          "inline-flex items-center space-x-1 justify-between w-full px-4 py-2 text-sm font-medium leading-5 transition duration-150 ease-in-out border border-slate-500 rounded-md ",
           {
-            "cursor-not-allowed theme-bg-disable theme-text-subtitle-1": disabled,
-            "theme-bg-surface hover:theme-text-heading-2 focus:outline-none focus:theme-border-primary focus:shadow-outline-blue theme-text-heading-1": !disabled,
+            "cursor-not-allowed bg-gray-300 text-slate-400": disabled,
+            "bg-gray-100 hover:hover:text-slate-500 focus:outline-none focus:border-teal-300 focus:shadow-outline-blue ": !disabled,
           }
         )}
         type="button"
@@ -53,14 +53,14 @@ function DropDown({
 
       <div className="opacity-0 invisible dropdown-menu transition-all duration-300 transform origin-top-right -translate-y-2 scale-95 ">
         <div
-          className="absolute right-0  mt-2 origin-top-right theme-bg-surface border theme-border-default divide-y theme-border-default rounded-md shadow-lg outline-none z-50"
+          className="absolute right-0 left-0 mt-2 origin-top-right bg-white border-gray-300 divide-y rounded-md shadow-lg outline-none z-50"
           role="menu"
         >
           {options.map((option, index) => {
             return (
               <div
                 key={index}
-                className={cx("flex theme-border-default", {
+                className={cx("flex border-gray-200", {
                   "cursor-not-allowed": option.disabled,
                 })}
                 role={"menuitem"}
@@ -69,15 +69,16 @@ function DropDown({
                   //   key={index}
                   disabled={option.disabled}
                   onClick={(e) => {
+                    e.preventDefault();
                     onChange(option);
                     e.currentTarget.blur();
                   }}
                   className={cx(
                     "flex-grow flex items-center px-4 py-2  text-left",
                     {
-                      "cursor-not-allowed theme-bg-disabled theme-text-subtitle-2":
+                      "cursor-not-allowed bg-gray-400 text-slate-400":
                         option.disabled,
-                      "hover:bg-theme-primary-lightest hover:theme-bg-default cursor-pointer": !option.disabled,
+                      "hover:bg-teal-50  cursor-pointer": !option.disabled,
                     }
                   )}
                 >
