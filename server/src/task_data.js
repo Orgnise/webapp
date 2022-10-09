@@ -1,4 +1,4 @@
-module.exports = class RandomData {
+class FakeBoardData {
   //👇🏻 Generates a random string
   fetchID = () =>
     Math.random()
@@ -116,4 +116,17 @@ module.exports = class RandomData {
       isArchived: this.fetchBoolean(),
       isDeleted: this.fetchBoolean(),
     }));
+
+  tasks = this.fetchPending();
+
+  // Update tasks
+  updateTasks = (tasks) => {
+    this.tasks = tasks;
+    console.table(this.tasks);
+  };
+}
+
+module.exports = function() {
+  this.FakeBoardData = new FakeBoardData();
+  this.tasks = this.FakeBoardData.tasks;
 };

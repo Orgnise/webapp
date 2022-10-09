@@ -2,18 +2,26 @@ import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import cx from "classnames";
 import { type } from "@testing-library/user-event/dist/type";
+import { useLocation } from "react-router-dom";
 
-export default function ModalForm({ children, button, title, className }) {
-  const [isShowing, setIsShowing] = useState(false);
-
+export default function ModalForm({
+  children,
+  button,
+  title,
+  className,
+  path,
+  visible,
+  setVisible,
+}) {
+  // const [visible, setVisible] = useState(false);
   const wrapperRef = useRef(null);
 
-  //   useTheme();
+  const search = useLocation().search;
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setIsShowing(false);
+        setVisible(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -26,7 +34,7 @@ export default function ModalForm({ children, button, title, className }) {
     let html = document.querySelector("html");
 
     if (html) {
-      if (isShowing && html) {
+      if (visible && html) {
         html.style.overflowY = "hidden";
 
         // const focusableElements =
@@ -45,7 +53,7 @@ export default function ModalForm({ children, button, title, className }) {
 
         document.addEventListener("keydown", function(e) {
           if (e.keyCode === 27) {
-            setIsShowing(false);
+            setVisible(false);
           }
 
           let isTabPressed = e.key === "Tab" || e.keyCode === 9;
@@ -75,22 +83,22 @@ export default function ModalForm({ children, button, title, className }) {
         html.style.overflowY = "visible";
       }
     }
-  }, [isShowing]);
+  }, [visible]);
 
   return (
     <>
       {button ? (
-        <div onClick={() => setIsShowing(true)}>{button}</div>
+        <div onClick={() => setVisible(true)}>{button}</div>
       ) : (
         <button
-          onClick={() => setIsShowing(true)}
+          onClick={() => setVisible(true)}
           className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
         >
           <span>Open Modal</span>
         </button>
       )}
 
-      {isShowing && typeof document !== "undefined"
+      {visible && typeof document !== "undefined"
         ? ReactDOM.createPortal(
             <div
               className="fixed top-0 left-0 z-20 flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm"
@@ -115,7 +123,7 @@ export default function ModalForm({ children, button, title, className }) {
                     {title}
                   </h3>
                   <button
-                    onClick={() => setIsShowing(false)}
+                    onClick={() => setVisible(false)}
                     className="inline-flex h-10 items-center justify-center gap-2 justify-self-center whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide  text-emerald-500 transition duration-300 hover:bg-emerald-100 hover:text-emerald-600 focus:bg-emerald-200 focus:text-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:text-emerald-300 disabled:shadow-none disabled:hover:bg-transparent"
                     aria-label="close dialog"
                   >

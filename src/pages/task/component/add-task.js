@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import cx from "classnames";
 import useSocket from "../../../hooks/use-socket.hook";
+import { useNavigate } from "react-router-dom";
+import { history } from "../../../helper/history.config";
+import DropDown from "../../../components/dropdown";
 
-const AddTask = () => {
+const AddTask = ({ setVisible = () => {} }) => {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("low");
@@ -25,7 +28,10 @@ const AddTask = () => {
     //👇🏻 sends the task to the Socket.io server
     socket.emit("createTask", { task, description });
     setTask("");
+    setDescription("");
+    setVisible(false);
   };
+
   return (
     <form className="max-w-lg min-w-full" onSubmit={handleAddTodo}>
       <div id="content-4a" className="flex-1">
@@ -58,13 +64,17 @@ const AddTask = () => {
 
           {/* <!-- Description --> */}
           <div className="relative my-6">
-            <input
-              id="id-b13"
-              type="text"
-              name="id-b13"
+            <textarea
+              className="peer relative  w-full rounded border border-slate-200 px-4 pr-12 py-2 max-h-96 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               placeholder="Task description"
-              onChange={(e) => setDescription(e.target.value)}
-              className="peer relative h-10 w-full rounded border border-slate-200 px-4 pr-12 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+              onChange={(e) => {
+                setDescription(e.target.value);
+                e.target.style.height = "inherit";
+                e.target.style.height = `${e.target.scrollHeight}px`;
+              }}
+              id="id-b13"
+              name="id-b13"
+              rows={3}
             />
             <label
               htmlFor="id-b13"

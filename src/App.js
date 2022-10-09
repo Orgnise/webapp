@@ -15,6 +15,8 @@ import {
   Task,
 } from "./helper/routes.helper";
 import { AppRoutes } from "./helper/app-routes";
+import TasksContainer from "./pages/task/component/task-container";
+import useSocket from "./hooks/use-socket.hook";
 
 /*
 👇🏻  Pass Socket.io into the required components
@@ -27,7 +29,7 @@ function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [lastPong, setLastPong] = useState(null);
 
-  const [socket, setSocket] = useState(null);
+  const [socketState, setSocketState, socket] = useSocket();
   const [storedValue, setValue] = useLocalStorage("user");
 
   useEffect(() => {
@@ -63,9 +65,10 @@ function App() {
           element={getLoggedInRoute(storedValue, <Task />)}
         />
         <Route
-          path="/comments/:category/:id"
+          path={AppRoutes.comments}
           element={getLoggedInRoute(storedValue, <Comments />)}
         />
+
         <Route
           path={AppRoutes.notFound}
           element={getLoggedInRoute(storedValue, <NoPageFound />)}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   solid,
   regular,
@@ -15,12 +15,18 @@ import AddTask from "./add-task";
 
 const Nav = () => {
   const [user, setUser] = useLocalStorage("user");
+  const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
+
   const handleLogout = () => {
     setUser({});
     navigate(AppRoutes.login);
     window.location.reload();
   };
+
+  React.useEffect(() => {
+    console.log("visible", visible);
+  }, [visible]);
 
   return (
     <nav className="w-full bg-slate-100 ">
@@ -34,17 +40,19 @@ const Nav = () => {
               <div>
                 <ModalForm
                   title={"Add new Task"}
-                  className="w-96"
+                  className="w-full sm:w-2/3 md:w-2/4 lg:w-1/3"
+                  visible={visible}
+                  setVisible={setVisible}
+                  path={AppRoutes.addTask}
                   button={
                     <FIcon
                       icon={solid("plus")}
                       className="cursor-pointer border border-slate-400 p-2 mt-1 rounded select-none"
                       size="sm"
-                      onClick={() => navigate(AppRoutes.addTask)}
                     />
                   }
                 >
-                  <AddTask />
+                  <AddTask setVisible={setVisible} />
                 </ModalForm>
               </div>
               <CustomDropDown

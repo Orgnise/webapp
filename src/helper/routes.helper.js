@@ -9,7 +9,6 @@ const NoPageFound = lazy(() => import("../pages/no-page-found.page"));
 
 function getProtectedRoute(user, element) {
   if (user && Object.keys(user).length !== 0) {
-    console.log("getProtectedRoute", user);
     return <Navigate to={AppRoutes.dashboard} />;
   }
   return <Login />;
@@ -18,7 +17,6 @@ function getProtectedRoute(user, element) {
 
 function getLoggedInRoute(user, element) {
   if (user && Object.keys(user).length !== 0) {
-    console.log("getLoggedInRoute", user);
     // return <Navigate to={AppRoutes.dashboard} />;
     return element;
   }

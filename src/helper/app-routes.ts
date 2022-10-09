@@ -6,5 +6,7 @@ export const AppRoutes = {
     setting: 'setting',
     notFound: '*',
     maintenance: 'maintenance',
-    addTask: '?add-task',
+    addTask: '?task=create',
+    task: "task",
+    comments: "/comments/:category/:id"
 };
