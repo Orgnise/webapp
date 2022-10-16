@@ -6,6 +6,7 @@ import { useLocation } from "react-router-dom";
 
 export default function ModalForm({
   children,
+  footer,
   button,
   title,
   className,
@@ -102,7 +103,7 @@ export default function ModalForm({
         ? ReactDOM.createPortal(
             <div
               className="fixed top-0 left-0 z-20 flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm"
-              aria-labelledby="header-4a content-4a"
+              aria-labelledby="header-4a content-4a footer-4a"
               aria-modal="true"
               tabIndex="-1"
               role="dialog"
@@ -111,15 +112,15 @@ export default function ModalForm({
               <div
                 ref={wrapperRef}
                 className={cx(
-                  "flex max-h-[90vh] max-w-7xl flex-col gap-4 overflow-hidden rounded bg-white p-6 text-slate-500 shadow-xl shadow-slate-700/10",
+                  "flex max-h-[90vh] max-w-7xl flex-col overflow-hidden rounded bg-white text-slate-500 shadow-xl shadow-slate-700/10",
                   className
                 )}
                 id="modal"
                 role="document"
               >
                 {/*        <!-- Modal header --> */}
-                <header id="header-4a" className="flex items-center">
-                  <h3 className="flex-1 text-lg font-medium text-slate-700">
+                <header id="header-4a" className="flex items-center px-6 pt-1">
+                  <h3 className="flex-1 text-lg font-semibold text-slate-700">
                     {title}
                   </h3>
                   <button
@@ -152,7 +153,14 @@ export default function ModalForm({
                   </button>
                 </header>
                 {/*        <!-- Modal content --> */}
-                {children}
+                <div id="content-4a" className="p-6">
+                  {children}
+                </div>
+                {footer && (
+                  <footer id="footer-4a" className="px-4 pb-4">
+                    {footer}
+                  </footer>
+                )}
               </div>
             </div>,
             document.body

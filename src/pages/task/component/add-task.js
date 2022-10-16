@@ -8,7 +8,7 @@ import DropDown from "../../../components/dropdown";
 const AddTask = ({ setVisible = () => {} }) => {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState("low");
+  const [priority, setPriority] = useState();
   const [status, setStatus] = useState();
   const [error, setError] = useState({});
   const [state, setState, socket] = useSocket(["createTask"], {});
@@ -25,8 +25,24 @@ const AddTask = ({ setVisible = () => {} }) => {
       setError({ task: "Task is required" });
       return;
     }
+    const data = {
+      task,
+      description,
+    };
+    if (status) {
+      data.status = status.value;
+    } else {
+      data.status = "Todo";
+    }
+    if (priority) {
+      data.priority = priority;
+    } else {
+      data.priority = "Low";
+    }
+
     //👇🏻 sends the task to the Socket.io server
-    socket.emit("createTask", { task, description });
+    socket.emit("createTask", data);
+    console.log(data);
     setTask("");
     setDescription("");
     setVisible(false);
@@ -41,7 +57,7 @@ const AddTask = ({ setVisible = () => {} }) => {
     {
       label: "In Progress",
       disabled: false,
-      value: "Inprogress",
+      value: "In Progress",
     },
     {
       label: "Done",
@@ -51,7 +67,30 @@ const AddTask = ({ setVisible = () => {} }) => {
     {
       label: "In Review",
       disabled: false,
-      value: "InReview",
+      value: "In Review",
+    },
+  ];
+
+  const PriorityType = [
+    {
+      label: "Low",
+      disabled: false,
+      value: "low",
+    },
+    {
+      label: "Medium",
+      disabled: false,
+      value: "medium",
+    },
+    {
+      label: "High",
+      disabled: false,
+      value: "high",
+    },
+    {
+      label: "Highest",
+      disabled: false,
+      value: "highest",
     },
   ];
 
@@ -59,16 +98,31 @@ const AddTask = ({ setVisible = () => {} }) => {
     <form className="max-w-lg min-w-full" onSubmit={handleAddTodo}>
       <div id="content-4a" className="flex-1">
         <div className="flex flex-col gap-6">
-          <DropDown
-            options={statusType}
-            className="w-1/2"
-            value={status}
-            onChange={(value) => {
-              setStatus(value);
-              console.table(value);
-            }}
-          />
+          <div className="flex space-x-2 w-full">
+            <div className="w-1/2">
+              <h3 className="font-semibold">Status </h3>
+              <DropDown
+                options={statusType}
+                className="w-full"
+                value={status}
+                onChange={(value) => {
+                  setStatus(value);
+                }}
+              />
+            </div>
 
+            <div className="w-1/2">
+              <h3 className="font-semibold">Priority </h3>
+              <DropDown
+                options={PriorityType}
+                className="w-full"
+                value={priority}
+                onChange={(value) => {
+                  setPriority(value);
+                }}
+              />
+            </div>
+          </div>
           {/* <!-- Title --> */}
           <div className="relative">
             <input

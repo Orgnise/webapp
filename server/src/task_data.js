@@ -1,6 +1,6 @@
 class FakeBoardData {
   //👇🏻 Generates a random string
-  fetchID = () => "KAN-" + this.fetchNumber(10000);
+  fetchID = (max = 1000) => "KAN-" + this.fetchNumber(max);
   // Math.random()
   // .toString(36)
   // .substring(2, 10);
@@ -11,6 +11,12 @@ class FakeBoardData {
   //👇🏻 Generates a random date
   fetchDate = () =>
     new Date(+new Date() - Math.floor(Math.random() * 10000000000));
+  //👇🏻 Fetch random status from ["Todo","In Progress","In Review", "Completed"]
+  fetchStatus = () =>
+    ["Todo", "In Progress", "In Review", "Completed"].at(this.fetchNumber(3));
+  // 👇🏻 Fetch random priority
+  fetchPriority = () =>
+    ["Low", "Medium", "High", "Highest"].at(this.fetchNumber(3));
 
   //👇🏻 Generates a random date
   fetchDateInBetween = () =>
@@ -98,36 +104,39 @@ class FakeBoardData {
   fetchTask = () => ({
     id: this.fetchID(),
     title: this.fetchText(),
+    description: this.fetchText(),
     comments: this.fetchComments(),
     date: this.fetchDateInBetween(),
     isComplete: this.fetchBoolean(),
     isArchived: this.fetchBoolean(),
     isDeleted: this.fetchBoolean(),
+    status: this.fetchStatus(),
+    priority: this.fetchPriority(),
   });
 
   //👇🏻 Generates a random list of tasks
   fetchTasks = () =>
-    Array.from({ length: this.fetchNumber(20) }, () => this.fetchTask());
+    Array.from({ length: this.fetchNumber(10) }, () => this.fetchTask());
 
   // 👇🏻 Generates a random list of tasks
   fetchBoard = () => ({
     Todo: {
-      id: this.fetchID(),
+      id: `Todo-${this.fetchID(100)}`,
       title: "Todo",
       items: this.fetchTasks(),
     },
     "In Progress": {
-      id: this.fetchID(),
+      id: `In Progress-${this.fetchID()}`,
       title: "In Progress",
       items: this.fetchTasks(),
     },
     "In Review": {
-      id: this.fetchID(),
+      id: `In Review-${this.fetchID()}`,
       title: "In Review",
       items: this.fetchTasks(),
     },
     Done: {
-      id: this.fetchID(),
+      id: `Done-${this.fetchID()}`,
       title: "Done",
       items: this.fetchTasks(),
     },

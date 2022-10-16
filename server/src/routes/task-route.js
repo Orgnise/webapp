@@ -62,14 +62,34 @@ module.exports = function() {
       const newTask = {
         id: this.board.FakeBoardData.fetchID(),
         title: data.task,
+        description: data.task.description,
         comments: [],
         data: this.board.FakeBoardData.fetchDate(),
-        isComplete: false,
+        status: data.status,
+        priority: data.priority,
+        isComplete: data.status === "Done" ? true : false,
         isArchived: false,
         isDeleted: false,
       };
-      // 👇🏻 Adds the task to the pending category
-      this.tasks["pending"].items.push(newTask);
+      // 👇🏻 Adds the task to the `[data.status]` category
+      if (this.tasks[data.status]) {
+        // Check if the status has items
+        if (this.tasks[data.status].items) {
+          // Add the new task to the existing items
+          this.tasks[data.status].items.push(newTask);
+        } else {
+          // If items is not defined then create items and add the new task
+          this.tasks[data.status].items = [newTask];
+        }
+      } else {
+        // If the status is not defined then create the status and add the new task
+        this.tasks[data.status] = {
+          id: `${data.status}-${this.board.FakeBoardData.fetchID()},`,
+          title: data.status,
+          items: [newTask],
+        };
+      }
+
       /* Fires the tasks event for update*/
       socket.emit("tasks", this.tasks);
       socket.emit("createTask", data);
