@@ -2,7 +2,7 @@ var express = require("express");
 var router = express.Router();
 var socket = require("../../index");
 
-const FakeBoardData = require("../task_data");
+const FakeBoardData = require("../config/task_data");
 
 module.exports = function() {
   // socket = socket;˝

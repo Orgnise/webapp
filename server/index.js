@@ -1,46 +1,29 @@
-const express = require("express");
-const http = require("http");
-const socketIO = require("socket.io");
-const cors = require("cors");
-var taskRouter = require("./src/routes/task-route");
+const app = require("./src/app");
+const socket = require("./src/config/socket");
+const mw = require("./src//middleware/middleware");
+var TaskRouter = require("./src/routes/task-route");
 var authRouter = require("./src/routes/auth-route");
-const mw = require("./src/middleware/middleware");
 
-const app = express();
-const port = process.env.PORT || 4000;
+const { API_PORT } = require("./src/config/config");
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cors());
-
-const router = new taskRouter();
+const port = API_PORT;
 
 const server = app.listen(port, () => {
   console.log(`Server listening on ${port}`);
 });
 
-const socket = socketIO(server, {
-  cors: {
-    origin: "http://localhost:3001",
-    methods: ["GET", "POST"],
-  },
+const taskRouter = new TaskRouter();
+new socket(server, (socket) => {
+  taskRouter.initSocket(socket);
 });
 
-socket.on("connection", (socket) => {
-  console.log(
-    `⚡: ${socket.id} user just connected!`,
-    new Date().toLocaleTimeString()
-  );
-  router.initSocket(socket);
-
-  socket.on("disconnect", () => {
-    socket.disconnect();
-    console.log("🔥: A user disconnected");
-  });
-});
-
-app.use(mw());
-app.use("/task", router.router);
+app.use("/task", taskRouter.router);
 app.use("/users", authRouter);
+
+// Handling Error
+process.on("unhandledRejection", (err) => {
+  console.log(`❤️‍🔥 An error occurred: ${err.message}`);
+  server.close(() => process.exit(1));
+});
 
 module.exports = socket;
