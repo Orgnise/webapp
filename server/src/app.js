@@ -1,6 +1,7 @@
 const cors = require("cors");
 const express = require("express");
 const connectDb = require("./config/db");
+require("dotenv").config();
 const mw = require("./middleware/middleware");
 
 connectDb.connect();

@@ -2,7 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { lazy } from "react";
 import { AppRoutes } from "./app-routes";
-const Login = lazy(() => import("../pages/login.page"));
+import { Login, Signup } from "../pages/auth/index";
 const Task = lazy(() => import("../pages/task/task.page"));
 const Comments = lazy(() => import("../pages/comments.page"));
 const NoPageFound = lazy(() => import("../pages/no-page-found.page"));
@@ -22,6 +22,6 @@ function getLoggedInRoute(user, element) {
   }
   return <Login />;
 }
-export { Login, Task, NoPageFound, Comments };
+export { Login, Signup, Task, NoPageFound, Comments };
 
 export { getProtectedRoute, getLoggedInRoute };

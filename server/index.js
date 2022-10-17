@@ -18,11 +18,11 @@ new socket(server, (socket) => {
 });
 
 app.use("/task", taskRouter.router);
-app.use("/users", authRouter);
+app.use("/auth", authRouter);
 
 // Handling Error
 process.on("unhandledRejection", (err) => {
-  console.log(`❤️‍🔥 An error occurred: ${err.message}`);
+  console.log(`❤️‍🔥 [unhandledRejection] An error occurred: ${err.message}`);
   server.close(() => process.exit(1));
 });
 

@@ -1,34 +1,40 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import loginSvg from "../assets/secure-login-animate.svg";
-import { AppRoutes } from "../helper/app-routes";
-import useLocalStorage from "../hooks/use-local-storage";
+import { Link, useNavigate } from "react-router-dom";
+import loginSvg from "../../assets/secure-login-animate.svg";
+import { AppRoutes } from "../../helper/app-routes";
+import useLocalStorage from "../../hooks/use-local-storage";
+
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
   const history = useNavigate();
   const [storedValue, setValue] = useLocalStorage("user", null);
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (!storedValue || Object.keys(storedValue).length === 0) {
-      setValue({ username, password });
-      history(AppRoutes.dashboard);
-      console.log("New user created");
-      window.location.reload();
-    }
-    //👇🏻 saves the user object in localStorage
-    // setValue({ username: username, password: password });
-    else if (
-      storedValue.username === username &&
-      storedValue.password === password
-    ) {
-      history(AppRoutes.dashboard);
-      console.log("User logged in");
-      window.location.reload();
-    } else {
-      alert("Invalid Credentials");
-    }
+    fetch("http://localhost:4000/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          console.log("User login successfully");
+          setValue(data.user);
+          history(AppRoutes.dashboard);
+          console.log("New user created", data);
+          window.location.reload();
+        }
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
@@ -48,16 +54,16 @@ const Login = () => {
             </p>
           </div>
           <div className="flex flex-col space-y-2 w-9/12">
-            <label className="text-md  text-slate-500">Username</label>
+            <label className="text-md  text-slate-500">Email</label>
             <input
               type="text"
-              name="username"
-              placeholder="Enter username"
+              name="email"
+              placeholder="Enter email"
               className="border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm"
               required
-              onChange={(e) => setUsername(e.target.value)}
-              value={username}
-              autoComplete="username"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              autoComplete="email"
             />
           </div>
           <div className="flex flex-col space-y-2 w-9/12">
@@ -86,6 +92,13 @@ const Login = () => {
           <button className="bg-teal-400 px-6 py-2 rounded text-white w-9/12 font-normal mt-8">
             Sign In
           </button>
+          <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
+            <span className="border-t flex-1" />
+            <span className="text-slate-500 px-4 text-sm hover:underline cursor-pointer">
+              <Link to={AppRoutes.signup}>CREATE AN ACCOUNT</Link>
+            </span>
+            <span className="border-t flex-1" />
+          </div>
         </form>
       </div>
     </div>

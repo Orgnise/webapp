@@ -1,10 +1,9 @@
 const Mongoose = require("mongoose");
 
 const UserSchema = new Mongoose.Schema({
-  username: {
+  name: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
     minlength: 3,
   },
@@ -16,7 +15,8 @@ const UserSchema = new Mongoose.Schema({
   },
   email: {
     type: String,
-    required: false,
+    unique: true,
+    required: true,
     trim: true,
     minlength: 3,
   },
@@ -26,6 +26,10 @@ const UserSchema = new Mongoose.Schema({
     trim: true,
     minlength: 3,
     default: "user",
+  },
+  token: {
+    type: String,
+    required: false,
   },
   createdAt: {
     type: Date,

@@ -17,6 +17,7 @@ import {
 import { AppRoutes } from "./helper/app-routes";
 import TasksContainer from "./pages/task/component/task-container";
 import useSocket from "./hooks/use-socket.hook";
+import Signup from "./pages/auth/signup.page";
 
 /*
 👇🏻  Pass Socket.io into the required components
@@ -57,9 +58,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route
-          path="/login"
+          path={AppRoutes.login}
           element={getProtectedRoute(storedValue, <Login />)}
         />
+        <Route path={AppRoutes.signup} element={<Signup />} />
         <Route
           path={AppRoutes.dashboard}
           element={getLoggedInRoute(storedValue, <Task />)}

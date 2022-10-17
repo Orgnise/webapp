@@ -1,6 +1,7 @@
 /** Declare  app routes and export*/
 export const AppRoutes = {
-    login: 'login',
+    login: '/login',
+    signup: '/signup',
     register: 'register',
     dashboard: '/',
     setting: 'setting',
