@@ -1,6 +1,6 @@
 class FakeBoardData {
   //👇🏻 Generates a random string
-  fetchID = (max = 1000) => "KAN-" + this.fetchNumber(max);
+  fetchID = (max = 10000) => "KAN-" + this.fetchNumber(max);
   // Math.random()
   // .toString(36)
   // .substring(2, 10);
@@ -121,7 +121,7 @@ class FakeBoardData {
   // 👇🏻 Generates a random list of tasks
   fetchBoard = () => ({
     Todo: {
-      id: `Todo-${this.fetchID(100)}`,
+      id: `Todo-${this.fetchID()}`,
       title: "Todo",
       items: this.fetchTasks(),
     },

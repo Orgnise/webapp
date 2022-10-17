@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var socket = require("../../index");
+const authMiddleware = require("../middleware/auth-middleware");
 
 const FakeBoardData = require("../config/task_data");
 
@@ -11,9 +12,8 @@ module.exports = function() {
   this.tasks = this.board.tasks;
 
   // middleware that is specific to this router
-  router.use((req, res, next) => {
-    next();
-  });
+  router.use(authMiddleware());
+
   // define the home page route
   router.get("/", (req, res) => {
     res.send({ response: this.tasks }).status(200);

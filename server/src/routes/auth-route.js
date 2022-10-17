@@ -8,12 +8,6 @@ const router = express.Router();
 const User = require("../models/user");
 const { TOKEN_KEY } = require("../config/config");
 
-// middleware that is specific to this router
-router.use((req, res, next) => {
-  console.log("Time: ", Date.now());
-  next();
-});
-
 // Register
 router.post("/register", async (req, res) => {
   try {
