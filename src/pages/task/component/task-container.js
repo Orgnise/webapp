@@ -4,35 +4,54 @@ import cx from "classnames";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import useSocket from "../../../hooks/use-socket.hook";
 import Task from "./task";
+import useLocalStorage from "../../../hooks/use-local-storage";
 
 const TasksContainer = () => {
   const [socketState, setSocketData, socket] = useSocket(["tasks"], {});
   const [tasks, setTasks] = useState([]);
   const [errors, setErrors] = useState({});
   const [dragFirstTask, setDragFirstTask] = useState(false);
+  const [user, setUser] = useLocalStorage("user");
 
   useEffect(() => {
     function fetchTasks() {
-      fetch("http://localhost:4000/task")
+      fetch("http://localhost:4000/task", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": user.token,
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
-          setSocketData({
-            tasks: data.response,
-          });
-          setTasks(data.response);
+          if (data.error) {
+            setErrors({ tasks: data.error });
+            console.log("error", data.error);
+          } else {
+            setSocketData({
+              tasks: data.response,
+            });
+            setTasks(data.response);
+            setErrors({ tasks: undefined });
+          }
         })
         .catch((err) => {
-          console.table(err);
+          console.log(err);
           setSocketData({ tasks: [] });
           setErrors({ tasks: "No tasks found" });
         });
     }
-    fetchTasks();
-  }, []);
+    if (user) {
+      fetchTasks();
+    } else {
+      setTasks([]);
+      setErrors({ tasks: "Sign in to view tasks" });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (socketState.tasks) {
-      console.log("Tasks updated");
+      console.log("Tasks updated", socketState.tasks);
       setTasks(socketState.tasks);
     }
   }, [socketState.tasks]);
