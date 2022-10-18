@@ -4,7 +4,6 @@ import "./style/comments.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Comments from "./pages/comments.page";
-import socketIO from "socket.io-client";
 import useLocalStorage from "./hooks/use-local-storage";
 import {
   getLoggedInRoute,
@@ -15,7 +14,6 @@ import {
   Task,
 } from "./helper/routes.helper";
 import { AppRoutes } from "./helper/app-routes";
-import TasksContainer from "./pages/task/component/task-container";
 import useSocket from "./hooks/use-socket.hook";
 import Signup from "./pages/auth/signup.page";
 
@@ -27,30 +25,15 @@ import Signup from "./pages/auth/signup.page";
 // export const socket = socketIO(`http://${window.location.hostname}:4000`);
 
 function App() {
-  const [isConnected, setIsConnected] = useState(false);
-  const [lastPong, setLastPong] = useState(null);
-
-  const [socketState, setSocketState, socket] = useSocket();
-  const [storedValue, setValue] = useLocalStorage("user");
+  const [, , socket] = useSocket();
+  const [storedValue] = useLocalStorage("user");
 
   useEffect(() => {
     if (!socket || !socket.connected) return;
-    socket.on("connect", () => {
-      setIsConnected(true);
-    });
-
-    socket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-
-    socket.on("pong", () => {
-      setLastPong(new Date().toISOString());
-    });
 
     return () => {
       socket.off("connect");
       socket.off("disconnect");
-      socket.off("pong");
     };
   }, [socket]);
 

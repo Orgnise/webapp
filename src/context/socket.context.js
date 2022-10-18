@@ -12,8 +12,9 @@ export default ({ children }) => {
   );
 };
 
-export const withFirebase = (Component) => (props) => (
-  <SocketContext.Consumer>
-    {(firebase, db) => <Component firebase={firebase} db={db} {...props} />}
-  </SocketContext.Consumer>
-);
+export const withSocket = (Component) => (props) =>
+  (
+    <SocketContext.Consumer>
+      {(socket) => <Component socket={socket} {...props} />}
+    </SocketContext.Consumer>
+  );

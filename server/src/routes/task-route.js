@@ -15,15 +15,8 @@ module.exports = function() {
   router.use(authMiddleware());
 
   // define the home page route
-  router.get("/", (req, res) => {
+  router.get("/get", (req, res) => {
     res.send({ response: this.tasks }).status(200);
-  });
-
-  /* GET home page. */
-  router.get("/task", function(req, res, next) {
-    res.render("index", {
-      title: "Express",
-    });
   });
 
   this.initSocket = function(socket) {

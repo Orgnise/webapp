@@ -25,7 +25,7 @@ const Nav = () => {
   };
 
   React.useEffect(() => {
-    console.log("visible", visible);
+    // console.log("visible", visible);
   }, [visible]);
 
   return (

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import cx from "classnames";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import useSocket from "../../../hooks/use-socket.hook";
 import Task from "./task";
 import useLocalStorage from "../../../hooks/use-local-storage";
+import { useAppService } from "../../../hooks/use-app-service";
 
 const TasksContainer = () => {
   const [socketState, setSocketData, socket] = useSocket(["tasks"], {});
@@ -12,35 +12,30 @@ const TasksContainer = () => {
   const [errors, setErrors] = useState({});
   const [dragFirstTask, setDragFirstTask] = useState(false);
   const [user, setUser] = useLocalStorage("user");
+  const { boardService } = useAppService();
 
   useEffect(() => {
     function fetchTasks() {
-      fetch("http://localhost:4000/task", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-token": user.token,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            setErrors({ tasks: data.error });
-            console.log("error", data.error);
-          } else {
-            setSocketData({
-              tasks: data.response,
-            });
-            setTasks(data.response);
-            setErrors({ tasks: undefined });
-          }
+      boardService
+        .getBoard()
+        .then(({ response }) => {
+          setSocketData({
+            tasks: response,
+          });
+          setTasks(response);
+          setErrors({ tasks: undefined });
         })
-        .catch((err) => {
-          console.log(err);
-          setSocketData({ tasks: [] });
-          setErrors({ tasks: "No tasks found" });
+        .catch(({ response }) => {
+          if (response.status === 403) {
+            setErrors({ tasks: "You are not authorized to view this board" });
+          } else {
+            console.log(response.error);
+            setSocketData({ tasks: [] });
+            setErrors({ tasks: "No tasks found" });
+          }
         });
     }
+
     if (user) {
       fetchTasks();
     } else {

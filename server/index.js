@@ -17,7 +17,7 @@ new socket(server, (socket) => {
   taskRouter.initSocket(socket);
 });
 
-app.use("/task", taskRouter.router);
+app.use("/board", taskRouter.router);
 app.use("/auth", authRouter);
 
 // Handling Error

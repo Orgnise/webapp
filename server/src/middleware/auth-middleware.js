@@ -4,12 +4,12 @@ const { TOKEN_KEY } = require("../config/config");
 module.exports = function(options) {
   return function(req, res, next) {
     console.log("🚥: Time: ", new Date().toUTCString());
-    const token = req.headers["x-access-token"];
+    const token = req.headers["x-access-token"] || req.headers["authorization"];
 
     if (!token) {
       return res
         .status(403)
-        .send({ error: "A token is required for authentication" });
+        .json({ error: "A token is required for authentication" });
     }
     try {
       const decoded = jwt.verify(token, TOKEN_KEY);
