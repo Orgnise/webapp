@@ -1,6 +1,8 @@
 const cors = require("cors");
 const express = require("express");
 const connectDb = require("./config/db");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger.config");
 require("dotenv").config();
 const mw = require("./middleware/middleware");
 
@@ -12,5 +14,13 @@ app.use(express.json());
 app.use(cors());
 
 app.use(mw());
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Serve swagger docs the way you like (Recommendation: swagger-tools)
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
 
 module.exports = app;

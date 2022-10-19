@@ -1,3 +1,5 @@
+// routes/task-route.js
+
 var express = require("express");
 var router = express.Router();
 var socket = require("../../index");
@@ -14,7 +16,23 @@ module.exports = function() {
   // middleware that is specific to this router
   router.use(authMiddleware());
 
-  // define the home page route
+  /**
+   * @swagger
+   * /board/get:
+   *   get:
+   *     summary: Get board data
+   *     description: Retrieve board data.
+   *     responses:
+   *       200:
+   *        description: Returns board data
+   *       401:
+   *        description: Unauthorized
+   *     content:
+   *      application/json:
+   *       schema:
+   *      example:
+   *      id: 1
+   */
   router.get("/get", (req, res) => {
     res.send({ response: this.tasks }).status(200);
   });

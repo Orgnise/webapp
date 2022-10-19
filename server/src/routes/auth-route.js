@@ -1,3 +1,5 @@
+// routes/auth-route.js
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
@@ -6,8 +8,16 @@ const router = express.Router();
 
 // importing user context
 const User = require("../models/user");
-const { TOKEN_KEY } = require("../config/config");
+// const { TOKEN_KEY } = require("../config/config");
+const { jwtTokenSecret, jwtExpiration } = require("../config/auth.config");
 
+/**
+ * @swagger
+ * /register:
+ *   get:
+ *     summary: 'Registration'
+ *     description: 'Create new user account'
+ */
 // Register
 router.post("/register", async (req, res) => {
   try {
@@ -42,10 +52,9 @@ router.post("/register", async (req, res) => {
       password: encryptedPassword,
     });
 
-    const tokenKey = TOKEN_KEY;
     // Create token
-    const token = jwt.sign({ user_id: user._id, email }, tokenKey, {
-      expiresIn: "2h",
+    const token = jwt.sign({ user_id: user._id, email }, jwtTokenSecret, {
+      expiresIn: jwtExpiration,
     });
     // save user token
     user.token = token;
@@ -65,7 +74,13 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login
+/**
+ * @swagger
+ * /login:
+ *   get:
+ *     summary: 'Login'
+ *     description: 'Login to user account'
+ */
 router.post("/login", async (req, res) => {
   try {
     // Get user input
@@ -81,9 +96,8 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email: email });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const tokenKey = TOKEN_KEY;
       // Create token
-      const token = jwt.sign({ user_id: user._id, email }, tokenKey, {
+      const token = jwt.sign({ user_id: user._id, email }, jwtTokenSecret, {
         expiresIn: "2h",
       });
 
