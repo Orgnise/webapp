@@ -12,15 +12,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hapi/hapi": "^20.2.2",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
+    "express-jwt": "^7.7.5",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.6.5",
     "nodemon": "^2.0.20",
     "socket.io": "^4.5.2",
     "swagger-jsdoc": "^6.2.5",
-    "swagger-ui-express": "^4.5.0"
+    "swagger-ui-express": "^4.5.0",
+    "yamljs": "^0.3.0"
   }
 }
