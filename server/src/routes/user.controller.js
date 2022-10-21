@@ -8,6 +8,7 @@ const Role = require("../helper/role");
 const UserService = require("../services/user.service");
 
 // routes
+router.post("/register", registerSchema, registerUser);
 router.post("/authenticate", authenticateSchema, authenticate);
 router.post("/refresh-token", refreshToken);
 router.post("/revoke-token", authorize(), revokeTokenSchema, revokeToken);
@@ -21,19 +22,68 @@ function authenticateSchema(req, res, next) {
   const schema = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),
+    ipAddress: Joi.string().required(),
   });
   ValidationRequest(req, next, schema);
 }
 
-function authenticate(req, res, next) {
-  const { email, password } = req.body;
-  const { ipAddress } = req.ip;
+function registerSchema(req, res, next) {
+  const schema = Joi.object({
+    name: Joi.string().alphanum().min(3).max(30).required(),
+    email: Joi.string()
+      .lowercase()
+      .min(6)
+      .max(70)
+      .email({ tlds: { allow: false }, minDomainSegments: 2 })
+      .required(),
+    password: Joi.string().min(6).required().strict(),
+    role: Joi.string().valid(Role.Admin, Role.User).default(Role.User),
+    confirmPassword: Joi.string()
+      .valid(Joi.ref("password"))
+      .required()
+      .strict(),
+  });
+  ValidationRequest(req, next, schema);
+}
 
-  UserService.authenticate({ email, password, ipAddress })
+// Authenticate user
+function authenticate(req, res, next) {
+  const { email, password, ipAddress } = req.body;
+  // const { ipAddress } = req.ip;
+
+  UserService.authenticate({
+    email: email,
+    password: password,
+    ipAddress: ipAddress,
+  })
     .then(({ refreshToken, ...user }) => {
       setTokenCookie(res, refreshToken);
       res.json(user);
     })
+    .catch(next);
+}
+
+// Create a new user account
+function registerUser(req, res, next) {
+  const { name, email, password, role } = req.body;
+  const ipAddress = req.ip;
+
+  UserService.registerUser({
+    name: name,
+    email: email,
+    password: password,
+    role: role,
+    ipAddress: ipAddress,
+  })
+    .then(({ user, refreshToken }) =>
+      res.json({
+        message: "User registered successfully",
+        user: {
+          ...user,
+          refreshToken: refreshToken,
+        },
+      })
+    )
     .catch(next);
 }
 

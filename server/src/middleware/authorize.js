@@ -16,13 +16,14 @@ module.exports = function authorize(roles = []) {
 
     // authorize based on user role
     async (req, res, next) => {
+      console.log("🚥:", roles, "@", new Date().toUTCString());
       const user = await User.findById(req.user.id);
 
       if (!user || (roles.length && !roles.includes(user.role))) {
         // user no longer exists or role not authorized
         return res.status(401).json({ message: "Unauthorized" });
       }
-
+      console.log("user", user);
       // authenticate and authorization successful
       req.user.role = user.role;
       const refreshToken = await RefreshToken.find({ user: user.id });

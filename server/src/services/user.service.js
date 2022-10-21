@@ -14,9 +14,12 @@ module.exports = {
   getAll,
   getById,
   getRefreshTokens,
+  registerUser,
 };
 
+// Authenticate user
 async function authenticate({ email, password, ipAddress }) {
+  console.log("Generating refresh token,", ipAddress);
   const user = await User.findOne({ email });
 
   if (!user || !bcrypt.compareSync(password, user.password)) {
@@ -34,6 +37,47 @@ async function authenticate({ email, password, ipAddress }) {
   return {
     ...basicUserDetails(user),
     jwtToken,
+    refreshToken: refreshToken.token,
+  };
+}
+
+// Register user
+async function registerUser({ name, email, password, role, ipAddress }) {
+  // validate
+  if (await User.findOne({ email })) {
+    throw {
+      message: "Email " + email + " is already registered",
+      status: 400,
+    };
+  }
+
+  encryptedPassword = await bcrypt.hash(password, 10);
+  const user = new User({
+    name,
+    email,
+    password: encryptedPassword,
+    role,
+  });
+
+  const jwtToken = generateJwtToken(user);
+  const refreshToken = generateRefreshToken(user, ipAddress);
+
+  // Save refresh token
+  await refreshToken.save();
+  user.token = jwtToken;
+
+  // save user
+  await user.save();
+
+  return {
+    user: {
+      id: user._id,
+      role: user.role,
+      name: user.name,
+      email: user.email,
+      token: jwtToken,
+      createdAt: user.createdAt,
+    },
     refreshToken: refreshToken.token,
   };
 }
@@ -129,7 +173,7 @@ function generateRefreshToken(user, ipAddress) {
 // Returns a new JWT token containing the user id that expires in 1 hour
 function generateJwtToken(user) {
   // create a jwt token containing the user id that expires in 15 minutes
-  return jwt.sign({ sub: user.id, id: user.id }, config.jwtTokenSecret, {
+  return jwt.sign({ id: user._id, email: user.email }, config.jwtTokenSecret, {
     expiresIn: config.jwtExpiration,
   });
 }
