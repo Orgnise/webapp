@@ -17,9 +17,7 @@ module.exports = function authorize(roles = []) {
 
     // authorize based on user role
     async (req, res, next) => {
-      console.log("🚓", req.auth);
       const user = await User.findById(req.auth.id);
-      console.log("🚀 ~ file: authorize.js ~ line 22 ~ user", user);
 
       if (!user || (roles.length && !roles.includes(user.role))) {
         if (!user) {

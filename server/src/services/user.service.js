@@ -6,6 +6,11 @@ const crypto = require("crypto");
 const db = require("../config/db");
 const User = require("../models/user");
 const RefreshToken = require("../models/refresh-token.model");
+const ApiResponseHandler = require("../helper/response/api-response");
+const {
+  HttpStatusCode,
+} = require("../helper/http-status-code/http-status-code");
+const HttpException = require("../helper/exception/http-exception");
 
 module.exports = {
   authenticate,
@@ -19,11 +24,13 @@ module.exports = {
 
 // Authenticate user
 async function authenticate({ email, password, ipAddress }) {
-  console.log("Generating refresh token,", ipAddress);
   const user = await User.findOne({ email });
 
   if (!user || !bcrypt.compareSync(password, user.password)) {
-    throw "Email or password is incorrect";
+    throw new HttpException(
+      HttpStatusCode.NOT_FOUND,
+      "Email or password is incorrect"
+    );
   }
 
   // Authenticate successful so generate jwt and refresh tokens
@@ -101,13 +108,12 @@ async function getAll() {
 // Returns basicDetails of user by id
 async function getById(id) {
   const user = await getUser(id);
-  return basicDetails(user);
+  return basicUserDetails(user);
 }
 
 async function refreshToken({ token, ipAddress }) {
   const refreshToken = await getRefreshToken(token);
   const { user } = refreshToken;
-
   // replace old refresh token with a new one and save
   const newRefreshToken = generateRefreshToken(user, ipAddress);
   refreshToken.revoked = Date.now();
@@ -130,7 +136,7 @@ async function refreshToken({ token, ipAddress }) {
 // Returns complete user details
 async function getUser(id) {
   if (!Mongoose.Types.ObjectId.isValid(id)) {
-    throw "Invalid User Id";
+    throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid user id");
   } else {
     const user = await User.findById(id);
     if (!user) throw "User not found";
@@ -139,11 +145,11 @@ async function getUser(id) {
 }
 
 // Returns refresh token from db for given token string if it exists, and isn't revoked
-async function getRefreshToken(userId) {
-  // check that user exist
-  await getUser(userId);
-
-  const refreshToken = await RefreshToken.findOne({ user: userId });
+async function getRefreshToken(token) {
+  const refreshToken = await RefreshToken.findOne({ token }).populate("user");
+  if (!refreshToken || !refreshToken.isActive) {
+    throw new HttpException(HttpStatusCode.UNAUTHORIZED, "Invalid token");
+  }
   return refreshToken;
 }
 

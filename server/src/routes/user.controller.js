@@ -6,6 +6,8 @@ const ValidationRequest = require("../middleware/validate-request");
 const authorize = require("../middleware/authorize");
 const Role = require("../helper/role");
 const UserService = require("../services/user.service");
+const ApiResponseHandler = require("../helper/response/api-response");
+const HttpStatusCode = require("../helper/http-status-code/http-status-code");
 
 // routes
 router.post("/register", registerSchema, registerUser);
@@ -47,8 +49,8 @@ function registerSchema(req, res, next) {
 
 // Authenticate user
 function authenticate(req, res, next) {
-  const { email, password, ipAddress } = req.body;
-  // const { ipAddress } = req.ip;
+  const { email, password } = req.body;
+  const ipAddress = req.socket.localAddress;
 
   UserService.authenticate({
     email: email,
@@ -57,7 +59,11 @@ function authenticate(req, res, next) {
   })
     .then(({ refreshToken, ...user }) => {
       setTokenCookie(res, refreshToken);
-      res.json(user);
+      ApiResponseHandler.success({
+        res: res,
+        message: "User authenticated successfully",
+        data: { ...user, refreshToken },
+      });
     })
     .catch(next);
 }
@@ -65,7 +71,7 @@ function authenticate(req, res, next) {
 // Create a new user account
 function registerUser(req, res, next) {
   const { name, email, password, role } = req.body;
-  const ipAddress = req.ip;
+  const ipAddress = req.socket.localAddress;
 
   UserService.registerUser({
     name: name,
@@ -87,8 +93,8 @@ function registerUser(req, res, next) {
 }
 
 function refreshToken(req, res, next) {
-  const token = req.cookie.refreshToken;
-  const ipAddress = req.ip;
+  const token = req.cookies.refreshToken;
+  const ipAddress = req.socket.remoteAddress;
   UserService.refreshToken({ token, ipAddress })
     .then(({ refreshToken, ...user }) => {
       setTokenCookie(res, refreshToken);
@@ -108,14 +114,14 @@ function revokeTokenSchema(req, res, next) {
 function revokeToken(req, res, next) {
   // access token from request body or cookie
   const token = req.body.token || req.cookies.refreshToken;
-  const ipAddress = req.ip;
+  const ipAddress = req.socket.localAddress;
 
   if (!token) {
     return res.status(400).json({ message: "Token is required" });
   }
 
   // users can revoke their own tokens and admins can revoke any tokens
-  if (!req.user.ownsToken(token) && req.user.role !== Role.Admin) {
+  if (!req.auth.ownsToken(token) && req.auth.role !== Role.Admin) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
@@ -133,8 +139,16 @@ function getAll(req, res, next) {
 // Get user by Id
 function getById(req, res, next) {
   // regular users can only access their own account and admins can access any account
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
+    if (req)
+      if (req.auth.role !== Role.Admin) {
+        return ApiResponseHandler.error({
+          res: res,
+          message: "Unauthorized",
+          errorCode: HttpStatusCode.ErrorCode(HttpStatusCode.UNAUTHORIZED),
+          status: HttpStatusCode.UNAUTHORIZED,
+        });
+      }
   }
 
   UserService.getById(req.params.id)
@@ -145,8 +159,13 @@ function getById(req, res, next) {
 // Get refresh token
 function getRefreshTokens(req, res, next) {
   // users can get their own refresh tokens and admins can get any user's refresh tokens
-  if (req.params.id !== req.user.id && req.user.role !== Role.Admin) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
+    return ApiResponseHandler.default.error({
+      res: res,
+      message: "Unauthorized",
+      errorCode: HttpStatusCode.ErrorCode(HttpStatusCode.UNAUTHORIZED),
+      status: HttpStatusCode.UNAUTHORIZED,
+    });
   }
 
   UserService.getRefreshTokens(req.params.id)

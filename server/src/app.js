@@ -1,4 +1,5 @@
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const express = require("express");
 const connectDb = require("./config/db");
 const swaggerUi = require("swagger-ui-express");
@@ -14,6 +15,8 @@ const swaggerDocument = YAML.load("./swagger.yaml");
 connectDb.connect();
 
 const app = express();
+// let’s you use the cookieParser in your application
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
