@@ -12,7 +12,7 @@ router.post("/register", registerSchema, registerUser);
 router.post("/authenticate", authenticateSchema, authenticate);
 router.post("/refresh-token", refreshToken);
 router.post("/revoke-token", authorize(), revokeTokenSchema, revokeToken);
-router.get("/all", authorize(Role.Admin), getAll);
+router.get("/all", authorize(Role.User), getAll);
 router.get("/:id", authorize(), getById);
 router.get("/:id/refresh-tokens", authorize(), getRefreshTokens);
 
@@ -22,7 +22,6 @@ function authenticateSchema(req, res, next) {
   const schema = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),
-    ipAddress: Joi.string().required(),
   });
   ValidationRequest(req, next, schema);
 }
@@ -54,7 +53,7 @@ function authenticate(req, res, next) {
   UserService.authenticate({
     email: email,
     password: password,
-    ipAddress: ipAddress,
+    ipAddress: "ipAddress",
   })
     .then(({ refreshToken, ...user }) => {
       setTokenCookie(res, refreshToken);

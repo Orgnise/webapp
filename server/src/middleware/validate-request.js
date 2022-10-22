@@ -12,17 +12,7 @@ function validateRequest(req, next, schema) {
 
   const { error, value } = schema.validate(req.body, options);
   if (error) {
-    // next(`Validation error: ${error.details.map((x) => x.message).join(", ")}`);
-    // next({
-    //   name: "ValidationError",
-    //   code: "VALIDATION_ERROR",
-    //   status: 400,
-    //   message: error.details.map((x) => x.message).join(", "),
-    // });
-    // Joi Error
-    console.log(error);
     const JoiError = {
-      status: "failed",
       status: 422,
       message: "Invalid request data. Please review request and try again.",
       error: error.details.map((x) => {
@@ -31,13 +21,6 @@ function validateRequest(req, next, schema) {
           [key]: x.message.replace(/['"]/g, ""),
         };
       }),
-    };
-
-    // Custom Error
-    const CustomError = {
-      code: "ValidationError",
-      states: 422,
-      error: "Invalid request data. Please review request and try again.",
     };
 
     next(JoiError);

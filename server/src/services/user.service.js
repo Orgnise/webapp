@@ -94,8 +94,8 @@ async function revokeToken({ token, ipAddress }) {
 
 // Returns basic details for all users
 async function getAll() {
-  const users = await db.User.find();
-  return users.map((x) => basicDetails(x));
+  const users = await User.find();
+  return users.map((x) => basicUserDetails(x));
 }
 
 // Returns basicDetails of user by id
