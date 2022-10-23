@@ -4,14 +4,17 @@ import { Link, useNavigate } from "react-router-dom";
 import loginSvg from "../../assets/secure-login-animate.svg";
 import { AppRoutes } from "../../helper/app-routes";
 import useLocalStorage from "../../hooks/use-local-storage";
+import { useAppService } from "../../hooks/use-app-service";
 
 const Signup = () => {
-  const [email, setEmail] = useState();
-  const [name, setName] = useState();
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [errors, setError] = useState({});
-  const [password, setPassword] = useState();
-  const [cPassword, setCPassword] = useState();
+  const [password, setPassword] = useState("");
+  const [cPassword, setCPassword] = useState("");
   const history = useNavigate();
+  const { authService } = useAppService();
+  const [_, setValue] = useLocalStorage("user", null);
 
   const validEmailRegex = RegExp(
     /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
@@ -20,10 +23,19 @@ const Signup = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     if (!email || !password || !cPassword || !name) {
-      alert("Please enter email and password");
+      setError({
+        ...errors,
+        email: "Email is required",
+        password: "Password is required",
+        cPassword: "Confirm Password is required",
+        name: "Name is required",
+      });
       return;
     } else if (password !== cPassword) {
-      alert("Password and confirm password should be same");
+      setError({
+        ...errors,
+        confirmPassword: "Password and confirm password should be same",
+      });
       return;
     }
     if (errors.email || errors.password || errors.name) {
@@ -36,36 +48,51 @@ const Signup = () => {
       }
       return;
     } else {
-      fetch("http://localhost:4000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      setError({});
+      authService
+        .register({
           name: name,
           email: email,
           password: password,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) {
-            alert(data.error);
-          } else {
-            alert("User created successfully");
-            history(AppRoutes.login);
-          }
+          confirmPassword: cPassword,
         })
-        .catch((err) => console.log(err));
+        .then(({ user }) => {
+          console.log("User registered successfully");
+          setValue(user);
+          history(AppRoutes.dashboard);
+          console.log("New user created", user);
+          window.location.reload();
+        })
+        .catch(({ response }) => {
+          const { status, errorCode, message, error } = response.data;
+          if (status === 422 && Array.isArray(error)) {
+            const errors = {};
+            error.forEach((err) => {
+              errors[Object.keys(err)[0]] = Object.values(err)[0];
+            });
+            setError(errors);
+            if (errors.confirmPassword) {
+              setError({
+                ...errors,
+                confirmPassword: "Password and confirm password should be same",
+              });
+            }
+            console.log(
+              "🚀 ~ file: signup.page.js ~ line 89 ~ handleLogin ~ errors",
+              errors
+            );
+          } else {
+            alert(Array.isArray(error) ? error[0] : message);
+          }
+        });
     }
   };
 
   const handleChange = (event) => {
     event.preventDefault();
     const { name, value } = event.target;
-
     switch (name) {
-      case "fullName":
+      case "name":
         setError({
           ...errors,
           name:
@@ -87,10 +114,11 @@ const Signup = () => {
         setError({
           ...errors,
           password:
-            value.length < 8
-              ? "Password must be at least 8 characters long!"
+            value.length < 6
+              ? "Password must be at least 6 characters long!"
               : undefined,
         });
+        break;
 
         break;
       default:
@@ -113,88 +141,55 @@ const Signup = () => {
               We are <span className="text-teal-500">happy</span> to have you
             </p>
           </div>
-          <div className="flex flex-col space-y-2 w-9/12">
-            <label className="text-md  text-slate-500">Full Name</label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter fullname"
-              className="border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm"
-              required
-              onChange={(e) => {
-                setName(e.target.value);
-                /// Debounce function
-                setTimeout(() => {
-                  handleChange(e);
-                }, 1000);
-              }}
-              value={name}
-              autoComplete="name"
-            />
-          </div>
-          <div className="flex flex-col space-y-2 w-9/12">
-            <label className="text-md  text-slate-500">Email</label>
-            <input
-              type="text"
-              name="email"
-              placeholder="Enter email"
-              className={cx(
-                "border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm",
-                {
-                  "border-red-500 ": errors.email,
-                }
-              )}
-              required
-              onChange={(e) => {
-                setEmail(e.target.value);
-                /// Debounce function
-                setTimeout(() => {
-                  handleChange(e);
-                }, 1000);
-              }}
-              value={email}
-              autoComplete="email"
-            />
-          </div>
 
-          <div className="flex flex-col space-y-2 w-9/12">
-            <label className="text-md text-slate-500 "> Password</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              className="border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm"
-              required
-              onChange={(e) => {
-                setPassword(e.target.value);
-                /// Debounce function
-                setTimeout(() => {
-                  handleChange(e);
-                }, 1000);
-              }}
-              value={password}
-              autoComplete="current-password"
-            />
-          </div>
-          <div className="flex flex-col space-y-2 w-9/12">
-            <label className="text-md text-slate-500 ">Confirm Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Enter confirm password"
-              className="border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm"
-              required
-              onChange={(e) => {
-                setCPassword(e.target.value);
-                /// Debounce function
-                setTimeout(() => {
-                  handleChange(e);
-                }, 1000);
-              }}
-              value={cPassword}
-              autoComplete="confirm-password"
-            />
-          </div>
+          <TextField
+            label="Fullname"
+            name="name"
+            onChange={(e) => {
+              setName(e.target.value);
+              handleChange(e);
+            }}
+            value={name}
+            autoComplete="name"
+            error={errors.name}
+            inputType="text"
+          />
+          <TextField
+            label="Email"
+            name="email"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              handleChange(e);
+            }}
+            value={email}
+            autoComplete="email"
+            error={errors.email}
+            inputType="email"
+          />
+          <TextField
+            label="Password"
+            name="password"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              handleChange(e);
+            }}
+            value={password}
+            autoComplete="password"
+            error={errors.password}
+            inputType="password"
+          />
+          <TextField
+            label="Confirm Password"
+            name="cpassword"
+            onChange={(e) => {
+              setCPassword(e.target.value);
+              handleChange(e);
+            }}
+            value={cPassword}
+            autoComplete="confirm-password"
+            error={errors.confirmPassword}
+            inputType="password"
+          />
           <button className="bg-teal-400 px-6 py-2 rounded text-white w-9/12 font-normal mt-8">
             Sign up
           </button>
@@ -210,5 +205,45 @@ const Signup = () => {
     </div>
   );
 };
+
+function TextField({
+  label,
+  inputType = "text",
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+  autoComplete,
+}) {
+  return (
+    <div className="flex flex-col space-y-2 w-9/12">
+      <label className="text-md text-slate-500 "> {label}</label>
+      <input
+        type={inputType}
+        name={name}
+        placeholder={`Enter ${label}`}
+        className={cx(
+          "border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase",
+          {
+            "border-red-500 ": error,
+          }
+        )}
+        required
+        onChange={onChange}
+        value={value}
+        autoComplete={autoComplete}
+      />
+      <label
+        className={cx("text-red-500 text-xs", {
+          "inline-block  scale-100": error !== "" && error !== undefined,
+          "h-0": !error,
+        })}
+      >
+        {error}
+      </label>
+    </div>
+  );
+}
 
 export default Signup;

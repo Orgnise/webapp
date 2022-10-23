@@ -18,5 +18,10 @@ export const Endpoints = {
         update: '/tasks/update',
         delete: '/tasks/delete',
         get: '/tasks',
+    },
+    auth: {
+        login: '/auth/login',
+        register: '/auth/register',
+        logout: '/auth/logout',
     }
 }

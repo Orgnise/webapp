@@ -30,7 +30,7 @@ function authenticateSchema(req, res, next) {
 
 function registerSchema(req, res, next) {
   const schema = Joi.object({
-    name: Joi.string().alphanum().min(3).max(30).required(),
+    name: Joi.string().min(3).max(30).required(),
     email: Joi.string()
       .lowercase()
       .min(6)
@@ -81,12 +81,12 @@ function registerUser(req, res, next) {
     ipAddress: ipAddress,
   })
     .then(({ user, refreshToken }) =>
-      res.json({
+      ApiResponseHandler.success({
+        res: res,
+        data: { ...user, refreshToken },
+        dataKey: "user",
         message: "User registered successfully",
-        user: {
-          ...user,
-          refreshToken: refreshToken,
-        },
+        status: HttpStatusCode.CREATED,
       })
     )
     .catch(next);

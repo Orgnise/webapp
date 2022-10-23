@@ -13,7 +13,9 @@ import AppService from "../service/app-service";
 export function useAppService() {
     const appService = useContext<AppService>(AppServiceContext as any);
     const boardService = appService.boardService;
+    const authService = appService.authService;
     return {
-        boardService
+        boardService,
+        authService
     }
 }
