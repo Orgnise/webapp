@@ -1,40 +1,59 @@
 import React, { useState } from "react";
+import cx from "classnames";
 import { Link, useNavigate } from "react-router-dom";
 import loginSvg from "../../assets/secure-login-animate.svg";
 import { AppRoutes } from "../../helper/app-routes";
+import { useAppService } from "../../hooks/use-app-service";
 import useLocalStorage from "../../hooks/use-local-storage";
 
 const Login = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setError] = useState({});
   const history = useNavigate();
   const [storedValue, setValue] = useLocalStorage("user", null);
 
+  const { authService } = useAppService();
+
   const handleLogin = (e) => {
     e.preventDefault();
-    fetch("http://localhost:4000/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: email,
-        password: password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          console.log("User login successfully");
-          setValue(data.user);
-          history(AppRoutes.dashboard);
-          console.log("New user created", data);
-          window.location.reload();
-        }
+    if (password.length < 6) {
+      setError({
+        ...errors,
+        password: "Password should be atleast 6 characters long",
+      });
+      return;
+    }
+    setError({});
+    authService
+      .login({ email, password })
+      .then(({ user }) => {
+        console.log("User authenticate successfully");
+        setValue(user);
+        history(AppRoutes.dashboard);
+        window.location.reload();
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        const response = err.response;
+        if (!response) {
+          console.error(
+            "🚀 ~ file: login.page.js ~ line 43 ~ handleLogin ~ response",
+            response
+          );
+
+          return;
+        }
+        const { status, errorCode, message, error } = response.data;
+        if (status === 422 && Array.isArray(error)) {
+          const errors = {};
+          error.forEach((err) => {
+            errors[Object.keys(err)[0]] = Object.values(err)[0];
+          });
+          setError(errors);
+        } else {
+          alert(Array.isArray(error) ? error[0] : message);
+        }
+      });
   };
 
   return (
@@ -53,7 +72,7 @@ const Login = () => {
               back
             </p>
           </div>
-          <div className="flex flex-col space-y-2 w-9/12">
+          {/* <div className="flex flex-col space-y-2 w-9/12">
             <label className="text-md  text-slate-500">Email</label>
             <input
               type="text"
@@ -78,7 +97,31 @@ const Login = () => {
               value={password}
               autoComplete="current-password"
             />
-          </div>
+          </div> */}
+          <TextField
+            label="Email"
+            name="email"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              // handleChange(e);
+            }}
+            value={email}
+            autoComplete="email"
+            error={errors.email}
+            inputType="email"
+          />
+          <TextField
+            label="Password"
+            name="password"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              // handleChange(e);
+            }}
+            value={password}
+            autoComplete="password"
+            error={errors.password}
+            inputType="password"
+          />
           <div className="flex items-center w-9/12 text-slate-500">
             <input
               className="h-5 w-5 rounded mr-3"
@@ -104,5 +147,44 @@ const Login = () => {
     </div>
   );
 };
+function TextField({
+  label,
+  inputType = "text",
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+  autoComplete,
+}) {
+  return (
+    <div className="flex flex-col space-y-2 w-9/12">
+      <label className="text-md text-slate-500 "> {label}</label>
+      <input
+        type={inputType}
+        name={name}
+        placeholder={`Enter ${label}`}
+        className={cx(
+          "border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase",
+          {
+            "border-red-500 ": error,
+          }
+        )}
+        required
+        onChange={onChange}
+        value={value}
+        autoComplete={autoComplete}
+      />
+      <label
+        className={cx("text-red-500 text-xs", {
+          "inline-block  scale-100": error !== "" && error !== undefined,
+          "h-0": !error,
+        })}
+      >
+        {error}
+      </label>
+    </div>
+  );
+}
 
 export default Login;

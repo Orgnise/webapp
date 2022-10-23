@@ -11,7 +11,7 @@ const HttpStatusCode = require("../helper/http-status-code/http-status-code");
 
 // routes
 router.post("/register", registerSchema, registerUser);
-router.post("/authenticate", authenticateSchema, authenticate);
+router.post("/login", authenticateSchema, authenticate);
 router.post("/refresh-token", refreshToken);
 router.post("/revoke-token", authorize(), revokeTokenSchema, revokeToken);
 router.get("/all", authorize(Role.User), getAll);
@@ -63,6 +63,7 @@ function authenticate(req, res, next) {
         res: res,
         message: "User authenticated successfully",
         data: { ...user, refreshToken },
+        dataKey: "user",
       });
     })
     .catch(next);

@@ -28,7 +28,7 @@ async function authenticate({ email, password, ipAddress }) {
 
   if (!user || !bcrypt.compareSync(password, user.password)) {
     throw new HttpException(
-      HttpStatusCode.NOT_FOUND,
+      HttpStatusCode.UNAUTHORIZED,
       "Email or password is incorrect"
     );
   }

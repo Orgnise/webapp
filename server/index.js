@@ -23,8 +23,8 @@ new socket(server, (socket) => {
 // global error middleware
 
 app.use("/board", taskRouter.router);
-app.use("/auth", authRouter);
-app.use("/users", UserController);
+// app.use("/auth", authRouter);
+app.use("/auth", UserController);
 
 // Handle unknown routes
 app.use("*", function (req, res, next) {
