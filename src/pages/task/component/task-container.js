@@ -18,18 +18,18 @@ const TasksContainer = () => {
     function fetchTasks() {
       boardService
         .getBoard()
-        .then(({ response }) => {
+        .then(({ board }) => {
           setSocketData({
-            tasks: response,
+            tasks: board,
           });
-          setTasks(response);
-          setErrors({ tasks: undefined });
+          setTasks(board);
+          setErrors({});
         })
         .catch(({ response }) => {
           if (response.status === 403) {
             setErrors({ tasks: "You are not authorized to view this board" });
           } else {
-            console.log(response.error);
+            console.log(response.data);
             setSocketData({ tasks: [] });
             setErrors({ tasks: "No tasks found" });
           }

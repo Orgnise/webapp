@@ -6,7 +6,6 @@ const crypto = require("crypto");
 const db = require("../config/db");
 const User = require("../models/user");
 const RefreshToken = require("../models/refresh-token.model");
-const ApiResponseHandler = require("../helper/response/api-response");
 const {
   HttpStatusCode,
 } = require("../helper/http-status-code/http-status-code");
@@ -20,6 +19,7 @@ module.exports = {
   getById,
   getRefreshTokens,
   registerUser,
+  getUserFromJwtToken,
 };
 
 // Authenticate user
@@ -133,7 +133,7 @@ async function refreshToken({ token, ipAddress }) {
   };
 }
 
-// Returns complete user details
+// Returns complete user details using the given user id
 async function getUser(id) {
   if (!Mongoose.Types.ObjectId.isValid(id)) {
     throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid user id");
@@ -142,6 +142,15 @@ async function getUser(id) {
     if (!user) throw "User not found";
     return user;
   }
+}
+
+// Returns basic details for a user using given jwt token
+async function getUserFromJwtToken(token) {
+  const decoded = jwt.verify(token, config.jwtTokenSecret);
+  const user = await User.findById(decoded.id);
+  if (!user)
+    throw new HttpException(HttpStatusCode.UNAUTHORIZED, "Invalid token");
+  return user;
 }
 
 // Returns refresh token from db for given token string if it exists, and isn't revoked

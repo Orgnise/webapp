@@ -22,7 +22,7 @@ module.exports = function authorize(roles = []) {
       if (!user || (roles.length && !roles.includes(user.role))) {
         if (!user) {
           // user no longer exists
-          return ApiResponseHandler.default.error({
+          return ApiResponseHandler.error({
             res: res,
             message: "",
             status: 401,
@@ -32,7 +32,7 @@ module.exports = function authorize(roles = []) {
           // return ApiResponseHandler(res, 401, "Unauthorized");
         } else {
           // User is not authorized to access this route
-          return ApiResponseHandler.default.error({
+          return ApiResponseHandler.error({
             res: res,
             message: "Not authorized to access this resource",
             status: 401,
