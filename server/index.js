@@ -2,10 +2,14 @@ const chalk = require("chalk");
 const app = require("./src/app");
 const SocketIO = require("./src/config/socket");
 const mw = require("./src//middleware/middleware");
-var BoardController = require("./src/routes/board.controller");
-var authRouter = require("./src/routes/auth-route");
 const errorHandler = require("./src/middleware/handle-error/error-handler");
-const UserController = require("./src/routes/user.controller");
+const {
+  UserController,
+  BoardController,
+  IssueController,
+  CompanyController,
+  ProjectController,
+} = require("./src/routes");
 
 const { API_PORT } = require("./src/config/config");
 
@@ -21,8 +25,11 @@ global.socket = socket;
 
 // global error middleware
 
-app.use("/board", BoardController);
 app.use("/auth", UserController);
+app.use("/company", CompanyController);
+app.use("/board", BoardController);
+app.use("/project", ProjectController);
+app.use("/issue", IssueController);
 
 // Handle unknown routes
 app.use("*", function (req, res, next) {
