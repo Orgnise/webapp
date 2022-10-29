@@ -25,11 +25,10 @@ global.socket = socket;
 
 // global error middleware
 
-app.use("/auth", UserController);
-app.use("/company", CompanyController);
-app.use("/board", BoardController);
-app.use("/project", ProjectController);
-app.use("/issue", IssueController);
+app.use("/", UserController);
+app.use("/", CompanyController);
+app.use("/", ProjectController);
+app.use("/", IssueController);
 
 // Handle unknown routes
 app.use("*", function (req, res, next) {

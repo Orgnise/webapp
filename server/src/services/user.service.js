@@ -136,7 +136,7 @@ async function refreshToken({ token, ipAddress }) {
 // Returns complete user details using the given user id
 async function getUser(id) {
   if (!Mongoose.Types.ObjectId.isValid(id)) {
-    throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid user id");
+    throw new HttpException(HttpStatusCode.BAD_REQUEST, "", "Invalid user id");
   } else {
     const user = await User.findById(id);
     if (!user) throw "User not found";
@@ -149,15 +149,25 @@ async function getUserFromJwtToken(token) {
   const decoded = jwt.verify(token, config.jwtTokenSecret);
   const user = await User.findById(decoded.id);
   if (!user)
-    throw new HttpException(HttpStatusCode.UNAUTHORIZED, "Invalid token");
+    throw new HttpException(HttpStatusCode.UNAUTHORIZED, "", "Invalid token");
   return user;
 }
 
 // Returns refresh token from db for given token string if it exists, and isn't revoked
-async function getRefreshToken(token) {
-  const refreshToken = await RefreshToken.findOne({ token }).populate("user");
-  if (!refreshToken || !refreshToken.isActive) {
-    throw new HttpException(HttpStatusCode.UNAUTHORIZED, "Invalid token");
+async function getRefreshToken(rfToken) {
+  const refreshToken = await RefreshToken.findOne({ rfToken }).populate("user");
+  if (!refreshToken) {
+    throw new HttpException(
+      HttpStatusCode.UNAUTHORIZED,
+      "Invalid token",
+      "Refresh token not found"
+    );
+  } else if (!refreshToken.isActive) {
+    throw new HttpException(
+      HttpStatusCode.UNAUTHORIZED,
+      "Token expired",
+      "Refresh token expired token"
+    );
   }
   return refreshToken;
 }

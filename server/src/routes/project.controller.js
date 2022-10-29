@@ -4,7 +4,7 @@ const Joi = require("joi");
 const ValidationRequest = require("../middleware/validate-request");
 const authorize = require("../middleware/authorize");
 const { Project, User, Board } = require("../models");
-const { CompanyService } = require("../services");
+const { CompanyService, ProjectService } = require("../services");
 const ApiResponseHandler = require("../helper/response/api-response");
 
 const {
@@ -12,27 +12,61 @@ const {
 } = require("../helper/http-status-code/http-status-code");
 const FakeBoardData = require("../config/task_data");
 
-router.get("/create", authorize(), createProjectSchema, createProject);
+router.get("/company/:id/project/get_all", authorize(), getAllProjects);
+router.post(
+  "/company/:id/project/create",
+  authorize(),
+  createProjectSchema,
+  createProject
+);
+// router.get("/:id", authorize(), getById);
 
 function createProjectSchema(req, res, next) {
   const schema = Joi.object({
     name: Joi.string().min(3).max(30).required(),
-    description: Joi.string().min(3).max(180),
-    createdBy: Joi.string().required(),
+    description: Joi.string().min(3).max(280),
     members: Joi.array().items(Joi.string()),
   });
   ValidationRequest(req, next, schema);
 }
 
 function createProject(req, res, next) {
-  CompanyService.createProject(req.body)
-    .then((board) => {
+  const { name, description, members } = req.body;
+  const companyId = req.params.id;
+  const user = req.auth;
+
+  ProjectService.crateProject({
+    companyId: companyId,
+    name: name,
+    description: description,
+    members: members,
+    userId: user.id,
+  })
+    .then((project) => {
       return ApiResponseHandler.success({
         res: res,
-        data: board,
+        data: project,
         message: "Project created successfully",
         dataKey: "project",
         status: HttpStatusCode.CREATED,
+      });
+    })
+    .catch(next);
+}
+
+function getAllProjects(req, res, next) {
+  const user = req.auth;
+  const companyId = req.params.id;
+
+  ProjectService.getAllProjects(companyId)
+    .then((companies) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: companies,
+        message: "Projects fetched successfully",
+        dataKey: "Projects",
+        status: HttpStatusCode.OK,
+        total: companies.length,
       });
     })
     .catch(next);

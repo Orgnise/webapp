@@ -5,7 +5,7 @@ const ProjectController = require("./project.controller");
 const IssueController = require("./issue.controller");
 
 module.exports = {
-  BoardController,
+  // BoardController,
   UserController,
   CompanyController,
   ProjectController,

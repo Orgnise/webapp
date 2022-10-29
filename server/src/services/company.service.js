@@ -1,3 +1,4 @@
+const Mongoose = require("mongoose");
 const db = require("../config/db");
 const { promise: fs } = require("fs");
 const { User, Company } = require("../models");
@@ -45,14 +46,9 @@ async function createCompany(body, userId) {
       name,
       description,
       createdBy: user.id,
+      members: [{ user: user.id, role: user.role, _id: user.id }],
     });
-    return {
-      id: company._id,
-      name: company.name,
-      description: company.description,
-      members: company.members,
-      createdBy: user,
-    };
+    return company;
   } catch (error) {
     throw new HttpException(
       HttpStatusCode.INTERNAL_SERVER_ERROR,
@@ -66,20 +62,26 @@ async function createCompany(body, userId) {
  * @param {ObjectId} companyId
  */
 async function getById(id) {
-  if (!id) {
+  if (!Mongoose.isValidObjectId(id)) {
     throw new HttpException(
-      HttpStatusCode.UNPROCESSABLE_ENTITY,
-      "companyId is required"
+      HttpStatusCode.BAD_REQUEST,
+      "",
+      "Invalid company id"
     );
   } else {
-    const company = await Company.findOne({ id: id });
-    if (!company) throw "Board not found";
-    console.log(
-      "🚀 ~ file: company.service.js ~ line 78 ~ getById ~ company",
-      company
-    );
-    // return getBasicCompanyInfo(company);
-    return company.toObject();
+    const company = await Company.findOne({ _id: id }).populate({
+      path: "members.user",
+      select: "name email id",
+    });
+    if (!company) {
+      throw new HttpException(
+        HttpStatusCode.NOT_FOUND,
+        "No company found with this id",
+        "Company not found"
+      );
+    }
+
+    return getBasicCompanyInfo(company);
   }
 }
 
@@ -94,11 +96,17 @@ async function getAllCompany(userId) {
   if (!userId) {
     throw new HttpException(
       HttpStatusCode.UNPROCESSABLE_ENTITY,
+      "userId cannot be empty or null",
       "userId is required"
     );
   }
   try {
-    const companies = await Company.find({ createdBy: userId });
+    const companies = await Company.find({ createdBy: userId }).populate({
+      path: "members.user",
+      select: "name email",
+      transform: (doc) =>
+        doc == null ? null : { name: doc.name, email: doc.email },
+    });
     return Promise.all(
       companies.map(async (company) => {
         const cc = getBasicCompanyInfo(company);
@@ -106,9 +114,11 @@ async function getAllCompany(userId) {
         return cc;
       })
     );
+    return companies;
   } catch (error) {
     throw new HttpException(
       HttpStatusCode.INTERNAL_SERVER_ERROR,
+      "",
       error.message
     );
   }

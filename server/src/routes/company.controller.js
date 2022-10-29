@@ -12,9 +12,10 @@ const {
 } = require("../helper/http-status-code/http-status-code");
 const FakeBoardData = require("../config/task_data");
 
-router.get("/create", authorize(), createCompanySchema, createCompany);
-router.get("/getAll", authorize(), createCompanySchema, getAllCompany);
-router.get("/:id", authorize(), getCompanyById);
+router.post("/company/create", authorize(), createCompanySchema, createCompany);
+router.get("/company/get_all", authorize(), getAllCompany);
+router.get("/company/get_by_id/:id", authorize(), getCompanyById);
+router;
 
 function createCompanySchema(req, res, next) {
   const schema = Joi.object({

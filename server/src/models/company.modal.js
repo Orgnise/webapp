@@ -1,4 +1,5 @@
 const Mongoose = require("mongoose");
+const Role = require("../helper/role");
 const Schema = Mongoose.Schema;
 
 const CompanySchema = new Schema(
@@ -22,18 +23,18 @@ const CompanySchema = new Schema(
     },
     members: [
       {
-        type: Mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        user: {
+          type: Mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        role: {
+          type: String,
+          enum: [Role.Admin, Role.User],
+          default: "member",
+        },
       },
     ],
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
     deactivatedAt: {
       type: Date,
     },
@@ -53,12 +54,14 @@ const CompanySchema = new Schema(
   },
   {
     timestamps: true,
-
-    toObject: {
+    toJSON: {
       transform: (obj, ret) => {
         delete ret.__v;
         ret.id = ret._id;
         delete ret._id;
+        // ret.members.user.id = user._id;
+        // delete ret.members.user._id;
+
         return ret;
       },
     },

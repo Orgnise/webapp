@@ -1,61 +1,61 @@
 const Mongoose = require("mongoose");
 
-const ProjectSchema = new Mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 3,
-  },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 3,
-  },
-  owner: {
-    type: Mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  members: [
-    {
+const ProjectSchema = new Mongoose.Schema(
+  {
+    company: {
+      type: Mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 3,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 3,
+    },
+    members: [
+      {
+        ...{
+          type: Mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        role: {
+          type: String,
+          enum: ["admin", "member"],
+          default: "member",
+        },
+      },
+    ],
+    completedAt: {
+      type: Date,
+      default: undefined,
+    },
+    createdBy: {
       type: Mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-  ],
-  contributors: [
-    {
-      type: Mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-  isDeactivated: {
-    type: Boolean,
-    default: false,
-  },
-  deactivatedAt: {
-    type: Date,
-    default: null,
-  },
-  deactivatedBy: {
-    type: Mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    default: null,
-  },
-  deactivatedNote: {
-    type: String,
-    default: null,
+  { timestamps: true }
+);
+
+ProjectSchema.virtual("isCompleted").get(function () {
+  return this.completedAt !== null;
+});
+
+ProjectSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    delete ret.__v;
+    ret.id = ret._id;
+    delete ret._id;
+    return ret;
   },
 });
 
