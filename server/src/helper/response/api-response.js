@@ -9,11 +9,13 @@ module.exports = class ApiResponseHandler {
     status = HttpStatusCode.OK,
     message,
     dataKey = "data",
+    total,
   }) {
     const response = {
       message,
       status,
       [dataKey]: data,
+      total,
     };
     return res.status(status).json(response);
   }

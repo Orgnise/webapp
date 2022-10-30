@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
 const ValidationRequest = require("../middleware/validate-request");
-// const authorize = require("../middleware/auth-middleware");
 const authorize = require("../middleware/authorize");
 const Role = require("../helper/role");
 const UserService = require("../services/user.service");
@@ -10,13 +9,13 @@ const ApiResponseHandler = require("../helper/response/api-response");
 const HttpStatusCode = require("../helper/http-status-code/http-status-code");
 
 // routes
-router.post("/register", registerSchema, registerUser);
-router.post("/login", authenticateSchema, authenticate);
-router.post("/refresh-token", refreshToken);
-router.post("/revoke-token", authorize(), revokeTokenSchema, revokeToken);
-router.get("/all", authorize(Role.User), getAll);
-router.get("/:id", authorize(), getById);
-router.get("/:id/refresh-tokens", authorize(), getRefreshTokens);
+router.post("/auth/register", registerSchema, registerUser);
+router.post("/auth/login", authenticateSchema, authenticate);
+router.post("/auth/refresh-token", refreshToken);
+router.post("/auth/revoke-token", authorize(), revokeTokenSchema, revokeToken);
+router.get("/authall", authorize(Role.User), getAll);
+router.get("/auth:id", authorize(), getById);
+router.get("/auth:id/refresh-tokens", authorize(), getRefreshTokens);
 
 module.exports = router;
 
@@ -94,9 +93,9 @@ function registerUser(req, res, next) {
 }
 
 function refreshToken(req, res, next) {
-  const token = req.cookies.refreshToken;
+  const refreshToken = req.cookies.refreshToken;
   const ipAddress = req.socket.remoteAddress;
-  UserService.refreshToken({ token, ipAddress })
+  UserService.refreshToken({ refreshToken, ipAddress })
     .then(({ refreshToken, ...user }) => {
       setTokenCookie(res, refreshToken);
       res.json(user);

@@ -1,39 +1,40 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const RefreshTokenSchema = new Schema({
-  token: {
-    type: String,
-    required: true,
-    unique: true,
+const RefreshTokenSchema = new Schema(
+  {
+    token: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    expires: {
+      type: Date,
+      required: true,
+    },
+    createdByIp: {
+      type: String,
+      required: true,
+    },
+    revoked: {
+      type: Date,
+    },
+    revokedByIp: {
+      type: String,
+    },
+    replacedByToken: {
+      type: String,
+    },
   },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  expires: {
-    type: Date,
-    required: true,
-  },
-  created: {
-    type: Date,
-    default: Date.now,
-  },
-  createdByIp: {
-    type: String,
-    required: true,
-  },
-  revoked: {
-    type: Date,
-  },
-  revokedByIp: {
-    type: String,
-  },
-  replacedByToken: {
-    type: String,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 RefreshTokenSchema.virtual("isExpired").get(function () {
   return Date.now() >= this.expires;

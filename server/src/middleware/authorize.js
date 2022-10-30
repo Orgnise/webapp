@@ -20,28 +20,26 @@ module.exports = function authorize(roles = []) {
       const user = await User.findById(req.auth.id);
 
       if (!user || (roles.length && !roles.includes(user.role))) {
+        console.log("🚀 ~ file: authorize.js ~ line 23 ~ user", user);
         if (!user) {
           // user no longer exists
-          return ApiResponseHandler.default.error({
+          return ApiResponseHandler.error({
             res: res,
-            message: "",
+            message: "User not found",
             status: 401,
-            errors: null,
             errorCode: "Unauthorized",
           });
           // return ApiResponseHandler(res, 401, "Unauthorized");
         } else {
           // User is not authorized to access this route
-          return ApiResponseHandler.default.error({
+          return ApiResponseHandler.error({
             res: res,
             message: "Not authorized to access this resource",
             status: 401,
-            errors: null,
             errorCode: "Unauthorized",
           });
         }
       }
-      console.log("user", user);
       // authenticate and authorization successful
       // req.user.role = user.role;
       const refreshToken = await RefreshToken.find({ user: user.id });
