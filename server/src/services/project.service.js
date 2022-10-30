@@ -17,21 +17,11 @@ module.exports = {
   getAllProjects,
 };
 
-async function getById(userId) {
-  if (!id) {
-    throw new HttpException(HttpStatusCode.NOT_FOUND, "Board not found");
-  } else {
-    const board = await Company.find({ createdBy: userId });
-    if (!board) throw "Board not found";
-    return board;
-  }
-}
-
 /**
  * create new task and save to db
  * @param {Object} taskBody
  * @returns {Promise<Task>}
- * @throws {Error}
+ * @throws {HttpException}
  */
 async function crateProject({ companyId, name, description, members, userId }) {
   try {
@@ -41,45 +31,40 @@ async function crateProject({ companyId, name, description, members, userId }) {
     // Check if user exists in company
     const company = await CompanyService.getById(companyId);
 
-    // Check if company exists
-    if (!company) {
-      throw new HttpException(
-        HttpStatusCode.BAD_REQUEST,
-        "Company does not exists"
-      );
-    }
+    // Check user data within company
     const teamMember = company.members.find((member) => {
-      // console.log(
-      //   "🚀 ~ file: project.service.js ~ line 57 member",
-      //   member.user._id._id,
-      //   ", userId:",
-      //   new Mongoose.Types.ObjectId(userId)
-      // );
       return member.user._id._id == userId;
     });
-    console.log(
-      "🚀 ~ file: project.service.js ~ line 59 ~ isTeamMember ~ isTeamMember",
-      teamMember
-    );
 
+    // Check if user is a member of company
     if (!teamMember) {
       throw new HttpException(
-        HttpStatusCode.BAD_REQUEST,
-        "User not exists in company"
+        HttpStatusCode.FORBIDDEN,
+        "You are not a member of this company",
+        "Not allowed to create project"
       );
     }
 
-    // Set user role to admin in company
+    // Set user role to admin for project
     user.role = role.Admin;
     const project = await Project.create({
       name: name,
       description: description,
-      members: members,
+      members: [
+        {
+          user: user.id,
+          role: user.role,
+          _id: user.id,
+        },
+      ],
       createdBy: user.id,
       company: company.id,
     });
+
+    // Save project to database
     project.save();
 
+    // return project
     return project;
   } catch (error) {
     throw error;
@@ -90,34 +75,49 @@ async function crateProject({ companyId, name, description, members, userId }) {
  * Get company by id
  * @param {string} projectId
  * @returns {Promise<Project>}
- * @throws {Error}
+ * @throws {HttpException}
  */
 async function getById(projectId) {
-  try {
-    const project = await Project.findById(projectId);
-    if (!project) throw "Company not found";
-    return project;
-  } catch (error) {
-    throw error;
+  // Validate project id
+  if (!Mongoose.isValidObjectId(projectId)) {
+    throw new HttpException(HttpStatusCode.NOT_FOUND, "Invalid project id");
   }
+
+  // Get project from database if exists
+  const project = await Project.findOne({ _id: projectId })
+    .populate("members.user", "name email id")
+    .populate("createdBy", "name id");
+
+  // Check if project exists in db
+  if (!project)
+    throw new HttpException(
+      HttpStatusCode.NOT_FOUND,
+      "Project not found",
+      "Project does not exists with id '" + projectId + "'"
+    );
+  // Return project
+  return project;
 }
 
 /**
  * Get all projects
  * @returns {Promise<Project[]>}
- * @throws {Error}
+ * @throws {HttpException}
  */
 
 async function getAllProjects(companyId) {
   try {
-    const isValidId = Mongoose.Types.ObjectId.isValid(companyId);
-    if (!isValidId)
+    // Check if companyId is valid object id
+    if (!Mongoose.isValidObjectId(companyId)) {
       throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
-    const projects = await Project.find({ company: companyId }).populate({
-      path: "company",
-      select: "name id",
-    });
-    if (!projects) throw "Projects not found";
+    }
+
+    // Get all projects of a company from database if exists
+    const projects = await Project.find({ company: companyId })
+      .populate("members.user", "name email id")
+      .populate("createdBy", "name id");
+
+    // Return all projects
     return projects;
   } catch (error) {
     throw error;

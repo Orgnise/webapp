@@ -37,10 +37,10 @@ async function createCompany(body, userId) {
       );
     }
 
-    // Get user
+    // Get user data
     const user = await UserService.getById(userId);
 
-    // Set user role to admin in company
+    // Set user role to admin for company
     user.role = Admin;
     const company = await Company.create({
       name,
@@ -48,7 +48,12 @@ async function createCompany(body, userId) {
       createdBy: user.id,
       members: [{ user: user.id, role: user.role, _id: user.id }],
     });
-    return company;
+
+    // return company data
+    return (await company.populate("members.user", "name email id")).populate(
+      "createdBy",
+      "name id"
+    );
   } catch (error) {
     throw new HttpException(
       HttpStatusCode.INTERNAL_SERVER_ERROR,
@@ -59,30 +64,35 @@ async function createCompany(body, userId) {
 
 /**
  * Get company by id
- * @param {ObjectId} companyId
+ * @param {ObjectId} Id
  */
 async function getById(id) {
+  // Check if id is a valid company id
   if (!Mongoose.isValidObjectId(id)) {
     throw new HttpException(
       HttpStatusCode.BAD_REQUEST,
       "",
       "Invalid company id"
     );
-  } else {
-    const company = await Company.findOne({ _id: id }).populate({
+  }
+  // Get company data using company id if exists
+  const company = await Company.findOne({ _id: id })
+    .populate({
       path: "members.user",
       select: "name email id",
-    });
-    if (!company) {
-      throw new HttpException(
-        HttpStatusCode.NOT_FOUND,
-        "No company found with this id",
-        "Company not found"
-      );
-    }
+    })
+    .populate("createdBy", "name id");
 
-    return getBasicCompanyInfo(company);
+  // Check if company exists
+  if (!company) {
+    throw new HttpException(
+      HttpStatusCode.NOT_FOUND,
+      "No company found with",
+      "Company does not exist with " + id + " id"
+    );
   }
+
+  return getBasicCompanyInfo(company);
 }
 
 /**
@@ -101,19 +111,18 @@ async function getAllCompany(userId) {
     );
   }
   try {
-    const companies = await Company.find({ createdBy: userId }).populate({
-      path: "members.user",
-      select: "name email",
-      transform: (doc) =>
-        doc == null ? null : { name: doc.name, email: doc.email },
-    });
-    return Promise.all(
-      companies.map(async (company) => {
-        const cc = getBasicCompanyInfo(company);
-        cc.createdBy = await UserService.getById(company.createdBy._id);
-        return cc;
+    const companies = await Company.find({ createdBy: userId })
+      .populate({
+        path: "members.user",
+        select: "name",
+        transform: (doc) =>
+          doc == null ? null : { name: doc.name, email: doc.email },
       })
-    );
+      .populate({
+        path: "createdBy",
+        select: "name",
+      });
+
     return companies;
   } catch (error) {
     throw new HttpException(
@@ -128,14 +137,14 @@ async function getAllCompany(userId) {
 
 /**
  * Get basic company info
+ * @param {Company} company
  */
 function getBasicCompanyInfo(company) {
-  const { id, name, description, members, createdBy } = company;
   return {
-    id,
-    name,
-    description,
-    members,
-    createdBy,
+    id: company.id,
+    name: company.name,
+    description: company.description,
+    members: company.members,
+    createdBy: company.createdBy,
   };
 }

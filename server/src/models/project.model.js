@@ -1,4 +1,5 @@
 const Mongoose = require("mongoose");
+const Role = require("../helper/role");
 
 const ProjectSchema = new Mongoose.Schema(
   {
@@ -21,14 +22,14 @@ const ProjectSchema = new Mongoose.Schema(
     },
     members: [
       {
-        ...{
+        user: {
           type: Mongoose.Schema.Types.ObjectId,
           ref: "User",
           required: true,
         },
         role: {
           type: String,
-          enum: ["admin", "member"],
+          enum: [Role.Admin, Role.User],
           default: "member",
         },
       },

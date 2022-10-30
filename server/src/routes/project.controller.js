@@ -19,7 +19,7 @@ router.post(
   createProjectSchema,
   createProject
 );
-// router.get("/:id", authorize(), getById);
+router.get("/project/get_by_id/:id", authorize(), getProjectById);
 
 function createProjectSchema(req, res, next) {
   const schema = Joi.object({
@@ -54,6 +54,9 @@ function createProject(req, res, next) {
     .catch(next);
 }
 
+/**
+ * Get all projects
+ */
 function getAllProjects(req, res, next) {
   const user = req.auth;
   const companyId = req.params.id;
@@ -67,6 +70,25 @@ function getAllProjects(req, res, next) {
         dataKey: "Projects",
         status: HttpStatusCode.OK,
         total: companies.length,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Get project by id
+ */
+function getProjectById(req, res, next) {
+  const user = req.auth;
+  const id = req.params.id;
+  ProjectService.getById(id)
+    .then((project) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: project,
+        message: "Project fetched successfully",
+        dataKey: "project",
+        status: HttpStatusCode.OK,
       });
     })
     .catch(next);

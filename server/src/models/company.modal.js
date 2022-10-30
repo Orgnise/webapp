@@ -49,7 +49,6 @@ const CompanySchema = new Schema(
     },
     reactivatedAt: {
       type: Date,
-      default: Date.now,
     },
   },
   {
@@ -67,6 +66,10 @@ const CompanySchema = new Schema(
     },
   }
 );
+
+CompanySchema.virtual("membersCount").get(function () {
+  return this.members.length;
+});
 
 CompanySchema.virtual("isDeactivated").get(function () {
   return this.deactivatedAt !== null;
