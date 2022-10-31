@@ -5,6 +5,7 @@ const ValidationRequest = require("../middleware/validate-request");
 const authorize = require("../middleware/authorize");
 const { Project, Company, Board } = require("../models");
 const { CompanyService } = require("../services");
+const Role = require("../helper/role");
 const ApiResponseHandler = require("../helper/response/api-response");
 
 const {
@@ -15,7 +16,12 @@ const FakeBoardData = require("../config/task_data");
 router.post("/company/create", authorize(), createCompanySchema, createCompany);
 router.get("/company/get_all", authorize(), getAllCompany);
 router.get("/company/get_by_id/:id", authorize(), getCompanyById);
-router;
+router.put(
+  "/company/:companyId/add_members",
+  authorize(),
+  addMembersSchema,
+  addMembers
+);
 
 function createCompanySchema(req, res, next) {
   const schema = Joi.object({
@@ -78,6 +84,45 @@ function getCompanyById(req, res, next) {
         res: res,
         data: company,
         message: "Company fetched successfully",
+        dataKey: "company",
+        status: HttpStatusCode.OK,
+      });
+    })
+    .catch(next);
+}
+
+// Add members to company schema
+function addMembersSchema(req, res, next) {
+  const schema = Joi.object({
+    members: Joi.array().items(
+      Joi.object({
+        role: Joi.string()
+          .valid(Role.Admin, Role.Moderator, Role.User)
+          .default(Role.User),
+        id: Joi.string().required(),
+      })
+    ),
+  });
+  ValidationRequest(req, next, schema);
+}
+
+// Add members to company
+function addMembers(req, res, next) {
+  const user = req.auth;
+  const { companyId } = req.params;
+  const { members } = req.body;
+
+  console.log(
+    "🚀 ~ file: company.controller.js ~ line 114 ~ addMembers ~ members:",
+    members
+  );
+
+  CompanyService.addMembers(companyId, user.id, members)
+    .then((company) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: company,
+        message: "Members added successfully",
         dataKey: "company",
         status: HttpStatusCode.OK,
       });

@@ -5,6 +5,7 @@ const { User, Company } = require("../models");
 // const { UserService } = require("../services");
 const UserService = require("../services/user.service");
 const FakeBoardData = require("../config/task_data");
+const Role = require("../helper/role");
 
 const {
   HttpStatusCode,
@@ -17,6 +18,7 @@ module.exports = {
   getById,
   createCompany,
   getAllCompany,
+  addMembers,
 };
 
 /**
@@ -50,7 +52,7 @@ async function createCompany(body, userId) {
     });
 
     // return company data
-    return (await company.populate("members.user", "name email id")).populate(
+    return (await company.populate("members.user", "name id")).populate(
       "createdBy",
       "name id"
     );
@@ -65,6 +67,8 @@ async function createCompany(body, userId) {
 /**
  * Get company by id
  * @param {ObjectId} Id
+ * @returns {Promise<Company>}
+ * @throws {Error}
  */
 async function getById(id) {
   // Check if id is a valid company id
@@ -77,10 +81,7 @@ async function getById(id) {
   }
   // Get company data using company id if exists
   const company = await Company.findOne({ _id: id })
-    .populate({
-      path: "members.user",
-      select: "name email id",
-    })
+    .populate("members.user", "name email id")
     .populate("createdBy", "name id");
 
   // Check if company exists
@@ -112,17 +113,14 @@ async function getAllCompany(userId) {
   }
   try {
     const companies = await Company.find({ createdBy: userId })
+      .populate("members.user", "name")
+      .populate("createdBy", "name")
       .populate({
-        path: "members.user",
-        select: "name",
-        transform: (doc) =>
-          doc == null ? null : { name: doc.name, email: doc.email },
-      })
-      .populate({
-        path: "createdBy",
-        select: "name",
+        path: "members",
+        transform: (doc) => {
+          return doc;
+        },
       });
-
     return companies;
   } catch (error) {
     throw new HttpException(
@@ -130,6 +128,100 @@ async function getAllCompany(userId) {
       "",
       error.message
     );
+  }
+}
+
+/**
+ * Add members to company
+ * @param {ObjectId} companyId
+ * @param {Array} members
+ * @param {ObjectId} userId
+ * @returns {Promise<Company>}
+ * @throws {Error}
+ */
+
+async function addMembers(companyId, userId, members) {
+  try {
+    if (!Mongoose.isValidObjectId(companyId)) {
+      throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
+    }
+
+    // Check if company exists
+    const company = await findCompany(companyId);
+
+    const user = company.members.find((member) => member.user._id == userId);
+    console.log(
+      "🚀 ~ file: company.service.js ~ line 175 ~ addMembers ~ user",
+      user
+    );
+
+    // Check if user is member of company
+    if (!user) {
+      throw new HttpException(
+        HttpStatusCode.FORBIDDEN,
+        "You are not a member of this company",
+        "Not authorized to add members"
+      );
+    } else if (user.role !== Role.Admin) {
+      throw new HttpException(
+        HttpStatusCode.FORBIDDEN,
+        "You are not a allowed to add member in this company, Only admin can add members",
+        "Not authorized to add members"
+      );
+    }
+
+    // Add members to company
+    const newMembers = members.map((member) => ({
+      user: member.id,
+      role: member.role,
+      _id: member.id,
+    }));
+
+    // Check is user already exists in company
+    const existingMembers = company.members.filter((member) =>
+      newMembers.find((newMember) => newMember.user == member.user._id)
+    );
+
+    if (existingMembers.length > 0) {
+      throw new HttpException(
+        HttpStatusCode.BAD_REQUEST,
+        `${existingMembers.length} of ${newMembers.length} users already exists in company`,
+        existingMembers.map((member) => {
+          return {
+            id: member.user._id,
+            role: member.role,
+          };
+        })
+      );
+    }
+
+    company.members = [...company.members, ...newMembers];
+
+    await company.save();
+
+    return findCompany(companyId);
+  } catch (error) {
+    throw error;
+  }
+
+  /**
+   * Get company complete info
+   */
+  async function findCompany(companyId) {
+    if (!Mongoose.isValidObjectId(companyId)) {
+      throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
+    }
+    const company = await Company.findOne({ _id: companyId })
+      .populate("members.user", "name")
+      .populate("createdBy", "name");
+    if (!company || company === null) {
+      throw new HttpException(
+        HttpStatusCode.NOT_FOUND,
+        "Company not found",
+        "Company not found with id " + companyId
+      );
+    }
+    return company;
   }
 }
 
