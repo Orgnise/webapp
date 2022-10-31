@@ -27,6 +27,7 @@ const CompanySchema = new Schema(
           type: Mongoose.Schema.Types.ObjectId,
           ref: "User",
           required: true,
+          unique: true,
         },
         role: {
           type: String,
