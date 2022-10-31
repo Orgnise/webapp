@@ -19,6 +19,7 @@ module.exports = {
   createCompany,
   getAllCompany,
   addMembers,
+  removeMembers,
 };
 
 /**
@@ -142,32 +143,27 @@ async function getAllCompany(userId) {
 
 async function addMembers(companyId, userId, members) {
   try {
-    if (!Mongoose.isValidObjectId(companyId)) {
-      throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
-    }
-
     // Check if company exists
     const company = await findCompany(companyId);
 
     const user = company.members.find((member) => member.user._id == userId);
-    console.log(
-      "🚀 ~ file: company.service.js ~ line 175 ~ addMembers ~ user",
-      user
-    );
 
-    // Check if user is member of company
-    if (!user) {
-      throw new HttpException(
-        HttpStatusCode.FORBIDDEN,
-        "You are not a member of this company",
-        "Not authorized to add members"
-      );
-    } else if (user.role !== Role.Admin) {
-      throw new HttpException(
-        HttpStatusCode.FORBIDDEN,
-        "You are not a allowed to add member in this company, Only admin can add members",
-        "Not authorized to add members"
-      );
+    // Check if auth user is a member of company or not, if he/she is not company owner
+    if (company.createdBy.id !== userId) {
+      // Check if user is member of company
+      if (!user) {
+        throw new HttpException(
+          HttpStatusCode.FORBIDDEN,
+          "You are not a member of this company",
+          "Not authorized to add members"
+        );
+      } else if (user.role !== Role.Admin) {
+        throw new HttpException(
+          HttpStatusCode.FORBIDDEN,
+          "You are not a allowed to add member in this company, Only admin can add members",
+          "Not authorized to add members"
+        );
+      }
     }
 
     // Add members to company
@@ -182,6 +178,7 @@ async function addMembers(companyId, userId, members) {
       newMembers.find((newMember) => newMember.user == member.user._id)
     );
 
+    // Throw error if trying to add existingMembers
     if (existingMembers.length > 0) {
       throw new HttpException(
         HttpStatusCode.BAD_REQUEST,
@@ -203,25 +200,78 @@ async function addMembers(companyId, userId, members) {
   } catch (error) {
     throw error;
   }
+}
 
-  /**
-   * Get company complete info
-   */
-  async function findCompany(companyId) {
-    if (!Mongoose.isValidObjectId(companyId)) {
-      throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
+/**
+ * Get company complete info
+ */
+async function findCompany(companyId) {
+  if (!Mongoose.isValidObjectId(companyId)) {
+    throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
+  }
+  const company = await Company.findOne({ _id: companyId })
+    .populate("members.user", "name")
+    .populate("createdBy", "name");
+  if (!company || company === null) {
+    throw new HttpException(
+      HttpStatusCode.NOT_FOUND,
+      "Company not found",
+      "Company not found with id " + companyId
+    );
+  }
+  return company;
+}
+
+/**
+ * Remove members from a company
+ * @param {ObjectId} companyId
+ * @param {Array} members
+ * @param {ObjectId} userId
+ * @return {Promise<Company>}
+ * @throws {Error}
+ */
+async function removeMembers(companyId, userId, members) {
+  try {
+    // get company data if exists
+    const company = await findCompany(companyId);
+
+    // Get current auth user from company if exists
+    const user = company.members.find((member) => member.user._id == userId);
+
+    // No need to verify if company owner is a member or not
+    if (userId !== company.createdBy.id) {
+      // Check if current auth user is member of company
+      if (!user) {
+        throw new HttpException(
+          HttpStatusCode.FORBIDDEN,
+          "You are not a member of this company",
+          "Not authorized to remove members"
+        );
+      }
+      // Check if current auth user is company admin or not
+      else if (user.role !== Role.Admin) {
+        throw new HttpException(
+          HttpStatusCode.FORBIDDEN,
+          "You are not a allowed to remove member in this company, Only admin can remove members",
+          "Not authorized to remove members"
+        );
+      }
     }
-    const company = await Company.findOne({ _id: companyId })
-      .populate("members.user", "name")
-      .populate("createdBy", "name");
-    if (!company || company === null) {
-      throw new HttpException(
-        HttpStatusCode.NOT_FOUND,
-        "Company not found",
-        "Company not found with id " + companyId
-      );
-    }
+
+    // Filter out remaining members
+    const remainingMembers = company.members.filter((member) => {
+      return !members.includes(member.id);
+    });
+
+    // Update company members
+    company.members = remainingMembers;
+
+    // Save company
+    await company.save();
+
     return company;
+  } catch (error) {
+    throw error;
   }
 }
 

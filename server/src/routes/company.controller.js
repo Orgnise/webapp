@@ -22,6 +22,12 @@ router.put(
   addMembersSchema,
   addMembers
 );
+router.put(
+  "/company/:companyId/remove_members",
+  authorize(),
+  removeMembersSchema,
+  removeMembers
+);
 
 function createCompanySchema(req, res, next) {
   const schema = Joi.object({
@@ -123,6 +129,33 @@ function addMembers(req, res, next) {
         res: res,
         data: company,
         message: "Members added successfully",
+        dataKey: "company",
+        status: HttpStatusCode.OK,
+      });
+    })
+    .catch(next);
+}
+
+// Remove members from company schema
+function removeMembersSchema(req, res, next) {
+  const schema = Joi.object({
+    members: Joi.array().items(Joi.string().required()),
+  });
+  ValidationRequest(req, next, schema);
+}
+
+// Remove members from company
+function removeMembers(req, res, next) {
+  const user = req.auth;
+  const { companyId } = req.params;
+  const { members } = req.body;
+
+  CompanyService.removeMembers(companyId, user.id, members)
+    .then((company) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: company,
+        message: "Members removed successfully",
         dataKey: "company",
         status: HttpStatusCode.OK,
       });
