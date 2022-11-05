@@ -20,6 +20,7 @@ module.exports = {
   getAllCompany,
   addMembers,
   removeMembers,
+  getJoinedCompanies,
 };
 
 /**
@@ -129,6 +130,24 @@ async function getAllCompany(userId) {
       "",
       error.message
     );
+  }
+}
+
+/**
+ * Gel all joined companies
+ * @param {ObjectId} userId
+ * @returns {Promise<Company[]>}
+ * @throws {HttpException}
+ */
+async function getJoinedCompanies(userId) {
+  try {
+    const user = await UserService.getById({ id: userId });
+    const companies = await Company.find({ "members.user": user.id })
+      .populate("members.user", "name")
+      .populate("createdBy", "name");
+    return companies;
+  } catch (error) {
+    throw error;
   }
 }
 

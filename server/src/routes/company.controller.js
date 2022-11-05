@@ -15,6 +15,7 @@ const FakeBoardData = require("../config/task_data");
 
 router.post("/company/create", authorize(), createCompanySchema, createCompany);
 router.get("/company/get_all", authorize(), getAllCompany);
+router.get("/company/get_joined_companies", authorize(), getJoinedCompanies);
 router.get("/company/get_by_id/:id", authorize(), getCompanyById);
 router.put(
   "/company/:companyId/add_members",
@@ -59,6 +60,23 @@ function getAllCompany(req, res, next) {
   const user = req.auth;
 
   CompanyService.getAllCompany(user.id)
+    .then((companies) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: companies,
+        message: "Company fetched successfully",
+        dataKey: "companies",
+        status: HttpStatusCode.OK,
+        total: companies.length,
+      });
+    })
+    .catch(next);
+}
+
+function getJoinedCompanies(req, res, next) {
+  const user = req.auth;
+
+  CompanyService.getJoinedCompanies(user.id)
     .then((companies) => {
       return ApiResponseHandler.success({
         res: res,

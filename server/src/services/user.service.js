@@ -108,10 +108,10 @@ async function getAll() {
 // Returns basicDetails of user by id
 async function getById({ id, authUser }) {
   const user = await getUser(id);
-  if (authUser.id !== user.id) {
-    return user.userBasicInfo();
-  } else {
+  if (authUser && authUser.id === user.id) {
     return user.userWithoutPassword();
+  } else {
+    return user.userBasicInfo();
   }
 }
 
