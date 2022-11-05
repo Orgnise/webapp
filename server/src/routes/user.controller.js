@@ -13,8 +13,8 @@ router.post("/auth/register", registerSchema, registerUser);
 router.post("/auth/login", authenticateSchema, authenticate);
 router.post("/auth/refresh-token", refreshToken);
 router.post("/auth/revoke-token", authorize(), revokeTokenSchema, revokeToken);
-router.get("/authall", authorize(Role.User), getAll);
-router.get("/auth:id", authorize(), getById);
+router.get("/auth/all", authorize(Role.User), getAll);
+router.get("/auth/:id/get_by_id", authorize(), getById);
 router.get("/auth:id/refresh-tokens", authorize(), getRefreshTokens);
 
 module.exports = router;
@@ -138,21 +138,10 @@ function getAll(req, res, next) {
 
 // Get user by Id
 function getById(req, res, next) {
-  // regular users can only access their own account and admins can access any account
-  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
-    if (req)
-      if (req.auth.role !== Role.Admin) {
-        return ApiResponseHandler.error({
-          res: res,
-          message: "Unauthorized",
-          errorCode: HttpStatusCode.ErrorCode(HttpStatusCode.UNAUTHORIZED),
-          status: HttpStatusCode.UNAUTHORIZED,
-        });
-      }
-  }
-
-  UserService.getById(req.params.id)
-    .then((user) => (user ? res.json(user) : res.sendStatus(404)))
+  UserService.getById({ id: req.params.id, authUser: req.auth })
+    .then((user) =>
+      ApiResponseHandler.success({ res: res, data: user, dataKey: "user" })
+    )
     .catch(next);
 }
 

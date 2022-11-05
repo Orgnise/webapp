@@ -46,7 +46,7 @@ module.exports = class HttpStatusCode {
     }
   };
 
-  static ErrorMessage = {
+  static HttpMessage = {
     OK: "OK",
     CREATED: "Created",
     ACCEPTED: "Accepted",

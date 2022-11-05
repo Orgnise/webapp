@@ -42,7 +42,7 @@ async function authenticate({ email, password, ipAddress }) {
 
   // Returns basic details and tokens
   return {
-    ...basicUserDetails(user),
+    ...user.userBasicInfo(),
     jwtToken,
     refreshToken: refreshToken.token,
   };
@@ -102,13 +102,17 @@ async function revokeToken({ token, ipAddress }) {
 // Returns basic details for all users
 async function getAll() {
   const users = await User.find();
-  return users.map((x) => basicUserDetails(x));
+  return users.map((x) => x.userBasicInfo());
 }
 
 // Returns basicDetails of user by id
-async function getById(id) {
+async function getById({ id, authUser }) {
   const user = await getUser(id);
-  return basicUserDetails(user);
+  if (authUser.id !== user.id) {
+    return user.userBasicInfo();
+  } else {
+    return user.userWithoutPassword();
+  }
 }
 
 async function refreshToken({ token, ipAddress }) {
@@ -127,7 +131,7 @@ async function refreshToken({ token, ipAddress }) {
 
   // return basic details and tokens
   return {
-    ...basicUserDetails(user),
+    ...user.userBasicInfo(),
     jwtToken,
     refreshToken: newRefreshToken.token,
   };
@@ -206,10 +210,4 @@ function generateJwtToken(user) {
 // Returns a random token string of the given length
 function randomTokenString() {
   return crypto.randomBytes(40).toString("hex");
-}
-
-// Returns basic user details
-function basicUserDetails(user) {
-  const { id, name, email, role } = user;
-  return { id, name, email, role };
 }

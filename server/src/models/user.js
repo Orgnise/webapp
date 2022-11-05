@@ -60,4 +60,21 @@ const UserSchema = new Mongoose.Schema(
   }
 );
 
+// Method to return user object without password
+UserSchema.methods.userWithoutPassword = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
+
+// Method to return user basic info
+UserSchema.methods.userBasicInfo = function () {
+  const user = this.toObject();
+  delete user.password;
+  delete user.token;
+  delete user.role;
+  delete user.updatedAt;
+  return user;
+};
+
 module.exports = Mongoose.model("User", UserSchema);

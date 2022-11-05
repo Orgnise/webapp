@@ -10,8 +10,8 @@ module.exports = function (options) {
     const errorCode = err.errorCode || HttpStatusCode.ErrorCode(status);
     const message =
       err.message ||
-      HttpStatusCode.ErrorMessage[errorCode] ||
-      HttpStatusCode.ErrorMessage.INTERNAL_SERVER_ERROR;
+      HttpStatusCode.HttpMessage[errorCode] ||
+      HttpStatusCode.HttpMessage.INTERNAL_SERVER_ERROR;
     const error = err.error;
 
     return res.status(status).json({
