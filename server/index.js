@@ -10,21 +10,25 @@ const {
   CompanyController,
   ProjectController,
 } = require("./src/routes");
+const SocketHandler = require("./src/routes/socket_handler");
 
 const { API_PORT } = require("./src/config/config");
 
 const port = API_PORT;
-
 const server = app.listen(port, () => {
   console.log(`Server listening on ${port}`);
 });
 
-const socket = SocketIO(server);
+const io = SocketIO(server);
 require("./src/config/global");
-global.socket = socket;
+global.socket = io;
+
+// Register socket handlers
+io.on("connection", (socket) => {
+  SocketHandler(io, socket);
+});
 
 // global error middleware
-
 app.use("/", UserController);
 app.use("/", CompanyController);
 app.use("/", ProjectController);
@@ -44,4 +48,4 @@ process.on("unhandledRejection", (err) => {
 });
 
 app.use(errorHandler());
-module.exports = socket;
+module.exports = io;
