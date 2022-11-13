@@ -26,7 +26,7 @@ module.exports = {
 async function crateProject({ companyId, name, description, members, userId }) {
   try {
     // Get user
-    const user = await UserService.getById(userId);
+    const user = await UserService.getById({ id: userId });
 
     // Check if user exists in company
     const company = await CompanyService.getById(companyId);

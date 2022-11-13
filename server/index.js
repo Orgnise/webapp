@@ -43,7 +43,7 @@ app.use("*", function (req, res, next) {
 // Handling Error
 process.on("unhandledRejection", (err) => {
   console.log("❤️‍🔥", chalk.red("[unhandledRejection]"), err);
-  console.log(chalk.red("[Message]"), err.message);
+  console.log(chalk.red("[Message]"), err?.message || err?.error || err);
   server.close(() => process.exit(1));
 });
 

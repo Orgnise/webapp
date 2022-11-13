@@ -139,8 +139,13 @@ async function refreshToken({ token, ipAddress }) {
 
 // Returns complete user details using the given user id
 async function getUser(id) {
-  if (!Mongoose.Types.ObjectId.isValid(id)) {
-    throw new HttpException(HttpStatusCode.BAD_REQUEST, "", "Invalid user id");
+  if (!Mongoose.isValidObjectId(id)) {
+    console.log("🚀 ~ file: user.service.js ~ line 143 ~ getUser ~ id", id);
+    throw new HttpException(
+      HttpStatusCode.BAD_REQUEST,
+      "User id is not valid",
+      "Invalid user id"
+    );
   } else {
     const user = await User.findById(id);
     if (!user) throw "User not found";

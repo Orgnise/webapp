@@ -7,27 +7,47 @@ const { Project, Company, Board } = require("../models");
 const { CompanyService } = require("../services");
 const Role = require("../helper/role");
 const ApiResponseHandler = require("../helper/response/api-response");
+const { updateCache } = require("../helper/redis/redis-client");
+const cacheMiddleWare = require("../middleware/cache-middleware");
 
 const {
   HttpStatusCode,
 } = require("../helper/http-status-code/http-status-code");
 const FakeBoardData = require("../config/task_data");
 
-router.post("/company/create", authorize(), createCompanySchema, createCompany);
-router.get("/company/get_all", authorize(), getAllCompany);
-router.get("/company/get_joined_companies", authorize(), getJoinedCompanies);
-router.get("/company/get_by_id/:id", authorize(), getCompanyById);
-router.put(
-  "/company/:companyId/add_members",
+router.post(
+  "/organization/create",
   authorize(),
-  addMembersSchema,
-  addMembers
+  createCompanySchema,
+  createCompany
+);
+router.get("/organization/all", authorize(), getAllCompany);
+router.get(
+  "/organization/get_joined_companies",
+  authorize(),
+  getJoinedCompanies
+);
+router.get(
+  "/organization/get_by_id/:id",
+  authorize(),
+  cacheMiddleWare({
+    keyPath: "params.id",
+    cacheDataKey: "company",
+    cacheDataMessage: "Company fetched successfully",
+  }),
+  getCompanyById
 );
 router.put(
-  "/company/:companyId/remove_members",
+  "/organization/:orgId/add_members",
+  authorize(), // authorize(Role.Admin),
+  addMembersSchema,
+  addMembers // <--- Add members
+);
+router.put(
+  "/organization/:orgId/remove_members",
   authorize(),
   removeMembersSchema,
-  removeMembers
+  removeMembers // <--- Remove members
 );
 
 function createCompanySchema(req, res, next) {
@@ -91,10 +111,10 @@ function getJoinedCompanies(req, res, next) {
 }
 
 // Get company by Id
-function getCompanyById(req, res, next) {
+async function getCompanyById(req, res, next) {
   const user = req.auth;
-  const { id } = req.params;
-  if (!id) {
+  const { orgId } = req.params;
+  if (!orgId) {
     return ApiResponseHandler.error({
       res: res,
       message: "Company id is required",
@@ -102,8 +122,10 @@ function getCompanyById(req, res, next) {
     });
   }
 
-  CompanyService.getById(id, user.id)
-    .then((company) => {
+  CompanyService.getById(orgId, user.id)
+    .then(async (company) => {
+      await updateCache(orgId, company);
+
       return ApiResponseHandler.success({
         res: res,
         data: company,
@@ -133,16 +155,12 @@ function addMembersSchema(req, res, next) {
 // Add members to company
 function addMembers(req, res, next) {
   const user = req.auth;
-  const { companyId } = req.params;
+  const { orgId } = req.params;
   const { members } = req.body;
 
-  console.log(
-    "🚀 ~ file: company.controller.js ~ line 114 ~ addMembers ~ members:",
-    members
-  );
-
-  CompanyService.addMembers(companyId, user.id, members)
-    .then((company) => {
+  CompanyService.addMembers(orgId, user.id, members)
+    .then(async (company) => {
+      await updateCache(orgId, company);
       return ApiResponseHandler.success({
         res: res,
         data: company,
@@ -165,11 +183,13 @@ function removeMembersSchema(req, res, next) {
 // Remove members from company
 function removeMembers(req, res, next) {
   const user = req.auth;
-  const { companyId } = req.params;
+  const { orgId } = req.params;
   const { members } = req.body;
 
-  CompanyService.removeMembers(companyId, user.id, members)
-    .then((company) => {
+  CompanyService.removeMembers(orgId, user.id, members)
+    .then(async (company) => {
+      await updateCache(orgId, company);
+
       return ApiResponseHandler.success({
         res: res,
         data: company,

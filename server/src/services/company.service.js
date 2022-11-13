@@ -42,7 +42,7 @@ async function createCompany(body, userId) {
     }
 
     // Get user data
-    const user = await UserService.getById(userId);
+    const user = await UserService.getById({ id: userId });
 
     // Set user role to admin for company
     user.role = Admin;
@@ -60,8 +60,9 @@ async function createCompany(body, userId) {
     );
   } catch (error) {
     throw new HttpException(
-      HttpStatusCode.INTERNAL_SERVER_ERROR,
-      error.message
+      error.status || HttpStatusCode.INTERNAL_SERVER_ERROR,
+      error.message,
+      error.error
     );
   }
 }

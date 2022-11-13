@@ -1,3 +1,4 @@
+const { logError, logInfo, logWarning } = require("../../helper/logger");
 const UserService = require("../../services/user.service");
 module.exports = (io, socket) => {
   // Register socket handlers
@@ -23,10 +24,11 @@ module.exports = (io, socket) => {
       // fire a registered event
       socket.emit("auth:register", user.userWithoutPassword());
       // log connection
-      console.info("SOCKET: user connected!" + user.id);
+      logInfo("SOCKET: user connected!" + user.id);
       return true;
     } catch (error) {
       socket.emit("auth:authorized", error);
+      logError("User is not authenticated");
     }
   };
 
@@ -40,10 +42,11 @@ module.exports = (io, socket) => {
         socket.emit("auth:read", user.userWithoutPassword());
       } else {
         socket.emit("auth:authorized", false);
+        logWarning("User is not authenticated");
       }
     } catch (error) {
       socket.emit("auth:authorized", error);
-      console.log({ error });
+      logError({ error });
     }
   };
 

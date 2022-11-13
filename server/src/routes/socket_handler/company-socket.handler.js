@@ -1,16 +1,18 @@
+const chalk = require("chalk");
 const UserService = require("../../services/user.service");
 const CompanyService = require("../../services/company.service");
 const ApiResponseHandler = require("../../helper/response/api-response");
-module.exports = (auth, socket) => {
+const { logError, logSuccess, logInfo } = require("../../helper/logger");
+module.exports = (io, socket) => {
   // Register socket handlers
   const getJoinedCompanies = async (payload) => {
     // Check if user is authenticated
     if (!auth) {
+      logError("User is not authenticated");
       socket.emit("auth:authorized", false);
       return;
     }
     try {
-      console.log("SOCKET:", auth.token);
       const user = await UserService.getUserFromJwtToken(auth.token);
       const list = await CompanyService.getJoinedCompanies(user.id);
       const companies = {
@@ -19,11 +21,31 @@ module.exports = (auth, socket) => {
         dataKey: "companies",
         total: list.length,
       };
-      socket.emit("company:joined:all:read", companies);
+      socket.emit("organization:joined:all:read", companies);
+      logSuccess("Company fetched successfully");
     } catch (error) {
-      socket.emit("company:joined:all:read", error);
+      logError(error);
     }
   };
 
-  socket.on("company:joined:all:read", getJoinedCompanies);
+  const createOrganization = async (payload) => {
+    // Check if user is authenticated
+    if (!io.auth) {
+      logError("User is not authenticated", "createOrganization ~ line 36");
+      socket.emit("auth:authorized", false);
+      return;
+    }
+    try {
+      const user = await UserService.getUserFromJwtToken(io.auth.token);
+      const organization = await CompanyService.createCompany(payload, user.id);
+      socket.emit("organization:create", organization.toJSON());
+      logSuccess(organization.toJSON());
+    } catch (error) {
+      socket.emit("company:organization:create", error);
+      logError(error);
+    }
+  };
+
+  socket.on("organization:joined:all:read", getJoinedCompanies);
+  socket.on("organization:create", createOrganization);
 };
