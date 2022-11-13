@@ -7,6 +7,13 @@ export const Endpoints = {
     login: '/login',
     register: '/register',
     logout: '/logout',
+    organization: {
+        get: '/organization',
+        getAll: '/organization/all',
+        create: '/organization/create',
+        update: '/organization/update',
+        delete: '/organization/delete',
+    },
     board: {
         create: '/board/create',
         update: '/board/update',

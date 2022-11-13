@@ -12,12 +12,12 @@ const TasksContainer = () => {
   const [errors, setErrors] = useState({});
   const [dragFirstTask, setDragFirstTask] = useState(false);
   const [user, setUser] = useLocalStorage("user");
-  const { boardService } = useAppService();
+  const { boardService, organizationService } = useAppService();
 
   useEffect(() => {
     function fetchTasks() {
-      boardService
-        .getBoard()
+      organizationService
+        .getAllCompanies()
         .then(({ board }) => {
           setSocketData({
             tasks: board,

@@ -26,7 +26,6 @@ export class AxiosClient {
         axios.interceptors.request.use(function (config) {
             // Add x-access-token to header
             const user = localStorage.getItem('user');
-            console.log("🚀 ~ file: axios-client.ts ~ line 29 ~ AxiosClient ~ user", user)
             if (config.url !== '/login' && config.url !== '/register' && user) {
                 if (config && config.headers) {
                     const token = JSON.parse(user).jwtToken;

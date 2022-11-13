@@ -14,8 +14,10 @@ export function useAppService() {
     const appService = useContext<AppService>(AppServiceContext as any);
     const boardService = appService.boardService;
     const authService = appService.authService;
+    const organizationService = appService.organizationService;
     return {
         boardService,
-        authService
+        authService,
+        organizationService
     }
 }

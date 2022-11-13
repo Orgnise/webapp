@@ -27,6 +27,7 @@ const useSocket = (events: string[], initialState: any): [Object, Dispatch<any>,
 
       events.forEach((event) => {
         socket.on(event, (data: any) => {
+          console.log("Socket event", event, data);
           setState((prevState: any) => ({ ...prevState, [event]: data }));
         });
       });
