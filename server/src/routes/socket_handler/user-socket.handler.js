@@ -1,4 +1,9 @@
-const { logError, logInfo, logWarning } = require("../../helper/logger");
+const {
+  logError,
+  logInfo,
+  logWarning,
+  logSuccess,
+} = require("../../helper/logger");
 const UserService = require("../../services/user.service");
 module.exports = (io, socket) => {
   // Register socket handlers
@@ -24,29 +29,27 @@ module.exports = (io, socket) => {
       // fire a registered event
       socket.emit("auth:register", user.userWithoutPassword());
       // log connection
-      logInfo("SOCKET: user connected!" + user.id);
+      logInfo("user connected!" + user.id, "Socket");
       return true;
     } catch (error) {
       socket.emit("auth:authorized", error);
-      logError("User is not authenticated");
+      logError("User is not authenticated", "registerUser ~ line 31");
     }
   };
 
   const getUser = async () => {
-    console.log("SOCKET:", io.auth);
-
     try {
       if (io.auth) {
-        console.log("SOCKET:", io.auth.token);
         const user = await UserService.getUserFromJwtToken(io.auth.token);
         socket.emit("auth:read", user.userWithoutPassword());
+        logSuccess("User fetched successfully", "getUser ~ line 40");
       } else {
         socket.emit("auth:authorized", false);
-        logWarning("User is not authenticated");
+        logWarning("User is not authenticated", "getUser ~ line 43");
       }
     } catch (error) {
       socket.emit("auth:authorized", error);
-      logError({ error });
+      logError(error, "getUser ~ line 47");
     }
   };
 

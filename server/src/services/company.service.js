@@ -115,7 +115,9 @@ async function getAllCompany(userId) {
     );
   }
   try {
-    const companies = await Company.find({ createdBy: userId })
+    const companies = await Company.find({
+      members: { $elemMatch: { user: userId } },
+    })
       .populate("members.user", "name")
       .populate("createdBy", "name")
       .populate({
