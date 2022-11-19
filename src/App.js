@@ -18,6 +18,8 @@ import useSocket from "./hooks/use-socket.hook";
 import Signup from "./pages/auth/signup.page";
 import OrganizationsPage from "./pages/organization/organizations.page";
 import { SocketEvent } from "./constant/socket-event-constant";
+import OrganizationPage from "./pages/organization/detail/organization";
+import DashBoardPage from "./pages/dashboard/dashboard.page";
 
 function App() {
   const [, , socket] = useSocket();
@@ -79,14 +81,16 @@ function App() {
           element={getProtectedRoute(user, <Login />)}
         />
         <Route path={AppRoutes.signup} element={<Signup />} />
-        <Route
+        {/* <Route
           path={AppRoutes.organization}
           element={getLoggedInRoute(user, <Task />)}
-        />
+        /> */}
         <Route
           path={AppRoutes.dashboard}
-          element={getLoggedInRoute(user, <OrganizationsPage />)}
-        />
+          element={getLoggedInRoute(user, <DashBoardPage />)}
+        >
+          <Route path={AppRoutes.organization} element={<OrganizationPage />} />
+        </Route>
         <Route
           path={AppRoutes.comments}
           element={getLoggedInRoute(user, <Comments />)}

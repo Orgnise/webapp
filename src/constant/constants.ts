@@ -13,6 +13,7 @@ export const Endpoints = {
         create: '/organization/create',
         update: '/organization/update',
         delete: '/organization/delete',
+        getById: (id: string) => `/organization/${id}`,
     },
     board: {
         create: '/board/create',

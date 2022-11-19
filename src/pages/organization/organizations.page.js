@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import moment from "moment";
 import Nav from "../task/component/nav";
 
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Router,
+  Routes,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import {
   Comments,
   getLoggedInRoute,
@@ -18,8 +25,58 @@ import FIcon from "../../components/ficon";
 import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import AddOrganization from "./component/add-organization";
 import ModalForm from "../../components/modal";
+import OrganizationPage from "./detail/organization";
+// import OrganizationPage from "./detail/organization-info.page";
 
 const OrganizationsPage = () => {
+  const params = useParams();
+  const id = params.id;
+  return (
+    <div className="flex flex-col h-screen bg-gray-100">
+      {/* Display the list of organizations */}
+      <div className="overflow-y-auto">
+        <div className="max-w-screen-xl mx-auto">
+          <span className="flex items-center py-6 text-slate-600 font-medium">
+            <FIcon icon={solid("user")} />
+            <a
+              href="/"
+              className="focus:outline-none text-base leading-normal px-2 hover:underline"
+            >
+              Organizations
+            </a>
+            <FIcon icon={solid("angle-right")} />
+            {id && (
+              <>
+                <span>
+                  <a
+                    href={`/organization/${id}`}
+                    className="focus:outline-none text-base leading-normal px-2 hover:underline"
+                  >
+                    {id}
+                  </a>
+                  <FIcon icon={solid("angle-right")} />
+                </span>
+              </>
+            )}
+          </span>
+
+          <Routes>
+            <Route path={AppRoutes.dashboard} element={<OrganizationList />} />
+            <Route
+              path={AppRoutes.organization}
+              element={<OrganizationPage />}
+            />
+          </Routes>
+        </div>
+      </div>
+      {/* <aside className="fixed top-0 bottom-0 left-0 w-14 hover:w-72 bg-teal-700  transition-all  duration-300 ease-in-out">
+        Hi
+      </aside> */}
+    </div>
+  );
+};
+
+function OrganizationList() {
   const [organization, setOrganization] = useState([]);
   const [tempOrganization, setTempOrganization] = useState([]);
   const [loading, setLoading] = useState();
@@ -86,87 +143,67 @@ const OrganizationsPage = () => {
     });
     setTempOrganization(filteredOrganization);
   }
-
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <Nav />
-      {/* Display loader while loading */}
-      {loading && <div>Loading...</div>}
-      {/* Display the list of organizations */}
-      <div className="overflow-y-auto">
-        <div className="max-w-screen-xl mx-auto">
-          <span className="flex items-center px-4 py-6 text-gray-500">
-            <FIcon icon={solid("user")} />
-            <a
-              href="#"
-              className="focus:outline-none text-base leading-normal text-gray-800 px-2 hover:underline"
-            >
-              Organizations
-            </a>
-            <FIcon icon={solid("angle-right")} />
-          </span>
-          <div className="bg-white shadow mx-4 mb-4 py-4 md:py-7 px-4 md:px-8 xl:px-10 ">
-            <div className="sm:flex items-center justify-between">
-              <div className="py-2 px-4 flex items-center border border-gray-200  leading-none cursor-pointer rounded">
-                <FIcon icon={solid("search")} className="text-gray-400 mr-2" />
-                <div className=" flex-grow  px-4">
-                  <input
-                    type="text"
-                    className="bg-transparent focus:outline-none w-full"
-                    placeholder="Filter by name"
-                    onChange={(e) => {
-                      console.log(e.target.value);
-                      filterByQuery(e.target.value);
-                    }}
-                  />
-                </div>
-              </div>
-              <ModalForm
-                title={"Add new Task"}
-                className="w-full sm:w-2/3 md:w-2/4 lg:w-1/3"
-                visible={visible}
-                setVisible={setVisible}
-                path={AppRoutes.addTask}
-                button={
-                  <button
-                    onClick={() => setVisible(true)}
-                    className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded"
-                  >
-                    <p className="text-sm font-medium leading-none text-white">
-                      Add Organization
-                    </p>
-                  </button>
-                }
-              >
-                <AddOrganization setVisible={setVisible} />
-              </ModalForm>
-            </div>
-            <div className="mt-7 overflow-x-auto">
-              <table className="w-full whitespace-nowrap">
-                <thead>
-                  <tr className="text-sm leading-none uppercase ">
-                    <th className="text-left px-4 py-3">Name</th>
-                    <th className="text-left px-4 py-3">Admin</th>
-                    <th className="text-left px-4 py-3">Description</th>
-                    <th className="text-left px-4 py-3">Members</th>
-                    <th className="text-left px-4 py-3">Created on</th>
-                    <th className="text-left px-4 py-3"></th>
-                    <th className="text-left px-1 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tempOrganization.map((org, index) => (
-                    <OrganizationRow key={index} org={org} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
+    <div className="bg-white shadow mb-4 py-4 md:py-7  md:px-8 xl:px-10 ">
+      <div className="sm:flex items-center justify-between">
+        <div className="py-2 px-4 flex items-center border border-gray-200  leading-none cursor-pointer rounded">
+          <FIcon icon={solid("search")} className="text-gray-400 mr-2" />
+          <div className=" flex-grow  px-4">
+            <input
+              type="text"
+              className="bg-transparent focus:outline-none w-full"
+              placeholder="Filter by name"
+              onChange={(e) => {
+                console.log(e.target.value);
+                filterByQuery(e.target.value);
+              }}
+            />
           </div>
         </div>
+        <ModalForm
+          title={"Add new Task"}
+          className="w-full sm:w-2/3 md:w-2/4 lg:w-1/3"
+          visible={visible}
+          setVisible={setVisible}
+          path={AppRoutes.addTask}
+          button={
+            <button
+              onClick={() => setVisible(true)}
+              className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded"
+            >
+              <p className="text-sm font-medium leading-none text-white">
+                Add Organization
+              </p>
+            </button>
+          }
+        >
+          <AddOrganization setVisible={setVisible} />
+        </ModalForm>
+      </div>
+      {loading && <div>Loading...</div>}
+      <div className="mt-7 overflow-x-auto">
+        <table className="w-full whitespace-nowrap">
+          <thead>
+            <tr className="text-sm leading-none uppercase ">
+              <th className="text-left px-4 py-3">Name</th>
+              <th className="text-left px-4 py-3">Admin</th>
+              <th className="text-left px-4 py-3">Description</th>
+              <th className="text-left px-4 py-3">Members</th>
+              <th className="text-left px-4 py-3">Created on</th>
+              <th className="text-left px-4 py-3"></th>
+              <th className="text-left px-1 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {tempOrganization.map((org, index) => (
+              <OrganizationRow key={index} org={org} />
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
-};
+}
 
 function OrganizationRow({ org, index }) {
   return (

@@ -28,7 +28,7 @@ router.get(
   getJoinedCompanies
 );
 router.get(
-  "/organization/get_by_id/:id",
+  "/organization/:id",
   authorize(),
   cacheMiddleWare({
     keyPath: "params.id",
@@ -113,8 +113,8 @@ function getJoinedCompanies(req, res, next) {
 // Get company by Id
 async function getCompanyById(req, res, next) {
   const user = req.auth;
-  const { orgId } = req.params;
-  if (!orgId) {
+  const { id } = req.params;
+  if (!id) {
     return ApiResponseHandler.error({
       res: res,
       message: "Company id is required",
@@ -122,9 +122,9 @@ async function getCompanyById(req, res, next) {
     });
   }
 
-  CompanyService.getById(orgId, user.id)
+  CompanyService.getById(id, user.id)
     .then(async (company) => {
-      await updateCache(orgId, company);
+      await updateCache(id, company);
 
       return ApiResponseHandler.success({
         res: res,

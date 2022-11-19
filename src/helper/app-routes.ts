@@ -4,7 +4,7 @@ export const AppRoutes = {
     signup: '/signup',
     register: 'register',
     dashboard: '/',
-    organization: '/organization',
+    organization: '/organization/:id',
     setting: 'setting',
     notFound: '*',
     maintenance: 'maintenance',
