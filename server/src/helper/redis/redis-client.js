@@ -68,6 +68,7 @@ const updateCache = async (key, value, option) => {
   } else if (value !== "string") {
     value = JSON.stringify(value);
   }
+
   if (!option) {
     option = {
       EX: 60 * 60 * 1000,
@@ -75,7 +76,7 @@ const updateCache = async (key, value, option) => {
     };
   }
   const data = await redisClient.set(key, value, option);
-
+  logInfo(`key ${key}  status: ${data}`, "Cache");
   return data;
 };
 

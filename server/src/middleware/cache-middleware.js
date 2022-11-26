@@ -17,7 +17,7 @@ module.exports = function cacheMiddleWare({
 }) {
   return [
     async (req, res, next) => {
-      if (keyPath) {
+      if (keyPath && false) {
         // convert the key to list of keys
         const keys = keyPath.split(".");
 

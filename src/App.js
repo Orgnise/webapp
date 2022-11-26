@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./style/App.css";
 import "./style/comments.css";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Route,
+  RouterProvider,
+  createRoutesFromElements,
+} from "react-router-dom";
 
 import Comments from "./pages/comments.page";
 import useLocalStorage from "./hooks/use-local-storage";
@@ -16,10 +21,14 @@ import {
 import { AppRoutes } from "./helper/app-routes";
 import useSocket from "./hooks/use-socket.hook";
 import Signup from "./pages/auth/signup.page";
-import OrganizationsPage from "./pages/organization/organizations.page";
 import { SocketEvent } from "./constant/socket-event-constant";
 import OrganizationPage from "./pages/organization/detail/organization";
-import DashBoardPage from "./pages/dashboard/dashboard.page";
+import SuperAdminPage from "./pages/super-admin/super-admin.page";
+import WorkSpacePage from "./pages/workspace";
+import ProjectsPage from "./pages/workspace/pages/projects";
+import WorkspacePageView from "./pages/workspace/workspace.page";
+import TeamPage from "./pages/organization/detail/team/team";
+import ErrorPage from "./pages/error/error-page";
 
 function App() {
   const [, , socket] = useSocket();
@@ -74,34 +83,49 @@ function App() {
   }, [user]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path={AppRoutes.login}
-          element={getProtectedRoute(user, <Login />)}
-        />
-        <Route path={AppRoutes.signup} element={<Signup />} />
-        {/* <Route
-          path={AppRoutes.organization}
-          element={getLoggedInRoute(user, <Task />)}
-        /> */}
-        <Route
-          path={AppRoutes.dashboard}
-          element={getLoggedInRoute(user, <DashBoardPage />)}
-        >
-          <Route path={AppRoutes.organization} element={<OrganizationPage />} />
-        </Route>
-        <Route
-          path={AppRoutes.comments}
-          element={getLoggedInRoute(user, <Comments />)}
-        />
+    <RouterProvider
+      router={createBrowserRouter(
+        createRoutesFromElements(
+          <Route path="/" errorElement={<ErrorPage />}>
+            <Route
+              path={AppRoutes.login}
+              element={getProtectedRoute(user, <Login />)}
+            />
+            <Route path={AppRoutes.signup} element={<Signup />} />
 
-        <Route
-          path={AppRoutes.notFound}
-          element={getLoggedInRoute(user, <NoPageFound />)}
-        />
-      </Routes>
-    </BrowserRouter>
+            {/* DASHBOARD ROUTES */}
+            <Route
+              path={AppRoutes.dashboard}
+              element={getLoggedInRoute(user, <SuperAdminPage />)}
+            >
+              <Route
+                path={AppRoutes.organization.root}
+                element={getLoggedInRoute(user, <SuperAdminPage />)}
+              />
+              <Route
+                path={AppRoutes.organization.allOrganizations}
+                element={getLoggedInRoute(user, <SuperAdminPage />)}
+              />
+            </Route>
+
+            {/* WORKSPACE ROUTE */}
+            <Route
+              path={AppRoutes.workspace.root}
+              element={getLoggedInRoute(user, <WorkSpacePage />)}
+            />
+            <Route
+              path={AppRoutes.comments}
+              element={getLoggedInRoute(user, <Comments />)}
+            />
+
+            <Route
+              path={AppRoutes.notFound}
+              element={getLoggedInRoute(user, <NoPageFound />)}
+            />
+          </Route>
+        )
+      )}
+    />
   );
 }
 export default App;

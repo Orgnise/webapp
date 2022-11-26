@@ -22,8 +22,11 @@ export const Fold = <T, K>({
     ifPresent,
     ifAbsent,
 }: FoldProps<T, K>) => {
-    if (!value || value == null) {
-        return ifAbsent?.() ?? null;
+    if (value === undefined || value === null) {
+        if (ifAbsent) {
+            return ifAbsent();
+        }
+        return null;
     }
     return ifPresent(value);
 };

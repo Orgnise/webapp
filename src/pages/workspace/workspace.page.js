@@ -1,105 +1,40 @@
 import React, { useState, useEffect } from "react";
-import moment from "moment";
-import Nav from "../task/component/nav";
-
-import {
-  BrowserRouter,
-  Route,
-  Router,
-  Routes,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import {
-  Comments,
-  getLoggedInRoute,
-  getProtectedRoute,
-  NoPageFound,
-} from "../../helper/routes.helper";
-import { AppRoutes } from "../../helper/app-routes";
-import useLocalStorage from "../../hooks/use-local-storage";
+import cx from "classnames";
+import { useParams } from "react-router-dom";
 import { useAppService } from "../../hooks/use-app-service";
-import { SocketEvent } from "../../constant/socket-event-constant";
+import useLocalStorage from "../../hooks/use-local-storage";
+import { Fold } from "../../helper/typescript-utils";
 import useSocket from "../../hooks/use-socket.hook";
+import moment from "moment";
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { AppRoutes } from "../../helper/app-routes";
 import FIcon from "../../components/ficon";
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import AddOrganization from "./component/add-organization";
 import ModalForm from "../../components/modal";
-import OrganizationPage from "./detail/organization";
-// import OrganizationPage from "./detail/organization-info.page";
+import TasksContainer from "../task/component/task-container";
 
-const OrganizationsPage = () => {
+export const ORGANIZATION_PAGE_ROUTES = AppRoutes.workspace.root;
+export default function WorkspacePageView() {
+  const [organization, setOrganization] = useState({});
+  const [loading, setLoading] = useState(true);
+
   const params = useParams();
   const id = params.id;
-  return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      {/* Display the list of organizations */}
-      <div className="overflow-y-auto">
-        <div className="max-w-screen-xl mx-auto">
-          <span className="flex items-center py-6 text-slate-600 font-medium">
-            <FIcon icon={solid("user")} />
-            <a
-              href="/"
-              className="focus:outline-none text-base leading-normal px-2 hover:underline"
-            >
-              Organizations
-            </a>
-            <FIcon icon={solid("angle-right")} />
-            {id && (
-              <>
-                <span>
-                  <a
-                    href={`/organization/${id}`}
-                    className="focus:outline-none text-base leading-normal px-2 hover:underline"
-                  >
-                    {id}
-                  </a>
-                  <FIcon icon={solid("angle-right")} />
-                </span>
-              </>
-            )}
-          </span>
-
-          <Routes>
-            <Route path={AppRoutes.dashboard} element={<OrganizationList />} />
-            <Route
-              path={AppRoutes.organization}
-              element={<OrganizationPage />}
-            />
-          </Routes>
-        </div>
-      </div>
-      {/* <aside className="fixed top-0 bottom-0 left-0 w-14 hover:w-72 bg-teal-700  transition-all  duration-300 ease-in-out">
-        Hi
-      </aside> */}
-    </div>
-  );
-};
-
-function OrganizationList() {
-  const [organization, setOrganization] = useState([]);
-  const [tempOrganization, setTempOrganization] = useState([]);
-  const [loading, setLoading] = useState();
-  const [visible, setVisible] = useState(false);
-
-  const [user, setUser] = useLocalStorage("user");
-  const createOrganization = SocketEvent.organization.create;
-  const [_, __, socket] = useSocket([], {});
   const { organizationService } = useAppService();
+  const [user, setUser] = useLocalStorage("user");
 
   // Fetch organization list in which authenticated user is member | owner | admin
   useEffect(() => {
+    // console.log("Fetching organization detail");
     if (user) {
       setLoading(true);
       organizationService
-        .getAllCompanies()
-        .then(({ companies }) => {
-          // console.log("res", companies);
-          setOrganization(companies);
-          setTempOrganization(companies);
+        .getCompanyById(id)
+        .then(({ company }) => {
+          // console.log("res", company);
+          setOrganization(company);
         })
-        .catch(({ response }) => {
-          console.log(response.data);
+        .catch(({ error }) => {
+          console.log(error);
         })
         .finally(() => {
           setLoading(false);
@@ -107,41 +42,73 @@ function OrganizationList() {
     }
   }, [user]);
 
+  return (
+    <div className="pt-4">
+      <div className="flex flex-col">
+        {loading ? (
+          <>loading..</>
+        ) : (
+          <p className="text-3xl font-bold mb-4">Workspace</p>
+        )}
+
+        <Fold
+          value={organization.members}
+          ifPresent={(v) => <TeamList teams={v} />}
+          ifAbsent={() => <div>Nothing</div>}
+        />
+        {/* <TasksContainer /> */}
+        <div className="h-screen"></div>
+      </div>
+    </div>
+  );
+}
+
+function TeamList({ teams }) {
+  const [members, setMembers] = useState(teams);
+  const [tempMembers, setTempMembers] = useState(teams);
+  const [loading, setLoading] = useState();
+  const [visible, setVisible] = useState(false);
+
+  const [user, setUser] = useLocalStorage("user");
+
+  const [_, __, socket] = useSocket([], {});
+  const { organizationService } = useAppService();
+
   // Listen if any organization is created
   useEffect(() => {
     if (!socket || !socket.connected) return;
-    socket.on(createOrganization, (data) => {
-      setOrganization((prev) => [...prev, data]);
-      setTempOrganization((prev) => [...prev, data]);
-    });
-    return () => {
-      socket.off(createOrganization);
-    };
+    // socket.on(createOrganization, (data) => {
+    //   setMembers((prev) => [...prev, data]);
+    //   setTempMembers((prev) => [...prev, data]);
+    // });
+    // return () => {
+    //   socket.off(createOrganization);
+    // };
   }, [socket]);
 
   // Sort organization by created date
   function sortBy(val) {
     if (val === "Latest") {
-      const sortedOrganization = organization.sort((a, b) => {
+      const sortedOrganization = members.sort((a, b) => {
         return moment(b.createdAt).diff(moment(a.createdAt));
       });
-      setOrganization(sortedOrganization);
-      setTempOrganization(sortedOrganization);
+      setMembers(sortedOrganization);
+      setTempMembers(sortedOrganization);
     } else if (val === "Oldest") {
-      const sortedOrganization = organization.sort((a, b) => {
+      const sortedOrganization = members.sort((a, b) => {
         return moment(a.createdAt).diff(moment(b.createdAt));
       });
-      setOrganization(sortedOrganization);
-      setTempOrganization(sortedOrganization);
+      setMembers(sortedOrganization);
+      setTempMembers(sortedOrganization);
     }
   }
 
   // Filter organization by name
   function filterByQuery(query) {
-    const filteredOrganization = organization.filter((org) => {
-      return org.name.toLowerCase().includes(query.toLowerCase());
+    const filteredOrganization = members.filter((data) => {
+      return data.user.name.toLowerCase().includes(query.toLowerCase());
     });
-    setTempOrganization(filteredOrganization);
+    setTempMembers(filteredOrganization);
   }
   return (
     <div className="bg-white shadow mb-4 py-4 md:py-7  md:px-8 xl:px-10 ">
@@ -172,12 +139,13 @@ function OrganizationList() {
               className="focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 mt-4 sm:mt-0 inline-flex items-start justify-start px-6 py-3 bg-indigo-700 hover:bg-indigo-600 focus:outline-none rounded"
             >
               <p className="text-sm font-medium leading-none text-white">
-                Add Organization
+                Invite Members
               </p>
             </button>
           }
         >
-          <AddOrganization setVisible={setVisible} />
+          {/* <AddOrganization setVisible={setVisible} /> */}
+          <></>
         </ModalForm>
       </div>
       {loading && <div>Loading...</div>}
@@ -186,17 +154,16 @@ function OrganizationList() {
           <thead>
             <tr className="text-sm leading-none uppercase ">
               <th className="text-left px-4 py-3">Name</th>
-              <th className="text-left px-4 py-3">Admin</th>
-              <th className="text-left px-4 py-3">Description</th>
-              <th className="text-left px-4 py-3">Members</th>
-              <th className="text-left px-4 py-3">Created on</th>
+              <th className="text-left px-4 py-3">Email</th>
+              <th className="text-left px-4 py-3">Role</th>
+              <th className="text-left px-4 py-3">ID</th>
               <th className="text-left px-4 py-3"></th>
               <th className="text-left px-1 py-3"></th>
             </tr>
           </thead>
           <tbody>
-            {tempOrganization.map((org, index) => (
-              <OrganizationRow key={index} org={org} />
+            {tempMembers.map((data, index) => (
+              <MemberRow key={index} data={data} />
             ))}
           </tbody>
         </table>
@@ -205,7 +172,8 @@ function OrganizationList() {
   );
 }
 
-function OrganizationRow({ org, index }) {
+function MemberRow({ data, index }) {
+  const { role, user: member } = data;
   return (
     <tr
       key={index}
@@ -215,53 +183,36 @@ function OrganizationRow({ org, index }) {
       <td className="">
         <div className="flex items-center pl-5">
           <a
-            href={`organization/${org.id}`}
+            href={`organization/${"member.name"}`}
             className="text-base font-medium leading-none text-gray-700 mr-2 hover:underline hover:cursor-pointer"
           >
-            {org.name}
+            {member.name}
           </a>
         </div>
       </td>
       <td className="pl-5">
         <div className="flex items-center">
-          <FIcon className="text-slate-500" icon={regular("user")} />
+          <FIcon className="text-slate-500" icon={solid("mail-forward")} />
           <p className="text-sm leading-none text-gray-600 ml-2">
-            {org.createdBy.name}
+            {member.email}
           </p>
+        </div>
+      </td>
+      <td className="pl-5">
+        <div className="flex items-center">
+          <span
+            className={cx("flex items-center lowercase px-2 rounded-md", {
+              "text-green-900 bg-green-200 ": role === "Admin",
+              "text-blue-900 bg-blue-200 ": role === "User",
+            })}
+          >
+            {role}
+          </span>
         </div>
       </td>
       <td className="pl-2">
         <div className="flex items-center">
-          <p className="text-sm leading-none text-gray-600 ml-2">
-            {org.description.length == 0
-              ? "-"
-              : org.description.substring(0, 40) + "..."}
-          </p>
-        </div>
-      </td>
-      <td className="pl-5">
-        <div className="flex items-center">
-          <FIcon
-            icon={regular("user")}
-            className="cursor-pointer p-1 rounded select-none "
-            size="xs"
-          />
-          <span className="flex items-center ">{org.members.length}</span>
-        </div>
-      </td>
-      <td className="pl-5">
-        <div className="flex items-center">
-          <FIcon
-            icon={regular("calendar")}
-            className="cursor-pointer p-1 rounded select-none"
-            size="xs"
-          />
-
-          <p className="text-sm leading-none text-gray-600 ml-2">
-            <span className=" text-slate-600">
-              {moment(org.createdAt).format("DD MMM YY")}
-            </span>
-          </p>
+          <p className="text-sm leading-none text-gray-600 ml-2">{member.id}</p>
         </div>
       </td>
 
@@ -327,5 +278,3 @@ function OrganizationRow({ org, index }) {
     </tr>
   );
 }
-
-export default OrganizationsPage;

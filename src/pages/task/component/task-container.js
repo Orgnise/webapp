@@ -5,6 +5,7 @@ import useSocket from "../../../hooks/use-socket.hook";
 import Task from "./task";
 import useLocalStorage from "../../../hooks/use-local-storage";
 import { useAppService } from "../../../hooks/use-app-service";
+import { useParams } from "react-router-dom";
 
 const TasksContainer = () => {
   const [socketState, setSocketData, socket] = useSocket(["tasks"], {});
@@ -14,10 +15,16 @@ const TasksContainer = () => {
   const [user, setUser] = useLocalStorage("user");
   const { boardService, organizationService } = useAppService();
 
+  const params = useParams();
+  const id = params.id;
+
   useEffect(() => {
+    if (!user || !id) {
+      return;
+    }
     function fetchTasks() {
       organizationService
-        .getAllCompanies()
+        .getCompanyById(id)
         .then(({ board }) => {
           setSocketData({
             tasks: board,
@@ -37,12 +44,13 @@ const TasksContainer = () => {
     }
 
     if (user) {
-      fetchTasks();
+      // fetchTasks();
+      setTasks([]);
     } else {
       setTasks([]);
       setErrors({ tasks: "Sign in to view tasks" });
     }
-  }, [user]);
+  }, [user, id]);
 
   useEffect(() => {
     if (socketState.tasks) {

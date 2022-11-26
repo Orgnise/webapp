@@ -24,9 +24,9 @@ export const SidebarPageLayout = ({
   footer,
 }: SidebarPageLayoutProps) => {
   return (
-    <div className="h-full bg-white flex flex-col sm:w-12 lg:w-64 w-12">
+    <div className="h-[calc(100vh-64px)] bg-white flex flex-col sm:w-12 lg:w-64 w-12">
       {/* HEADER */}
-      <div>{header}</div>
+      <div className="flex-grow-0">{header}</div>
 
       {/* CONTENT */}
 
