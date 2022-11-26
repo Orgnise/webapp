@@ -1,5 +1,4 @@
-import { Axios } from 'axios';
-import { AxiosClient } from "./axios-client";
+import { Axios, AxiosResponse } from 'axios';
 import { Endpoints } from "../constant/constants";
 
 export default class OrganizationService {
@@ -9,7 +8,11 @@ export default class OrganizationService {
         this.client = axios;
     }
 
-    async getAllCompanies() {
+    /**
+     * Get company all companies
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    async getAllCompanies(): Promise<AxiosResponse<any>> {
         return this.client
             .get(Endpoints.organization.getAll)
             .then((response) => response.data);
@@ -20,7 +23,7 @@ export default class OrganizationService {
      * @param id
      * @returns {Promise<AxiosResponse<any>>}
      */
-    async getCompanyById(id: string) {
+    async getCompanyById(id: string): Promise<AxiosResponse<any>> {
         return this.client
             .get(Endpoints.organization.getById(id))
             .then((response) => response.data);

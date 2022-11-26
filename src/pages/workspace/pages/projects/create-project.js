@@ -1,42 +1,45 @@
 import React, { useState } from "react";
 import cx from "classnames";
 import { faker } from "@faker-js/faker";
-import useSocket from "../../../hooks/use-socket.hook";
-import { useNavigate } from "react-router-dom";
-import { history } from "../../../helper/history.config";
-import DropDown from "../../../components/dropdown";
-import { SocketEvent } from "../../../constant/socket-event-constant";
+import { SocketEvent } from "../../../../constant/socket-event-constant";
+import useSocket from "../../../../hooks/use-socket.hook";
+import { useAppService } from "../../../../hooks/use-app-service";
+import { LoadingSpinner } from "../../../../components/atom/spinner";
 
-const AddOrganization = ({ setVisible = () => {} }) => {
+const AddProject = ({ orgId, setVisible = () => {} }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState({});
-  const createOrganization = SocketEvent.organization.create;
-  const [state, setState, socket] = useSocket([createOrganization], {});
+  const [loading, setLoading] = useState(false);
 
-  React.useEffect(() => {
-    if (state[createOrganization]) {
-      console.log("Organization created", state[createOrganization]);
-    }
-  }, [state[createOrganization]]);
+  const { projectService } = useAppService();
 
-  const handleAddTodo = (e) => {
+  const createProject = (e) => {
     e.preventDefault();
     // Use faker.js to generate random data
     const data = {
       name: faker.company.name(),
       description: faker.lorem.paragraph().substring(0, 100),
     };
-
-    //👇🏻 sends the task to the Socket.io server
-    socket.emit(createOrganization, data);
-    setName("");
-    setDescription("");
-    setVisible(false);
+    setLoading(true);
+    projectService
+      .createProject(orgId, data)
+      .then(({ Project }) => {
+        setName("");
+        setDescription("");
+        setVisible(false);
+      })
+      .catch((err) => {
+        setError(err);
+        console.error(err);
+      })
+      .then(() => {
+        setLoading(false);
+      });
   };
 
   return (
-    <form className="max-w-lg min-w-full" onSubmit={handleAddTodo}>
+    <form className="max-w-lg min-w-full" onSubmit={createProject}>
       <div id="content-4a" className="flex-1">
         <div className="flex flex-col gap-6">
           {/* <!-- Title --> */}
@@ -45,7 +48,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
               id="id-b03"
               type="text"
               name="id-b03"
-              placeholder="Task title"
+              placeholder="Project title"
               required={error.name}
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -58,10 +61,10 @@ const AddOrganization = ({ setVisible = () => {} }) => {
               htmlFor="id-b03"
               className="absolute left-2 -top-2 z-[1] px-2 text-xs text-slate-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
             >
-              Organization name
+              Project name
             </label>
             <small className="absolute flex w-full justify-between px-4 py-1 text-xs text-slate-400 invisible peer-invalid:visible transition peer-invalid:text-pink-500">
-              <span>Enter organization name</span>
+              <span>Enter project name</span>
             </small>
           </div>
 
@@ -69,7 +72,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
           <div className="relative my-6">
             <textarea
               className="peer relative  w-full rounded border border-slate-200 px-4 pr-12 py-2 max-h-96 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
-              placeholder="Task description"
+              placeholder="Project description"
               onChange={(e) => {
                 setDescription(e.target.value);
                 e.target.style.height = "inherit";
@@ -89,7 +92,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
           </div>
         </div>
 
-        {/* <!-- Add Task button --> */}
+        {/* <!-- Add Project button --> */}
         <button
           disabled={name.length === 0}
           className={cx(
@@ -99,11 +102,11 @@ const AddOrganization = ({ setVisible = () => {} }) => {
             }
           )}
         >
-          <span>Create Organization</span>
+          {!loading ? <LoadingSpinner /> : <span>Add Project</span>}
         </button>
       </div>
     </form>
   );
 };
 
-export default AddOrganization;
+export default AddProject;

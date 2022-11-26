@@ -8,6 +8,7 @@ import { AppRoutes } from "../../../helper/app-routes";
 import ProjectsPage from "../pages/projects";
 import TeamPage from "../pages/team";
 import Breadcrumb from "../../../components/breadcrumb";
+import ErrorPage from "../../error/error-page";
 
 function WorkSpaceLayout() {
   const params = useParams();
@@ -15,8 +16,6 @@ function WorkSpaceLayout() {
 
   const path = window.location.pathname;
   const pathArray = path.split("/").filter((item) => item !== "");
-
-  console.log("pathNameArray", pathArray);
 
   return (
     <div>
@@ -36,7 +35,11 @@ function WorkSpaceLayout() {
             ]}
           />
           <Routes>
-            <Route path={"/project"} element={<ProjectsPage />} />
+            <Route
+              path={"/project"}
+              errorElement={<ErrorPage />}
+              element={<ProjectsPage />}
+            />
             <Route path={"team"} element={<TeamPage />} />
           </Routes>
         </div>

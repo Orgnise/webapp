@@ -1,3 +1,4 @@
+
 /**
  * Define api endpoints
  */
@@ -13,8 +14,19 @@ export const Endpoints = {
         create: '/organization/create',
         update: '/organization/update',
         delete: '/organization/delete',
-        getById: (id: string) => `/organization/${id}`,
+        getById: (orgId: string) => `/organization/${orgId}`,
+        project: (orgId: string) => {
+            return {
+                getAll: `/organization/${orgId}/project/all`,
+                create: `/organization/${orgId}/project/create`,
+                update: `/organization/${orgId}/project/update`,
+                delete: `/organization/${orgId}/project/delete`,
+                getById: (projectId: string) => `/organization/${orgId}/project/${projectId}`,
+            }
+        },
     },
+
+
     board: {
         create: '/board/create',
         update: '/board/update',

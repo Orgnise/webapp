@@ -55,7 +55,15 @@ function App() {
     socket.on(
       SocketEvent.auth.register,
       ({ isAuthenticated, event, payload }) => {
+        console.log(
+          "🚀 ~ file: App.js ~ line 58 ~ useEffect ~ isAuthenticated",
+          isAuthenticated
+        );
         // Check if user is not authenticated
+        console.log(
+          "🚀 ~ file: App.js ~ line 64 ~ useEffect ~ auhRetry",
+          auhRetry
+        );
         // If not authenticated, then retry to register user in socket
         if (!isAuthenticated) {
           // If user data is available in local storage, then retry to register user in socket
@@ -111,6 +119,7 @@ function App() {
             {/* WORKSPACE ROUTE */}
             <Route
               path={AppRoutes.workspace.root}
+              errorElement={<ErrorPage />}
               element={getLoggedInRoute(user, <WorkSpacePage />)}
             />
             <Route

@@ -15,9 +15,6 @@ export function useAppService() {
     const boardService = appService.boardService;
     const authService = appService.authService;
     const organizationService = appService.organizationService;
-    return {
-        boardService,
-        authService,
-        organizationService
-    }
+    const projectService = appService.projectService;
+    return { boardService, authService, organizationService, projectService };
 }
