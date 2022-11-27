@@ -71,7 +71,7 @@ function TeamList({ teams }) {
 
   const [user, setUser] = useLocalStorage("user");
 
-  const [_, __, socket] = useSocket([], {});
+  const socket = useSocket([], {});
   const { organizationService } = useAppService();
 
   // Listen if any organization is created

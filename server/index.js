@@ -21,11 +21,12 @@ const server = app.listen(port, () => {
 
 const io = SocketIO(server);
 require("./src/config/global");
-global.socket = io;
 
 // Register socket handlers
 io.on("connection", (socket) => {
   SocketHandler(io, socket);
+  global.socket = socket;
+  global.io = io;
 });
 
 // global error middleware

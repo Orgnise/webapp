@@ -12,7 +12,7 @@ export default class OrganizationService {
      * Get organization all companies
      * @returns {Promise<AxiosResponse<any>>}
      */
-    async getAllCompanies(): Promise<AxiosResponse<any>> {
+    async getAllOrganizations(): Promise<AxiosResponse<any>> {
         return this.client
             .get(Endpoints.organization.getAll)
             .then((response) => response.data);
@@ -23,7 +23,7 @@ export default class OrganizationService {
      * @param id
      * @returns {Promise<AxiosResponse<any>>}
      */
-    async getCompanyById(id: string): Promise<AxiosResponse<any>> {
+    async getOrganizationById(id: string): Promise<AxiosResponse<any>> {
         return this.client
             .get(Endpoints.organization.getById(id))
             .then((response) => response.data);

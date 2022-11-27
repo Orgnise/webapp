@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import cx from "classnames";
 import { faker } from "@faker-js/faker";
+import toast, { Toaster } from "react-hot-toast";
 import { SocketEvent } from "../../../../constant/socket-event-constant";
 import useSocket from "../../../../hooks/use-socket.hook";
 import { useAppService } from "../../../../hooks/use-app-service";
@@ -23,15 +24,17 @@ const AddProject = ({ orgId, setVisible = () => {} }) => {
     };
     setLoading(true);
     projectService
-      .createProject(orgId, data)
+      .createProject("orgId", data)
       .then(({ Project }) => {
         setName("");
         setDescription("");
+        toast("Project created successfully", { position: "top-right" });
         setVisible(false);
       })
       .catch((err) => {
         setError(err);
         console.error(err);
+        toast.error("Failed to create project", { position: "top-right" });
       })
       .then(() => {
         setLoading(false);
@@ -102,9 +105,10 @@ const AddProject = ({ orgId, setVisible = () => {} }) => {
             }
           )}
         >
-          {!loading ? <LoadingSpinner /> : <span>Add Project</span>}
+          {loading ? <LoadingSpinner /> : <span>Add Project</span>}
         </button>
       </div>
+      <Toaster />
     </form>
   );
 };
