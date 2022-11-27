@@ -1,4 +1,4 @@
-const CompanySocketHAndler = require("./company-socket.handler");
+const CompanySocketHAndler = require("./organization-socket.handler");
 const UserSocketHAndler = require("./user-socket.handler");
 
 module.exports = (io, socket) => {

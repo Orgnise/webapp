@@ -1,4 +1,4 @@
-const Company = require("./company.modal");
+const Organization = require("./Organization.modal");
 const User = require("./user");
 const Project = require("./project.model");
 const Comment = require("./comment.model");
@@ -7,7 +7,7 @@ const IssueType = require("./issue-type.model");
 const Column = require("./column.model");
 
 module.exports = {
-  Company,
+  Organization,
   User,
   Project,
   Comment,

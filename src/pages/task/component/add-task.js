@@ -11,13 +11,7 @@ const AddTask = ({ setVisible = () => {} }) => {
   const [priority, setPriority] = useState();
   const [status, setStatus] = useState();
   const [error, setError] = useState({});
-  const [state, setState, socket] = useSocket(["createTask"], {});
-
-  React.useEffect(() => {
-    if (state.createTask) {
-      console.log("Task added", state.createTask);
-    }
-  }, [state.createTask]);
+  const socket = useSocket(["createTask"], {});
 
   const handleAddTodo = (e) => {
     e.preventDefault();

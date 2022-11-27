@@ -7,7 +7,7 @@ const {
   UserController,
   BoardController,
   IssueController,
-  CompanyController,
+  OrganizationController,
   ProjectController,
 } = require("./src/routes");
 const SocketHandler = require("./src/routes/socket_handler");
@@ -21,16 +21,17 @@ const server = app.listen(port, () => {
 
 const io = SocketIO(server);
 require("./src/config/global");
-global.socket = io;
 
 // Register socket handlers
 io.on("connection", (socket) => {
   SocketHandler(io, socket);
+  global.socket = socket;
+  global.io = io;
 });
 
 // global error middleware
 app.use("/", UserController);
-app.use("/", CompanyController);
+app.use("/", OrganizationController);
 app.use("/", ProjectController);
 app.use("/", IssueController);
 

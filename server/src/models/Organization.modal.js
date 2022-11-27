@@ -2,7 +2,7 @@ const Mongoose = require("mongoose");
 const Role = require("../helper/role");
 const Schema = Mongoose.Schema;
 
-const CompanySchema = new Schema(
+const OrganizationSchema = new Schema(
   {
     name: {
       type: String,
@@ -27,7 +27,6 @@ const CompanySchema = new Schema(
           type: Mongoose.Schema.Types.ObjectId,
           ref: "User",
           required: true,
-          unique: true,
         },
         role: {
           type: String,
@@ -68,12 +67,12 @@ const CompanySchema = new Schema(
   }
 );
 
-CompanySchema.virtual("membersCount").get(function () {
+OrganizationSchema.virtual("membersCount").get(function () {
   return this.members.length;
 });
 
-CompanySchema.virtual("isDeactivated").get(function () {
+OrganizationSchema.virtual("isDeactivated").get(function () {
   return this.deactivatedAt !== null;
 });
 
-module.exports = Mongoose.model("Company", CompanySchema);
+module.exports = Mongoose.model("Organization", OrganizationSchema);

@@ -1,4 +1,5 @@
 import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import toast from "react-hot-toast";
 import moment from "moment";
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -15,13 +16,18 @@ import AddProject from "./create-project";
 
 function ProjectsPage() {
   const [projects, setProjects] = useState([]);
-  const [tempOrganization, setTempOrganization] = useState([]);
+  const [tempProject, setTempProject] = useState([]);
   const [loading, setLoading] = useState();
   const [visible, setVisible] = useState(false);
 
   const [user, setUser] = useLocalStorage("user");
-  const createOrganization = SocketEvent.organization.create;
-  const [_, __, socket] = useSocket([], {});
+  const createProject = SocketEvent.organization.project.create;
+  const socket = useSocket([createProject], (event, data) => {
+    if (event === createProject) {
+      setTempProject((prev) => [...prev, data]);
+      setProjects((prev) => [...prev, data]);
+    }
+  });
   const { projectService } = useAppService();
 
   const params = useParams();
@@ -36,7 +42,7 @@ function ProjectsPage() {
         .then(({ Projects }) => {
           // console.log("res", companies);
           setProjects(Projects);
-          setTempOrganization(Projects);
+          setTempProject(Projects);
         })
         .catch(({ response }) => {
           console.log(response.data);
@@ -47,18 +53,6 @@ function ProjectsPage() {
     }
   }, [user, id]);
 
-  // Listen if any organization is created
-  useEffect(() => {
-    if (!socket || !socket.connected) return;
-    socket.on(createOrganization, (data) => {
-      setProjects((prev) => [...prev, data]);
-      setTempOrganization((prev) => [...prev, data]);
-    });
-    return () => {
-      socket.off(createOrganization);
-    };
-  }, [socket]);
-
   // Sort organization by created date
   function sortBy(val) {
     if (val === "Latest") {
@@ -66,13 +60,13 @@ function ProjectsPage() {
         return moment(b.createdAt).diff(moment(a.createdAt));
       });
       setProjects(sortedOrganization);
-      setTempOrganization(sortedOrganization);
+      setTempProject(sortedOrganization);
     } else if (val === "Oldest") {
       const sortedOrganization = projects.sort((a, b) => {
         return moment(a.createdAt).diff(moment(b.createdAt));
       });
       setProjects(sortedOrganization);
-      setTempOrganization(sortedOrganization);
+      setTempProject(sortedOrganization);
     }
   }
 
@@ -81,7 +75,7 @@ function ProjectsPage() {
     const filteredOrganization = projects.filter((org) => {
       return org.name.toLowerCase().includes(query.toLowerCase());
     });
-    setTempOrganization(filteredOrganization);
+    setTempProject(filteredOrganization);
   }
   return (
     <section className="flex flex-col space-y-6">
@@ -136,9 +130,9 @@ function ProjectsPage() {
             </thead>
             <tbody>
               <TableBody
-                items={tempOrganization}
+                items={tempProject}
                 renderItem={(org, index) => (
-                  <ProjectRow org={org} index={index} />
+                  <ProjectRow key={index} org={org} index={index} />
                 )}
                 placeholder={
                   <tr>

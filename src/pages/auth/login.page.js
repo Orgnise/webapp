@@ -16,7 +16,7 @@ const Login = () => {
   const [storedValue, setValue] = useLocalStorage("user", null);
 
   /// 👇🏻  Use the useSocket hook to get the socket
-  const [_, __, socket] = useSocket([SocketEvent.auth.register], {});
+  const socket = useSocket([], {});
 
   const { authService } = useAppService();
 

@@ -12,13 +12,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
   const [description, setDescription] = useState("");
   const [error, setError] = useState({});
   const createOrganization = SocketEvent.organization.create;
-  const [state, setState, socket] = useSocket([createOrganization], {});
-
-  React.useEffect(() => {
-    if (state[createOrganization]) {
-      console.log("Organization created", state[createOrganization]);
-    }
-  }, [state[createOrganization]]);
+  const socket = useSocket();
 
   const handleAddTodo = (e) => {
     e.preventDefault();

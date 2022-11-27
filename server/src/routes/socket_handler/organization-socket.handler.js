@@ -1,6 +1,6 @@
 const chalk = require("chalk");
 const UserService = require("../../services/user.service");
-const CompanyService = require("../../services/company.service");
+const CompanyService = require("../../services/organization.service");
 const ApiResponseHandler = require("../../helper/response/api-response");
 const { logError, logSuccess, logWarning } = require("../../helper/logger");
 module.exports = (io, socket) => {
@@ -17,12 +17,12 @@ module.exports = (io, socket) => {
       const list = await CompanyService.getJoinedCompanies(user.id);
       const companies = {
         data: list,
-        message: "Company fetched successfully",
+        message: "Organization fetched successfully",
         dataKey: "companies",
         total: list.length,
       };
       socket.emit("organization:joined:all:read", companies);
-      logSuccess("Company fetched successfully");
+      logSuccess("Organization fetched successfully");
     } catch (error) {
       logError(error, "getJoinedCompanies ~ line 32");
     }

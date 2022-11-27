@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import moment from "moment";
 import Nav from "../task/component/nav";
 
@@ -29,7 +30,6 @@ import ModalForm from "../../components/modal";
 import OrganizationPage from "./detail/organization";
 import Breadcrumb from "../../components/breadcrumb";
 import { WithBreadcrumb } from "../../components/compound/withbreadcrumn";
-// import OrganizationPage from "./detail/organization-info.page";
 
 const AllOrganizationsList = () => {
   const params = useParams();
@@ -62,18 +62,26 @@ export function OrganizationList() {
   const [tempOrganization, setTempOrganization] = useState([]);
   const [loading, setLoading] = useState();
   const [visible, setVisible] = useState(false);
+  const { organizationService } = useAppService();
 
   const [user, setUser] = useLocalStorage("user");
   const createOrganization = SocketEvent.organization.create;
-  const [_, __, socket] = useSocket([], {});
-  const { organizationService } = useAppService();
+  useSocket([createOrganization], (event, data) => {
+    if (event === createOrganization) {
+      setOrganization((prev) => [...prev, data]);
+      setTempOrganization((prev) => [...prev, data]);
+      toast.success("Organization created successfully", {
+        position: "top-right",
+      });
+    }
+  });
 
   // Fetch organization list in which authenticated user is member | owner | admin
   useEffect(() => {
     if (user) {
       setLoading(true);
       organizationService
-        .getAllCompanies()
+        .getAllOrganizations()
         .then(({ companies }) => {
           // console.log("res", companies);
           setOrganization(companies);
@@ -87,18 +95,6 @@ export function OrganizationList() {
         });
     }
   }, [user]);
-
-  // Listen if any organization is created
-  useEffect(() => {
-    if (!socket || !socket.connected) return;
-    socket.on(createOrganization, (data) => {
-      setOrganization((prev) => [...prev, data]);
-      setTempOrganization((prev) => [...prev, data]);
-    });
-    return () => {
-      socket.off(createOrganization);
-    };
-  }, [socket]);
 
   // Sort organization by created date
   function sortBy(val) {

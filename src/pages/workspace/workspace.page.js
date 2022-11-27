@@ -29,9 +29,9 @@ export default function WorkspacePageView() {
       setLoading(true);
       organizationService
         .getCompanyById(id)
-        .then(({ company }) => {
-          // console.log("res", company);
-          setOrganization(company);
+        .then(({ organization }) => {
+          // console.log("res", organization);
+          setOrganization(organization);
         })
         .catch(({ error }) => {
           console.log(error);
@@ -71,7 +71,7 @@ function TeamList({ teams }) {
 
   const [user, setUser] = useLocalStorage("user");
 
-  const [_, __, socket] = useSocket([], {});
+  const socket = useSocket([], {});
   const { organizationService } = useAppService();
 
   // Listen if any organization is created

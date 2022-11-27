@@ -11,15 +11,11 @@ import { SocketContext } from "../context/socket.context";
  * @param {Object} initialState
  * @returns
  * @example
- * const [state, setState] = useSocket(["event1", "event2"], { event1: null, event2: null });
+ * const [state, setState] = useSocket(["event1", "event2"], (event,data) => {console.log(event, data)});
  * setState({ event1: "new value" });
- * @example <caption>Second way of updating data</caption>
- * const [state, setState] = useSocket(["event1", "event2"], { event1: null, event2: null });
- * setState((prevState) => ({ ...prevState, event1: "New data" }));
  */
-const useSocket = (events: string[], initialState: any): [Object, Dispatch<any>, Socket] => {
+const useSocket = (events: string[], callback = (event: string, data: (_: any) => void) => { }): Socket => {
 
-  const [state, setState] = useState(initialState);
   const socket = useContext<any>(SocketContext);
 
   useEffect(() => {
@@ -28,7 +24,8 @@ const useSocket = (events: string[], initialState: any): [Object, Dispatch<any>,
       events.forEach((event) => {
         socket.on(event, (data: any) => {
           console.log("Socket event", event, data);
-          setState((prevState: any) => ({ ...prevState, [event]: data }));
+          // setState((prevState: any) => ({ ...prevState, [event]: data }));
+          callback(event, data);
         });
       });
       return () => {
@@ -40,7 +37,7 @@ const useSocket = (events: string[], initialState: any): [Object, Dispatch<any>,
     return () => { };
   }, [events, socket]);
 
-  return [state, setState, socket];
+  return socket;
 }
 
 export default useSocket;

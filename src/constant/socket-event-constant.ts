@@ -9,7 +9,11 @@ export const SocketEvent = {
         delete: 'organization:delete',
         get: 'organization:get',
         getAll: 'organization:getAll',
+        project: {
+            create: 'organization:project:create',
+        }
     },
+
     // Socket events for board
     board: {
         create: 'board:create',
@@ -29,6 +33,7 @@ export const SocketEvent = {
         login: 'auth:login',
         register: 'auth:register',
         logout: 'auth:logout',
+        checkAuth: "auth:authorized"
     },
 
 };

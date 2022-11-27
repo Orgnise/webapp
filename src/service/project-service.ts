@@ -21,7 +21,7 @@ export default class ProjectService {
     }
 
     /**
-     * Get company by id
+     * Get organization by id
      * @param id
      * @param {string} orgId
      * @returns {Promise<AxiosResponse<any>>}

@@ -8,7 +8,7 @@ import { useAppService } from "../../../hooks/use-app-service";
 import { useParams } from "react-router-dom";
 
 const TasksContainer = () => {
-  const [socketState, setSocketData, socket] = useSocket(["tasks"], {});
+  const socket = useSocket(["tasks"], {});
   const [tasks, setTasks] = useState([]);
   const [errors, setErrors] = useState({});
   const [dragFirstTask, setDragFirstTask] = useState(false);
@@ -26,9 +26,6 @@ const TasksContainer = () => {
       organizationService
         .getCompanyById(id)
         .then(({ board }) => {
-          setSocketData({
-            tasks: board,
-          });
           setTasks(board);
           setErrors({});
         })
@@ -37,7 +34,6 @@ const TasksContainer = () => {
             setErrors({ tasks: "You are not authorized to view this board" });
           } else {
             console.log(response.data);
-            setSocketData({ tasks: [] });
             setErrors({ tasks: "No tasks found" });
           }
         });
@@ -51,13 +47,6 @@ const TasksContainer = () => {
       setErrors({ tasks: "Sign in to view tasks" });
     }
   }, [user, id]);
-
-  useEffect(() => {
-    if (socketState.tasks) {
-      console.log("Tasks updated", socketState.tasks);
-      setTasks(socketState.tasks);
-    }
-  }, [socketState.tasks]);
 
   //👇🏻 This function is the value of the onDragEnd prop
   const handleDragEnd = ({ destination, source }) => {

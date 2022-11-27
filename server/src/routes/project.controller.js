@@ -43,6 +43,7 @@ function createProject(req, res, next) {
     userId: user.id,
   })
     .then((project) => {
+      global.socket.emit("organization:project:create", project);
       return ApiResponseHandler.success({
         res: res,
         data: project,
