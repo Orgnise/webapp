@@ -21,9 +21,9 @@ export default function TeamPage() {
       setLoading(true);
       organizationService
         .getCompanyById(id)
-        .then(({ company }) => {
-          // console.log("res", company);
-          setTeam(company);
+        .then(({ organization }) => {
+          // console.log("res", organization);
+          setTeam(organization);
         })
         .catch(({ error }) => {
           console.log(error);

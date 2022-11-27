@@ -30,9 +30,9 @@ export default function OrganizationPage() {
       setLoading(true);
       organizationService
         .getCompanyById(id)
-        .then(({ company }) => {
-          console.log("res", company);
-          setOrganization(company);
+        .then(({ organization }) => {
+          console.log("res", organization);
+          setOrganization(organization);
         })
         .catch(({ error }) => {
           console.log(error);

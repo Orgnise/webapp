@@ -9,7 +9,7 @@ export default class OrganizationService {
     }
 
     /**
-     * Get company all companies
+     * Get organization all companies
      * @returns {Promise<AxiosResponse<any>>}
      */
     async getAllCompanies(): Promise<AxiosResponse<any>> {
@@ -19,7 +19,7 @@ export default class OrganizationService {
     }
 
     /**
-     * Get company by id
+     * Get organization by id
      * @param id
      * @returns {Promise<AxiosResponse<any>>}
      */

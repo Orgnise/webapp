@@ -1,9 +1,9 @@
 const Mongoose = require("mongoose");
 const db = require("../config/db");
 const { promise: fs } = require("fs");
-const { User, Company } = require("../models");
+const { User, Organization } = require("../models");
 // const { UserService } = require("../services");
-const UserService = require("../services/user.service");
+const UserService = require("./user.service");
 const FakeBoardData = require("../config/task_data");
 const Role = require("../helper/role");
 
@@ -24,37 +24,37 @@ module.exports = {
 };
 
 /**
- * Create new company and save to db
- * @param {Object} body - company data
- * @returns {Promise<Company>}
+ * Create new organization and save to db
+ * @param {Object} body - organization data
+ * @returns {Promise<Organization>}
  * @throws {Error}
  */
 async function createCompany(body, userId) {
   try {
     const { name, description, createdBy } = body;
 
-    // Check if company already exists with same name
-    if (await Company.findOne({ name })) {
+    // Check if organization already exists with same name
+    if (await Organization.findOne({ name })) {
       throw new HttpException(
         HttpStatusCode.BAD_REQUEST,
-        "Company already exists"
+        "Organization already exists"
       );
     }
 
     // Get user data
     const user = await UserService.getById({ id: userId });
 
-    // Set user role to admin for company
+    // Set user role to admin for organization
     user.role = Admin;
-    const company = await Company.create({
+    const organization = await Organization.create({
       name,
       description,
       createdBy: user.id,
       members: [{ user: user.id, role: user.role, _id: user.id }],
     });
 
-    // return company data
-    return (await company.populate("members.user", "name id")).populate(
+    // return organization data
+    return (await organization.populate("members.user", "name id")).populate(
       "createdBy",
       "name id"
     );
@@ -68,41 +68,41 @@ async function createCompany(body, userId) {
 }
 
 /**
- * Get company by id
+ * Get organization by id
  * @param {ObjectId} Id
- * @returns {Promise<Company>}
+ * @returns {Promise<Organization>}
  * @throws {Error}
  */
 async function getById(id) {
-  // Check if id is a valid company id
+  // Check if id is a valid organization id
   if (!Mongoose.isValidObjectId(id)) {
     throw new HttpException(
       HttpStatusCode.BAD_REQUEST,
       "",
-      "Invalid company id"
+      "Invalid organization id"
     );
   }
-  // Get company data using company id if exists
-  const company = await Company.findOne({ _id: id })
+  // Get organization data using organization id if exists
+  const organization = await Organization.findOne({ _id: id })
     .populate("members.user", "name email id")
     .populate("createdBy", "name id");
 
-  // Check if company exists
-  if (!company) {
+  // Check if organization exists
+  if (!organization) {
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
-      "No company found with",
-      "Company does not exist with " + id + " id"
+      "No organization found with",
+      "Organization does not exist with " + id + " id"
     );
   }
 
-  return getBasicCompanyInfo(company);
+  return getBasicCompanyInfo(organization);
 }
 
 /**
- * Get all company basic info for user
+ * Get all organization basic info for user
  * @param {ObjectId} userId
- * @returns {Promise<Company[]>}
+ * @returns {Promise<Organization[]>}
  * @throws {HttpException}
  */
 
@@ -115,7 +115,7 @@ async function getAllCompany(userId) {
     );
   }
   try {
-    const companies = await Company.find({
+    const companies = await Organization.find({
       members: { $elemMatch: { user: userId } },
     })
       .populate("members.user", "name")
@@ -139,13 +139,13 @@ async function getAllCompany(userId) {
 /**
  * Gel all joined companies
  * @param {ObjectId} userId
- * @returns {Promise<Company[]>}
+ * @returns {Promise<Organization[]>}
  * @throws {HttpException}
  */
 async function getJoinedCompanies(userId) {
   try {
     const user = await UserService.getById({ id: userId });
-    const companies = await Company.find({ "members.user": user.id })
+    const companies = await Organization.find({ "members.user": user.id })
       .populate("members.user", "name")
       .populate("createdBy", "name");
     return companies;
@@ -155,48 +155,50 @@ async function getJoinedCompanies(userId) {
 }
 
 /**
- * Add members to company
+ * Add members to organization
  * @param {ObjectId} companyId
  * @param {Array} members
  * @param {ObjectId} userId
- * @returns {Promise<Company>}
+ * @returns {Promise<Organization>}
  * @throws {Error}
  */
 
 async function addMembers(companyId, userId, members) {
   try {
-    // Check if company exists
-    const company = await findCompany(companyId);
+    // Check if organization exists
+    const organization = await findCompany(companyId);
 
-    const user = company.members.find((member) => member.user._id == userId);
+    const user = organization.members.find(
+      (member) => member.user._id == userId
+    );
 
-    // Check if auth user is a member of company or not, if he/she is not company owner
-    if (company.createdBy.id !== userId) {
-      // Check if user is member of company
+    // Check if auth user is a member of organization or not, if he/she is not organization owner
+    if (organization.createdBy.id !== userId) {
+      // Check if user is member of organization
       if (!user) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a member of this company",
+          "You are not a member of this organization",
           "Not authorized to add members"
         );
       } else if (user.role !== Role.Admin) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a allowed to add member in this company, Only admin can add members",
+          "You are not a allowed to add member in this organization, Only admin can add members",
           "Not authorized to add members"
         );
       }
     }
 
-    // Add members to company
+    // Add members to organization
     const newMembers = members.map((member) => ({
       user: member.id,
       role: member.role,
       _id: member.id,
     }));
 
-    // Check is user already exists in company
-    const existingMembers = company.members.filter((member) =>
+    // Check is user already exists in organization
+    const existingMembers = organization.members.filter((member) =>
       newMembers.find((newMember) => newMember.user == member.user._id)
     );
 
@@ -204,7 +206,7 @@ async function addMembers(companyId, userId, members) {
     if (existingMembers.length > 0) {
       throw new HttpException(
         HttpStatusCode.BAD_REQUEST,
-        `${existingMembers.length} of ${newMembers.length} users already exists in company`,
+        `${existingMembers.length} of ${newMembers.length} users already exists in organization`,
         existingMembers.map((member) => {
           return {
             id: member.user._id,
@@ -214,9 +216,9 @@ async function addMembers(companyId, userId, members) {
       );
     }
 
-    company.members = [...company.members, ...newMembers];
+    organization.members = [...organization.members, ...newMembers];
 
-    await company.save();
+    await organization.save();
 
     return findCompany(companyId);
   } catch (error) {
@@ -225,73 +227,78 @@ async function addMembers(companyId, userId, members) {
 }
 
 /**
- * Get company complete info
+ * Get organization complete info
  */
 async function findCompany(companyId) {
   if (!Mongoose.isValidObjectId(companyId)) {
-    throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
-  }
-  const company = await Company.findOne({ _id: companyId })
-    .populate("members.user", "name")
-    .populate("createdBy", "name");
-  if (!company || company === null) {
     throw new HttpException(
-      HttpStatusCode.NOT_FOUND,
-      "Company not found",
-      "Company not found with id " + companyId
+      HttpStatusCode.BAD_REQUEST,
+      "Invalid organization id"
     );
   }
-  return company;
+  const organization = await Organization.findOne({ _id: companyId })
+    .populate("members.user", "name")
+    .populate("createdBy", "name");
+  if (!organization || organization === null) {
+    throw new HttpException(
+      HttpStatusCode.NOT_FOUND,
+      "Organization not found",
+      "Organization not found with id " + companyId
+    );
+  }
+  return organization;
 }
 
 /**
- * Remove members from a company
+ * Remove members from a organization
  * @param {ObjectId} companyId
  * @param {Array} members
  * @param {ObjectId} userId
- * @return {Promise<Company>}
+ * @return {Promise<Organization>}
  * @throws {Error}
  */
 async function removeMembers(companyId, userId, members) {
   try {
-    // get company data if exists
-    const company = await findCompany(companyId);
+    // get organization data if exists
+    const organization = await findCompany(companyId);
 
-    // Get current auth user from company if exists
-    const user = company.members.find((member) => member.user._id == userId);
+    // Get current auth user from organization if exists
+    const user = organization.members.find(
+      (member) => member.user._id == userId
+    );
 
-    // No need to verify if company owner is a member or not
-    if (userId !== company.createdBy.id) {
-      // Check if current auth user is member of company
+    // No need to verify if organization owner is a member or not
+    if (userId !== organization.createdBy.id) {
+      // Check if current auth user is member of organization
       if (!user) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a member of this company",
+          "You are not a member of this organization",
           "Not authorized to remove members"
         );
       }
-      // Check if current auth user is company admin or not
+      // Check if current auth user is organization admin or not
       else if (user.role !== Role.Admin) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a allowed to remove member in this company, Only admin can remove members",
+          "You are not a allowed to remove member in this organization, Only admin can remove members",
           "Not authorized to remove members"
         );
       }
     }
 
     // Filter out remaining members
-    const remainingMembers = company.members.filter((member) => {
+    const remainingMembers = organization.members.filter((member) => {
       return !members.includes(member.id);
     });
 
-    // Update company members
-    company.members = remainingMembers;
+    // Update organization members
+    organization.members = remainingMembers;
 
-    // Save company
-    await company.save();
+    // Save organization
+    await organization.save();
 
-    return company;
+    return organization;
   } catch (error) {
     throw error;
   }
@@ -300,15 +307,15 @@ async function removeMembers(companyId, userId, members) {
 // Helper functions
 
 /**
- * Get basic company info
- * @param {Company} company
+ * Get basic organization info
+ * @param {Organization} organization
  */
-function getBasicCompanyInfo(company) {
+function getBasicCompanyInfo(organization) {
   return {
-    id: company.id,
-    name: company.name,
-    description: company.description,
-    members: company.members,
-    createdBy: company.createdBy,
+    id: organization.id,
+    name: organization.name,
+    description: organization.description,
+    members: organization.members,
+    createdBy: organization.createdBy,
   };
 }

@@ -65,7 +65,7 @@ export function OrganizationList() {
 
   const [user, setUser] = useLocalStorage("user");
   const createOrganization = SocketEvent.organization.create;
-  const [_, __, socket] = useSocket([], {});
+  const [_, __, socket] = useSocket([createOrganization], {});
   const { organizationService } = useAppService();
 
   // Fetch organization list in which authenticated user is member | owner | admin

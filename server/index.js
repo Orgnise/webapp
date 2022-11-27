@@ -7,7 +7,7 @@ const {
   UserController,
   BoardController,
   IssueController,
-  CompanyController,
+  OrganizationController,
   ProjectController,
 } = require("./src/routes");
 const SocketHandler = require("./src/routes/socket_handler");
@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
 
 // global error middleware
 app.use("/", UserController);
-app.use("/", CompanyController);
+app.use("/", OrganizationController);
 app.use("/", ProjectController);
 app.use("/", IssueController);
 

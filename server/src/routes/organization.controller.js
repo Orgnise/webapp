@@ -3,7 +3,7 @@ var router = express.Router();
 const Joi = require("joi");
 const ValidationRequest = require("../middleware/validate-request");
 const authorize = require("../middleware/authorize");
-const { Project, Company, Board } = require("../models");
+const { Project, Organization, Board } = require("../models");
 const { CompanyService } = require("../services");
 const Role = require("../helper/role");
 const ApiResponseHandler = require("../helper/response/api-response");
@@ -32,8 +32,8 @@ router.get(
   authorize(),
   cacheMiddleWare({
     keyPath: "params.id",
-    cacheDataKey: "company",
-    cacheDataMessage: "Company fetched successfully",
+    cacheDataKey: "organization",
+    cacheDataMessage: "Organization fetched successfully",
   }),
   getCompanyById
 );
@@ -68,8 +68,8 @@ function createCompany(req, res, next) {
       return ApiResponseHandler.success({
         res: res,
         data: board,
-        message: "Company created successfully",
-        dataKey: "company",
+        message: "Organization created successfully",
+        dataKey: "organization",
         status: HttpStatusCode.CREATED,
       });
     })
@@ -84,7 +84,7 @@ function getAllCompany(req, res, next) {
       return ApiResponseHandler.success({
         res: res,
         data: companies,
-        message: "Company fetched successfully",
+        message: "Organization fetched successfully",
         dataKey: "companies",
         status: HttpStatusCode.OK,
         total: companies.length,
@@ -101,7 +101,7 @@ function getJoinedCompanies(req, res, next) {
       return ApiResponseHandler.success({
         res: res,
         data: companies,
-        message: "Company fetched successfully",
+        message: "Organization fetched successfully",
         dataKey: "companies",
         status: HttpStatusCode.OK,
         total: companies.length,
@@ -110,34 +110,34 @@ function getJoinedCompanies(req, res, next) {
     .catch(next);
 }
 
-// Get company by Id
+// Get organization by Id
 async function getCompanyById(req, res, next) {
   const user = req.auth;
   const { id } = req.params;
   if (!id) {
     return ApiResponseHandler.error({
       res: res,
-      message: "Company id is required",
+      message: "Organization id is required",
       status: HttpStatusCode.BAD_REQUEST,
     });
   }
 
   CompanyService.getById(id, user.id)
-    .then(async (company) => {
-      await updateCache(id, company);
+    .then(async (organization) => {
+      await updateCache(id, organization);
 
       return ApiResponseHandler.success({
         res: res,
-        data: company,
-        message: "Company fetched successfully",
-        dataKey: "company",
+        data: organization,
+        message: "Organization fetched successfully",
+        dataKey: "organization",
         status: HttpStatusCode.OK,
       });
     })
     .catch(next);
 }
 
-// Add members to company schema
+// Add members to organization schema
 function addMembersSchema(req, res, next) {
   const schema = Joi.object({
     members: Joi.array().items(
@@ -152,27 +152,27 @@ function addMembersSchema(req, res, next) {
   ValidationRequest(req, next, schema);
 }
 
-// Add members to company
+// Add members to organization
 function addMembers(req, res, next) {
   const user = req.auth;
   const { orgId } = req.params;
   const { members } = req.body;
 
   CompanyService.addMembers(orgId, user.id, members)
-    .then(async (company) => {
-      await updateCache(orgId, company);
+    .then(async (organization) => {
+      await updateCache(orgId, organization);
       return ApiResponseHandler.success({
         res: res,
-        data: company,
+        data: organization,
         message: "Members added successfully",
-        dataKey: "company",
+        dataKey: "organization",
         status: HttpStatusCode.OK,
       });
     })
     .catch(next);
 }
 
-// Remove members from company schema
+// Remove members from organization schema
 function removeMembersSchema(req, res, next) {
   const schema = Joi.object({
     members: Joi.array().items(Joi.string().required()),
@@ -180,21 +180,21 @@ function removeMembersSchema(req, res, next) {
   ValidationRequest(req, next, schema);
 }
 
-// Remove members from company
+// Remove members from organization
 function removeMembers(req, res, next) {
   const user = req.auth;
   const { orgId } = req.params;
   const { members } = req.body;
 
   CompanyService.removeMembers(orgId, user.id, members)
-    .then(async (company) => {
-      await updateCache(orgId, company);
+    .then(async (organization) => {
+      await updateCache(orgId, organization);
 
       return ApiResponseHandler.success({
         res: res,
-        data: company,
+        data: organization,
         message: "Members removed successfully",
-        dataKey: "company",
+        dataKey: "organization",
         status: HttpStatusCode.OK,
       });
     })
