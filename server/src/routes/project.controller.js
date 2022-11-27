@@ -12,9 +12,9 @@ const {
 } = require("../helper/http-status-code/http-status-code");
 const FakeBoardData = require("../config/task_data");
 
-router.get("/company/:id/project/get_all", authorize(), getAllProjects);
+router.get("/organization/:id/project/all", authorize(), getAllProjects);
 router.post(
-  "/company/:id/project/create",
+  "/organization/:id/project/create",
   authorize(),
   createProjectSchema,
   createProject
@@ -43,6 +43,7 @@ function createProject(req, res, next) {
     userId: user.id,
   })
     .then((project) => {
+      global.socket.emit("organization:project:create", project);
       return ApiResponseHandler.success({
         res: res,
         data: project,

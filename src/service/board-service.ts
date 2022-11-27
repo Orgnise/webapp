@@ -2,7 +2,7 @@ import { Axios } from 'axios';
 import { AxiosClient } from "./axios-client";
 import { Endpoints } from "../constant/constants";
 
-export class BoardService {
+export default class BoardService {
     private client: Axios;
 
     constructor(axios: Axios) {

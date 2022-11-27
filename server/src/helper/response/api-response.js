@@ -10,21 +10,24 @@ module.exports = class ApiResponseHandler {
     message,
     dataKey = "data",
     total,
+    ...props
   }) {
     const response = {
       message,
       status,
       [dataKey]: data,
       total,
+      ...props,
     };
     return res.status(status).json(response);
   }
-  static error({ res, message, status, errors, errorCode }) {
+  static error({ res, message, status, errors, errorCode, props }) {
     const response = {
       message,
       status,
       errors,
       errorCode,
+      ...props,
     };
     return res
       .status(status !== null && status !== void 0 ? status : 500)

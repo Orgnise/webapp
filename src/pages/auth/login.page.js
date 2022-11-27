@@ -5,6 +5,8 @@ import loginSvg from "../../assets/secure-login-animate.svg";
 import { AppRoutes } from "../../helper/app-routes";
 import { useAppService } from "../../hooks/use-app-service";
 import useLocalStorage from "../../hooks/use-local-storage";
+import useSocket from "../../hooks/use-socket.hook";
+import { SocketEvent } from "../../constant/socket-event-constant";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +14,9 @@ const Login = () => {
   const [errors, setError] = useState({});
   const history = useNavigate();
   const [storedValue, setValue] = useLocalStorage("user", null);
+
+  /// 👇🏻  Use the useSocket hook to get the socket
+  const socket = useSocket([], {});
 
   const { authService } = useAppService();
 
@@ -30,6 +35,9 @@ const Login = () => {
       .then(({ user }) => {
         console.log("User authenticate successfully");
         setValue(user);
+        socket.emit(SocketEvent.auth.register, {
+          jwtToken: user.jwtToken,
+        });
         history(AppRoutes.dashboard);
         window.location.reload();
       })

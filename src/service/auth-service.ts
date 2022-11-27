@@ -3,7 +3,7 @@ import { AxiosClient } from "./axios-client";
 import { Endpoints } from "../constant/constants";
 
 
-export class AuthService {
+export default class AuthService {
     private client: Axios;
 
     constructor(axios: Axios) {

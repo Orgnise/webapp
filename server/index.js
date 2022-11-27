@@ -7,26 +7,31 @@ const {
   UserController,
   BoardController,
   IssueController,
-  CompanyController,
+  OrganizationController,
   ProjectController,
 } = require("./src/routes");
+const SocketHandler = require("./src/routes/socket_handler");
 
 const { API_PORT } = require("./src/config/config");
 
 const port = API_PORT;
-
 const server = app.listen(port, () => {
   console.log(`Server listening on ${port}`);
 });
 
-const socket = SocketIO(server);
+const io = SocketIO(server);
 require("./src/config/global");
-global.socket = socket;
+
+// Register socket handlers
+io.on("connection", (socket) => {
+  SocketHandler(io, socket);
+  global.socket = socket;
+  global.io = io;
+});
 
 // global error middleware
-
 app.use("/", UserController);
-app.use("/", CompanyController);
+app.use("/", OrganizationController);
 app.use("/", ProjectController);
 app.use("/", IssueController);
 
@@ -39,9 +44,9 @@ app.use("*", function (req, res, next) {
 // Handling Error
 process.on("unhandledRejection", (err) => {
   console.log("❤️‍🔥", chalk.red("[unhandledRejection]"), err);
-  console.log(chalk.red("[Message]"), err.message);
+  console.log(chalk.red("[Message]"), err?.message || err?.error || err);
   server.close(() => process.exit(1));
 });
 
 app.use(errorHandler());
-module.exports = socket;
+module.exports = io;

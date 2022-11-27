@@ -1,5 +1,5 @@
 const db = require("../config/db");
-const { User, Company, Project } = require("../models");
+const { User, Organization, Project } = require("../models");
 const FakeBoardData = require("../config/task_data");
 
 const {
@@ -7,7 +7,7 @@ const {
 } = require("../helper/http-status-code/http-status-code");
 const HttpException = require("../helper/exception/http-exception");
 const UserService = require("./user.service");
-const CompanyService = require("./company.service");
+const CompanyService = require("./organization.service");
 const role = require("../helper/role");
 const Mongoose = require("mongoose");
 
@@ -26,21 +26,21 @@ module.exports = {
 async function crateProject({ companyId, name, description, members, userId }) {
   try {
     // Get user
-    const user = await UserService.getById(userId);
+    const user = await UserService.getById({ id: userId });
 
-    // Check if user exists in company
-    const company = await CompanyService.getById(companyId);
+    // Check if user exists in organization
+    const organization = await CompanyService.getById(companyId);
 
-    // Check user data within company
-    const teamMember = company.members.find((member) => {
+    // Check user data within organization
+    const teamMember = organization.members.find((member) => {
       return member.user._id._id == userId;
     });
 
-    // Check if user is a member of company
+    // Check if user is a member of organization
     if (!teamMember) {
       throw new HttpException(
         HttpStatusCode.FORBIDDEN,
-        "You are not a member of this company",
+        "You are not a member of this organization",
         "Not allowed to create project"
       );
     }
@@ -58,7 +58,7 @@ async function crateProject({ companyId, name, description, members, userId }) {
         },
       ],
       createdBy: user.id,
-      company: company.id,
+      organization: organization.id,
     });
 
     // Save project to database
@@ -72,7 +72,7 @@ async function crateProject({ companyId, name, description, members, userId }) {
 }
 
 /**
- * Get company by id
+ * Get organization by id
  * @param {string} projectId
  * @returns {Promise<Project>}
  * @throws {HttpException}
@@ -109,11 +109,14 @@ async function getAllProjects(companyId) {
   try {
     // Check if companyId is valid object id
     if (!Mongoose.isValidObjectId(companyId)) {
-      throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid company id");
+      throw new HttpException(
+        HttpStatusCode.BAD_REQUEST,
+        "Invalid organization id"
+      );
     }
 
-    // Get all projects of a company from database if exists
-    const projects = await Project.find({ company: companyId })
+    // Get all projects of a organization from database if exists
+    const projects = await Project.find({ organization: companyId })
       .populate("members.user", "name email id")
       .populate("createdBy", "name id");
 

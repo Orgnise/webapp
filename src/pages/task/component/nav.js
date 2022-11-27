@@ -12,6 +12,7 @@ import Dropdown from "../../../components/dropdown";
 import FIcon from "../../../components/ficon";
 import ModalForm from "../../../components/modal";
 import AddTask from "./add-task";
+import AddOrganization from "../../organization/component/add-organization";
 
 const Nav = () => {
   const [user, setUser] = useLocalStorage("user");
@@ -29,31 +30,31 @@ const Nav = () => {
   }, [visible]);
 
   return (
-    <nav className="w-full bg-slate-100 flex-none">
-      <div className="max-w-screen-xl flex items-center place-content-between m-auto h-14 px-2">
-        <h2 className="font-bold text-lg">React Kanban</h2>
+    <div className="flex items-center place-content-between w-full">
+      <h2 className="text-lg">React Kanban</h2>
 
-        <div className="">
-          {//👇🏻 if user is logged in, show logout button
+      <div className="">
+        {
+          //👇🏻 if user is logged in, show logout button
           user && Object.keys(user).length !== 0 ? (
             <div className="flex items-center space-x-4 ">
               <div>
-                <ModalForm
-                  title={"Add new Task"}
-                  className="w-full sm:w-2/3 md:w-2/4 lg:w-1/3"
-                  visible={visible}
-                  setVisible={setVisible}
-                  path={AppRoutes.addTask}
-                  button={
-                    <FIcon
-                      icon={solid("plus")}
-                      className="cursor-pointer border border-slate-400 p-2 mt-1 rounded select-none"
-                      size="sm"
-                    />
-                  }
-                >
-                  <AddTask setVisible={setVisible} />
-                </ModalForm>
+                {/* <ModalForm
+                    title={"Add new Task"}
+                    className="w-full sm:w-2/3 md:w-2/4 lg:w-1/3"
+                    visible={visible}
+                    setVisible={setVisible}
+                    path={AppRoutes.addTask}
+                    button={
+                      <FIcon
+                        icon={solid("plus")}
+                        className="cursor-pointer border border-slate-400 p-2 mt-1 rounded select-none"
+                        size="sm"
+                      />
+                    }
+                  >
+                    <AddTask setVisible={setVisible} />
+                  </ModalForm> */}
               </div>
               <CustomDropDown
                 button={
@@ -88,10 +89,10 @@ const Nav = () => {
             >
               Login
             </button>
-          )}
-        </div>
+          )
+        }
       </div>
-    </nav>
+    </div>
   );
 };
 export default Nav;

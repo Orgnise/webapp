@@ -7,14 +7,24 @@ const Role = require("../helper/role");
 const UserService = require("../services/user.service");
 const ApiResponseHandler = require("../helper/response/api-response");
 const HttpStatusCode = require("../helper/http-status-code/http-status-code");
-
+const cacheMiddleWare = require("../middleware/cache-middleware");
+const { updateCache } = require("../helper/redis/redis-client");
 // routes
 router.post("/auth/register", registerSchema, registerUser);
 router.post("/auth/login", authenticateSchema, authenticate);
 router.post("/auth/refresh-token", refreshToken);
 router.post("/auth/revoke-token", authorize(), revokeTokenSchema, revokeToken);
-router.get("/authall", authorize(Role.User), getAll);
-router.get("/auth:id", authorize(), getById);
+router.get("/auth/all", authorize(Role.User), getAll);
+router.get(
+  "/auth/:id/get_by_id",
+  authorize(),
+  cacheMiddleWare({
+    keyPath: "params.id",
+    cacheDataKey: "user",
+    cacheDataMessage: "User fetched successfully",
+  }),
+  getById
+);
 router.get("/auth:id/refresh-tokens", authorize(), getRefreshTokens);
 
 module.exports = router;
@@ -138,21 +148,18 @@ function getAll(req, res, next) {
 
 // Get user by Id
 function getById(req, res, next) {
-  // regular users can only access their own account and admins can access any account
-  if (req.params.id !== req.auth.id && req.auth.role !== Role.Admin) {
-    if (req)
-      if (req.auth.role !== Role.Admin) {
-        return ApiResponseHandler.error({
-          res: res,
-          message: "Unauthorized",
-          errorCode: HttpStatusCode.ErrorCode(HttpStatusCode.UNAUTHORIZED),
-          status: HttpStatusCode.UNAUTHORIZED,
-        });
-      }
-  }
+  UserService.getById({ id: req.params.id, authUser: req.auth })
+    .then(async (user) => {
+      await updateCache(req.params.id, user);
 
-  UserService.getById(req.params.id)
-    .then((user) => (user ? res.json(user) : res.sendStatus(404)))
+      return ApiResponseHandler.success({
+        res: res,
+        data: user,
+        dataKey: "user",
+        status: HttpStatusCode.OK,
+        message: "User fetched successfully",
+      });
+    })
     .catch(next);
 }
 

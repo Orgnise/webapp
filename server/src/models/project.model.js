@@ -3,9 +3,9 @@ const Role = require("../helper/role");
 
 const ProjectSchema = new Mongoose.Schema(
   {
-    company: {
+    organization: {
       type: Mongoose.Schema.Types.ObjectId,
-      ref: "Company",
+      ref: "Organization",
       required: true,
     },
     name: {
