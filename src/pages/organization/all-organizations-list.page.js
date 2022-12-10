@@ -164,7 +164,6 @@ export function OrganizationList() {
             <tr className="text-sm leading-none uppercase ">
               <th className="text-left px-4 py-3">Name</th>
               <th className="text-left px-4 py-3">Admin</th>
-              <th className="text-left px-4 py-3">Description</th>
               <th className="text-left px-4 py-3">Members</th>
               <th className="text-left px-4 py-3">Created on</th>
               <th className="text-left px-4 py-3"></th>
@@ -207,15 +206,7 @@ function OrganizationRow({ org, index }) {
           </p>
         </div>
       </td>
-      <td className="pl-2">
-        <div className="flex items-center">
-          <p className="text-sm leading-none text-gray-600 ml-2">
-            {org.description.length == 0
-              ? "-"
-              : org.description.substring(0, 40) + "..."}
-          </p>
-        </div>
-      </td>
+
       <td className="pl-5">
         <div className="flex items-center">
           <FIcon

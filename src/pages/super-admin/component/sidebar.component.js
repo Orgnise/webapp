@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
+import cx from "classnames";
 import { SidebarPageLayout } from "../../layout";
 import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import FIcon from "../../../components/ficon";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import useLocalStorage from "../../../hooks/use-local-storage";
 import { AppRoutes } from "../../../helper/app-routes";
 
@@ -14,9 +15,18 @@ function SidebarComponent() {
         header={<div className="h-4"></div>}
         children={
           <>
-            <Link
+            <NavLink
               to={AppRoutes.organization.allOrganizations}
-              className="bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md"
+              className={(data) =>
+                cx(
+                  " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
+                  {
+                    "bg-gray-100 text-slate-700": data.isActive,
+                    "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
+                      !data.isActive,
+                  }
+                )
+              }
             >
               <svg
                 className="h-6 w-6"
@@ -34,7 +44,7 @@ function SidebarComponent() {
                 />
               </svg>
               <span className="hidden lg:block">Organizations</span>
-            </Link>
+            </NavLink>
           </>
         }
         footer={

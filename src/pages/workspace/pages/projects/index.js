@@ -2,7 +2,7 @@ import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import toast from "react-hot-toast";
 import moment from "moment";
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { ListView, TableBody } from "../../../../components/compound/list-view";
 import FIcon from "../../../../components/ficon";
 import ModalForm from "../../../../components/modal";
@@ -24,8 +24,13 @@ function ProjectsPage() {
   const createProject = SocketEvent.organization.project.create;
   const socket = useSocket([createProject], (event, data) => {
     if (event === createProject) {
-      setTempProject((prev) => [...prev, data]);
-      setProjects((prev) => [...prev, data]);
+      const allProjects = [...projects, data];
+      // sort by date
+      allProjects.sort((a, b) => {
+        return moment(b.createdAt).diff(moment(a.createdAt));
+      });
+      setTempProject(allProjects);
+      setProjects(allProjects);
     }
   });
   const { projectService } = useAppService();
@@ -72,8 +77,8 @@ function ProjectsPage() {
 
   // Filter organization by name
   function filterByQuery(query) {
-    const filteredOrganization = projects.filter((org) => {
-      return org.name.toLowerCase().includes(query.toLowerCase());
+    const filteredOrganization = projects.filter((project) => {
+      return project.name.toLowerCase().includes(query.toLowerCase());
     });
     setTempProject(filteredOrganization);
   }
@@ -124,15 +129,14 @@ function ProjectsPage() {
                 <th className="text-left px-4 py-3">Name</th>
                 <th className="text-left px-4 py-3">Members</th>
                 <th className="text-left px-4 py-3">Created on</th>
-                <th className="text-left px-4 py-3"></th>
                 <th className="text-left px-1 py-3"></th>
               </tr>
             </thead>
             <tbody>
               <TableBody
                 items={tempProject}
-                renderItem={(org, index) => (
-                  <ProjectRow key={index} org={org} index={index} />
+                renderItem={(project, index) => (
+                  <ProjectRow key={index} project={project} index={index} />
                 )}
                 placeholder={
                   <tr>
@@ -157,7 +161,8 @@ function ProjectsPage() {
   );
 }
 
-function ProjectRow({ org, index }) {
+function ProjectRow({ project, index }) {
+  const currentPath = useLocation().pathname;
   return (
     <tr
       key={index}
@@ -166,12 +171,12 @@ function ProjectRow({ org, index }) {
     >
       <td className="">
         <div className="flex items-center pl-5">
-          <a
-            href={`organization/${org.id}`}
+          <Link
+            to={`${currentPath}/${project.id}`}
             className="text-base font-medium leading-none text-gray-700 mr-2 hover:underline hover:cursor-pointer"
           >
-            {org.name}
-          </a>
+            {project.name}
+          </Link>
         </div>
       </td>
 
@@ -182,7 +187,7 @@ function ProjectRow({ org, index }) {
             className="cursor-pointer p-1 rounded select-none "
             size="xs"
           />
-          <span className="flex items-center ">{org.members.length}</span>
+          <span className="flex items-center ">{project.members.length}</span>
         </div>
       </td>
 
@@ -196,31 +201,21 @@ function ProjectRow({ org, index }) {
 
           <p className="text-sm leading-none text-gray-600 ml-2">
             <span className=" text-slate-600">
-              {moment(org.createdAt).format("DD MMM YY")}
+              {moment(project.createdAt).format("DD MMM YY")}
             </span>
           </p>
         </div>
       </td>
-      <td className="pl-5">
-        <Link
-          to={`/workspace/${org.id}`}
-          className="px-2 py-1 rounded bg-teal-500 text-white  hover:shadow-lg"
-        >
-          View
-        </Link>
-      </td>
+
       <td>
-        <div className="relative px-5 pt-2">
+        <div className="group relative px-5 pt-2">
           <button
-            className="focus:ring-2 rounded-md focus:outline-none"
-            // onClick={dropdownFunction(org.id)}
+            className="focus:ring-2 rounded-md focus:outline-none "
             role="button"
             aria-label="option"
           >
             <svg
-              className="dropbtn"
-              // onClick={dropdownFunction()}
-              xmlns="http://www.w3.org/2000/svg"
+              xmlns="http://www.w3.project/2000/svg"
               width="20"
               height="20"
               viewBox="0 0 20 20"
@@ -251,7 +246,7 @@ function ProjectRow({ org, index }) {
           </button>
           <div
             id="dropdown-content"
-            className=" bg-white shadow w-24 absolute z-30 right-0 mr-6 hidden"
+            className=" bg-white shadow w-24 absolute z-30 right-0 mr-6 invisible group-focus-within:visible"
           >
             <div
               tabIndex=""

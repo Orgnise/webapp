@@ -24,11 +24,13 @@ const AddProject = ({ orgId, setVisible = () => {} }) => {
     };
     setLoading(true);
     projectService
-      .createProject("orgId", data)
+      .createProject(orgId, data)
       .then(({ Project }) => {
         setName("");
         setDescription("");
-        toast("Project created successfully", { position: "top-right" });
+        toast.success("Project created successfully", {
+          position: "top-right",
+        });
         setVisible(false);
       })
       .catch((err) => {

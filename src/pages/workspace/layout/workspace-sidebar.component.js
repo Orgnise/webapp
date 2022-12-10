@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import cx from "classnames";
 import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { Link, useParams } from "react-router-dom";
+import { Link, NavLink, useParams } from "react-router-dom";
 import useLocalStorage from "../../../hooks/use-local-storage";
 import FIcon from "../../../components/ficon";
 import SidebarComponent from "../../super-admin/component/sidebar.component";
@@ -19,8 +20,8 @@ function WorkspaceSidebarLayout() {
         children={
           <div className="flex flex-col space-y-2">
             <Link
-              to="/"
-              className="bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md"
+              to={AppRoutes.organization.allOrganizations}
+              className="hover:bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md"
             >
               <svg
                 className="h-6 w-6"
@@ -39,20 +40,39 @@ function WorkspaceSidebarLayout() {
               </svg>
               <span className="hidden lg:block">Organization</span>
             </Link>
-            <Link
-              to={`/workspace/${id}/team`}
-              className="hover:bg-gray-100 active:bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md"
-            >
-              <FIcon icon={solid("users")} />
-              <span className="hidden lg:block">Team</span>
-            </Link>
-            <Link
+
+            <NavLink
               to={`/workspace/${id}/project`}
-              className="hover:bg-gray-100 active:bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md"
+              className={(data) =>
+                cx(
+                  " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
+                  {
+                    "bg-gray-100 text-slate-700": data.isActive,
+                    "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
+                      !data.isActive,
+                  }
+                )
+              }
             >
               <FIcon icon={solid("users")} />
               <span className="hidden lg:block">Projects</span>
-            </Link>
+            </NavLink>
+            <NavLink
+              to={`/workspace/${id}/team`}
+              className={(data) =>
+                cx(
+                  " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
+                  {
+                    "bg-gray-100 text-slate-700": data.isActive,
+                    "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
+                      !data.isActive,
+                  }
+                )
+              }
+            >
+              <FIcon icon={solid("users")} />
+              <span className="hidden lg:block">Team</span>
+            </NavLink>
           </div>
         }
         footer={

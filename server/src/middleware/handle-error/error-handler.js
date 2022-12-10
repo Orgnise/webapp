@@ -4,6 +4,11 @@ const HttpStatusCode = require("../../helper/http-status-code/http-status-code")
 
 module.exports = function (options) {
   return function (err, req, res, next) {
+    if (err.code === "invalid_token") {
+      global.socket.emit("auth:authorized", {
+        isAuthenticated: false,
+      });
+    }
     console.log("❤️‍🔥", chalk.red("[errorHandler]"), err);
 
     const status = err.status || HttpStatusCode.INTERNAL_SERVER_ERROR;
