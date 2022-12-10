@@ -1,73 +1,38 @@
-# Getting Started with Create React App
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FTheAlphamerc%2Fpulse&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Pulse [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FTheAlphamerc%2Fpulse&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
-## Available Scripts
+Pulse is a project management app built with React on the frontend and Node.js on the backend. With Pulse, you can easily track the progress of your projects and tasks, ensuring that your team stays organized and on track. 
 
-In the project directory, you can run:
+Pulse's intuitive interface allows you to quickly add and update your projects and tasks, view their status and progress, and collaborate with your team members in real time.
 
-### `npm start`
+Whether you're working on a small personal project or a large enterprise project, Pulse is the tools you need to stay on top of your work and achieve your goals.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Project setup
+- Install Node.js and npm on your local system. This is necessary to run the app's server-side code, which is written in Node.js. (Skip this if already setup on the system).
+- Clone the "Pulse" app repository by running the following command in a terminal or command prompt window: `git clone https://github.com/TheAlphamerc/pulse.git`
+- Install the app's dependencies by running the command: `npm install`
+- Install server side code dependencies by running the two commands: `cd server` and `npm install`
+- Start the app's server by running the command: `npm start`.
+- In a separate terminal or command prompt window, navigate to the "pulse" root directory and start the app's frontend by running command: `npm start`
+- The app will now be running on your local system. You can access it in your web browser at http://localhost:3000.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Note that these steps assume that you have already installed Node.js and npm on your local system and are familiar with using the terminal or command prompt to navigate directories and run commands. 
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Created & Maintained By
 
-### `npm run build`
+[Sonu Sharma](https://github.com/TheAlphamerc) ([Twitter](https://www.twitter.com/TheAlphamerc)) ([Youtube](https://www.youtube.com/user/sonusharma045sonu/)) ([Insta](https://www.instagram.com/_sonu_sharma__)) ([Dev.to](https://dev.to/thealphamerc))
+  ![Twitter Follow](https://img.shields.io/twitter/follow/thealphamerc?style=social) 
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+> If you found this project helpful or you learned something from the source code and want to thank me, consider buying me a cup of :coffee:
+>
+> * [PayPal](https://www.paypal.me/TheAlphamerc/)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+> You can also nominate me for Github Star developer program
+> https://stars.github.com/nominate
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 ## Visitors Count
 
 <img align="left" src = "https://profile-counter.glitch.me/TheAlphamerc-pulse/count.svg" alt ="Loading">
