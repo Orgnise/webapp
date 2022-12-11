@@ -11,7 +11,7 @@ Whether you're working on a small personal project or a large enterprise project
 - Clone the "Pulse" app repository by running the following command in a terminal or command prompt window: `git clone https://github.com/TheAlphamerc/pulse.git`
 - Install the app's dependencies by running the command: `npm install`
 - Install server side code dependencies by running the two commands: `cd server` and `npm install`
-- Start the app's server by running the command: `npm start`.
+- Start the app's server by running the command: `npm run dev`.
 - In a separate terminal or command prompt window, navigate to the "pulse" root directory and start the app's frontend by running command: `npm start`
 - The app will now be running on your local system. You can access it in your web browser at http://localhost:3000.
 
