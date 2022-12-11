@@ -20,12 +20,25 @@ router.post(
   createProject
 );
 router.get("/project/get_by_id/:id", authorize(), getProjectById);
+router.post(
+  "/organization/:id/project/add_example_projects",
+  authorize(),
+  addExampleProjectSchema,
+  addExamples
+);
 
 function createProjectSchema(req, res, next) {
   const schema = Joi.object({
     name: Joi.string().min(3).max(30).required(),
     description: Joi.string().min(3).max(280),
     members: Joi.array().items(Joi.string()),
+  });
+  ValidationRequest(req, next, schema);
+}
+
+function addExampleProjectSchema(req, res, next) {
+  const schema = Joi.object({
+    examples: Joi.array().items(Joi.string()).required(),
   });
   ValidationRequest(req, next, schema);
 }
@@ -49,6 +62,30 @@ function createProject(req, res, next) {
         data: project,
         message: "Project created successfully",
         dataKey: "project",
+        status: HttpStatusCode.CREATED,
+      });
+    })
+    .catch(next);
+}
+
+function addExamples(req, res, next) {
+  const { examples } = req.body;
+  const companyId = req.params.id;
+
+  const user = req.auth;
+
+  ProjectService.addExamples({
+    companyId: companyId,
+    examples: examples,
+    userId: user.id,
+  })
+    .then((projects) => {
+      // global.socket.emit("organization:project:create", projects);
+      return ApiResponseHandler.success({
+        res: res,
+        data: projects,
+        message: "Example projects created successfully",
+        dataKey: "projects",
         status: HttpStatusCode.CREATED,
       });
     })

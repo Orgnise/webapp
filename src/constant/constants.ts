@@ -22,6 +22,7 @@ export const Endpoints = {
                 update: `/organization/${orgId}/project/update`,
                 delete: `/organization/${orgId}/project/delete`,
                 getById: (projectId: string) => `/organization/${orgId}/project/${projectId}`,
+                addExampleProjects: `/organization/${orgId}/project/add_example_projects`,
             }
         },
     },

@@ -20,10 +20,7 @@ const Breadcrumb: React.FC<Props> = ({ items, className }) => {
         <ul className="flex items-center font-medium space-x-2">
           {items.map((item, index) => (
             <li key={index} className="flex items-center font-medium space-x-2">
-              <Link
-                to={item.link}
-                className="hover:underline theme-text-primary"
-              >
+              <Link to={item.link} className="hover:underline text-primary">
                 {item.label}
               </Link>
               {index === items.length - 1 ? (

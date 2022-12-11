@@ -34,6 +34,7 @@ import WorkspaceHomeView from "./pages/workspace/workspace-home-view";
 import OnboardingPage, {
   OnboardingStepPage,
 } from "./pages/onboarding/onboarding";
+import { OrganizationList } from "./pages/organization/all-organizations-list.page";
 
 function App() {
   const socket = useSocket([SocketEvent.auth.checkAuth], retryAuth);
@@ -113,12 +114,16 @@ function App() {
 
               {/* Onboarding ROUTES */}
               <Route
-                path={AppRoutes.onboard.root}
+                path={AppRoutes.organization.create}
                 element={getLoggedInRoute(user, <OnboardingPage />)}
               ></Route>
               <Route
                 path={AppRoutes.onboard.step1}
                 element={getLoggedInRoute(user, <OnboardingStepPage />)}
+              />
+              <Route
+                path={AppRoutes.users.myOrganization}
+                element={getLoggedInRoute(user, <OrganizationList />)}
               />
 
               {/* WORKSPACE ROUTE */}

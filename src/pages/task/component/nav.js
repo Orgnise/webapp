@@ -31,7 +31,7 @@ const Nav = () => {
 
   return (
     <div className="flex items-center place-content-between w-full">
-      <h2 className="text-lg">React Kanban</h2>
+      <h2 className="text-lg">Pulse</h2>
 
       <div className="">
         {
