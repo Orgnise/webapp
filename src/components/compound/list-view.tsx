@@ -7,6 +7,7 @@ interface ListViewProps {
   noItemsElement?: string;
   footerElement?: React.ReactNode;
   className?: string;
+  loading?: boolean;
 }
 
 /**
@@ -28,12 +29,13 @@ export const ListView: React.FC<ListViewProps> = ({
   footerElement,
   placeholder,
   className,
+  loading = false,
 }) => {
-  if (items === undefined) {
+  if (loading) {
     return placeholder ? <>{placeholder}</> : null;
   }
 
-  if (items === null || !Array.isArray(items) || items.length === 0) {
+  if (!items || items === null || items.length === 0) {
     return <>{noItemsElement && noItemsElement}</>;
   }
 

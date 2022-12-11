@@ -7,8 +7,8 @@ import React from "react";
 const Logo: React.FC = () => {
   return (
     <div className="Logo">
-      <div className="flex items-center">
-        <div className="flex items-center justify-center w-6 h-6 text-emerald-300 bg-primary rounded-full">
+      <div className="flex items-center  text-teal-600">
+        <div className="flex items-center justify-center w-6 h-6  rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="512"
@@ -35,7 +35,7 @@ const Logo: React.FC = () => {
             >
               <svg
                 id="uf3k0813e1_97905"
-                enable-background="new 0 0 512 512"
+                enableBackground="new 0 0 512 512"
                 height="512"
                 viewBox="0 0 512 512"
                 width="512"
@@ -96,7 +96,7 @@ const Logo: React.FC = () => {
             </g>
           </svg>
         </div>
-        <div className="ml-2 text-xl text-primary">Pulse</div>
+        <div className="ml-2 text-xl ">Pulse</div>
       </div>
     </div>
   );

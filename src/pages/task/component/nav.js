@@ -58,7 +58,7 @@ const Nav = () => {
               </div>
               <CustomDropDown
                 button={
-                  <div className="flex items-center place-content-center font-bold text-lg h-10 w-10 rounded-full bg-blue-200">
+                  <div className="flex items-center place-content-center font-bold text-lg h-10 w-10 rounded-full bg-teal-200 text-teal-500 hover:text-teal-700">
                     {user.name[0].toUpperCase()}
                   </div>
                 }

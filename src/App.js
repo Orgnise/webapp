@@ -125,6 +125,11 @@ function App() {
                 path={AppRoutes.users.myOrganization}
                 element={getLoggedInRoute(user, <OrganizationList />)}
               />
+              <Route
+                path={AppRoutes.organization.detail}
+                errorElement={<ErrorPage />}
+                element={getLoggedInRoute(user, <WorkSpacePage />)}
+              />
 
               {/* WORKSPACE ROUTE */}
               <Route

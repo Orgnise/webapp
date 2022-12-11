@@ -12,9 +12,10 @@ import { AppRoutes } from "../../helper/app-routes";
 import { Fold } from "../../helper/typescript-utils";
 import { useAppService } from "../../hooks/use-app-service";
 import useSocket from "../../hooks/use-socket.hook";
+import { NavbarLayout } from "../layout";
 import AddOrganization from "../organization/component/add-organization";
-import ProjectsPage from "../workspace/pages/projects";
-import AddProject from "../workspace/pages/projects/create-project";
+import Nav from "../task/component/nav";
+
 function OnboardingPage() {
   const [organization, setOrganization] = useState();
   const navigate = useNavigate();
@@ -27,12 +28,15 @@ function OnboardingPage() {
 
   return (
     <div className="w-full h-full bg-slate-50">
-      <div className="max-w-xl mx-auto h-full py-24">
+      <NavbarLayout>
+        <Nav />
+      </NavbarLayout>
+      <div className="max-w-xl mx-auto py-24 px-3">
         <div className="flex flex-col space-y-3 items-center place-content-center text-sm">
           <Fold
             value={organization}
             ifPresent={() => <>Display Project list</>}
-            ifAbsent={() => <NoOrgView />}
+            ifAbsent={() => <CreateOrganization />}
           />
         </div>
       </div>
@@ -40,7 +44,7 @@ function OnboardingPage() {
   );
 }
 
-function NoOrgView() {
+function CreateOrganization() {
   const [isVisible, setIsVisible] = useState();
 
   return (
@@ -54,7 +58,10 @@ function NoOrgView() {
             you and
           </span>
           <span className="pl-2 text-primary">
-            <Link to={"#"} className="text-emerald-500">
+            <Link
+              to={AppRoutes.users.myOrganization}
+              className="text-emerald-500"
+            >
               check your team
             </Link>
           </span>
@@ -75,22 +82,22 @@ export function OnboardingStepPage() {
 
   return (
     <div className="w-full h-full bg-slate-50">
-      <div className="p-2">
-        <Logo />
-      </div>
-      <div className="max-w-xl mx-auto h-full py-24">
+      <NavbarLayout>
+        <Nav />
+      </NavbarLayout>
+      <div className="max-w-xl mx-auto py-24">
         <div className="flex flex-col space-y-3 items-center place-content-center text-sm">
           <Fold
             value={project}
             ifPresent={() => <>Display Board list</>}
-            ifAbsent={() => <NoProjView />}
+            ifAbsent={() => <AddExampleProjects />}
           />
         </div>
       </div>
     </div>
   );
 }
-function NoProjView() {
+function AddExampleProjects() {
   const [isLoading, setIsLoading] = useState();
   const params = useParams();
   const id = params.id;
