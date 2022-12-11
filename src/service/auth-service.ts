@@ -1,5 +1,4 @@
 import { Axios } from 'axios';
-import { AxiosClient } from "./axios-client";
 import { Endpoints } from "../constant/constants";
 
 

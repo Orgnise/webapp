@@ -14,13 +14,14 @@ const Mongoose = require("mongoose");
 module.exports = {
   getById,
   crateProject,
+  addExamples,
   getAllProjects,
 };
 
 /**
  * create new task and save to db
  * @param {Object} taskBody
- * @returns {Promise<Task>}
+ * @returns {Promise<Project>}
  * @throws {HttpException}
  */
 async function crateProject({ companyId, name, description, members, userId }) {
@@ -33,7 +34,7 @@ async function crateProject({ companyId, name, description, members, userId }) {
 
     // Check user data within organization
     const teamMember = organization.members.find((member) => {
-      return member.user._id._id == userId;
+      return member.user.id === userId;
     });
 
     // Check if user is a member of organization
@@ -66,6 +67,52 @@ async function crateProject({ companyId, name, description, members, userId }) {
 
     // return project
     return project;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Add example projects to organization
+ * @param {string} companyId
+ * @param {string[]} examples
+ * @returns {Promise<Project[]>}
+ */
+async function addExamples({ companyId, examples, userId }) {
+  try {
+    // Get user
+    const user = await UserService.getById({ id: userId });
+
+    // Check if user exists in organization
+    const organization = await CompanyService.getById(companyId);
+
+    // Set user role to admin for project
+    user.role = role.Admin;
+
+    let projects = [];
+    let Promises = [];
+
+    // Iterate through examples and create projects
+    for (let i = 0; i < examples.length; i++) {
+      let example = examples[i];
+      const project = crateProject({
+        companyId: organization.id,
+        name: example,
+        description: "Example project",
+        members: [],
+        userId: userId,
+      });
+
+      Promises.push(project);
+    }
+
+    //  Resolve all promises and push to projects array
+    await Promise.all(Promises).then((values) => {
+      projects.push(...values);
+    });
+
+    // return projects
+    return projects;
   } catch (error) {
     throw error;
   }

@@ -12,7 +12,6 @@ import FIcon from "../../components/ficon";
 import ModalForm from "../../components/modal";
 import TasksContainer from "../task/component/task-container";
 
-export const ORGANIZATION_PAGE_ROUTES = AppRoutes.workspace.root;
 export default function WorkspacePageView() {
   const [organization, setOrganization] = useState({});
   const [loading, setLoading] = useState(true);
@@ -28,7 +27,7 @@ export default function WorkspacePageView() {
     if (user) {
       setLoading(true);
       organizationService
-        .getCompanyById(id)
+        .getOrganizationById(id)
         .then(({ organization }) => {
           // console.log("res", organization);
           setOrganization(organization);

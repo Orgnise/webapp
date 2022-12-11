@@ -3,12 +3,13 @@ import WorkspacePageView from "../workspace.page";
 import { MasterPageLayout } from "../../layout";
 import Nav from "../../task/component/nav";
 import WorkspaceSidebarLayout from "./workspace-sidebar.component";
-import { Route, Routes, useParams } from "react-router-dom";
+import { Outlet, Route, Routes, useParams } from "react-router-dom";
 import { AppRoutes } from "../../../helper/app-routes";
 import ProjectsPage from "../pages/projects";
 import TeamPage from "../pages/team";
 import Breadcrumb from "../../../components/breadcrumb";
 import ErrorPage from "../../error/error-page";
+import WorkspaceHomeView from "../workspace-home-view";
 
 function WorkSpaceLayout() {
   const params = useParams();
@@ -36,7 +37,11 @@ function WorkSpaceLayout() {
           />
           <Routes>
             <Route
-              path={"/project"}
+              path={AppRoutes.workspace.home}
+              element={<WorkspaceHomeView />}
+            />
+            <Route
+              path={":id/project"}
               errorElement={<ErrorPage />}
               element={<ProjectsPage />}
             />

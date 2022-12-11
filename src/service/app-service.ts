@@ -11,9 +11,9 @@ export default class AppService {
 
     constructor() {
         this.axios = new AxiosClient().axios;
-        this.authService = new AuthService(axios);
-        this.boardService = new BoardService(axios);
-        this.projectService = new ProjectService(axios);
-        this.organizationService = new OrganizationService(axios);
+        this.authService = new AuthService(this.axios);
+        this.boardService = new BoardService(this.axios);
+        this.projectService = new ProjectService(this.axios);
+        this.organizationService = new OrganizationService(this.axios);
     }
 }

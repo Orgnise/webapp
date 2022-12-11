@@ -19,7 +19,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
     // Use faker.js to generate random data
     const data = {
       name: faker.company.name(),
-      description: faker.lorem.paragraph().substring(0, 100),
+      description: faker.lorem.paragraph().substring(0, 20),
     };
 
     //👇🏻 sends the task to the Socket.io server
@@ -31,7 +31,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
 
   return (
     <form className="max-w-lg min-w-full" onSubmit={handleAddTodo}>
-      <div id="content-4a" className="flex-1">
+      <div id="content-4a" className="flex flex-col gap-6">
         <div className="flex flex-col gap-6">
           {/* <!-- Title --> */}
           <div className="relative">
@@ -60,7 +60,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
           </div>
 
           {/* <!-- Description --> */}
-          <div className="relative my-6">
+          {/* <div className="relative my-6">
             <textarea
               className="peer relative  w-full rounded border border-slate-200 px-4 pr-12 py-2 max-h-96 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               placeholder="Task description"
@@ -80,7 +80,7 @@ const AddOrganization = ({ setVisible = () => {} }) => {
             >
               Description
             </label>
-          </div>
+          </div> */}
         </div>
 
         {/* <!-- Add Task button --> */}

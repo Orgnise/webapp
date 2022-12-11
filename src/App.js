@@ -30,6 +30,11 @@ import ProjectsPage from "./pages/workspace/pages/projects";
 import WorkspacePageView from "./pages/workspace/workspace.page";
 import TeamPage from "./pages/organization/detail/team/team";
 import ErrorPage from "./pages/error/error-page";
+import WorkspaceHomeView from "./pages/workspace/workspace-home-view";
+import OnboardingPage, {
+  OnboardingStepPage,
+} from "./pages/onboarding/onboarding";
+import { OrganizationList } from "./pages/organization/all-organizations-list.page";
 
 function App() {
   const socket = useSocket([SocketEvent.auth.checkAuth], retryAuth);
@@ -107,12 +112,37 @@ function App() {
                 />
               </Route>
 
+              {/* Onboarding ROUTES */}
+              <Route
+                path={AppRoutes.organization.create}
+                element={getLoggedInRoute(user, <OnboardingPage />)}
+              ></Route>
+              <Route
+                path={AppRoutes.onboard.step1}
+                element={getLoggedInRoute(user, <OnboardingStepPage />)}
+              />
+              <Route
+                path={AppRoutes.users.myOrganization}
+                element={getLoggedInRoute(user, <OrganizationList />)}
+              />
+              <Route
+                path={AppRoutes.organization.detail}
+                errorElement={<ErrorPage />}
+                element={getLoggedInRoute(user, <WorkSpacePage />)}
+              />
+
               {/* WORKSPACE ROUTE */}
               <Route
                 path={AppRoutes.workspace.root}
                 errorElement={<ErrorPage />}
                 element={getLoggedInRoute(user, <WorkSpacePage />)}
               />
+              <Route
+                path={AppRoutes.workspace.home}
+                errorElement={<ErrorPage />}
+                element={getLoggedInRoute(user, <WorkSpacePage />)}
+              />
+
               <Route
                 path={AppRoutes.comments}
                 element={getLoggedInRoute(user, <Comments />)}

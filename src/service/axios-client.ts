@@ -12,7 +12,6 @@ export class AxiosClient {
                 'Content-Type': 'application/json',
             },
         });
-        this.axios.defaults.baseURL = Endpoints.baseUrl;
         this.addInterceptor();
     }
 
@@ -23,7 +22,7 @@ export class AxiosClient {
     public axios: Axios;
 
     private addInterceptor() {
-        axios.interceptors.request.use(function (config) {
+        this.axios.interceptors.request.use(function (config) {
             // Add x-access-token to header
             const user = localStorage.getItem('user');
             if (config.url !== '/login' && config.url !== '/register' && user) {

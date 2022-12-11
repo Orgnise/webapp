@@ -6,9 +6,9 @@ const { API_PORT } = require("./config");
 // https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
 const swaggerDefinition = {
   info: {
-    title: "React Kanban API Documentation", // Title (required)
+    title: "Pulse API Documentation", // Title (required)
     version: "1.0.0", // Version (required)
-    description: "This is a documentation for the React Kanban API", // Description (optional)
+    description: "This is a documentation for the Pulse API", // Description (optional)
   },
   // servers: [
   //   {
