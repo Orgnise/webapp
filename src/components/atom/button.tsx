@@ -82,7 +82,7 @@ const Button = (props: Props) => {
       className={cx(
         `inline-flex items-center justify-center gap-2 justify-self-center tracking-wide font-bold py-2 px-4 rounded transition duration-300` +
           " focus-visible:outline-none disabled:cursor-not-allowed " +
-          " whitespace-nowrap rounded px-6 text-sm font-medium ",
+          " whitespace-nowrap rounded px-6 text-sm font-medium z-0",
         "cursor-pointer",
         TextColor[type],
         getBackgroundColor(),
