@@ -14,7 +14,7 @@ const FakeBoardData = require("../config/task_data");
 
 router.get("/organization/:id/project/all", authorize(), getAllProjects);
 router.get(
-  "/organization/:slug/project/get_all_projects_by_slug",
+  "/organization/slug/:slug/project/all",
   authorize(),
   getAllProjectsBySlug
 );
@@ -27,10 +27,22 @@ router.post(
 router.get("/project/get_by_id/:id", authorize(), getProjectById);
 router.get("/project/get_by_slug/:slug", authorize(), getProjectBySlug);
 router.post(
-  "/organization/:id/project/add_example_projects",
+  "/organization/:id/project/add_examples",
   authorize(),
   addExampleProjectSchema,
   addExamples
+);
+router.post(
+  "/organization/:slug/project/add_examples",
+  authorize(),
+  addExampleProjectSchema,
+  addExamples
+);
+router.post(
+  "/organization/slug/:slug/project/add_examples",
+  authorize(),
+  addExampleProjectSchema,
+  addExamplesBySlug
 );
 
 function createProjectSchema(req, res, next) {
@@ -74,6 +86,9 @@ function createProject(req, res, next) {
     .catch(next);
 }
 
+/**
+ * Add example projects
+ */
 function addExamples(req, res, next) {
   const { examples } = req.body;
   const companyId = req.params.id;
@@ -87,6 +102,33 @@ function addExamples(req, res, next) {
   })
     .then((projects) => {
       // global.socket.emit("organization:project:create", projects);
+      return ApiResponseHandler.success({
+        res: res,
+        data: projects,
+        message: "Example projects created successfully",
+        dataKey: "projects",
+        status: HttpStatusCode.CREATED,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Add example projects using organization slug
+ */
+function addExamplesBySlug(req, res, next) {
+  const { examples } = req.body;
+  const slug = req.params.slug;
+
+  const user = req.auth;
+
+  ProjectService.addExamplesBySlug({
+    slug: slug,
+    examples: examples,
+    userId: user.id,
+  })
+    .then((projects) => {
+      // global.socket.emit("organization:project
       return ApiResponseHandler.success({
         res: res,
         data: projects,

@@ -17,6 +17,7 @@ module.exports = {
   getBySlug,
   crateProject,
   addExamples,
+  addExamplesBySlug,
   getAllProjects,
   getAllProjectsBySlug,
 };
@@ -125,6 +126,30 @@ async function addExamples({ companyId, examples, userId }) {
     //  Resolve all promises and push to projects array
     await Promise.all(Promises).then((values) => {
       projects.push(...values);
+    });
+
+    // return projects
+    return projects;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Add example projects to organization using organization slug
+ * @param {string} slug
+ * @param {string[]} examples
+ * @returns {Promise<Project[]>}
+ */
+async function addExamplesBySlug({ slug, examples, userId }) {
+  try {
+    // Check if user exists in organization
+    const organization = await CompanyService.getBySlug(slug);
+
+    const projects = await addExamples({
+      companyId: organization.id,
+      examples: examples,
+      userId: userId,
     });
 
     // return projects
