@@ -13,6 +13,11 @@ const {
 const FakeBoardData = require("../config/task_data");
 
 router.get("/organization/:id/project/all", authorize(), getAllProjects);
+router.get(
+  "/organization/:slug/project/get_all_projects_by_slug",
+  authorize(),
+  getAllProjectsBySlug
+);
 router.post(
   "/organization/:id/project/create",
   authorize(),
@@ -101,6 +106,27 @@ function getAllProjects(req, res, next) {
   const companyId = req.params.id;
 
   ProjectService.getAllProjects(companyId)
+    .then((companies) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: companies,
+        message: "Projects fetched successfully",
+        dataKey: "Projects",
+        status: HttpStatusCode.OK,
+        total: companies.length,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Get all projects by organization slug
+ */
+function getAllProjectsBySlug(req, res, next) {
+  const user = req.auth;
+  const slug = req.params.slug;
+
+  ProjectService.getAllProjectsBySlug(slug)
     .then((companies) => {
       return ApiResponseHandler.success({
         res: res,

@@ -18,6 +18,7 @@ module.exports = {
   crateProject,
   addExamples,
   getAllProjects,
+  getAllProjectsBySlug,
 };
 
 /**
@@ -187,6 +188,7 @@ async function getBySlug(slug) {
 
 /**
  * Get all projects
+ * @param {string} companyId
  * @returns {Promise<Project[]>}
  * @throws {HttpException}
  */
@@ -205,6 +207,35 @@ async function getAllProjects(companyId) {
     const projects = await Project.find({ organization: companyId })
       .populate("members.user", "name email id")
       .populate("createdBy", "name id");
+
+    // Return all projects
+    return projects;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Get all projects using organization slug
+ * @param {string} slug
+ * @returns {Promise<Project[]>}
+ * @throws {HttpException}
+ */
+async function getAllProjectsBySlug(slug) {
+  try {
+    if (!slug)
+      throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid slug");
+    const organization = await CompanyService.getBySlug(slug);
+    if (!organization) {
+      throw new HttpException(
+        HttpStatusCode.NOT_FOUND,
+        "Organization not found",
+        "Organization does not exists with slug - '" + slug + "'"
+      );
+    }
+
+    // Get all projects of a organization from database if exists
+    const projects = await getAllProjects(organization.id);
 
     // Return all projects
     return projects;
