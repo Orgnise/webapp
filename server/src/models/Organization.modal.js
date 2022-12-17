@@ -35,6 +35,13 @@ const OrganizationSchema = new Schema(
         },
       },
     ],
+    meta: {
+      type: Object,
+      default: {},
+      title: "",
+      description: "",
+      slug: "",
+    },
     deactivatedAt: {
       type: Date,
     },

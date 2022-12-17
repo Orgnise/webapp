@@ -10,9 +10,11 @@ const UserService = require("./user.service");
 const CompanyService = require("./organization.service");
 const role = require("../helper/role");
 const Mongoose = require("mongoose");
+const { generateSlug } = require("../helper/slug-helper");
 
 module.exports = {
   getById,
+  getBySlug,
   crateProject,
   addExamples,
   getAllProjects,
@@ -31,6 +33,14 @@ async function crateProject({ companyId, name, description, members, userId }) {
 
     // Check if user exists in organization
     const organization = await CompanyService.getById(companyId);
+
+    // Generate slug for organization
+    const slug = await generateSlug({
+      name,
+      didExist: async (val) => {
+        return await Project.findOne({ "meta.slug": val });
+      },
+    });
 
     // Check user data within organization
     const teamMember = organization.members.find((member) => {
@@ -60,6 +70,11 @@ async function crateProject({ companyId, name, description, members, userId }) {
       ],
       createdBy: user.id,
       organization: organization.id,
+      meta: {
+        title: name,
+        description: "",
+        slug: slug,
+      },
     });
 
     // Save project to database
@@ -141,6 +156,30 @@ async function getById(projectId) {
       HttpStatusCode.NOT_FOUND,
       "Project not found",
       "Project does not exists with id '" + projectId + "'"
+    );
+  // Return project
+  return project;
+}
+
+/**
+ * Get organization by slug
+ * @param {string} slug
+ * @returns {Promise<Project>}
+ * @throws {HttpException}
+ */
+async function getBySlug(slug) {
+  if (!slug)
+    throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid slug");
+  // Get project from database if exists
+  const project = await Project.findOne({ "meta.slug": slug })
+    .populate("members.user", "name email id")
+    .populate("createdBy", "name id");
+  // Check if project exists in db
+  if (!project)
+    throw new HttpException(
+      HttpStatusCode.NOT_FOUND,
+      "Project not found",
+      "Project does not exists with slug - '" + slug + "'"
     );
   // Return project
   return project;

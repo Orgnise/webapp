@@ -37,6 +37,16 @@ router.get(
   }),
   getCompanyById
 );
+router.get(
+  "/organization/get_by_slug/:slug",
+  authorize(),
+  cacheMiddleWare({
+    keyPath: "params.slug",
+    cacheDataKey: "organization",
+    cacheDataMessage: "Organization fetched successfully",
+  }),
+  getCompanyBySlug
+);
 router.put(
   "/organization/:orgId/add_members",
   authorize(), // authorize(Role.Admin),
@@ -125,6 +135,33 @@ async function getCompanyById(req, res, next) {
   CompanyService.getById(id, user.id)
     .then(async (organization) => {
       await updateCache(id, organization);
+
+      return ApiResponseHandler.success({
+        res: res,
+        data: organization,
+        message: "Organization fetched successfully",
+        dataKey: "organization",
+        status: HttpStatusCode.OK,
+      });
+    })
+    .catch(next);
+}
+
+// Get organization by slug
+async function getCompanyBySlug(req, res, next) {
+  const user = req.auth;
+  const { slug } = req.params;
+  if (!slug) {
+    return ApiResponseHandler.error({
+      res: res,
+      message: "Organization slug is required",
+      status: HttpStatusCode.BAD_REQUEST,
+    });
+  }
+
+  CompanyService.getBySlug(slug, user.id)
+    .then(async (organization) => {
+      await updateCache(slug, organization);
 
       return ApiResponseHandler.success({
         res: res,

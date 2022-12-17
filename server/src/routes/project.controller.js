@@ -20,6 +20,7 @@ router.post(
   createProject
 );
 router.get("/project/get_by_id/:id", authorize(), getProjectById);
+router.get("/project/get_by_slug/:slug", authorize(), getProjectBySlug);
 router.post(
   "/organization/:id/project/add_example_projects",
   authorize(),
@@ -120,6 +121,25 @@ function getProjectById(req, res, next) {
   const user = req.auth;
   const id = req.params.id;
   ProjectService.getById(id)
+    .then((project) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: project,
+        message: "Project fetched successfully",
+        dataKey: "project",
+        status: HttpStatusCode.OK,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Get project by slug
+ */
+function getProjectBySlug(req, res, next) {
+  const user = req.auth;
+  const slug = req.params.slug;
+  ProjectService.getBySlug(slug)
     .then((project) => {
       return ApiResponseHandler.success({
         res: res,
