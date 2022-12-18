@@ -3,16 +3,23 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import SocketProvider from "./context/socket.context";
-import AppServiceContext from "./context/app-service.context";
+import SocketProvider from "./provider/socket.provider";
+import AppServiceContext from "./provider/app-service.provider";
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider } from "./provider/auth-provider";
+import AppServiceProvider from "./provider/app-service.provider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <SocketProvider>
-      <AppServiceContext>
-        <App />
-      </AppServiceContext>
+      <AppServiceProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </AuthProvider>
+      </AppServiceProvider>
     </SocketProvider>
   </React.StrictMode>
 );

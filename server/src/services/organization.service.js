@@ -13,9 +13,11 @@ const {
 const HttpException = require("../helper/exception/http-exception");
 const { Admin } = require("../helper/role");
 const { Promise } = require("mongoose");
+const { generateSlug } = require("../helper/slug-helper");
 
 module.exports = {
   getById,
+  getBySlug,
   createCompany,
   getAllCompany,
   addMembers,
@@ -44,6 +46,14 @@ async function createCompany(body, userId) {
     // Get user data
     const user = await UserService.getById({ id: userId });
 
+    // Generate slug for organization
+    const slug = await generateSlug({
+      name,
+      didExist: async (val) => {
+        return await Organization.findOne({ "meta.slug": val });
+      },
+    });
+
     // Set user role to admin for organization
     user.role = Admin;
     const organization = await Organization.create({
@@ -51,6 +61,11 @@ async function createCompany(body, userId) {
       description,
       createdBy: user.id,
       members: [{ user: user.id, role: user.role, _id: user.id }],
+      meta: {
+        title: name,
+        description: "",
+        slug: slug,
+      },
     });
 
     // return organization data
@@ -93,6 +108,33 @@ async function getById(id) {
       HttpStatusCode.NOT_FOUND,
       "No organization found with",
       "Organization does not exist with " + id + " id"
+    );
+  }
+
+  return getBasicCompanyInfo(organization);
+}
+
+/**
+ * Get organization by slug
+ * @param {String} slug
+ * @returns {Promise<Organization>}
+ * @throws {Error}
+ */
+async function getBySlug(slug) {
+  if (!slug)
+    throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid slug");
+
+  // Get organization data using organization id if exists
+  const organization = await Organization.findOne({ "meta.slug": slug })
+    .populate("members.user", "name email id")
+    .populate("createdBy", "name id");
+
+  // Check if organization exists
+  if (!organization) {
+    throw new HttpException(
+      HttpStatusCode.NOT_FOUND,
+      "No organization found",
+      "Organization does not exist with slug -" + slug
     );
   }
 

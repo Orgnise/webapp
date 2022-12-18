@@ -1,3 +1,5 @@
+import Validator from "./validator";
+
 interface FoldProps<T, K> {
     value: T | null | undefined;
     ifPresent: (value: T) => K;
@@ -22,13 +24,13 @@ export const Fold = <T, K>({
     ifPresent,
     ifAbsent,
 }: FoldProps<T, K>) => {
-    if (value === undefined || value === null) {
+    if (!Validator.hasValue(value)) {
         if (ifAbsent) {
             return ifAbsent();
         }
         return null;
     }
-    return ifPresent(value);
+    return ifPresent(value!);
 };
 
 
@@ -48,4 +50,40 @@ export const FoldRaw = <T, K>(
     ifPresent: (value: T) => K,
     ifAbsent: () => K | undefined,
 ) => Fold({ value, ifPresent, ifAbsent });
+
+
+/**
+ * Search and return path from a URL
+ * @param path The path to search
+ * @param keys The keys to search
+ * @returns The map of keys and values
+ * @example
+ * ExtractPath("/a/b/c/d", ["a", "b", "c", "d"]) // { a: "b", b: "c", c: "d" }
+ * ExtractPath("/a/b/c/d", ["a", "b", "c"]) // { a: "b", b: "c" }
+ * ExtractPath("/a/b/c/d", ["a", "b"]) // { a: "b" }
+ * ExtractPath("/a/b/c/d", ["a"]) // { a: "b" }
+ * ExtractPath("/a/b/c/d", ["b"]) // { b: "c" }
+ * ExtractPath("/a/b/c/d", ["c"]) // { c: "d" }
+ * ExtractPath("/a/b/c/d", ["d"]) // {}
+ * ExtractPath("/a/b/c/d", ["e"]) // {}
+ * ExtractPath("/a/b/c/d", ["a", "b", "c", "d", "e"]) // { a: "b", b: "c", c: "d" }
+ * ExtractPath("/a/b/c/d", ["a", "b", "c", "d", "e", "f"]) // { a: "b", b: "c", c: "d" }
+ */
+
+export function ExtractPath(path: string, keys: string[]): { [key: string]: string | undefined } {
+    try {
+        const map: { [key: string]: string | undefined } = {};
+        const parts = path.split('/');
+
+        for (let i = 0; i < parts.length; i++) {
+            if (keys.includes(parts[i])) {
+                map[parts[i]] = parts[i + 1];
+            }
+        }
+
+        return map;
+    } catch (error) {
+        return {};
+    }
+}
 

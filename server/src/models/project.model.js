@@ -43,6 +43,13 @@ const ProjectSchema = new Mongoose.Schema(
       ref: "User",
       required: true,
     },
+    meta: {
+      type: Object,
+      default: {},
+      title: "",
+      description: "",
+      slug: "",
+    },
   },
   { timestamps: true }
 );

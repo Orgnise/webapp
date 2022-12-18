@@ -6,19 +6,17 @@ export const AppRoutes = {
     dashboard: '/',
     onboard: {
         root: '/onboard/*',
-        step1: '/onboard/:id/onboarding-projects',
+        addExamples: '/onboard/:slug',
     },
     organization: {
-        root: 'organization/*',
-        allOrganizations: '/organizations',
-        detail: '/organization/:id',
         create: '/create-organization',
     },
     workspace: {
+
         root: '/workspace/*',
         home: '/workspace/:id',
         team: '/workspace/:id/team',
-        project: '/workspace/:id/project',
+        project: '/workspace/:slug/project/:id',
     },
     users: {
         root: '/users/*',

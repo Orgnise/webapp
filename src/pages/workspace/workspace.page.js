@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import cx from "classnames";
 import { useParams } from "react-router-dom";
 import { useAppService } from "../../hooks/use-app-service";
-import useLocalStorage from "../../hooks/use-local-storage";
 import { Fold } from "../../helper/typescript-utils";
 import useSocket from "../../hooks/use-socket.hook";
 import moment from "moment";
@@ -10,7 +9,7 @@ import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { AppRoutes } from "../../helper/app-routes";
 import FIcon from "../../components/ficon";
 import ModalForm from "../../components/modal";
-import TasksContainer from "../task/component/task-container";
+import useAuth from "../../hooks/use-auth";
 
 export default function WorkspacePageView() {
   const [organization, setOrganization] = useState({});
@@ -19,7 +18,7 @@ export default function WorkspacePageView() {
   const params = useParams();
   const id = params.id;
   const { organizationService } = useAppService();
-  const [user, setUser] = useLocalStorage("user");
+  const { user } = useAuth();
 
   // Fetch organization list in which authenticated user is member | owner | admin
   useEffect(() => {
@@ -67,8 +66,6 @@ function TeamList({ teams }) {
   const [tempMembers, setTempMembers] = useState(teams);
   const [loading, setLoading] = useState();
   const [visible, setVisible] = useState(false);
-
-  const [user, setUser] = useLocalStorage("user");
 
   const socket = useSocket([], {});
   const { organizationService } = useAppService();

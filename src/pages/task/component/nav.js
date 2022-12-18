@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppRoutes } from "../../../helper/app-routes";
-import useLocalStorage from "../../../hooks/use-local-storage";
 import CustomDropDown from "../../../components/custom_dropdown";
 import Logo from "../../../components/atom/logo";
+import useAuth from "../../../hooks/use-auth";
 
 const Nav = () => {
-  const [user, setUser] = useLocalStorage("user");
+  const auth = useAuth();
+  const user = auth.user;
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    setUser({});
-    navigate(AppRoutes.login);
-    window.location.reload();
+    auth.signOut(() => navigate("/"));
   };
 
   return (
@@ -33,7 +32,7 @@ const Nav = () => {
                   </div>
                 }
               >
-                <div className="bg-white px-3 py-3">
+                <div className="bg-white px-3 py-3 rounded">
                   <div className="px-4 py-2 hover:bg-slate-100 rounded">
                     <p className="cursor-pointer text-slate-700 ">
                       {user.name}

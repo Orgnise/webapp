@@ -1,6 +1,6 @@
 
 import { useContext } from "react";
-import { AppServiceContext } from "../context/app-service.context";
+import { AppServiceContext } from "../provider/app-service.provider";
 import AppService from "../service/app-service";
 
 /**

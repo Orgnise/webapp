@@ -5,6 +5,9 @@ import loginSvg from "../../assets/secure-login-animate.svg";
 import { AppRoutes } from "../../helper/app-routes";
 import useLocalStorage from "../../hooks/use-local-storage";
 import { useAppService } from "../../hooks/use-app-service";
+import useAuth from "../../hooks/use-auth";
+import useSocket from "../../hooks/use-socket.hook";
+import { SocketEvent } from "../../constant/socket-event-constant";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +15,12 @@ const Signup = () => {
   const [errors, setError] = useState({});
   const [password, setPassword] = useState("");
   const [cPassword, setCPassword] = useState("");
-  const history = useNavigate();
+
+  const navigate = useNavigate();
+  const auth = useAuth();
   const { authService } = useAppService();
-  const [_, setValue] = useLocalStorage("user", null);
+
+  const socket = useSocket([]);
 
   const validEmailRegex = RegExp(
     /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
@@ -58,10 +64,13 @@ const Signup = () => {
         })
         .then(({ user }) => {
           console.log("User registered successfully");
-          setValue(user);
-          history(AppRoutes.dashboard);
+
+          socket.emit(SocketEvent.auth.register, {
+            jwtToken: user.jwtToken,
+          });
           console.log("New user created", user);
-          window.location.reload();
+          auth.signIn(user);
+          navigate(AppRoutes.users.myOrganization, { replace: true });
         })
         .catch(({ response }) => {
           const { status, errorCode, message, error } = response.data;

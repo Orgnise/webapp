@@ -1,5 +1,4 @@
-const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://localhost:27017/react-kanban-db";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/pulse-db";
 
 const API_PORT = process.env.API_PORT || 4000;
 

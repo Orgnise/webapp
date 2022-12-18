@@ -82,7 +82,7 @@ async function registerUser({ name, email, password, role, ipAddress }) {
       role: user.role,
       name: user.name,
       email: user.email,
-      token: jwtToken,
+      jwtToken: jwtToken,
       createdAt: user.createdAt,
     },
     refreshToken: refreshToken.token,
