@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import cx from "classnames";
 import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { Link, NavLink, useParams } from "react-router-dom";
-import useLocalStorage from "../../../hooks/use-local-storage";
 import FIcon from "../../../components/ficon";
-import SidebarComponent from "../../super-admin/component/sidebar.component";
 import { SidebarPageLayout } from "../../layout";
 import { AppRoutes } from "../../../helper/app-routes";
+import useAuth from "../../../hooks/use-auth";
 
+/**
+ * @deprecated This component is not used anymore
+ */
 function WorkspaceSidebarLayout() {
-  const [user, setUser] = useLocalStorage("user");
+  const { user } = useAuth();
   const params = useParams();
   const id = params.id;
 

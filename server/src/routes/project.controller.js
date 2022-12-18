@@ -25,7 +25,7 @@ router.post(
   createProject
 );
 router.get("/project/get_by_id/:id", authorize(), getProjectById);
-router.get("/project/get_by_slug/:slug", authorize(), getProjectBySlug);
+router.get("/project/slug/:slug", authorize(), getProjectBySlug);
 router.post(
   "/organization/:id/project/add_examples",
   authorize(),

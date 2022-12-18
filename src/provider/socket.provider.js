@@ -6,15 +6,10 @@ SocketContext.displayName = "SocketContext";
 
 export { SocketContext };
 
-export default ({ children }) => {
+const SocketProvider = ({ children }) => {
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>
   );
 };
 
-export const withSocket = (Component) => (props) =>
-  (
-    <SocketContext.Consumer>
-      {(socket) => <Component socket={socket} {...props} />}
-    </SocketContext.Consumer>
-  );
+export default SocketProvider;

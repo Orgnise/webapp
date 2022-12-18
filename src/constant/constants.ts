@@ -15,6 +15,7 @@ export const Endpoints = {
         update: '/organization/update',
         delete: '/organization/delete',
         getById: (orgId: string) => `/organization/${orgId}`,
+        getBySlug: (slug: string) => `/organization/slug/${slug}`,
         project: (orgId: string) => {
             return {
                 getAll: `/organization/${orgId}/project/all`,
@@ -22,9 +23,16 @@ export const Endpoints = {
                 update: `/organization/${orgId}/project/update`,
                 delete: `/organization/${orgId}/project/delete`,
                 getById: (projectId: string) => `/organization/${orgId}/project/${projectId}`,
-                addExampleProjects: `/organization/${orgId}/project/add_example_projects`,
+                addExampleProjects: `/organization/${orgId}/project/add_examples`,
             }
         },
+        projectBySlug: (slug: string) => {
+            return {
+                getAll: `/organization/slug/${slug}/project/all`,
+                addExampleProjects: `/organization/slug/${slug}/project/add_examples`,
+                getBySlug: () => `/project/slug/${slug}`,
+            }
+        }
     },
 
 

@@ -3,16 +3,16 @@ import cx from "classnames";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import useSocket from "../../../hooks/use-socket.hook";
 import Task from "./task";
-import useLocalStorage from "../../../hooks/use-local-storage";
 import { useAppService } from "../../../hooks/use-app-service";
 import { useParams } from "react-router-dom";
+import useAuth from "../../../hooks/use-auth";
 
 const TasksContainer = () => {
   const socket = useSocket(["tasks"], {});
   const [tasks, setTasks] = useState([]);
   const [errors, setErrors] = useState({});
   const [dragFirstTask, setDragFirstTask] = useState(false);
-  const [user, setUser] = useLocalStorage("user");
+  const { user } = useAuth();
   const { boardService, organizationService } = useAppService();
 
   const params = useParams();

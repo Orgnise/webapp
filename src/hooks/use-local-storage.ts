@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 
+interface ILocalStorage<T> {
+    value: any;
+    setValue: (value: any) => void;
+    removeValue: () => void;
+}
+
 const useLocalStorage = <T>(
     key: string,
-    initialValue: T
-): [T, (value: T) => void] => {
-    const [storedValue, setStoredValue] = useState(initialValue);
+    initialValue?: T,
+): ILocalStorage<T> => {
+    const [value, setStoredValue] = useState<T | undefined>(initialValue);
 
     useEffect(() => {
         // Retrieve from localStorage
         const item = localStorage.getItem(key);
-        if (item) {
+        if (item && item != null) {
             setStoredValue(JSON.parse(item));
         }
     }, [key]);
@@ -17,10 +23,22 @@ const useLocalStorage = <T>(
     const setValue = (value: any) => {
         // Save state
         setStoredValue(value);
-        // Save to localStorage
-        localStorage.setItem(key, JSON.stringify(value));
+        console.log("[Local storage]: User Updated", value);
+        if (typeof value === 'object') {
+            // Save to localStorage
+            localStorage.setItem(key, JSON.stringify(value));
+        } else {
+            localStorage.setItem(key, value);
+        }
+
     };
-    return [storedValue, setValue];
+
+    const removeValue = () => {
+        localStorage.removeItem(key);
+    }
+
+
+    return { value, setValue, removeValue };
 };
 
 export default useLocalStorage;

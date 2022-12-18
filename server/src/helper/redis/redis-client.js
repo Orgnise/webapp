@@ -18,7 +18,7 @@ const redisClient = redis.createClient({
       chalk.green("Redis client connected")
     );
   });
-  await redisClient.connect();
+  // await redisClient.connect();
 })();
 
 /**
@@ -75,7 +75,8 @@ const updateCache = async (key, value, option) => {
       NX: true,
     };
   }
-  const data = await redisClient.set(key, value, option);
+  let data = "";
+  // const data = await redisClient.set(key, value, option);
   logInfo(`key ${key}  status: ${data}`, "Cache");
   return data;
 };

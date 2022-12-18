@@ -4,11 +4,14 @@ import { SidebarPageLayout } from "../../layout";
 import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import FIcon from "../../../components/ficon";
 import { Link, NavLink } from "react-router-dom";
-import useLocalStorage from "../../../hooks/use-local-storage";
 import { AppRoutes } from "../../../helper/app-routes";
+import useAuth from "../../../hooks/use-auth";
 
+/**
+ * @deprecated This component is not used anymore
+ */
 function SidebarComponent() {
-  const [user, setUser] = useLocalStorage("user");
+  const { user } = useAuth();
   return (
     <>
       <SidebarPageLayout

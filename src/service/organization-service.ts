@@ -28,4 +28,15 @@ export default class OrganizationService {
             .get(Endpoints.organization.getById(id))
             .then((response) => response.data);
     }
+
+    /**
+     * Get organization by slug
+     * @param slug
+     * @returns {Promise<AxiosResponse<any>>}
+     */
+    async getOrganizationBySlug(slug: string): Promise<AxiosResponse<any>> {
+        return this.client
+            .get(Endpoints.organization.getBySlug(slug))
+            .then((response) => response.data);
+    }
 }

@@ -38,7 +38,7 @@ router.get(
   getCompanyById
 );
 router.get(
-  "/organization/get_by_slug/:slug",
+  "/organization/slug/:slug",
   authorize(),
   cacheMiddleWare({
     keyPath: "params.slug",

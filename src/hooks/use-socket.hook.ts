@@ -1,8 +1,8 @@
 // Socket hook
 
-import { useState, useEffect, useContext, Dispatch } from "react";
+import { useEffect, useContext } from "react";
 import { Socket } from "socket.io-client";
-import { SocketContext } from "../context/socket.context";
+import { SocketContext } from "../provider/socket.provider";
 
 
 /**

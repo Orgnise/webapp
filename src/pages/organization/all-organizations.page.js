@@ -1,78 +1,31 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import moment from "moment";
 import Nav from "../task/component/nav";
 
-import {
-  BrowserRouter,
-  Link,
-  Route,
-  Router,
-  Routes,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-import {
-  Comments,
-  getLoggedInRoute,
-  getProtectedRoute,
-  NoPageFound,
-} from "../../helper/routes.helper";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AppRoutes } from "../../helper/app-routes";
-import useLocalStorage from "../../hooks/use-local-storage";
 import { useAppService } from "../../hooks/use-app-service";
 import { SocketEvent } from "../../constant/socket-event-constant";
 import useSocket from "../../hooks/use-socket.hook";
 import FIcon from "../../components/ficon";
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import AddOrganization from "./component/add-organization";
-import ModalForm from "../../components/modal";
-import OrganizationPage from "./detail/organization";
-import Breadcrumb from "../../components/breadcrumb";
-import { WithBreadcrumb } from "../../components/compound/withbreadcrumn";
+import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { NavbarLayout } from "../layout";
 import Button from "../../components/atom/button";
-import DropDown from "../../components/dropdown";
 import CustomDropDown from "../../components/custom_dropdown";
 import { ListView } from "../../components/compound/list-view";
+import useAuth from "../../hooks/use-auth";
 
-const AllOrganizationsList = () => {
-  const params = useParams();
-  const id = params.id;
-  return (
-    <WithBreadcrumb
-      BCrumb={
-        <Breadcrumb
-          className="py-6"
-          items={[
-            {
-              label: "Dashboard",
-              link: "/",
-            },
-            {
-              label: "Organizations",
-              link: AppRoutes.organization.allOrganizations,
-            },
-          ]}
-        />
-      }
-    >
-      <OrganizationList />
-    </WithBreadcrumb>
-  );
-};
-
-export function OrganizationList() {
+export default function AllOrganizationsPage() {
   const [organization, setOrganization] = useState([]);
   const [loading, setLoading] = useState();
   const [visible, setVisible] = useState(false);
   const { organizationService } = useAppService();
 
-  const [user, setUser] = useLocalStorage("user");
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const createOrganization = SocketEvent.organization.create;
-  useSocket([createOrganization], (event, data) => {
-    if (event === createOrganization) {
+
+  useSocket([SocketEvent.organization.create], (event, data) => {
+    if (event === SocketEvent.organization.create) {
       setOrganization((prev) => [...prev, data]);
       toast.success("Organization created successfully", {
         position: "top-right",
@@ -90,7 +43,9 @@ export function OrganizationList() {
           setOrganization(companies);
         })
         .catch(({ response }) => {
-          console.log(response.data);
+          if (response && response.data) {
+            console.log(response.data);
+          }
         })
         .finally(() => {
           setLoading(false);
@@ -103,8 +58,8 @@ export function OrganizationList() {
       <NavbarLayout>
         <Nav />
       </NavbarLayout>
-      <section className="flex flex-col bg-white py-4 md:py-7  md:px-8 xl:px-10 mt-28 h-full overflow-y-auto items-center">
-        <div className="divide-y max-w-xl w-full px-2 sm:px-0">
+      <section className="flex flex-col bg-white py-4 md:py-7  md:px-8 xl:px-10 h-full overflow-y-auto items-center">
+        <div className="divide-y max-w-xl w-full px-2 sm:px-0 pt-28">
           <div className="flex flex-col  gap-5 ">
             <div className="flex">
               <h1 className="font-medium text-2xl flex-1 ">Organization</h1>
@@ -122,7 +77,7 @@ export function OrganizationList() {
               loading={loading}
               noItemsElement={
                 <div className="p-4 rounded bg-gray-100 text-xs text-slate-500">
-                  You are now a member of any organization yet. Create a new
+                  You are not a member of any organization yet. Create a new
                   organization or ask someone to invite you to their
                   organization
                 </div>
@@ -158,7 +113,7 @@ function OrganizationRow({ org, index }) {
     <div className="flex items-center border-b-[1px] py-2 first:border-t border-gray-100 hover:bg-gray-50 cursor-pointer px-4">
       <div className=" mr-2 hover:cursor-pointer w-full">
         <div className="flex">
-          <Link to={`/organization/${org.id}`} className="flex-1">
+          <Link to={`/workspace/${org.meta.slug}`} className="flex-1">
             <h3 className="text-base text-gray-700">{org.name}</h3>
             <h5 className="text-xs text-gray-500">
               {org.members.length} team members
@@ -181,5 +136,3 @@ function OrganizationRow({ org, index }) {
     </div>
   );
 }
-
-export default AllOrganizationsList;

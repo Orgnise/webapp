@@ -1,31 +1,64 @@
 import React, { useState } from "react";
 import cx from "classnames";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import loginSvg from "../../assets/secure-login-animate.svg";
 import { AppRoutes } from "../../helper/app-routes";
 import { useAppService } from "../../hooks/use-app-service";
-import useLocalStorage from "../../hooks/use-local-storage";
 import useSocket from "../../hooks/use-socket.hook";
 import { SocketEvent } from "../../constant/socket-event-constant";
+import Validator from "../../helper/validator";
+import useAuth from "../../hooks/use-auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setError] = useState({});
-  const history = useNavigate();
-  const [storedValue, setValue] = useLocalStorage("user", null);
 
   /// 👇🏻  Use the useSocket hook to get the socket
   const socket = useSocket([], {});
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const { authService } = useAppService();
+  const location = useLocation();
+  const pathname = location.pathname;
 
-  const handleLogin = (e) => {
+  let auth = useAuth();
+
+  let from = getLeaf(location, "state.from.pathname") || AppRoutes.dashboard;
+
+  // get the redirect url from the query params
+  const redirect = new URLSearchParams(useLocation().search).get("redirect");
+  console.log("🚀 ~ file: login.page.js:35 ~ Login ~ redirect", redirect);
+
+  // if the user is already logged in, redirect to the dashboard
+  React.useEffect(() => {
+    if (Validator.hasValue(auth.user)) {
+      // if (![AppRoutes.login, AppRoutes.signup, "/"].includes(pathname)) {
+      //   navigate(`${AppRoutes.login}?redirect=${pathname}`);
+      // }
+      navigate(AppRoutes.users.myOrganization, { replace: true });
+    }
+  }, [auth.user]);
+
+  function getLeaf(node, path) {
+    if (node) {
+      const keys = path.split(".");
+      for (let i = 0; i < keys.length; i++) {
+        if (node[keys[i]]) {
+          node = node[keys[i]];
+        }
+      }
+      return node;
+    }
+  }
+
+  const login = (e) => {
     e.preventDefault();
     if (password.length < 6) {
       setError({
         ...errors,
-        password: "Password should be atleast 6 characters long",
+        password: "Password should be at least 6 characters long",
       });
       return;
     }
@@ -34,18 +67,22 @@ const Login = () => {
       .login({ email, password })
       .then(({ user }) => {
         console.log("User authenticate successfully");
-        setValue(user);
+
         socket.emit(SocketEvent.auth.register, {
           jwtToken: user.jwtToken,
         });
-        history(AppRoutes.dashboard);
-        window.location.reload();
+        auth.signIn(user);
+        if (from === "/login") {
+          navigate(AppRoutes.users.myOrganization, { replace: true });
+        } else {
+          navigate(from, { replace: true });
+        }
       })
       .catch((err) => {
         const response = err.response;
         if (!response) {
           console.error(
-            "🚀 ~ file: login.page.js ~ line 43 ~ handleLogin ~ response",
+            "🚀 ~ file: login.page.js ~ line 43 ~ login ~ response",
             response
           );
 
@@ -71,7 +108,7 @@ const Login = () => {
 
         <form
           className="flex flex-col items-center place-content-center space-y-6 h-full bg-slate-50 rounded-md"
-          onSubmit={handleLogin}
+          onSubmit={login}
         >
           <div className="flex flex-col items-center font-normal">
             <h3 className="text-3xl font-bold ">Welcome back</h3>
@@ -80,38 +117,11 @@ const Login = () => {
               back
             </p>
           </div>
-          {/* <div className="flex flex-col space-y-2 w-9/12">
-            <label className="text-md  text-slate-500">Email</label>
-            <input
-              type="text"
-              name="email"
-              placeholder="Enter email"
-              className="border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
-              autoComplete="email"
-            />
-          </div>
-          <div className="flex flex-col space-y-2 w-9/12">
-            <label className="text-md text-slate-500 "> Password</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              className="border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm"
-              required
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-              autoComplete="current-password"
-            />
-          </div> */}
           <TextField
             label="Email"
             name="email"
             onChange={(e) => {
               setEmail(e.target.value);
-              // handleChange(e);
             }}
             value={email}
             autoComplete="email"
@@ -123,7 +133,6 @@ const Login = () => {
             name="password"
             onChange={(e) => {
               setPassword(e.target.value);
-              // handleChange(e);
             }}
             value={password}
             autoComplete="password"

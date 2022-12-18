@@ -9,10 +9,8 @@ import {
   NoPageFound,
 } from "../../helper/routes.helper";
 import { AppRoutes } from "../../helper/app-routes";
-import useLocalStorage from "../../hooks/use-local-storage";
 
 const Task = () => {
-  const [storedValue, setValue] = useLocalStorage("user");
   return (
     <div className="flex flex-col h-screen">
       <Nav />

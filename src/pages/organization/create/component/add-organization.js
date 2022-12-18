@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import cx from "classnames";
 import { faker } from "@faker-js/faker";
-import useSocket from "../../../hooks/use-socket.hook";
+import useSocket from "../../../../hooks/use-socket.hook";
 import { useNavigate } from "react-router-dom";
-import { history } from "../../../helper/history.config";
-import DropDown from "../../../components/dropdown";
-import { SocketEvent } from "../../../constant/socket-event-constant";
+import { history } from "../../../../helper/history.config";
+import DropDown from "../../../../components/dropdown";
+import { SocketEvent } from "../../../../constant/socket-event-constant";
 
 const AddOrganization = ({ setVisible = () => {} }) => {
   const [name, setName] = useState("");
