@@ -28,13 +28,13 @@ module.exports = {
  * @returns {Promise<Project>}
  * @throws {HttpException}
  */
-async function crateProject({ companyId, name, description, members, userId }) {
+async function crateProject({ orgId, name, description, members, userId }) {
   try {
     // Get user
     const user = await UserService.getById({ id: userId });
 
     // Check if user exists in organization
-    const organization = await CompanyService.getById(companyId);
+    const organization = await CompanyService.getById(orgId);
 
     // Generate slug for organization
     const slug = await generateSlug({
@@ -91,17 +91,17 @@ async function crateProject({ companyId, name, description, members, userId }) {
 
 /**
  * Add example projects to organization
- * @param {string} companyId
+ * @param {string} orgId
  * @param {string[]} examples
  * @returns {Promise<Project[]>}
  */
-async function addExamples({ companyId, examples, userId }) {
+async function addExamples({ orgId, examples, userId }) {
   try {
     // Get user
     const user = await UserService.getById({ id: userId });
 
     // Check if user exists in organization
-    const organization = await CompanyService.getById(companyId);
+    const organization = await CompanyService.getById(orgId);
 
     // Set user role to admin for project
     user.role = role.Admin;
@@ -113,7 +113,7 @@ async function addExamples({ companyId, examples, userId }) {
     for (let i = 0; i < examples.length; i++) {
       let example = examples[i];
       const project = crateProject({
-        companyId: organization.id,
+        orgId: organization.id,
         name: example,
         description: "Example project",
         members: [],
@@ -147,7 +147,7 @@ async function addExamplesBySlug({ slug, examples, userId }) {
     const organization = await CompanyService.getBySlug(slug);
 
     const projects = await addExamples({
-      companyId: organization.id,
+      orgId: organization.id,
       examples: examples,
       userId: userId,
     });
@@ -213,15 +213,15 @@ async function getBySlug(slug) {
 
 /**
  * Get all projects
- * @param {string} companyId
+ * @param {string} orgId
  * @returns {Promise<Project[]>}
  * @throws {HttpException}
  */
 
-async function getAllProjects(companyId) {
+async function getAllProjects(orgId) {
   try {
-    // Check if companyId is valid object id
-    if (!Mongoose.isValidObjectId(companyId)) {
+    // Check if orgId is valid object id
+    if (!Mongoose.isValidObjectId(orgId)) {
       throw new HttpException(
         HttpStatusCode.BAD_REQUEST,
         "Invalid organization id"
@@ -229,7 +229,7 @@ async function getAllProjects(companyId) {
     }
 
     // Get all projects of a organization from database if exists
-    const projects = await Project.find({ organization: companyId })
+    const projects = await Project.find({ organization: orgId })
       .populate("members.user", "name email id")
       .populate("createdBy", "name id");
 

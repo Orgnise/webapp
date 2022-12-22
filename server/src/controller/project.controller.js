@@ -63,11 +63,11 @@ function addExampleProjectSchema(req, res, next) {
 
 function createProject(req, res, next) {
   const { name, description, members } = req.body;
-  const companyId = req.params.id;
+  const orgId = req.params.id;
   const user = req.auth;
 
   ProjectService.crateProject({
-    companyId: companyId,
+    orgId: orgId,
     name: name,
     description: description,
     members: members,
@@ -91,12 +91,12 @@ function createProject(req, res, next) {
  */
 function addExamples(req, res, next) {
   const { examples } = req.body;
-  const companyId = req.params.id;
+  const orgId = req.params.id;
 
   const user = req.auth;
 
   ProjectService.addExamples({
-    companyId: companyId,
+    orgId: orgId,
     examples: examples,
     userId: user.id,
   })
@@ -145,9 +145,9 @@ function addExamplesBySlug(req, res, next) {
  */
 function getAllProjects(req, res, next) {
   const user = req.auth;
-  const companyId = req.params.id;
+  const orgId = req.params.id;
 
-  ProjectService.getAllProjects(companyId)
+  ProjectService.getAllProjects(orgId)
     .then((companies) => {
       return ApiResponseHandler.success({
         res: res,

@@ -84,13 +84,13 @@ async function createCompany(body, userId) {
 
 /**
  * Get organization by id
- * @param {ObjectId} Id
+ * @param {ObjectId} orgId
  * @returns {Promise<Organization>}
  * @throws {Error}
  */
-async function getById(id) {
+async function getById(orgId) {
   // Check if id is a valid organization id
-  if (!Mongoose.isValidObjectId(id)) {
+  if (!Mongoose.isValidObjectId(orgId)) {
     throw new HttpException(
       HttpStatusCode.BAD_REQUEST,
       "",
@@ -98,7 +98,7 @@ async function getById(id) {
     );
   }
   // Get organization data using organization id if exists
-  const organization = await Organization.findOne({ _id: id })
+  const organization = await Organization.findOne({ _id: orgId })
     .populate("members.user", "name email id")
     .populate("createdBy", "name id");
 
@@ -107,7 +107,7 @@ async function getById(id) {
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
       "No organization found with",
-      "Organization does not exist with " + id + " id"
+      "Organization does not exist with " + orgId + " id"
     );
   }
 
@@ -198,17 +198,17 @@ async function getJoinedCompanies(userId) {
 
 /**
  * Add members to organization
- * @param {ObjectId} companyId
+ * @param {ObjectId} orgId
  * @param {Array} members
  * @param {ObjectId} userId
  * @returns {Promise<Organization>}
  * @throws {Error}
  */
 
-async function addMembers(companyId, userId, members) {
+async function addMembers(orgId, userId, members) {
   try {
     // Check if organization exists
-    const organization = await findCompany(companyId);
+    const organization = await findCompany(orgId);
 
     const user = organization.members.find(
       (member) => member.user._id == userId
@@ -262,7 +262,7 @@ async function addMembers(companyId, userId, members) {
 
     await organization.save();
 
-    return findCompany(companyId);
+    return findCompany(orgId);
   } catch (error) {
     throw error;
   }
@@ -271,21 +271,21 @@ async function addMembers(companyId, userId, members) {
 /**
  * Get organization complete info
  */
-async function findCompany(companyId) {
-  if (!Mongoose.isValidObjectId(companyId)) {
+async function findCompany(orgId) {
+  if (!Mongoose.isValidObjectId(orgId)) {
     throw new HttpException(
       HttpStatusCode.BAD_REQUEST,
       "Invalid organization id"
     );
   }
-  const organization = await Organization.findOne({ _id: companyId })
+  const organization = await Organization.findOne({ _id: orgId })
     .populate("members.user", "name")
     .populate("createdBy", "name");
   if (!organization || organization === null) {
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
       "Organization not found",
-      "Organization not found with id " + companyId
+      "Organization not found with id " + orgId
     );
   }
   return organization;
@@ -293,16 +293,16 @@ async function findCompany(companyId) {
 
 /**
  * Remove members from a organization
- * @param {ObjectId} companyId
+ * @param {ObjectId} orgId
  * @param {Array} members
  * @param {ObjectId} userId
  * @return {Promise<Organization>}
  * @throws {Error}
  */
-async function removeMembers(companyId, userId, members) {
+async function removeMembers(orgId, userId, members) {
   try {
     // get organization data if exists
-    const organization = await findCompany(companyId);
+    const organization = await findCompany(orgId);
 
     // Get current auth user from organization if exists
     const user = organization.members.find(

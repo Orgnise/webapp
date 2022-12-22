@@ -9,8 +9,8 @@ const {
   IssueController,
   OrganizationController,
   ProjectController,
-} = require("./src/routes");
-const SocketHandler = require("./src/routes/socket_handler");
+} = require("./src/controller");
+const SocketHandler = require("./src/controller/socket_handler");
 
 const { API_PORT } = require("./src/config/config");
 
