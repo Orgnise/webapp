@@ -16,7 +16,7 @@ function useSearchPath(keys: string[]): { [key: string]: string | undefined } {
 
     const currentPath = useLocation().pathname;
     useEffect(() => {
-        console.log("Current path: ", currentPath);
+        // console.log("Current path: ", currentPath);
     }, [currentPath]);
 
     return ExtractPath(currentPath, keys);

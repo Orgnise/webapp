@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import toast, { LoaderIcon, Toaster } from "react-hot-toast";
 import {
   Link,
+  NavLink,
   Route,
   Routes,
   useLocation,
@@ -19,14 +20,14 @@ import FIcon from "../../components/ficon";
 import { SlideModal } from "../../components/molecule/slide-modal";
 import { AppRoutes } from "../../helper/app-routes";
 import { Fold, ExtractPath } from "../../helper/typescript-utils";
-import Validator from "../../helper/validator";
+
 import { useAppService } from "../../hooks/use-app-service";
 import useAuth from "../../hooks/use-auth";
 import useSearchPath from "../../hooks/use-search-path-hook";
 import { NavbarLayout } from "../layout";
 import Nav from "../task/component/nav";
-
-import WorkspacePageView from "./workspace.page";
+import WorkspaceContentView from "./layout/workspace-content-view";
+import ProjectView from "./pages/project-view";
 
 function WorkSpacePage() {
   const [organization, setOrganization] = useState();
@@ -160,61 +161,6 @@ function WorkSpacePage() {
   }
 }
 
-function ProjectView({ displayProject }) {
-  const [isLoading, setIsLoading] = useState();
-  const [project, setProject] = useState();
-  const map = useSearchPath(["workspace", "projects"]);
-  const projectSlug = map.projects;
-  const orgSlug = map.workspace;
-  const { projectService } = useAppService();
-  const navigate = useNavigate();
-
-  // Navigate to first project if no project is selected
-  useEffect(() => {
-    if (displayProject) {
-      navigate(`${orgSlug}/projects/${displayProject.meta.slug}`);
-    }
-  }, [displayProject]);
-
-  useEffect(() => {
-    if (!Validator.hasValue(projectSlug)) {
-      return;
-    }
-    console.log(
-      "🚀 ~ file: index.js:184 ~ useEffect ~ projectSlug",
-      projectSlug
-    );
-    setIsLoading(true);
-    projectService
-      .getProjectBySlug(projectSlug)
-      .then(({ project }) => {
-        setProject(project);
-      })
-      .catch((err) => {
-        console.error("getAllProjectsBySlug", err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [projectSlug]);
-
-  if (isLoading) {
-    return <LoaderIcon />;
-  }
-
-  return (
-    <>
-      {!project ? (
-        <>No Data Available</>
-      ) : (
-        <div className="flex flex-col h-full items-center place-content-center">
-          {project.name}
-        </div>
-      )}
-    </>
-  );
-}
-
 function WorkspaceSidePanel({
   setActive,
   active,
@@ -294,12 +240,22 @@ function WorkspaceSidePanel({
                 <ListView
                   items={list}
                   renderItem={(project) => (
-                    <div
-                      className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
+                    <NavLink
+                      to={`/workspace/${orgId}/projects/${project.meta.slug}`}
+                      // className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
+                      className={(data) =>
+                        cx(
+                          " group flex items-center space-x-2 px-2  lg:mx-2 py-3 text-sm font-medium rounded-md ",
+                          "transition-all ease-in duration-200",
+                          {
+                            "bg-gray-100 text-slate-700 border-l-4 rounded-l border-red-500":
+                              data.isActive,
+                            "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
+                              !data.isActive,
+                          }
+                        )
+                      }
                       onClick={() => {
-                        navigate(
-                          `/workspace/${orgId}/projects/${project.meta.slug}`
-                        );
                         setActive(false);
                       }}
                     >
@@ -311,7 +267,7 @@ function WorkspaceSidePanel({
                       <p className="text-sm font-medium text-gray-900">
                         {project.name}
                       </p>
-                    </div>
+                    </NavLink>
                   )}
                   noItemsElement={
                     <div className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer">

@@ -14,6 +14,7 @@ import Button from "../../components/atom/button";
 import CustomDropDown from "../../components/custom_dropdown";
 import { ListView } from "../../components/compound/list-view";
 import useAuth from "../../hooks/use-auth";
+import WorkspaceContentView from "../workspace/layout/workspace-content-view";
 
 export default function AllOrganizationsPage() {
   const [organization, setOrganization] = useState([]);
@@ -52,6 +53,17 @@ export default function AllOrganizationsPage() {
         });
     }
   }, [user]);
+
+  // if (true) {
+  //   return (
+  //     <div className="OrganizationList h-screen flex flex-col">
+  //       <NavbarLayout>
+  //         <Nav />
+  //       </NavbarLayout>
+  //       <WorkspaceContentView />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="OrganizationList h-screen flex flex-col">
