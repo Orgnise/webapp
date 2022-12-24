@@ -1,5 +1,5 @@
 const Mongoose = require("mongoose");
-const { Collection } = require("../models");
+const { Collection, Team } = require("../models");
 const UserService = require("./user.service");
 
 const {
@@ -13,6 +13,7 @@ module.exports = {
   createCollection,
   getById,
   updateCollection,
+  deleteCollection,
 };
 
 /**
@@ -36,6 +37,7 @@ async function createCollection(body) {
 
     // Get user data
     const user = await UserService.getById({ id: userId });
+    const hasPermission = isAllowed(userId, collection);
     // Generate slug for team
     const slug = await generateSlug({
       title,
@@ -136,18 +138,70 @@ async function getById(id) {
   }
 
   // Get workspace from database if exists
-  const collection = await Collection.findOne({ _id: id }).populate(
-    "createdBy",
-    "name id"
-  );
+  const collection = await Collection.findOne({ _id: id })
+    .populate("createdBy", "name id")
+    .populate("lastUpdatedUserId", "name id")
+    .populate("team", "members");
 
   // Check if workspace exists in db
   if (!collection)
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
-      "Collection not found",
-      "Collection does not exists with id '" + id + "'"
+      "Item not found",
+      "Item does not exists with id " + id
     );
   // Return workspace
   return collection;
+}
+
+/**
+ * Delete collection/item by id
+ */
+async function deleteCollection(body) {
+  try {
+    const { id, userId } = body;
+    const collection = await getById(id);
+    if (collection.object === "collection") {
+      // TODO: Delete all children items
+    }
+    const hasPermission = isAllowed(userId, collection);
+    await Collection.remove({ _id: id });
+    return collection;
+  } catch (error) {
+    throw new HttpException(
+      error.status || HttpStatusCode.INTERNAL_SERVER_ERROR,
+      error.message,
+      error.error
+    );
+  }
+}
+
+/**
+ * Is user allowed to perform action
+ * @param {string} userId
+ * @param {Object} collection
+ * @returns {boolean}
+ */
+function isAllowed(userId, collection) {
+  // Check user data within team
+  const members = collection.team.members;
+  console.log(
+    "🚀 ~ file:  collection.team ",
+    Array.isArray(members),
+    typeof members,
+    members
+  );
+
+  const teamMember = members.find((member) => member.user._id == userId);
+
+  // Check if user is a member of team
+  if (!teamMember) {
+    throw new HttpException(
+      HttpStatusCode.FORBIDDEN,
+      "You are not a member of the team",
+      "Not allowed to perform this action"
+    );
+  }
+
+  return true;
 }

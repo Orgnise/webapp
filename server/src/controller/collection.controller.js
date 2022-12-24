@@ -12,6 +12,7 @@ const HttpException = require("../helper/exception/http-exception");
 router.post("/items", authorize(), validateItemSchema, createCollection);
 router.put("/items/:id", authorize(), validateItemSchema, updateCollection);
 router.get("/items/:id", authorize(), getCollection);
+router.delete("/items/:id", authorize(), deleteCollection);
 
 function validateItemSchema(req, res, next) {
   const schema = Joi.object({
@@ -153,6 +154,30 @@ function getCollection(req, res, next) {
         message: `${
           collection.object == "collection" ? "Collection" : "Object"
         } fetched successfully`,
+        dataKey: "item",
+        status: HttpStatusCode.OK,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Delete collection/item by id
+ */
+function deleteCollection(req, res, next) {
+  const id = req.params.id;
+  const userId = req.auth.id;
+
+  CollectionService.deleteCollection({ userId, id })
+    .then((collection) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: {
+          id: collection.id,
+        },
+        message: `${
+          collection.object == "collection" ? "Collection" : "Object"
+        } deleted successfully`,
         dataKey: "item",
         status: HttpStatusCode.OK,
       });
