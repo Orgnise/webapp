@@ -1,9 +1,9 @@
 const UserService = require("./user.service");
-const CompanyService = require("./organization.service");
-const ProjectService = require("./project.service");
+const TeamService = require("./team.service");
+const WorkspaceService = require("./workspace.service");
 
 module.exports = {
   UserService,
-  CompanyService,
-  ProjectService,
+  TeamService,
+  WorkspaceService,
 };

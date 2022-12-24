@@ -8,29 +8,29 @@ export const Endpoints = {
     login: '/login',
     register: '/register',
     logout: '/logout',
-    organization: {
-        get: '/organization',
-        getAll: '/organization/all',
-        create: '/organization/create',
-        update: '/organization/update',
-        delete: '/organization/delete',
-        getById: (orgId: string) => `/organization/${orgId}`,
-        getBySlug: (slug: string) => `/organization/slug/${slug}`,
-        project: (orgId: string) => {
+    team: {
+        get: '/team',
+        getAll: '/team/all',
+        create: '/team/create',
+        update: '/team/update',
+        delete: '/team/delete',
+        getById: (orgId: string) => `/team/${orgId}`,
+        getBySlug: (slug: string) => `/team/slug/${slug}`,
+        workspace: (orgId: string) => {
             return {
-                getAll: `/organization/${orgId}/project/all`,
-                create: `/organization/${orgId}/project/create`,
-                update: `/organization/${orgId}/project/update`,
-                delete: `/organization/${orgId}/project/delete`,
-                getById: (projectId: string) => `/organization/${orgId}/project/${projectId}`,
-                addExampleProjects: `/organization/${orgId}/project/add_examples`,
+                getAll: `/team/${orgId}/workspace/all`,
+                create: `/team/${orgId}/workspace/create`,
+                update: `/team/${orgId}/workspace/update`,
+                delete: `/team/${orgId}/workspace/delete`,
+                getById: (workspaceId: string) => `/team/${orgId}/workspace/${workspaceId}`,
+                addExampleWorkspaces: `/team/${orgId}/workspace/add_examples`,
             }
         },
-        projectBySlug: (slug: string) => {
+        workspaceBySlug: (slug: string) => {
             return {
-                getAll: `/organization/slug/${slug}/project/all`,
-                addExampleProjects: `/organization/slug/${slug}/project/add_examples`,
-                getBySlug: () => `/project/slug/${slug}`,
+                getAll: `/team/slug/${slug}/workspace/all`,
+                addExampleWorkspaces: `/team/slug/${slug}/workspace/add_examples`,
+                getBySlug: () => `/workspace/slug/${slug}`,
             }
         }
     },

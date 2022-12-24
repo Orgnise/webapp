@@ -19,7 +19,7 @@ function SidebarComponent() {
         children={
           <>
             <NavLink
-              to={AppRoutes.organization.allOrganizations}
+              to={AppRoutes.team.allOrganizations}
               className={(data) =>
                 cx(
                   " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
@@ -46,7 +46,7 @@ function SidebarComponent() {
                   d="M4 6h16M4 12h16M4 18h7"
                 />
               </svg>
-              <span className="hidden lg:block">Organizations</span>
+              <span className="hidden lg:block">Teams</span>
             </NavLink>
           </>
         }

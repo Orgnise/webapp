@@ -12,44 +12,44 @@ import FIcon from "../../../components/ficon";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 
 /**
- * Displays the project view
+ * Displays the workspace view
  */
-export default function ProjectView({ displayProject }) {
+export default function WorkspaceView({ displayWorkspace }) {
   const [isLoading, setIsLoading] = useState();
-  const [project, setProject] = useState();
-  const map = useSearchPath(["workspace", "projects"]);
-  const projectSlug = map.projects;
+  const [workspace, setWorkspace] = useState();
+  const map = useSearchPath(["workspace", "workspaces"]);
+  const workspaceSlug = map.workspaces;
   const orgSlug = map.workspace;
-  const { projectService } = useAppService();
+  const { workspaceService } = useAppService();
   const navigate = useNavigate();
 
   const [leftPanelSize, setLeftPanelSize] = useState(LeftPanelSize.default);
 
-  // Navigate to first project if no project is selected
+  // Navigate to first workspace if no workspace is selected
   useEffect(() => {
-    if (displayProject) {
-      navigate(`${orgSlug}/projects/${displayProject.meta.slug}`);
+    if (displayWorkspace) {
+      navigate(`${orgSlug}/workspaces/${displayWorkspace.meta.slug}`);
     }
-  }, [displayProject]);
+  }, [displayWorkspace]);
 
   useEffect(() => {
-    if (!Validator.hasValue(projectSlug)) {
+    if (!Validator.hasValue(workspaceSlug)) {
       return;
     }
 
     setIsLoading(true);
-    projectService
-      .getProjectBySlug(projectSlug)
-      .then(({ project }) => {
-        setProject(project);
+    workspaceService
+      .getWorkspaceBySlug(workspaceSlug)
+      .then(({ workspace }) => {
+        setWorkspace(workspace);
       })
       .catch((err) => {
-        console.error("getAllProjectsBySlug", err);
+        console.error("getAllWorkspaceBySlug", err);
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [projectSlug]);
+  }, [workspaceSlug]);
 
   if (isLoading) {
     return (
@@ -62,7 +62,7 @@ export default function ProjectView({ displayProject }) {
   return (
     <>
       <WorkspaceContentView
-        content={!project ? <>No Data Available</> : <ProjectContent />}
+        content={!workspace ? <>No Data Available</> : <WorkspaceContent />}
         leftPanelState={leftPanelSize}
         onLeftPanelStateChange={setLeftPanelSize}
         leftPanel={
@@ -176,7 +176,7 @@ function LeftPanel({ leftPanelSize, setLeftPanelSize }) {
   );
 }
 
-function ProjectContent() {
+function WorkspaceContent() {
   return (
     <div className="flex flex-col gap-8 h-full  py-10">
       <div className="font-semibold text-4xl">Welcome!</div>

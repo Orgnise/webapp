@@ -1,11 +1,11 @@
 const Mongoose = require("mongoose");
 const Role = require("../helper/role");
 
-const ProjectSchema = new Mongoose.Schema(
+const WorkspaceSchema = new Mongoose.Schema(
   {
-    organization: {
+    team: {
       type: Mongoose.Schema.Types.ObjectId,
-      ref: "Organization",
+      ref: "Team",
       required: true,
     },
     name: {
@@ -53,11 +53,11 @@ const ProjectSchema = new Mongoose.Schema(
   { timestamps: true }
 );
 
-ProjectSchema.virtual("isCompleted").get(function () {
+WorkspaceSchema.virtual("isCompleted").get(function () {
   return this.completedAt !== null;
 });
 
-ProjectSchema.set("toJSON", {
+WorkspaceSchema.set("toJSON", {
   transform: (doc, ret) => {
     delete ret.__v;
     ret.id = ret._id;
@@ -66,4 +66,4 @@ ProjectSchema.set("toJSON", {
   },
 });
 
-module.exports = Mongoose.model("Project", ProjectSchema);
+module.exports = Mongoose.model("Workspace", WorkspaceSchema);

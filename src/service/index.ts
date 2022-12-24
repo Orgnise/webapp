@@ -1,7 +1,6 @@
-import BoardService from "./board-service";
 import AuthService from "./auth-service";
-import OrganizationService from "./organization-service";
-import ProjectService from "./project-service";
+import TeamService from "./team-service";
+import WorkspaceService from "./workspace-service";
 
 
-export { AuthService, BoardService, OrganizationService, ProjectService };
+export { AuthService, TeamService as OrganizationService, WorkspaceService };

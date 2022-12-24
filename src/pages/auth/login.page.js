@@ -37,7 +37,7 @@ const Login = () => {
       // if (![AppRoutes.login, AppRoutes.signup, "/"].includes(pathname)) {
       //   navigate(`${AppRoutes.login}?redirect=${pathname}`);
       // }
-      navigate(AppRoutes.users.myOrganization, { replace: true });
+      navigate(AppRoutes.users.myTeam, { replace: true });
     }
   }, [auth.user]);
 
@@ -73,7 +73,7 @@ const Login = () => {
         });
         auth.signIn(user);
         if (from === "/login") {
-          navigate(AppRoutes.users.myOrganization, { replace: true });
+          navigate(AppRoutes.users.myTeam, { replace: true });
         } else {
           navigate(from, { replace: true });
         }

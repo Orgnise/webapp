@@ -14,34 +14,33 @@ import Button from "../../components/atom/button";
 import CustomDropDown from "../../components/custom_dropdown";
 import { ListView } from "../../components/compound/list-view";
 import useAuth from "../../hooks/use-auth";
-import WorkspaceContentView from "../workspace/layout/workspace-content-view";
 
-export default function AllOrganizationsPage() {
-  const [organization, setOrganization] = useState([]);
+export default function AllTeamsPage() {
+  const [team, setOrganization] = useState([]);
   const [loading, setLoading] = useState();
   const [visible, setVisible] = useState(false);
-  const { organizationService } = useAppService();
+  const { teamService } = useAppService();
 
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  useSocket([SocketEvent.organization.create], (event, data) => {
-    if (event === SocketEvent.organization.create) {
+  useSocket([SocketEvent.team.create], (event, data) => {
+    if (event === SocketEvent.team.create) {
       setOrganization((prev) => [...prev, data]);
-      toast.success("Organization created successfully", {
+      toast.success("Team created successfully", {
         position: "top-right",
       });
     }
   });
 
-  // Fetch organization list in which authenticated user is member | owner | admin
+  // Fetch team list in which authenticated user is member | owner | admin
   useEffect(() => {
     if (user) {
       setLoading(true);
-      organizationService
-        .getAllOrganizations()
-        .then(({ companies }) => {
-          setOrganization(companies);
+      teamService
+        .getAllTeams()
+        .then(({ teams }) => {
+          setOrganization(teams);
         })
         .catch(({ response }) => {
           if (response && response.data) {
@@ -74,24 +73,23 @@ export default function AllOrganizationsPage() {
         <div className="divide-y max-w-xl w-full px-2 sm:px-0 pt-28">
           <div className="flex flex-col  gap-5 ">
             <div className="flex">
-              <h1 className="font-medium text-2xl flex-1 ">Organization</h1>
+              <h1 className="font-medium text-2xl flex-1 ">Team</h1>
               <Button
-                label="Create Organization"
+                label="Create Team"
                 type="link"
                 size="small"
                 onClick={() => {
-                  navigate(AppRoutes.organization.create);
+                  navigate(AppRoutes.team.create);
                 }}
               />
             </div>
             <ListView
-              items={organization}
+              items={team}
               loading={loading}
               noItemsElement={
                 <div className="p-4 rounded bg-gray-100 text-xs text-slate-500">
-                  You are not a member of any organization yet. Create a new
-                  organization or ask someone to invite you to their
-                  organization
+                  You are not a member of any team yet. Create a new team or ask
+                  someone to invite you to their team
                 </div>
               }
               placeholder={

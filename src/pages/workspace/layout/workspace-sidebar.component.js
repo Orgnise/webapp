@@ -22,7 +22,7 @@ function WorkspaceSidebarLayout() {
         children={
           <div className="flex flex-col space-y-2">
             <Link
-              to={AppRoutes.organization.allOrganizations}
+              to={AppRoutes.team.allOrganizations}
               className="hover:bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md"
             >
               <svg
@@ -40,11 +40,11 @@ function WorkspaceSidebarLayout() {
                   d="M4 6h16M4 12h16M4 18h7"
                 />
               </svg>
-              <span className="hidden lg:block">Organization</span>
+              <span className="hidden lg:block">Team</span>
             </Link>
 
             <NavLink
-              to={`/workspace/${id}/project`}
+              to={`/workspace/${id}/workspace`}
               className={(data) =>
                 cx(
                   " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
@@ -57,7 +57,7 @@ function WorkspaceSidebarLayout() {
               }
             >
               <FIcon icon={solid("users")} />
-              <span className="hidden lg:block">Projects</span>
+              <span className="hidden lg:block">Workspaces</span>
             </NavLink>
             <NavLink
               to={`/workspace/${id}/team`}

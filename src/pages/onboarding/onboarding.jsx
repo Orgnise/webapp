@@ -10,12 +10,12 @@ import useSocket from "../../hooks/use-socket.hook";
 
 function OnboardingPage() {
   const navigate = useNavigate();
-  const { organizationService } = useAppService();
+  const { teamService } = useAppService();
   const { user } = useAuth();
 
-  const socket = useSocket([SocketEvent.organization.create], (event, data) => {
-    if (event === SocketEvent.organization.create) {
-      navigate(`/onboard/${data.id}/onboarding-projects`);
+  const socket = useSocket([SocketEvent.team.create], (event, data) => {
+    if (event === SocketEvent.team.create) {
+      navigate(`/onboard/${data.id}/onboarding-workspaces`);
     }
     console.log("🚀 ~data", data);
   });
@@ -23,16 +23,16 @@ function OnboardingPage() {
   // Get user initial data
   useEffect(() => {
     if (!Validator.hasValue(user)) return;
-    organizationService
-      .getAllOrganizations()
-      .then(({ companies }) => {
-        // If user has no organization, redirect to onboarding page
-        if (!Validator.hasValue(companies)) {
-          console.log("🚀 ~ Navigate to create organization");
-          navigate(AppRoutes.organization.create);
+    teamService
+      .getAllTeams()
+      .then(({ teams }) => {
+        // If user has no team, redirect to onboarding page
+        if (!Validator.hasValue(teams)) {
+          console.log("🚀 ~ Navigate to create team");
+          navigate(AppRoutes.team.create);
         } else {
-          console.log("🚀 ~ Navigate to my organization");
-          navigate(AppRoutes.users.myOrganization);
+          console.log("🚀 ~ Navigate to my team");
+          navigate(AppRoutes.users.myTeam);
         }
       })
       .catch(({ response }) => {

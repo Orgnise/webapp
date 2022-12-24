@@ -27,13 +27,11 @@ function WorkspaceContentView({
     LeftPanelSize[leftPanelState]
   );
 
-  console.log("leftPanelState", leftPanelState);
   useEffect(() => {
     setLeftPanelSize(leftPanelState);
   }, [leftPanelState]);
 
   useEffect(() => {
-    console.log("leftPanelSize", leftPanelSize);
     onLeftPanelStateChange(leftPanelSize);
   }, [leftPanelSize]);
 

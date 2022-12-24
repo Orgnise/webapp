@@ -11,14 +11,8 @@ import { useAppService } from "../../hooks/use-app-service";
 import CheckBox from "../../components/atom/checkbox";
 import Button from "../../components/atom/button";
 
-export default function AddExampleProjectsPage() {
+export default function AddExampleWorkspacePage() {
   const navigate = useNavigate();
-  //   const projectCreate = SocketEvent.organization.project.create;
-  //   const socket = useSocket([projectCreate], (event, data) => {
-  //     if (event === projectCreate) {
-  //       // navigate(AppRoutes.users.myOrganization)
-  //     }
-  //   });
 
   return (
     <div className="w-full h-full bg-slate-50">
@@ -27,47 +21,47 @@ export default function AddExampleProjectsPage() {
       </NavbarLayout>
       <div className="max-w-xl mx-auto py-24">
         <div className="flex flex-col space-y-3 items-center place-content-center text-sm">
-          <AddExampleProjects />
+          <AddExampleSpace />
         </div>
       </div>
     </div>
   );
 }
-function AddExampleProjects() {
+function AddExampleSpace() {
   const [isLoading, setIsLoading] = useState();
   const params = useParams();
   const slug = params.slug;
 
-  const [projects, setProjects] = useState({});
-  const { projectService } = useAppService();
+  const [workspaces, setWorkspace] = useState({});
+  const { workspaceService } = useAppService();
   const navigate = useNavigate();
 
-  // Toggle example project selection
-  const selectProject = (project, val) => {
+  // Toggle example workspace selection
+  const selectWorkspace = (workspace, val) => {
     if (val === false) {
-      const { [project]: _, ...rest } = projects;
-      setProjects(rest);
+      const { [workspace]: _, ...rest } = workspaces;
+      setWorkspace(rest);
     } else {
-      setProjects({ ...projects, [project]: val });
+      setWorkspace({ ...workspaces, [workspace]: val });
     }
   };
 
-  // Add example projects
-  const createProject = () => {
+  // Add example workspaces
+  const createWorkspace = () => {
     setIsLoading(true);
-    const examples = Object.keys(projects).map((key) => key);
+    const examples = Object.keys(workspaces).map((key) => key);
 
     const payload = {
       examples: examples,
     };
 
-    projectService
-      .addExampleProjectsBySlug(slug, payload)
-      .then(({ projects }) => {
-        toast.success("Examples projects added successfully", {
+    workspaceService
+      .addExampleWorkspaceBySlug(slug, payload)
+      .then(({ workspaces }) => {
+        toast.success("Examples workspaces added successfully", {
           position: "top-right",
         });
-        // Navigate to project page after 1 second delay
+        // Navigate to workspace page after 1 second delay
         navigate(`/workspace/${slug}`);
       })
       .catch(({ response }) => {
@@ -87,50 +81,48 @@ function AddExampleProjects() {
       <div className="flex flex-col gap-2 py-6  px-4">
         <h2 className="font-medium text-2xl">Add examples</h2>
 
-        <p className="">
-          Select any example you'd like to add to your organization
-        </p>
+        <p className="">Select any example you'd like to add to your team</p>
         <div className="flex flex-col gap-6 py-4">
           <CheckBox
             label="Engineering"
-            checked={projects.Engineering}
+            checked={workspaces.Engineering}
             onChange={(val) => {
-              selectProject("Engineering", val);
+              selectWorkspace("Engineering", val);
             }}
           />
           <CheckBox
             label="Game Development"
-            checked={projects["Game Development"]}
+            checked={workspaces["Game Development"]}
             onChange={(val) => {
-              selectProject("Game Development", val);
+              selectWorkspace("Game Development", val);
             }}
           />
           <CheckBox
             label="Product Management"
-            checked={projects["Product Management"]}
+            checked={workspaces["Product Management"]}
             onChange={(val) => {
-              selectProject("Product Management", val);
+              selectWorkspace("Product Management", val);
             }}
           />
           <CheckBox
             label="Marketing"
-            checked={projects.Marketing}
+            checked={workspaces.Marketing}
             onChange={(val) => {
-              selectProject("Marketing", val);
+              selectWorkspace("Marketing", val);
             }}
           />
           <CheckBox
             label="Sales"
-            checked={projects.Sales}
+            checked={workspaces.Sales}
             onChange={(val) => {
-              selectProject("Sales", val);
+              selectWorkspace("Sales", val);
             }}
           />
           <CheckBox
             label="Design"
-            checked={projects.Design}
+            checked={workspaces.Design}
             onChange={(val) => {
-              selectProject("Design", val);
+              selectWorkspace("Design", val);
             }}
           />
         </div>
@@ -140,8 +132,8 @@ function AddExampleProjects() {
             label="Continue"
             size="small"
             className="flex-1"
-            disabled={Object.keys(projects).length === 0 || isLoading}
-            onClick={createProject}
+            disabled={Object.keys(workspaces).length === 0 || isLoading}
+            onClick={createWorkspace}
             leadingIcon={isLoading ? <LoaderIcon /> : null}
           />
         </div>

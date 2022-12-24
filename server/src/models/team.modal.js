@@ -2,7 +2,7 @@ const Mongoose = require("mongoose");
 const Role = require("../helper/role");
 const Schema = Mongoose.Schema;
 
-const OrganizationSchema = new Schema(
+const TeamSchema = new Schema(
   {
     name: {
       type: String,
@@ -74,12 +74,12 @@ const OrganizationSchema = new Schema(
   }
 );
 
-OrganizationSchema.virtual("membersCount").get(function () {
+TeamSchema.virtual("membersCount").get(function () {
   return this.members.length;
 });
 
-OrganizationSchema.virtual("isDeactivated").get(function () {
+TeamSchema.virtual("isDeactivated").get(function () {
   return this.deactivatedAt !== null;
 });
 
-module.exports = Mongoose.model("Organization", OrganizationSchema);
+module.exports = Mongoose.model("Team", TeamSchema);

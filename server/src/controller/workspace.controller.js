@@ -3,48 +3,48 @@ var router = express.Router();
 const Joi = require("joi");
 const ValidationRequest = require("../middleware/validate-request");
 const authorize = require("../middleware/authorize");
-const { Project, User, Board } = require("../models");
-const { CompanyService, ProjectService } = require("../services");
+const { Workspace, User, Board } = require("../models");
+const { TeamService, WorkspaceService } = require("../services");
 const ApiResponseHandler = require("../helper/response/api-response");
 
 const {
   HttpStatusCode,
 } = require("../helper/http-status-code/http-status-code");
 
-router.get("/organization/:id/project/all", authorize(), getAllProjects);
+router.get("/team/:id/workspace/all", authorize(), getAllWorkspace);
 router.get(
-  "/organization/slug/:slug/project/all",
+  "/team/slug/:slug/workspace/all",
   authorize(),
-  getAllProjectsBySlug
+  getAllWorkspaceBySlug
 );
 router.post(
-  "/organization/:id/project/create",
+  "/team/:id/workspace/create",
   authorize(),
-  createProjectSchema,
-  createProject
+  createWorkspaceSchema,
+  createWorkspace
 );
-router.get("/project/get_by_id/:id", authorize(), getProjectById);
-router.get("/project/slug/:slug", authorize(), getProjectBySlug);
+router.get("/workspace/get_by_id/:id", authorize(), getWorkspaceById);
+router.get("/workspace/slug/:slug", authorize(), getWorkspaceBySlug);
 router.post(
-  "/organization/:id/project/add_examples",
+  "/team/:id/workspace/add_examples",
   authorize(),
-  addExampleProjectSchema,
+  addExampleWorkspaceSchema,
   addExamples
 );
 router.post(
-  "/organization/:slug/project/add_examples",
+  "/team/:slug/workspace/add_examples",
   authorize(),
-  addExampleProjectSchema,
+  addExampleWorkspaceSchema,
   addExamples
 );
 router.post(
-  "/organization/slug/:slug/project/add_examples",
+  "/team/slug/:slug/workspace/add_examples",
   authorize(),
-  addExampleProjectSchema,
+  addExampleWorkspaceSchema,
   addExamplesBySlug
 );
 
-function createProjectSchema(req, res, next) {
+function createWorkspaceSchema(req, res, next) {
   const schema = Joi.object({
     name: Joi.string().min(3).max(30).required(),
     description: Joi.string().min(3).max(280),
@@ -53,32 +53,32 @@ function createProjectSchema(req, res, next) {
   ValidationRequest(req, next, schema);
 }
 
-function addExampleProjectSchema(req, res, next) {
+function addExampleWorkspaceSchema(req, res, next) {
   const schema = Joi.object({
     examples: Joi.array().items(Joi.string()).required(),
   });
   ValidationRequest(req, next, schema);
 }
 
-function createProject(req, res, next) {
+function createWorkspace(req, res, next) {
   const { name, description, members } = req.body;
   const orgId = req.params.id;
   const user = req.auth;
 
-  ProjectService.crateProject({
+  WorkspaceService.crateWorkspace({
     orgId: orgId,
     name: name,
     description: description,
     members: members,
     userId: user.id,
   })
-    .then((project) => {
-      global.socket.emit("organization:project:create", project);
+    .then((workspace) => {
+      global.socket.emit("team:workspace:create", workspace);
       return ApiResponseHandler.success({
         res: res,
-        data: project,
-        message: "Project created successfully",
-        dataKey: "project",
+        data: workspace,
+        message: "Workspace created successfully",
+        dataKey: "workspace",
         status: HttpStatusCode.CREATED,
       });
     })
@@ -86,7 +86,7 @@ function createProject(req, res, next) {
 }
 
 /**
- * Add example projects
+ * Add example workspaces
  */
 function addExamples(req, res, next) {
   const { examples } = req.body;
@@ -94,18 +94,18 @@ function addExamples(req, res, next) {
 
   const user = req.auth;
 
-  ProjectService.addExamples({
+  WorkspaceService.addExamples({
     orgId: orgId,
     examples: examples,
     userId: user.id,
   })
-    .then((projects) => {
-      // global.socket.emit("organization:project:create", projects);
+    .then((workspaces) => {
+      // global.socket.emit("team:workspace:create", workspaces);
       return ApiResponseHandler.success({
         res: res,
-        data: projects,
-        message: "Example projects created successfully",
-        dataKey: "projects",
+        data: workspaces,
+        message: "Example workspaces created successfully",
+        dataKey: "workspaces",
         status: HttpStatusCode.CREATED,
       });
     })
@@ -113,7 +113,7 @@ function addExamples(req, res, next) {
 }
 
 /**
- * Add example projects using organization slug
+ * Add example workspaces using team slug
  */
 function addExamplesBySlug(req, res, next) {
   const { examples } = req.body;
@@ -121,18 +121,18 @@ function addExamplesBySlug(req, res, next) {
 
   const user = req.auth;
 
-  ProjectService.addExamplesBySlug({
+  WorkspaceService.addExamplesBySlug({
     slug: slug,
     examples: examples,
     userId: user.id,
   })
-    .then((projects) => {
-      // global.socket.emit("organization:project
+    .then((workspaces) => {
+      // global.socket.emit("team:workspace
       return ApiResponseHandler.success({
         res: res,
-        data: projects,
-        message: "Example projects created successfully",
-        dataKey: "projects",
+        data: workspaces,
+        message: "Example workspaces created successfully",
+        dataKey: "workspaces",
         status: HttpStatusCode.CREATED,
       });
     })
@@ -140,60 +140,60 @@ function addExamplesBySlug(req, res, next) {
 }
 
 /**
- * Get all projects
+ * Get all workspaces
  */
-function getAllProjects(req, res, next) {
+function getAllWorkspace(req, res, next) {
   const user = req.auth;
   const orgId = req.params.id;
 
-  ProjectService.getAllProjects(orgId)
-    .then((companies) => {
+  WorkspaceService.getAllWorkspace(orgId)
+    .then((teams) => {
       return ApiResponseHandler.success({
         res: res,
-        data: companies,
-        message: "Projects fetched successfully",
-        dataKey: "Projects",
+        data: teams,
+        message: "Workspaces fetched successfully",
+        dataKey: "Workspaces",
         status: HttpStatusCode.OK,
-        total: companies.length,
+        total: teams.length,
       });
     })
     .catch(next);
 }
 
 /**
- * Get all projects by organization slug
+ * Get all workspaces by team slug
  */
-function getAllProjectsBySlug(req, res, next) {
+function getAllWorkspaceBySlug(req, res, next) {
   const user = req.auth;
   const slug = req.params.slug;
 
-  ProjectService.getAllProjectsBySlug(slug)
-    .then((companies) => {
+  WorkspaceService.getAllWorkspaceBySlug(slug)
+    .then((teams) => {
       return ApiResponseHandler.success({
         res: res,
-        data: companies,
-        message: "Projects fetched successfully",
-        dataKey: "Projects",
+        data: teams,
+        message: "Workspaces fetched successfully",
+        dataKey: "Workspaces",
         status: HttpStatusCode.OK,
-        total: companies.length,
+        total: teams.length,
       });
     })
     .catch(next);
 }
 
 /**
- * Get project by id
+ * Get workspace by id
  */
-function getProjectById(req, res, next) {
+function getWorkspaceById(req, res, next) {
   const user = req.auth;
   const id = req.params.id;
-  ProjectService.getById(id)
-    .then((project) => {
+  WorkspaceService.getById(id)
+    .then((workspace) => {
       return ApiResponseHandler.success({
         res: res,
-        data: project,
-        message: "Project fetched successfully",
-        dataKey: "project",
+        data: workspace,
+        message: "Workspace fetched successfully",
+        dataKey: "workspace",
         status: HttpStatusCode.OK,
       });
     })
@@ -201,18 +201,18 @@ function getProjectById(req, res, next) {
 }
 
 /**
- * Get project by slug
+ * Get workspace by slug
  */
-function getProjectBySlug(req, res, next) {
+function getWorkspaceBySlug(req, res, next) {
   const user = req.auth;
   const slug = req.params.slug;
-  ProjectService.getBySlug(slug)
-    .then((project) => {
+  WorkspaceService.getBySlug(slug)
+    .then((workspace) => {
       return ApiResponseHandler.success({
         res: res,
-        data: project,
-        message: "Project fetched successfully",
-        dataKey: "project",
+        data: workspace,
+        message: "Workspace fetched successfully",
+        dataKey: "workspace",
         status: HttpStatusCode.OK,
       });
     })

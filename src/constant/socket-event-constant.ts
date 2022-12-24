@@ -2,15 +2,15 @@ export const SocketEvent = {
     // Socket events
     connect: 'connect',
     disconnect: 'disconnect',
-    // Socket events for organization
-    organization: {
-        create: 'organization:create',
-        update: 'organization:update',
-        delete: 'organization:delete',
-        get: 'organization:get',
-        getAll: 'organization:getAll',
-        project: {
-            create: 'organization:project:create',
+    // Socket events for team
+    team: {
+        create: 'team:create',
+        update: 'team:update',
+        delete: 'team:delete',
+        get: 'team:get',
+        getAll: 'team:getAll',
+        workspace: {
+            create: 'team:workspace:create',
         }
     },
 

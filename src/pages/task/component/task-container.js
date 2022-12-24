@@ -13,7 +13,7 @@ const TasksContainer = () => {
   const [errors, setErrors] = useState({});
   const [dragFirstTask, setDragFirstTask] = useState(false);
   const { user } = useAuth();
-  const { boardService, organizationService } = useAppService();
+  const { boardService, teamService } = useAppService();
 
   const params = useParams();
   const id = params.id;
@@ -23,8 +23,8 @@ const TasksContainer = () => {
       return;
     }
     function fetchTasks() {
-      organizationService
-        .getCompanyById(id)
+      teamService
+        .getTeamById(id)
         .then(({ board }) => {
           setTasks(board);
           setErrors({});

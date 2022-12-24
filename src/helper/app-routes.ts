@@ -8,20 +8,20 @@ export const AppRoutes = {
         root: '/onboard/*',
         addExamples: '/onboard/:slug',
     },
-    organization: {
-        create: '/create-organization',
+    team: {
+        create: '/create-team',
     },
     workspace: {
 
         root: '/workspace/*',
         home: '/workspace/:id',
         team: '/workspace/:id/team',
-        project: '/workspace/:slug/project/:id',
+        workspace: '/workspace/:slug/workspace/:id',
     },
     users: {
         root: '/users/*',
         me: '/users/me',
-        myOrganization: '/users/me/organization',
+        myTeam: '/users/me/team',
     },
 
     setting: 'setting',

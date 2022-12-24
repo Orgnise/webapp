@@ -1,7 +1,7 @@
 const Mongoose = require("mongoose");
 const db = require("../config/db");
 const { promise: fs } = require("fs");
-const { User, Organization } = require("../models");
+const { User, Team } = require("../models");
 // const { UserService } = require("../services");
 const UserService = require("./user.service");
 const FakeBoardData = require("../config/task_data");
@@ -18,45 +18,45 @@ const { generateSlug } = require("../helper/slug-helper");
 module.exports = {
   getById,
   getBySlug,
-  createCompany,
-  getAllCompany,
+  createTeam,
+  getAllTeam,
   addMembers,
   removeMembers,
-  getJoinedCompanies,
+  getJoinedTeams,
 };
 
 /**
- * Create new organization and save to db
- * @param {Object} body - organization data
- * @returns {Promise<Organization>}
+ * Create new team and save to db
+ * @param {Object} body - team data
+ * @returns {Promise<Team>}
  * @throws {Error}
  */
-async function createCompany(body, userId) {
+async function createTeam(body, userId) {
   try {
     const { name, description, createdBy } = body;
 
-    // Check if organization already exists with same name
-    if (await Organization.findOne({ name })) {
+    // Check if team already exists with same name
+    if (await Team.findOne({ name })) {
       throw new HttpException(
         HttpStatusCode.BAD_REQUEST,
-        "Organization already exists"
+        "Team already exists"
       );
     }
 
     // Get user data
     const user = await UserService.getById({ id: userId });
 
-    // Generate slug for organization
+    // Generate slug for team
     const slug = await generateSlug({
       name,
       didExist: async (val) => {
-        return await Organization.findOne({ "meta.slug": val });
+        return await Team.findOne({ "meta.slug": val });
       },
     });
 
-    // Set user role to admin for organization
+    // Set user role to admin for team
     user.role = Admin;
-    const organization = await Organization.create({
+    const team = await Team.create({
       name,
       description,
       createdBy: user.id,
@@ -68,8 +68,8 @@ async function createCompany(body, userId) {
       },
     });
 
-    // return organization data
-    return (await organization.populate("members.user", "name id")).populate(
+    // return team data
+    return (await team.populate("members.user", "name id")).populate(
       "createdBy",
       "name id"
     );
@@ -83,72 +83,68 @@ async function createCompany(body, userId) {
 }
 
 /**
- * Get organization by id
+ * Get team by id
  * @param {ObjectId} orgId
- * @returns {Promise<Organization>}
+ * @returns {Promise<Team>}
  * @throws {Error}
  */
 async function getById(orgId) {
-  // Check if id is a valid organization id
+  // Check if id is a valid team id
   if (!Mongoose.isValidObjectId(orgId)) {
-    throw new HttpException(
-      HttpStatusCode.BAD_REQUEST,
-      "",
-      "Invalid organization id"
-    );
+    throw new HttpException(HttpStatusCode.BAD_REQUEST, "", "Invalid team id");
   }
-  // Get organization data using organization id if exists
-  const organization = await Organization.findOne({ _id: orgId })
+  // Get team data using team id if exists
+  const team = await Team.findOne({ _id: orgId })
     .populate("members.user", "name email id")
     .populate("createdBy", "name id");
 
-  // Check if organization exists
-  if (!organization) {
+  // Check if team exists
+  if (!team) {
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
-      "No organization found with",
-      "Organization does not exist with " + orgId + " id"
+      "No team found with",
+      "Team does not exist with " + orgId + " id"
     );
   }
 
-  return getBasicCompanyInfo(organization);
+  return getBasicTeamInfo(team);
 }
 
 /**
- * Get organization by slug
+ * Get team by slug
  * @param {String} slug
- * @returns {Promise<Organization>}
+ * @returns {Promise<Team>}
  * @throws {Error}
  */
 async function getBySlug(slug) {
   if (!slug)
     throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid slug");
 
-  // Get organization data using organization id if exists
-  const organization = await Organization.findOne({ "meta.slug": slug })
+  // Get team data using team id if exists
+  const team = await Team.findOne({ "meta.slug": slug })
     .populate("members.user", "name email id")
     .populate("createdBy", "name id");
 
-  // Check if organization exists
-  if (!organization) {
+  // Check if team exists
+  if (!team) {
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
-      "No organization found",
-      "Organization does not exist with slug -" + slug
+      "No team found",
+      "Team does not exist with slug -" + slug
     );
   }
 
-  return getBasicCompanyInfo(organization);
+  return getBasicTeamInfo(team);
 }
 
 /**
- * Get all organization basic info for user
+ * Get all team basic info for user
  * @param {ObjectId} userId
- * @returns {Promise<Organization[]>}
+ * @returns {Promise<Team[]>}
  * @throws {HttpException}
  */
 
-async function getAllCompany(userId) {
+async function getAllTeam(userId) {
   if (!userId) {
     throw new HttpException(
       HttpStatusCode.UNPROCESSABLE_ENTITY,
@@ -157,7 +153,7 @@ async function getAllCompany(userId) {
     );
   }
   try {
-    const companies = await Organization.find({
+    const teams = await Team.find({
       members: { $elemMatch: { user: userId } },
     })
       .populate("members.user", "name")
@@ -168,7 +164,7 @@ async function getAllCompany(userId) {
           return doc;
         },
       });
-    return companies;
+    return teams;
   } catch (error) {
     throw new HttpException(
       HttpStatusCode.INTERNAL_SERVER_ERROR,
@@ -179,68 +175,66 @@ async function getAllCompany(userId) {
 }
 
 /**
- * Gel all joined companies
+ * Gel all joined teams
  * @param {ObjectId} userId
- * @returns {Promise<Organization[]>}
+ * @returns {Promise<Team[]>}
  * @throws {HttpException}
  */
-async function getJoinedCompanies(userId) {
+async function getJoinedTeams(userId) {
   try {
     const user = await UserService.getById({ id: userId });
-    const companies = await Organization.find({ "members.user": user.id })
+    const teams = await Team.find({ "members.user": user.id })
       .populate("members.user", "name")
       .populate("createdBy", "name");
-    return companies;
+    return teams;
   } catch (error) {
     throw error;
   }
 }
 
 /**
- * Add members to organization
+ * Add members to team
  * @param {ObjectId} orgId
  * @param {Array} members
  * @param {ObjectId} userId
- * @returns {Promise<Organization>}
+ * @returns {Promise<Team>}
  * @throws {Error}
  */
 
 async function addMembers(orgId, userId, members) {
   try {
-    // Check if organization exists
-    const organization = await findCompany(orgId);
+    // Check if team exists
+    const team = await findTeam(orgId);
 
-    const user = organization.members.find(
-      (member) => member.user._id == userId
-    );
+    const user = team.members.find((member) => member.user._id == userId);
 
-    // Check if auth user is a member of organization or not, if he/she is not organization owner
-    if (organization.createdBy.id !== userId) {
-      // Check if user is member of organization
+    // Check if auth user is a member of team or not, if he/she is not team owner
+    if (team.createdBy.id !== userId) {
+      // Check if user is member of team
       if (!user) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a member of this organization",
+          "You are not a member of this team",
           "Not authorized to add members"
         );
       } else if (user.role !== Role.Admin) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a allowed to add member in this organization, Only admin can add members",
+          "You are not a allowed to add member in this team, Only admin can add members",
           "Not authorized to add members"
         );
       }
     }
 
-    // Add members to organization
+    // Add members to team
     const newMembers = members.map((member) => ({
       user: member.id,
       role: member.role,
       _id: member.id,
     }));
 
-    // Check is user already exists in organization
-    const existingMembers = organization.members.filter((member) =>
+    // Check is user already exists in team
+    const existingMembers = team.members.filter((member) =>
       newMembers.find((newMember) => newMember.user == member.user._id)
     );
 
@@ -248,7 +242,7 @@ async function addMembers(orgId, userId, members) {
     if (existingMembers.length > 0) {
       throw new HttpException(
         HttpStatusCode.BAD_REQUEST,
-        `${existingMembers.length} of ${newMembers.length} users already exists in organization`,
+        `${existingMembers.length} of ${newMembers.length} users already exists in team`,
         existingMembers.map((member) => {
           return {
             id: member.user._id,
@@ -258,89 +252,84 @@ async function addMembers(orgId, userId, members) {
       );
     }
 
-    organization.members = [...organization.members, ...newMembers];
+    team.members = [...team.members, ...newMembers];
 
-    await organization.save();
+    await team.save();
 
-    return findCompany(orgId);
+    return findTeam(orgId);
   } catch (error) {
     throw error;
   }
 }
 
 /**
- * Get organization complete info
+ * Get team complete info
  */
-async function findCompany(orgId) {
+async function findTeam(orgId) {
   if (!Mongoose.isValidObjectId(orgId)) {
-    throw new HttpException(
-      HttpStatusCode.BAD_REQUEST,
-      "Invalid organization id"
-    );
+    throw new HttpException(HttpStatusCode.BAD_REQUEST, "Invalid team id");
   }
-  const organization = await Organization.findOne({ _id: orgId })
+  const team = await Team.findOne({ _id: orgId })
     .populate("members.user", "name")
     .populate("createdBy", "name");
-  if (!organization || organization === null) {
+  if (!team || team === null) {
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
-      "Organization not found",
-      "Organization not found with id " + orgId
+      "Team not found",
+      "Team not found with id " + orgId
     );
   }
-  return organization;
+  return team;
 }
 
 /**
- * Remove members from a organization
+ * Remove members from a team
  * @param {ObjectId} orgId
  * @param {Array} members
  * @param {ObjectId} userId
- * @return {Promise<Organization>}
+ * @return {Promise<Team>}
  * @throws {Error}
  */
 async function removeMembers(orgId, userId, members) {
   try {
-    // get organization data if exists
-    const organization = await findCompany(orgId);
+    // get team data if exists
+    const team = await findTeam(orgId);
 
-    // Get current auth user from organization if exists
-    const user = organization.members.find(
-      (member) => member.user._id == userId
-    );
+    // Get current auth user from team if exists
+    const user = team.members.find((member) => member.user._id == userId);
 
-    // No need to verify if organization owner is a member or not
-    if (userId !== organization.createdBy.id) {
-      // Check if current auth user is member of organization
+    // No need to verify if team owner is a member or not
+    if (userId !== team.createdBy.id) {
+      // Check if current auth user is member of team
       if (!user) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a member of this organization",
+          "You are not a member of this team",
           "Not authorized to remove members"
         );
       }
-      // Check if current auth user is organization admin or not
+      // Check if current auth user is team admin or not
       else if (user.role !== Role.Admin) {
         throw new HttpException(
           HttpStatusCode.FORBIDDEN,
-          "You are not a allowed to remove member in this organization, Only admin can remove members",
+          "You are not a allowed to remove member in this team, Only admin can remove members",
           "Not authorized to remove members"
         );
       }
     }
 
     // Filter out remaining members
-    const remainingMembers = organization.members.filter((member) => {
+    const remainingMembers = team.members.filter((member) => {
       return !members.includes(member.id);
     });
 
-    // Update organization members
-    organization.members = remainingMembers;
+    // Update team members
+    team.members = remainingMembers;
 
-    // Save organization
-    await organization.save();
+    // Save team
+    await team.save();
 
-    return organization;
+    return team;
   } catch (error) {
     throw error;
   }
@@ -349,15 +338,15 @@ async function removeMembers(orgId, userId, members) {
 // Helper functions
 
 /**
- * Get basic organization info
- * @param {Organization} organization
+ * Get basic team info
+ * @param {Team} team
  */
-function getBasicCompanyInfo(organization) {
+function getBasicTeamInfo(team) {
   return {
-    id: organization.id,
-    name: organization.name,
-    description: organization.description,
-    members: organization.members,
-    createdBy: organization.createdBy,
+    id: team.id,
+    name: team.name,
+    description: team.description,
+    members: team.members,
+    createdBy: team.createdBy,
   };
 }

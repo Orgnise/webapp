@@ -27,59 +27,59 @@ import useSearchPath from "../../hooks/use-search-path-hook";
 import { NavbarLayout } from "../layout";
 import Nav from "../task/component/nav";
 import WorkspaceContentView from "./layout/workspace-content-view";
-import ProjectView from "./pages/project-view";
+import WorkspaceView from "./pages/workspace-view";
 
 function WorkSpacePage() {
-  const [organization, setOrganization] = useState();
-  const [projects, setProjects] = useState();
+  const [team, setOrganization] = useState();
+  const [workspaces, setWorkspace] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const { organizationService } = useAppService();
+  const { teamService } = useAppService();
   const { user } = useAuth();
   const [active, setActive] = useState(false);
 
   const params = useParams();
-  const { projectService } = useAppService();
+  const { workspaceService } = useAppService();
 
-  const map = useSearchPath(["workspace", "projects"]);
+  const map = useSearchPath(["workspace", "workspaces"]);
   const navigation = useNavigate();
 
-  // Current organization slug
+  // Current team slug
   const orgSlug = map.workspace;
 
-  const projectSlug = map.projects;
+  const workspaceSlug = map.workspaces;
 
-  // Get all organizations for current user
+  // Get all teams for current user
   useEffect(() => {
     if (!user || !orgSlug) return;
     console.log("Getting orgs");
     setIsLoading(true);
-    organizationService
+    teamService
       .getOrganizationBySlug(orgSlug)
-      .then(({ organization }) => {
-        setOrganization(organization);
+      .then(({ team }) => {
+        setOrganization(team);
       })
       .catch((err) => {
         console.log(err);
 
-        toast.error("Failed to load organizations");
+        toast.error("Failed to load teams");
       })
       .finally(() => {
         setIsLoading(false);
       });
   }, [orgSlug, user]);
 
-  // Get projects for current organization
+  // Get workspaces for current team
   useEffect(() => {
     if (!orgSlug || !user) {
       return;
     }
-    console.log("Getting projects", orgSlug);
+    console.log("Getting workspaces", orgSlug);
     setIsLoading(true);
-    projectService
-      .getAllProjectsBySlug(orgSlug)
-      .then(({ Projects }) => {
-        if (Projects.length != 0) {
-          setProjects(Projects);
+    workspaceService
+      .getAllWorkspaceBySlug(orgSlug)
+      .then(({ Workspaces }) => {
+        if (Workspaces.length != 0) {
+          setWorkspace(Workspaces);
         }
       })
       .catch((err) => {
@@ -113,43 +113,43 @@ function WorkSpacePage() {
           <WorkspaceSidePanel
             active={active}
             setActive={setActive}
-            projects={projects}
-            activeWorkspace={organization}
+            workspaces={workspaces}
+            activeWorkspace={team}
             orgId={orgSlug}
           />
 
           <Fold
-            value={projects}
+            value={workspaces}
             ifPresent={(list) => (
               <>
-                <ProjectView displayProject={!projectSlug && list[0]} />
+                <WorkspaceView displayWorkspace={!workspaceSlug && list[0]} />
               </>
             )}
-            ifAbsent={(list) => <EmptyProjectsView />}
+            ifAbsent={(list) => <EmptyWorkspaceView />}
           />
         </div>
       )}
     </>
   );
 
-  function EmptyProjectsView() {
+  function EmptyWorkspaceView() {
     return (
       <div className="flex-1">
         <div className="h-full flex flex-col gap-4 w-full items-center place-content-center max-w-xl mx-auto text-center">
-          <h1 className="text-3xl">Create a project</h1>
+          <h1 className="text-3xl">Create a workspace</h1>
           <span className="text-slate-500 text-sm">
-            Projects are where you
+            Workspaces are where you
             <span className="font-medium mx-2 text-slate-700">
               organize your work.
             </span>
-            You can create projects for different teams, clients, or even for
+            You can create workspaces for different teams, clients, or even for
             yourself. For example, an{" "}
             <span className="font-medium mx-2 text-slate-700">engineering</span>
-            project could contains all engineering-related tasks.
+            workspace could contains all engineering-related tasks.
           </span>
           <div className="border rounded-full border-teal-400">
             <Button
-              label="Create Project"
+              label="Create Workspace"
               type="outline"
               className="rounded-full"
               size="small"
@@ -165,7 +165,7 @@ function WorkspaceSidePanel({
   setActive,
   active,
   activeWorkspace,
-  projects,
+  workspaces,
   orgId,
 }) {
   const navigate = useNavigate();
@@ -204,7 +204,7 @@ function WorkspaceSidePanel({
                       <div
                         className="px-2 py-3 rounded hover:bg-gray-100 cursor-pointer"
                         onClick={() => {
-                          navigate(AppRoutes.users.myOrganization);
+                          navigate(AppRoutes.users.myTeam);
                         }}
                       >
                         Switch and manage workspaces
@@ -220,12 +220,12 @@ function WorkspaceSidePanel({
               </button>
             </div>
 
-            {/* CREATE PROJECT */}
+            {/* CREATE WORKSPACE */}
 
             <div className="flex gap-2 px-3 items-center mt-3">
-              <p className="flex-1 text-[13px] text-slate-400">PROJECTS</p>
+              <p className="flex-1 text-[13px] text-slate-400">WORKSPACES</p>
               <Button
-                label="create Project"
+                label="create Workspace"
                 type="link"
                 size="small"
                 leadingIcon={
@@ -235,13 +235,13 @@ function WorkspaceSidePanel({
             </div>
 
             <Fold
-              value={projects}
+              value={workspaces}
               ifPresent={(list) => (
                 <ListView
                   items={list}
-                  renderItem={(project) => (
+                  renderItem={(workspace) => (
                     <NavLink
-                      to={`/workspace/${orgId}/projects/${project.meta.slug}`}
+                      to={`/workspace/${orgId}/workspaces/${workspace.meta.slug}`}
                       // className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
                       className={(data) =>
                         cx(
@@ -265,7 +265,7 @@ function WorkspaceSidePanel({
                         size="1x"
                       />
                       <p className="text-sm font-medium text-gray-900">
-                        {project.name}
+                        {workspace.name}
                       </p>
                     </NavLink>
                   )}
