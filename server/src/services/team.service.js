@@ -48,7 +48,7 @@ async function createTeam(body, userId) {
 
     // Generate slug for team
     const slug = await generateSlug({
-      name,
+      title,
       didExist: async (val) => {
         return await Team.findOne({ "meta.slug": val });
       },

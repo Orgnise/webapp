@@ -7,6 +7,7 @@ const {
   UserController,
   TeamController,
   WorkspaceController,
+  CollectionController,
 } = require("./src/controller");
 const SocketHandler = require("./src/controller/socket_handler");
 
@@ -31,6 +32,7 @@ io.on("connection", (socket) => {
 app.use("/", UserController);
 app.use("/", TeamController);
 app.use("/", WorkspaceController);
+app.use("/", CollectionController);
 
 // Handle unknown routes
 app.use("*", function (req, res, next) {
