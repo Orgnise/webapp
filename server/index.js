@@ -5,8 +5,6 @@ const mw = require("./src//middleware/middleware");
 const errorHandler = require("./src/middleware/handle-error/error-handler");
 const {
   UserController,
-  BoardController,
-  IssueController,
   OrganizationController,
   ProjectController,
 } = require("./src/controller");
@@ -33,7 +31,6 @@ io.on("connection", (socket) => {
 app.use("/", UserController);
 app.use("/", OrganizationController);
 app.use("/", ProjectController);
-app.use("/", IssueController);
 
 // Handle unknown routes
 app.use("*", function (req, res, next) {

@@ -10,7 +10,6 @@ const ApiResponseHandler = require("../helper/response/api-response");
 const {
   HttpStatusCode,
 } = require("../helper/http-status-code/http-status-code");
-const FakeBoardData = require("../config/task_data");
 
 router.get("/organization/:id/project/all", authorize(), getAllProjects);
 router.get(
