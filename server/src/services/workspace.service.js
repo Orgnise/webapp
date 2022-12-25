@@ -38,7 +38,7 @@ async function crateWorkspace({ orgId, name, description, members, userId }) {
 
     // Generate slug for team
     const slug = await generateSlug({
-      title,
+      title: name,
       didExist: async (val) => {
         return await Workspace.findOne({ "meta.slug": val });
       },

@@ -14,6 +14,7 @@ module.exports = {
   getById,
   updateCollection,
   deleteCollection,
+  getAllCollection,
 };
 
 /**
@@ -37,7 +38,7 @@ async function createCollection(body) {
 
     // Get user data
     const user = await UserService.getById({ id: userId });
-    const hasPermission = isAllowed(userId, collection);
+
     // Generate slug for team
     const slug = await generateSlug({
       title,
@@ -161,12 +162,50 @@ async function deleteCollection(body) {
   try {
     const { id, userId } = body;
     const collection = await getById(id);
+
     if (collection.object === "collection") {
       // TODO: Delete all children items
     }
     const hasPermission = isAllowed(userId, collection);
     await Collection.remove({ _id: id });
     return collection;
+  } catch (error) {
+    throw new HttpException(
+      error.status || HttpStatusCode.INTERNAL_SERVER_ERROR,
+      error.message,
+      error.error
+    );
+  }
+}
+
+/**
+ * Get all collections/items
+ * @param {Object} body
+ * @returns {Promise<Collection[]>}
+ */
+async function getAllCollection(body) {
+  try {
+    const { workspaceId, teamId, parentId, userId } = body;
+    const filter = {
+      workspace: workspaceId,
+      team: teamId,
+      parentId: parentId,
+    };
+    for (let key in filter) {
+      if (
+        !filter[key] ||
+        filter[key] === "null" ||
+        filter[key] === "undefined"
+      ) {
+        delete filter[key];
+      }
+    }
+    const collections = await Collection.find(filter)
+      .populate("createdBy", "name id")
+      .populate("lastUpdatedUserId", "name id")
+      .populate("team", "members");
+
+    return collections;
   } catch (error) {
     throw new HttpException(
       error.status || HttpStatusCode.INTERNAL_SERVER_ERROR,

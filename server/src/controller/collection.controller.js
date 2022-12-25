@@ -10,6 +10,7 @@ const HttpException = require("../helper/exception/http-exception");
 
 // routes
 router.post("/items", authorize(), validateItemSchema, createCollection);
+router.get("/items", authorize(), getAllCollection);
 router.put("/items/:id", authorize(), validateItemSchema, updateCollection);
 router.get("/items/:id", authorize(), getCollection);
 router.delete("/items/:id", authorize(), deleteCollection);
@@ -180,6 +181,36 @@ function deleteCollection(req, res, next) {
         } deleted successfully`,
         dataKey: "item",
         status: HttpStatusCode.OK,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Get all collections
+ */
+function getAllCollection(req, res, next) {
+  const userId = req.auth.id;
+  const { workspaceId, object, limit, query, parentId, teamId } = req.query;
+  const filter = {
+    userId,
+    workspaceId,
+    object,
+    limit,
+    query,
+    parentId,
+    teamId,
+  };
+
+  CollectionService.getAllCollection(filter)
+    .then((collections) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: collections,
+        message: "Collections fetched successfully",
+        dataKey: "items",
+        status: HttpStatusCode.OK,
+        total: collections.length,
       });
     })
     .catch(next);
