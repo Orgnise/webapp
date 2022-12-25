@@ -12,6 +12,7 @@ import { SocketEvent } from "../../../constant/socket-event-constant";
 export default function CreateTeamPage() {
   const navigate = useNavigate();
   const socket = useSocket([SocketEvent.team.create], (event, data) => {
+    console.log("🚀 ~ file: create-team.js:15 ~ socket ~ data", data);
     if (event === SocketEvent.team.create) {
       navigate(`/onboard/${data.meta.slug}`);
     }
@@ -47,7 +48,7 @@ function CreateTeam() {
             you and
           </span>
           <span className="pl-2 text-primary">
-            <Link to={AppRoutes.users.myTeam} className="text-emerald-500">
+            <Link to={AppRoutes.workspace.team} className="text-emerald-500">
               check your team
             </Link>
           </span>

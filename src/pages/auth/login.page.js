@@ -25,11 +25,11 @@ const Login = () => {
 
   let auth = useAuth();
 
-  let from = getLeaf(location, "state.from.pathname") || AppRoutes.dashboard;
+  let from =
+    Validator.getLeaf(location, "state.from.pathname") || AppRoutes.dashboard;
 
   // get the redirect url from the query params
   const redirect = new URLSearchParams(useLocation().search).get("redirect");
-  console.log("🚀 ~ file: login.page.js:35 ~ Login ~ redirect", redirect);
 
   // if the user is already logged in, redirect to the dashboard
   React.useEffect(() => {
@@ -37,21 +37,14 @@ const Login = () => {
       // if (![AppRoutes.login, AppRoutes.signup, "/"].includes(pathname)) {
       //   navigate(`${AppRoutes.login}?redirect=${pathname}`);
       // }
-      navigate(AppRoutes.users.myTeam, { replace: true });
+      // navigate(AppRoutes.workspace.team, { replace: true });
+      if (from === "/login") {
+        navigate(AppRoutes.workspace.team, { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
   }, [auth.user]);
-
-  function getLeaf(node, path) {
-    if (node) {
-      const keys = path.split(".");
-      for (let i = 0; i < keys.length; i++) {
-        if (node[keys[i]]) {
-          node = node[keys[i]];
-        }
-      }
-      return node;
-    }
-  }
 
   const login = (e) => {
     e.preventDefault();
@@ -73,7 +66,7 @@ const Login = () => {
         });
         auth.signIn(user);
         if (from === "/login") {
-          navigate(AppRoutes.users.myTeam, { replace: true });
+          navigate(AppRoutes.workspace.team, { replace: true });
         } else {
           navigate(from, { replace: true });
         }

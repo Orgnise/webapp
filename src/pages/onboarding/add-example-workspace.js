@@ -62,6 +62,7 @@ function AddExampleSpace() {
           position: "top-right",
         });
         // Navigate to workspace page after 1 second delay
+        // TODO: Open workspace navigation
         navigate(`/workspace/${slug}`);
       })
       .catch(({ response }) => {

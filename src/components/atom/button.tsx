@@ -89,7 +89,7 @@ const Button = (props: Props) => {
         getDisabledStateColor(),
         {
           "": type === "secondary",
-          "border-emerald-500  hover:border-emerald-600  focus:border-emerald-700  disabled:border-emerald-300":
+          "outline outline-1 border-emerald-500  hover:border-emerald-600  focus:border-emerald-700  disabled:border-emerald-300":
             type === "outline",
         },
         {

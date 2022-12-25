@@ -12,11 +12,10 @@ export const AppRoutes = {
         create: '/create-team',
     },
     workspace: {
-
-        root: '/workspace/*',
-        home: '/workspace/:id',
-        team: '/workspace/:id/team',
-        workspace: '/workspace/:slug/workspace/:id',
+        root: '/*',
+        team: '/team/*',
+        workspace: ':slug/*',
+        item: ':id',
     },
     users: {
         root: '/users/*',

@@ -34,6 +34,13 @@ export const Endpoints = {
             }
         }
     },
+    collection: {
+        create: '/items',
+        delete: (id: string) => `/items/${id}`,
+        update: (id: string) => `/items/${id}`,
+        getAll: ({ teamId, parentId, workspaceId }: any) => `/items?teamId=${teamId}&workspaceId=${workspaceId}&parentId=${parentId}`,
+        getCollectionById: (id: string) => `/items/${id}`,
+    },
 
 
     board: {

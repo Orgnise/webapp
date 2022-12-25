@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Nav from "../task/component/nav";
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { AppRoutes } from "../../helper/app-routes";
 import { useAppService } from "../../hooks/use-app-service";
 import { SocketEvent } from "../../constant/socket-event-constant";
@@ -14,8 +21,29 @@ import Button from "../../components/atom/button";
 import CustomDropDown from "../../components/custom_dropdown";
 import { ListView } from "../../components/compound/list-view";
 import useAuth from "../../hooks/use-auth";
+import ErrorPage from "../error/error-page";
+import { RequireAuth } from "../../helper/protected-route";
+import WorkspaceView from "../workspace/pages/workspace-view";
+import WorkSpacePage from "../workspace";
+import { WorkspaceProvider } from "../workspace/provider/workspace.provider";
 
 export default function AllTeamsPage() {
+  return (
+    <WorkspaceProvider>
+      <Routes>
+        <Route path={"/"} element={<Teams />} />
+        <Route path=":id" element={<WorkSpacePage />} />
+        <Route path={":id/*"} errorElement={<ErrorPage />}>
+          {/* <Route path="" element={<WorkSpacePage />}></Route> */}
+        </Route>
+        <Route path="/:id/:slug" element={<WorkSpacePage />} />
+        <Route path=":id/:slug/:item" element={<WorkSpacePage />} />
+      </Routes>
+    </WorkspaceProvider>
+  );
+}
+
+function Teams() {
   const [team, setOrganization] = useState([]);
   const [loading, setLoading] = useState();
   const [visible, setVisible] = useState(false);
@@ -52,17 +80,6 @@ export default function AllTeamsPage() {
         });
     }
   }, [user]);
-
-  // if (true) {
-  //   return (
-  //     <div className="OrganizationList h-screen flex flex-col">
-  //       <NavbarLayout>
-  //         <Nav />
-  //       </NavbarLayout>
-  //       <WorkspaceContentView />
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="OrganizationList h-screen flex flex-col">
@@ -123,7 +140,7 @@ function OrganizationRow({ org, index }) {
     <div className="flex items-center border-b-[1px] py-2 first:border-t border-gray-100 hover:bg-gray-50 cursor-pointer px-4">
       <div className=" mr-2 hover:cursor-pointer w-full">
         <div className="flex">
-          <Link to={`/workspace/${org.meta.slug}`} className="flex-1">
+          <Link to={`/team/${org.meta.slug}`} className="flex-1">
             <h3 className="text-base text-gray-700">{org.name}</h3>
             <h5 className="text-xs text-gray-500">
               {org.members.length} team members

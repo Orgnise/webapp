@@ -118,7 +118,7 @@ function Content({ leftPanelSize, children }: IContentProps) {
       )}
     >
       <div className="px-6 w-full h-full">
-        <div className="mx-auto w-full max-w-[720px]">{children}</div>
+        <div className="mx-auto w-full max-w-[720px] h-full">{children}</div>
       </div>
     </div>
   );

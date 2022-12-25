@@ -15,5 +15,6 @@ export function useAppService() {
     const authService = appService.authService;
     const teamService = appService.teamService;
     const workspaceService = appService.workspaceService;
-    return { authService, teamService, workspaceService };
+    const collectionService = appService.collectionService;
+    return { authService, teamService, workspaceService, collectionService };
 }

@@ -7,7 +7,6 @@ import { AppRoutes } from "./helper/app-routes";
 import useSocket from "./hooks/use-socket.hook";
 import Signup from "./pages/auth/signup.page";
 import { SocketEvent } from "./constant/socket-event-constant";
-import WorkSpacePage from "./pages/workspace";
 import ErrorPage from "./pages/error/error-page";
 import OnboardingPage from "./pages/onboarding/onboarding";
 import useAuth from "./hooks/use-auth";
@@ -68,7 +67,7 @@ function App() {
             element={<RequireAuth children={<OnboardingPage />} />}
           />
           <Route
-            path={AppRoutes.users.myTeam}
+            path={"team/*"}
             element={<RequireAuth children={<AllTeamsPage />} />}
           />
           <Route
@@ -80,21 +79,10 @@ function App() {
             element={<RequireAuth children={<AddExampleWorkspacePage />} />}
           />
 
-          <Route
+          {/* <Route
             path={AppRoutes.users.myTeam}
             element={<RequireAuth children={<AllTeamsPage />} />}
-          />
-
-          <Route
-            path={AppRoutes.workspace.root}
-            errorElement={<ErrorPage />}
-            element={<RequireAuth children={<WorkSpacePage />} />}
-          />
-          <Route
-            path={AppRoutes.workspace.workspace}
-            errorElement={<ErrorPage />}
-            element={<RequireAuth children={<WorkSpacePage />} />}
-          />
+          /> */}
 
           <Route path={AppRoutes.notFound} element={<NoPageFound />} />
         </Route>

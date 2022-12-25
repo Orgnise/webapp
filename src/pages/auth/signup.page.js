@@ -70,7 +70,7 @@ const Signup = () => {
           });
           console.log("New user created", user);
           auth.signIn(user);
-          navigate(AppRoutes.users.myTeam, { replace: true });
+          navigate(AppRoutes.workspace.team, { replace: true });
         })
         .catch(({ response }) => {
           const { status, errorCode, message, error } = response.data;

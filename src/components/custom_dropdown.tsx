@@ -20,7 +20,7 @@ export default function CustomDropDown({
           "inline-flex items-center space-x-1 justify-between w-full text-sm font-medium leading-5 transition duration-150 ease-in-out  rounded-md m-0",
           {
             "cursor-not-allowed bg-gray-400 text-gray-700": disabled,
-            "bg-white hover:text-slate-500 focus:outline-none focus:border-slate-400 focus:shadow-outline-blue":
+            " hover:text-slate-500 focus:outline-none focus:border-slate-400 focus:shadow-outline-blue":
               !disabled,
           }
         )}

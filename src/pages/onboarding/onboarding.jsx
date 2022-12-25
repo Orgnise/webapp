@@ -32,7 +32,7 @@ function OnboardingPage() {
           navigate(AppRoutes.team.create);
         } else {
           console.log("🚀 ~ Navigate to my team");
-          navigate(AppRoutes.users.myTeam);
+          navigate(AppRoutes.workspace.team);
         }
       })
       .catch(({ response }) => {

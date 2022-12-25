@@ -39,5 +39,17 @@ export default class Validator {
         return true;
     }
 
+    static getLeaf(node: Object, path: string): any {
+        if (node) {
+            const keys = path.split(".");
+            for (let i = 0; i < keys.length; i++) {
+                if (node[keys[i]]) {
+                    node = node[keys[i]];
+                }
+            }
+            return node;
+        }
+    }
+
 }
 
