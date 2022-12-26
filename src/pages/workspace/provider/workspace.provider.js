@@ -5,6 +5,7 @@ import toast, { LoaderIcon, Toaster } from "react-hot-toast";
 import Validator from "../../../helper/validator";
 import { useLocation } from "react-router-dom";
 import { faker } from "@faker-js/faker";
+import useCollection from "../hook/use-collection.hook";
 
 export const WorkspaceContext = React.createContext();
 WorkspaceContext.displayName = "WorkspaceContext";
@@ -26,6 +27,7 @@ export const WorkspaceProvider = ({ children }) => {
   const { teamService, workspaceService, collectionService } = useAppService();
 
   const workspaceId = Validator.getLeaf(workspace, "id");
+  const teamId = Validator.getLeaf(team, "id");
 
   const path = useLocation().pathname;
   const pathArray = path.split("/team")[1].split("/");
@@ -34,10 +36,46 @@ export const WorkspaceProvider = ({ children }) => {
   const teamSlug = pathArray[1];
   const workspaceSlug = pathArray[2];
 
+  const { createCollection, createItem, deleteCollection } = useCollection(
+    teamId,
+    workspaceId,
+    {
+      onCollectionCreate: (collection) => {
+        setAllCollection((prev) => [...prev, collection]);
+      },
+      onItemCreate: (item) => {},
+
+      onCollectionUpdate: (collection) => {
+        setAllCollection((prev) => {
+          const index = prev.findIndex((c) => c.id === collection.id);
+          prev[index] = collection;
+          return [...prev];
+        });
+      },
+      onItemDelete: (id, parent) => {
+        setAllCollection((prev) => {
+          const oldCollection = prev.find((c) => c.id === parent);
+          const newCollection = {
+            ...oldCollection,
+            children: oldCollection.children.filter((c) => c.id !== id),
+          };
+          const index = prev.findIndex((c) => c.id === parent);
+          prev[index] = newCollection;
+          return [...prev];
+        });
+      },
+      onCollectionDelete: (collection) => {
+        setAllCollection((prev) => {
+          return prev.filter((c) => c.id !== collection.id);
+        });
+      },
+    }
+  );
+
   // Get current teams for current user
   useEffect(() => {
     if (!user || !teamSlug) return;
-    console.log("Getting orgs", teamSlug);
+
     setIsLoadingTeam(true);
     teamService
       .getOrganizationBySlug(teamSlug)
@@ -87,13 +125,14 @@ export const WorkspaceProvider = ({ children }) => {
     setWorkspace(workspace);
   }, [workspaceSlug, workspacesList]);
 
+  // Get all collection
   useEffect(() => {
     if (!Validator.hasValue(workspaceId)) {
       return;
     }
     setIsLoadingCollection(true);
     collectionService
-      .getAllCollection({ workspaceId: workspace.id })
+      .getAllCollection({ workspaceId: workspace.id, object: "collection" })
       .then(({ items }) => {
         setAllCollection(items);
       })
@@ -104,31 +143,6 @@ export const WorkspaceProvider = ({ children }) => {
         setIsLoadingCollection(false);
       });
   }, [workspaceId]);
-
-  // Create collection
-  function createCollection() {
-    if (!Validator.hasValue(workspaceId) || isCreatingCollection) {
-      return;
-    }
-    setIsCreatingCollection(true);
-    const title = faker.name.jobTitle();
-    collectionService
-      .createCollection({
-        teamId: team.id,
-        workspaceId: workspace.id,
-        title: title,
-        object: "collection",
-      })
-      .then(({ item }) => {
-        setAllCollection((old) => [...old, item]);
-      })
-      .catch((err) => {
-        console.error("getAllCollection", err);
-      })
-      .finally(() => {
-        setIsCreatingCollection(false);
-      });
-  }
 
   // Update collection
   function updateCollection(id, title) {
@@ -159,30 +173,6 @@ export const WorkspaceProvider = ({ children }) => {
       });
   }
 
-  // Delete collection
-  function deleteCollection(id) {
-    if (!Validator.hasValue(workspaceId) || isDeletingCollection) {
-      return;
-    }
-    setIsDeletingCollection(true);
-
-    collectionService
-      .deleteCollection(id)
-      .then(({ item }) => {
-        setAllCollection((old) =>
-          old.filter((collection) => collection.id !== id)
-        );
-        toast.success("Collection deleted", { position: "top-right" });
-      })
-      .catch((err) => {
-        console.error("getAllCollection", err);
-        toast.error("Failed to delete collection", { position: "top-right" });
-      })
-      .finally(() => {
-        setIsDeletingCollection(false);
-      });
-  }
-
   const value = {
     team,
     isLoadingTeam,
@@ -194,6 +184,7 @@ export const WorkspaceProvider = ({ children }) => {
     allCollection,
     isLoadingCollection,
     createCollection,
+    createItem,
     deleteCollection,
     updateCollection,
   };
@@ -203,4 +194,49 @@ export const WorkspaceProvider = ({ children }) => {
       {children}
     </WorkspaceContext.Provider>
   );
+};
+
+const data = {
+  node1: {
+    id: "parentNode1",
+    children: ["childNode1"],
+  },
+  node2: {
+    id: "parentNode2",
+    children: ["childNode2", "childNode3"],
+  },
+  node3: {
+    id: "childNode1",
+    parent: "parentNode1",
+  },
+  node4: {
+    id: "childNode2",
+    parent: "parentNode2",
+  },
+  node5: {
+    id: "childNode3",
+    parent: "parentNode2",
+  },
+};
+
+const getTree = (data) => {
+  const tree = [];
+  const nodes = {};
+  for (let i = 0; i < data.length; i++) {
+    const node = data[i];
+    const id = node.id;
+    const parent = node.parent;
+    if (!nodes[id]) {
+      nodes[id] = { ...node, children: [] };
+    }
+    if (parent) {
+      if (!nodes[parent]) {
+        nodes[parent] = { children: [] };
+      }
+      nodes[parent].children.push(nodes[id]);
+    } else {
+      tree.push(nodes[id]);
+    }
+  }
+  return tree;
 };

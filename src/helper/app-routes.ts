@@ -13,7 +13,7 @@ export const AppRoutes = {
     },
     workspace: {
         root: '/*',
-        team: '/team/*',
+        team: '/team/',
         workspace: ':slug/*',
         item: ':id',
     },

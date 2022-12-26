@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import cx from "classnames";
 import Validator from "../../../helper/validator";
 import { LoaderIcon } from "react-hot-toast";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAppService } from "../../../hooks/use-app-service";
 import useSearchPath from "../../../hooks/use-search-path-hook";
 import WorkspaceContentView, {
@@ -16,6 +16,7 @@ import useWorkspace from "../hook/use-workspace.hook";
 import { Fold } from "../../../helper/typescript-utils";
 import CustomDropDown from "../../../components/custom_dropdown";
 import { VerticalEllipse } from "../../../components/svg-icon/verticle-ellipse";
+import Accordion from "../../../components/compound/accordion";
 
 /**
  * Displays the workspace view
@@ -25,7 +26,7 @@ export default function WorkspaceView() {
 
   const [leftPanelSize, setLeftPanelSize] = useState(LeftPanelSize.default);
 
-  const { allCollection, isLoadingCollection, workspace } = useWorkspace();
+  const { isLoadingCollection, workspace } = useWorkspace();
 
   if (isLoading) {
     return (
@@ -37,15 +38,14 @@ export default function WorkspaceView() {
 
   return (
     <WorkspaceContentView
-      content={<CollectionContent allCollection={allCollection} />}
+      content={<CollectionContent />}
       leftPanelState={leftPanelSize}
       onLeftPanelStateChange={setLeftPanelSize}
       leftPanel={
-        <LeftPanel
+        <CollectionPanel
           workspace={workspace}
           leftPanelSize={leftPanelSize}
           setLeftPanelSize={setLeftPanelSize}
-          allCollection={allCollection}
           isLoadingCollection={isLoadingCollection}
         />
       }
@@ -53,18 +53,18 @@ export default function WorkspaceView() {
   );
 }
 
-function LeftPanel({
+function CollectionPanel({
   workspace,
   leftPanelSize,
   setLeftPanelSize,
-  allCollection,
+
   isLoadingCollection,
 }) {
   if (!workspace) {
     return null;
   }
 
-  const { createCollection } = useWorkspace();
+  const { createCollection, createItem, allCollection } = useWorkspace();
 
   const path = useLocation().pathname;
   const relativePath = path.split(workspace.meta.slug)[0] + workspace.meta.slug;
@@ -121,40 +121,92 @@ function LeftPanel({
           <ListView
             items={allCollection}
             loading={isLoadingCollection}
-            renderItem={(item) => {
+            renderItem={(collection, index) => {
               return (
-                <NavLink
-                  to={`${relativePath}/${item.id}`}
-                  // className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
-                  className={(data) =>
-                    cx(
-                      " group flex items-center space-x-2 px-2  lg:mx-2 py-3 text-sm font-medium",
-                      "transition-all ease-in duration-200",
-                      {
-                        "bg-gray-100 text-slate-700 border-l-4 border-red-500":
-                          data.isActive,
-                        "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
-                          !data.isActive,
-                      }
-                    )
-                  }
-                >
-                  <p className="text-sm font-sans text-gray-900">
-                    <span>
+                <div>
+                  <NavLink
+                    to={`${relativePath}/${collection.id}`}
+                    // className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
+                    className={(data) =>
+                      cx(
+                        " group flex items-center space-x-2 px-2  lg:mx-2 py-3 text-sm font-medium",
+                        "transition-all ease-in duration-200",
+                        {
+                          "bg-gray-100 text-slate-700 border-l-4 border-red-500":
+                            data.isActive,
+                          "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
+                            !data.isActive,
+                        }
+                      )
+                    }
+                  >
+                    <div className="flex-1 text-sm font-sans text-gray-900">
                       <span>
-                        {item.object === "collection" ? (
-                          <FIcon
-                            icon={solid("angle-right")}
-                            className="w-1 pr-1"
-                          />
-                        ) : (
-                          <div className="w-1 pr-1" />
-                        )}
+                        <span>
+                          {collection.object === "collection" ? (
+                            <FIcon
+                              icon={solid("angle-right")}
+                              className="w-1 pr-1"
+                            />
+                          ) : (
+                            <div className="w-1 pr-1" />
+                          )}
+                        </span>
+                        <span>{collection.title}</span>
                       </span>
-                      <span>{item.title}</span>
-                    </span>
-                  </p>
-                </NavLink>
+                    </div>
+
+                    <FIcon
+                      icon={solid("plus")}
+                      className="invisible group-hover:visible hover:bg-gray-200 rounded p-2 outline-1 outline-gray-500 text-teal-500 cursor-pointer h-3 "
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        createItem(collection);
+                      }}
+                    />
+                  </NavLink>
+                  {collection.children && (
+                    <div className="flex flex-col gap-2">
+                      {collection.children.map((child, index) => {
+                        return (
+                          <NavLink
+                            key={index}
+                            to={`${relativePath}/${child.id}`}
+                            className={(data) =>
+                              cx(
+                                "group flex items-center space-x-2 px-2 lg:mx-2 py-3 text-sm font-medium ml-4",
+                                "transition-all ease-in duration-200",
+                                {
+                                  "bg-gray-100 text-slate-700 border-l-4 border-red-500":
+                                    data.isActive,
+                                  "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
+                                    !data.isActive,
+                                }
+                              )
+                            }
+                          >
+                            <div className="flex-1 text-sm font-sans text-gray-900">
+                              <span>
+                                <span>
+                                  {child.object === "collection" ? (
+                                    <FIcon
+                                      icon={solid("angle-right")}
+                                      className="w-1 pr-1"
+                                    />
+                                  ) : (
+                                    <div className="w-1 pr-1" />
+                                  )}
+                                </span>
+                                <span>{child.title}</span>
+                              </span>
+                            </div>
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
             }}
             noItemsElement={
@@ -188,11 +240,15 @@ function LeftPanel({
   );
 }
 
-function CollectionContent({ allCollection }) {
-  const [title, setTitle] = useState();
+function CollectionContent() {
   const [collection, setCollection] = useState();
-  const { createCollection, deleteCollection, updateCollection } =
-    useWorkspace();
+  const [item, setItem] = useState();
+  const {
+    createCollection,
+    deleteCollection,
+    updateCollection,
+    allCollection,
+  } = useWorkspace();
   const activeCollection = useLocation().pathname.split("/").pop();
 
   useEffect(() => {
@@ -202,9 +258,33 @@ function CollectionContent({ allCollection }) {
     const col = allCollection.find(
       (collection) => collection.id === activeCollection
     );
-    setCollection(col);
-    setTitle(col && col.title);
-  }, [activeCollection]);
+
+    let item;
+
+    // if collection is not found, check if it is a child item
+    if (col === undefined) {
+      for (let i = 0; i < allCollection.length; i++) {
+        if (Validator.hasValue(allCollection[i].children)) {
+          item = allCollection[i].children.find(
+            (item) => item.id === activeCollection
+          );
+          if (item !== undefined) {
+            break;
+          }
+        }
+      }
+    }
+    if (item) {
+      setItem(item);
+      setCollection();
+    } else if (col) {
+      setItem();
+      setCollection(col);
+    } else {
+      setItem();
+      setCollection();
+    }
+  }, [activeCollection, allCollection]);
 
   if (!Validator.hasValue(allCollection)) {
     return (
@@ -229,14 +309,7 @@ function CollectionContent({ allCollection }) {
     );
   }
 
-  // setTitle(collection.title);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    updateCollection(collection.id, title);
-  }
-
-  if (!collection) {
+  if (!collection && !item) {
     return (
       <div className="flex flex-col items-center place-content-center h-full py-8">
         <div className="font-semibold text-xs text-slate-700">
@@ -248,6 +321,33 @@ function CollectionContent({ allCollection }) {
       </div>
     );
   }
+  return (
+    <>
+      {collection && <CollectionPage collection={collection} />}
+      {item && <ItemPage item={item} />}
+    </>
+  );
+}
+
+function CollectionPage({ collection }) {
+  const [title, setTitle] = useState("");
+  const { workspace, createCollection, deleteCollection, updateCollection } =
+    useWorkspace();
+
+  const path = useLocation().pathname;
+  const relativePath = path.split(workspace.meta.slug)[0] + workspace.meta.slug;
+
+  useEffect(() => {
+    if (Validator.hasValue(collection)) {
+      setTitle(collection.title);
+    }
+  }, [collection]);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    updateCollection(collection.id, title);
+  }
+
   return (
     <div className="flex flex-col gap-8 h-full  py-10">
       <div className="flex items-center place-content-between">
@@ -283,57 +383,77 @@ function CollectionContent({ allCollection }) {
           />
         </form>
       </div>
-      <div className="border-l-4 p-2 border-slate-700">
-        <span className="font-semibold">💡 Pulse Tip: </span>This pinned welcome
-        page is the first page your team members will see when they join this
-        workspace. This is a perfect opportunity to provide some guidance on
-        what changed and where to find what.
+      <div className="flex flex-col gap-4">
+        <ListView
+          items={collection.children}
+          renderItem={(item) => {
+            return (
+              <Link
+                to={`${relativePath}/${item.id}`}
+                className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer"
+              >
+                <FIcon icon={solid("angle-right")} className="pr-1" />
+                <div className="font-sans">{item.title}</div>
+              </Link>
+            );
+          }}
+        />
       </div>
-      <div>
-        <span className="font-semibold">Welcome to our Engineering Wiki!</span>{" "}
-        This is our source of truth for all Engineering-related information,
-        such as processes, best practices, setup guides, and more.
-      </div>
-      <div>
-        <div className="font-semibold text-lg">Getting started </div>
-        <hr />
-        <div className="flex flex-col gap-2">
-          <div>
-            {" "}
-            New to our team? Here are some helpful resources to get you started.
-            Our workflows: Learn how we communicate, collaborate, and get things
-            done at Acme. Our tools: Discover the tools we use in our team.
+    </div>
+  );
+}
+
+function ItemPage({ item }) {
+  const [title, setTitle] = useState("");
+  const { deleteCollection, updateCollection } = useWorkspace();
+
+  useEffect(() => {
+    if (Validator.hasValue(item)) {
+      setTitle(item.title);
+    }
+  }, [item]);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    updateCollection(item.id, title);
+  }
+
+  return (
+    <div className="flex flex-col gap-8 h-full  py-10">
+      <div className="flex items-center place-content-between">
+        <FIcon icon={regular("copy")} className="pr-1" />
+        <CustomDropDown
+          button={
+            <div className="h-4">
+              <VerticalEllipse />
+            </div>
+          }
+        >
+          <div className="flex flex-col gap-2">
+            <div
+              className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
+              onClick={() => {
+                deleteCollection(item.id, item.parent);
+              }}
+            >
+              Delete
+            </div>
           </div>
-          <div>...</div>
-          <div>...</div>
-          <div>...</div>
-        </div>
+        </CustomDropDown>
       </div>
-      <div>
-        <div className="font-semibold text-lg">What's new </div>
-        <hr />
-        <div className="flex flex-col gap-2">
-          <span className="font-semibold">Here are our latest updates!</span>{" "}
-          <span>
-            {" "}
-            If you have anything to share, please add it to the list and mention
-            @Engineering to notify the team. A new colleague is joining our
-            @Engineering team on 18 Jul 2022. Please everyone say hi to @Rayan!
-            👋
-          </span>
-          <div>...</div>
-          <div>...</div>
-          <div>...</div>
-        </div>
+      <div className="font-semibold text-4xl">
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => {
+              setTitle(e.target.value);
+            }}
+            className="w-full bg-transparent"
+          />
+        </form>
       </div>
-      <div>
-        <div className="font-semibold text-lg">Questions?</div> <hr />
-        <div>
-          Juan is the curator of this workspace. If you have a question or
-          notice something that is incorrect or outdated, leave a comment and
-          mention @Juan to let him know.
-        </div>
-      </div>
+      <div className="p-2">{item.content}</div>
     </div>
   );
 }

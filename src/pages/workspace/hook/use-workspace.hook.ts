@@ -15,8 +15,9 @@ function useWorkspace(): {
     allCollection: Array<object>,
     isLoadingCollection: boolean,
     createCollection: Function,
+    createItem: (collection: Object) => void,
     updateCollection: (id: String, title: String) => void,
-    deleteCollection: Function,
+    deleteCollection: (id: String, parent: String | undefined) => void,
 } {
     return React.useContext(WorkspaceContext);
 }
