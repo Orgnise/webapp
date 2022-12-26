@@ -12,8 +12,12 @@ const CollectionSchema = new Schema(
       type: Mongoose.Schema.Types.ObjectId,
       ref: "Workspace",
     },
-    parentId: {
+    parent: {
       type: Mongoose.Schema.Types.ObjectId,
+      ref: "Collection",
+    },
+    children: {
+      type: [Mongoose.Schema.Types.ObjectId],
       ref: "Collection",
     },
     team: {

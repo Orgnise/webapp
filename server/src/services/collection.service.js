@@ -8,6 +8,7 @@ const {
 const HttpException = require("../helper/exception/http-exception");
 const { Admin } = require("../helper/role");
 const { generateSlug } = require("../helper/slug-helper");
+const { logInfo } = require("../helper/logger");
 
 module.exports = {
   createCollection,
@@ -31,7 +32,7 @@ async function createCollection(body) {
       index,
       teamId,
       userId,
-      parentId,
+      parent,
       content,
       object,
     } = body;
@@ -47,15 +48,16 @@ async function createCollection(body) {
       },
     });
 
-    if (parentId) {
-      await getById(parentId);
+    let parentCollection;
+    if (parent) {
+      parentCollection = await getById(parent);
     }
 
     const collection = await Collection.create({
       title: title,
       workspace: workspaceId,
       createdBy: user.id,
-      parentId: parentId,
+      parent: parent,
       content: content,
       lastUpdatedUserId: user.id,
       index: index,
@@ -67,6 +69,18 @@ async function createCollection(body) {
         slug: slug,
       },
     });
+
+    if (parentCollection) {
+      const col = await Collection.findOneAndUpdate(
+        { _id: parent },
+        { $push: { children: collection._id } }
+      );
+      col.save();
+      logInfo(
+        `Item ${collection._id} added to ${parent} collection`,
+        "createCollection"
+      );
+    }
 
     return collection;
   } catch (error) {
@@ -83,7 +97,7 @@ async function createCollection(body) {
  */
 async function updateCollection(body) {
   try {
-    const { id, content, title } = body;
+    const { id, content, title, parent } = body;
 
     const coll = await getById(id);
     if (coll.object === "collection" && content) {
@@ -141,6 +155,7 @@ async function getById(id) {
   // Get workspace from database if exists
   const collection = await Collection.findOne({ _id: id })
     .populate("createdBy", "name id")
+    .populate("children", "title id")
     .populate("lastUpdatedUserId", "name id")
     .populate("team", "members");
 
@@ -163,11 +178,22 @@ async function deleteCollection(body) {
     const { id, userId } = body;
     const collection = await getById(id);
 
+    // const hasPermission = isAllowed(userId, collection);
     if (collection.object === "collection") {
       // TODO: Delete all children items
+    } else if (collection.object === "item") {
+      if (collection.parent) {
+        await Collection.findOneAndUpdate(
+          { _id: collection.parent },
+          { $pull: { children: collection._id } }
+        );
+        logInfo(
+          `Item ${collection._id} removed from ${collection.parent}`,
+          "deleteCollection"
+        );
+      }
     }
-    const hasPermission = isAllowed(userId, collection);
-    await Collection.remove({ _id: id });
+    await Collection.deleteOne({ _id: id });
     return collection;
   } catch (error) {
     throw new HttpException(
@@ -185,11 +211,12 @@ async function deleteCollection(body) {
  */
 async function getAllCollection(body) {
   try {
-    const { workspaceId, teamId, parentId, userId } = body;
+    const { workspaceId, teamId, parent, userId, object } = body;
     const filter = {
       workspace: workspaceId,
       team: teamId,
-      parentId: parentId,
+      parent: parent,
+      object: object,
     };
     for (let key in filter) {
       if (
@@ -200,8 +227,10 @@ async function getAllCollection(body) {
         delete filter[key];
       }
     }
+    // Get all collections from database using filter
     const collections = await Collection.find(filter)
       .populate("createdBy", "name id")
+      .populate("children", "id title object parent")
       .populate("lastUpdatedUserId", "name id")
       .populate("team", "members");
 

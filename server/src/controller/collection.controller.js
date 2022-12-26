@@ -19,7 +19,7 @@ function validateItemSchema(req, res, next) {
   const schema = Joi.object({
     teamId: Joi.string().required(),
     workspaceId: Joi.string(),
-    parentId: Joi.string(),
+    parent: Joi.string(),
     object: Joi.string().default("item"),
     title: Joi.string().optional(),
     content: Joi.string(),
@@ -34,7 +34,7 @@ function validateItemSchema(req, res, next) {
 function createCollection(req, res, next) {
   const data = req.body;
   const user = req.auth;
-  const { workspaceId, title, index, teamId, parentId, content, object } = data;
+  const { workspaceId, title, index, teamId, parent, content, object } = data;
 
   if (object === "collection") {
     if (!workspaceId) {
@@ -69,10 +69,10 @@ function createCollection(req, res, next) {
       })
       .catch(next);
   } else {
-    if (!parentId) {
+    if (!parent) {
       throw new HttpException(
         HttpStatusCode.BAD_REQUEST,
-        "ParentId is required",
+        "Parent is required",
         object
       );
     }
@@ -80,7 +80,8 @@ function createCollection(req, res, next) {
       title,
       index,
       teamId,
-      parentId,
+      parent,
+      workspaceId,
       content,
       object: "item",
       userId: user.id,
@@ -191,14 +192,14 @@ function deleteCollection(req, res, next) {
  */
 function getAllCollection(req, res, next) {
   const userId = req.auth.id;
-  const { workspaceId, object, limit, query, parentId, teamId } = req.query;
+  const { workspaceId, object, limit, query, parent, teamId } = req.query;
   const filter = {
     userId,
     workspaceId,
     object,
     limit,
     query,
-    parentId,
+    parent,
     teamId,
   };
 
