@@ -6,16 +6,25 @@ import FIcon from "../ficon";
 type AccordionProps = {
   title: React.ReactNode;
   children: React.ReactNode;
+  isOpen?: boolean;
   onStateChange?: (isOpen: boolean) => void;
 };
 export const Accordion = ({
   title,
   children,
+  isOpen = false,
   onStateChange = (_) => {},
 }: AccordionProps) => {
   const [isOpened, setOpened] = useState<boolean>(false);
   const [height, setHeight] = useState<string>("0px");
   const contentElement = useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (isOpen && !isOpened) {
+      console.log("open", !isOpened);
+      HandleOpening();
+    }
+  }, [isOpen]);
 
   const HandleOpening = () => {
     if (contentElement !== null) {

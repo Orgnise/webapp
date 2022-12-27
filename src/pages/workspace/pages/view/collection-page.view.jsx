@@ -10,8 +10,7 @@ import useWorkspace from "../../hook/use-workspace.hook";
 
 export default function CollectionPage({ collection }) {
   const [title, setTitle] = useState("");
-  const { workspace, createCollection, deleteCollection, updateCollection } =
-    useWorkspace();
+  const { workspace, deleteCollection, updateCollection } = useWorkspace();
 
   const path = useLocation().pathname;
   const relativePath = path.split(workspace.meta.slug)[0] + workspace.meta.slug;
@@ -24,7 +23,7 @@ export default function CollectionPage({ collection }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    updateCollection(collection.id, title);
+    updateCollection({ id: collection.id, title: title });
   }
 
   return (

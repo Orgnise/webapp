@@ -21,16 +21,25 @@ export default function useCollection(teamId: String, workspaceId: String,
     {
         onCollectionCreate = (_: any) => { },
         onItemCreate = (_: any) => { },
+        /**
+        * Update collection/ item
+        * @param {Object} data - object containing id, title and content
+        * @param {String} data.id - id of collection
+        * @param {String} data.title - title of collection
+        * @param {String} data.parent - parent id of item (if any)
+        * @param {String} data.content - content of collection
+        */
         onCollectionUpdate = (_: any) => { },
         onCollectionDelete = (_: any) => { },
         onItemDelete = (id: any, parent: String) => { },
+        onItemUpdate = (_: any) => { }
     }: IProps): {
         isLoadingCollection: boolean;
         isCreatingCollection: boolean;
         // isDeletingCollection: boolean;
-        createCollection: () => any;
-        createItem: (collection: Object) => any;
-        // updateCollection: (id: String, title: String) => void;
+        createCollection: () => void;
+        createItem: (collection: Object) => void;
+        updateCollection: (body: Object) => void;
         deleteCollection: (id: String, parent: String | undefined) => void;
     } {
 
@@ -139,6 +148,46 @@ export default function useCollection(teamId: String, workspaceId: String,
     }
 
 
+    /**
+     * Update collection/ item
+     * @param {Object} data - object containing id, title and content
+     * @param {String} data.id - id of collection
+     * @param {String} data.title - title of collection
+     * @param {String} data.parent - parent id of item (if any)
+     * @param {String} data.content - content of collection
+     */
+    function updateCollection(data: Object) {
+        if (!Validator.hasValue(workspaceId) || isCreatingCollection) {
+            return;
+        }
+        const { id, parent, title, content }: any = data;
+        setIsCreatingCollection(true);
+        collectionService
+            .updateCollection(id, {
+                teamId: teamId,
+                title,
+                content,
+            })
+            .then(({ item }: any) => {
+                if (Validator.hasValue(parent)) {
+                    onItemUpdate(item);
+                    toast.success("Item updated", { position: "top-right" });
+                    return;
+                } else {
+                    onCollectionUpdate(item);
+                    toast.success("Collection updated", { position: "top-right" });
+                }
+            }
+            )
+            .catch((err) => {
+                console.error("getAllCollection", err);
+            })
+            .finally(() => {
+                setIsCreatingCollection(false);
+            });
+    }
 
-    return { createCollection, createItem, isLoadingCollection, isCreatingCollection, deleteCollection };
+
+
+    return { createCollection, createItem, isLoadingCollection, isCreatingCollection, deleteCollection, updateCollection };
 }

@@ -16,7 +16,15 @@ function useWorkspace(): {
     isLoadingCollection: boolean,
     createCollection: Function,
     createItem: (collection: Object) => void,
-    updateCollection: (id: String, title: String) => void,
+    /**
+    * Update collection/ item
+    * @param {Object} data - object containing id, title and content
+    * @param {String} data.id - id of collection
+    * @param {String} data.title - title of collection
+    * @param {String} data.parent - parent id of item (if any)
+    * @param {String} data.content - content of collection
+    */
+    updateCollection: (body: Object) => void,
     deleteCollection: (id: String, parent: String | undefined) => void,
 } {
     return React.useContext(WorkspaceContext);

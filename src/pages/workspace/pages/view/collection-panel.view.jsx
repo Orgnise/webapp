@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import cx from "classnames";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { NavLink, useLocation } from "react-router-dom";
@@ -8,6 +8,7 @@ import useWorkspace from "../../hook/use-workspace.hook";
 import { LeftPanelSize } from "../../layout/workspace-content-view";
 import Button from "../../../../components/atom/button";
 import Accordion from "../../../../components/compound/accordion";
+import Validator from "../../../../helper/validator";
 
 export default function CollectionPanel({
   workspace,
@@ -22,9 +23,6 @@ export default function CollectionPanel({
 
   const { createCollection, createItem, allCollection } = useWorkspace();
 
-  const path = useLocation().pathname;
-  const relativePath = path.split(workspace.meta.slug)[0] + workspace.meta.slug;
-
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <PanelTopToolbar />
@@ -35,9 +33,9 @@ export default function CollectionPanel({
         loading={isLoadingCollection}
         renderItem={(collection, index) => (
           <RenderCollection
+            workspace={workspace}
             collection={collection}
             createItem={createItem}
-            relativePath={relativePath}
           />
         )}
         noItemsElement={
@@ -119,11 +117,28 @@ export default function CollectionPanel({
   }
 }
 
-function RenderCollection({ collection, relativePath, createItem }) {
+function RenderCollection({ workspace, collection, createItem }) {
   const [active, setActive] = React.useState(false);
+  const pathArray = useLocation().pathname.split(workspace.meta.slug);
+  const relativePath = pathArray[0] + workspace.meta.slug;
+  const activeId = pathArray.pop().replace("/", "");
+
+  // Display active collection and its children
+  useEffect(() => {
+    if (Validator.hasValue(collection.children)) {
+      const hasActiveChild = collection.children.find(
+        (child) => child.id === activeId
+      );
+
+      if (hasActiveChild) {
+        setActive(true);
+      }
+    }
+  }, [activeId, collection]);
   return (
     <Accordion
       onStateChange={(state) => setActive(state)}
+      isOpen={active}
       title={
         <NavLink
           to={`${relativePath}/${collection.id}`}

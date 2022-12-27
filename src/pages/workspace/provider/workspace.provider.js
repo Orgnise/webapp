@@ -36,14 +36,25 @@ export const WorkspaceProvider = ({ children }) => {
   const teamSlug = pathArray[1];
   const workspaceSlug = pathArray[2];
 
-  const { createCollection, createItem, deleteCollection } = useCollection(
-    teamId,
-    workspaceId,
-    {
+  const { createCollection, createItem, deleteCollection, updateCollection } =
+    useCollection(teamId, workspaceId, {
       onCollectionCreate: (collection) => {
         setAllCollection((prev) => [...prev, collection]);
       },
       onItemCreate: (item) => {},
+      onItemUpdate: (item) => {
+        setAllCollection((prev) => {
+          const oldCollection = prev.find((c) => c.id === item.parent);
+          const itemIndex = oldCollection.children.findIndex(
+            (c) => c.id === item.id
+          );
+          oldCollection.children[itemIndex] = item;
+
+          const index = prev.findIndex((c) => c.id === item.parent);
+          prev[index] = oldCollection;
+          return [...prev];
+        });
+      },
 
       onCollectionUpdate: (collection) => {
         setAllCollection((prev) => {
@@ -69,8 +80,7 @@ export const WorkspaceProvider = ({ children }) => {
           return prev.filter((c) => c.id !== collection.id);
         });
       },
-    }
-  );
+    });
 
   // Get current teams for current user
   useEffect(() => {
@@ -143,35 +153,6 @@ export const WorkspaceProvider = ({ children }) => {
         setIsLoadingCollection(false);
       });
   }, [workspaceId]);
-
-  // Update collection
-  function updateCollection(id, title) {
-    if (!Validator.hasValue(workspaceId) || isCreatingCollection) {
-      return;
-    }
-    setIsCreatingCollection(true);
-    collectionService
-      .updateCollection(id, {
-        teamId: team.id,
-        title,
-      })
-      .then(({ item }) => {
-        setAllCollection((old) =>
-          old.map((collection) => {
-            if (collection.id === id) {
-              return item;
-            }
-            return collection;
-          })
-        );
-      })
-      .catch((err) => {
-        console.error("getAllCollection", err);
-      })
-      .finally(() => {
-        setIsCreatingCollection(false);
-      });
-  }
 
   const value = {
     team,

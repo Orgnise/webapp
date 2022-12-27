@@ -10,17 +10,39 @@ import CollectionPage from "./collection-page.view";
 
 export default function ItemPage({ item }) {
   const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const { deleteCollection, updateCollection } = useWorkspace();
 
   useEffect(() => {
     if (Validator.hasValue(item)) {
       setTitle(item.title);
+      setContent(item.content);
     }
   }, [item]);
 
+  const onKeyDown = (e) => {
+    if (e.metaKey && e.which === 83) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  });
+
   function handleSubmit(e) {
     e.preventDefault();
-    updateCollection(item.id, title);
+    updateCollection({
+      id: item.id,
+      title: title,
+      content: content,
+      parent: item.parent,
+    });
   }
 
   return (
@@ -46,19 +68,28 @@ export default function ItemPage({ item }) {
           </div>
         </CustomDropDown>
       </div>
-      <div className="font-semibold text-4xl">
-        <form onSubmit={handleSubmit}>
+      <div className="flex flex-col">
+        <form id={item.id} onSubmit={handleSubmit}>
           <input
             type="text"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
             }}
-            className="w-full bg-transparent"
+            className="w-full bg-transparent font-semibold text-4xl"
+          />
+          <textarea
+            type="text"
+            value={content}
+            onChange={(e) => {
+              setContent(e.target.value);
+            }}
+            role="textbox"
+            rows={50}
+            className="w-full bg-transparent p-2 focus:outline-none"
           />
         </form>
       </div>
-      <div className="p-2">{item.content}</div>
     </div>
   );
 }

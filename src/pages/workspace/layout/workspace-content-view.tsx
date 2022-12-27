@@ -37,7 +37,7 @@ function WorkspaceContentView({
 
   return (
     <div className="Workspace  bg-gray-50 h-full">
-      <div className="relative h-[calc(100%-64px)]  w-full  overflow-y-auto bottom-0 left-0 right-0">
+      <div className="relative h-full  w-full  overflow-y-auto bottom-0 left-0 right-0">
         <Divider
           leftPanelSize={leftPanelSize}
           setLeftPanelSize={setLeftPanelSize}
