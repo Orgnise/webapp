@@ -230,7 +230,7 @@ async function getAllCollection(body) {
     // Get all collections from database using filter
     const collections = await Collection.find(filter)
       .populate("createdBy", "name id")
-      .populate("children", "id title object parent")
+      .populate("children", "id title object parent content")
       .populate("lastUpdatedUserId", "name id")
       .populate("team", "members");
 

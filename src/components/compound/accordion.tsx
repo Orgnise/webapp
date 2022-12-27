@@ -6,8 +6,13 @@ import FIcon from "../ficon";
 type AccordionProps = {
   title: React.ReactNode;
   children: React.ReactNode;
+  onStateChange?: (isOpen: boolean) => void;
 };
-export const Accordion = ({ title, children }: AccordionProps) => {
+export const Accordion = ({
+  title,
+  children,
+  onStateChange = (_) => {},
+}: AccordionProps) => {
   const [isOpened, setOpened] = useState<boolean>(false);
   const [height, setHeight] = useState<string>("0px");
   const contentElement = useRef<HTMLDivElement>(null);
@@ -16,25 +21,31 @@ export const Accordion = ({ title, children }: AccordionProps) => {
     if (contentElement !== null) {
       setOpened(!isOpened);
       const height = Validator.getLeaf(contentElement, "current?.scrollHeight"); //contentElement.current?.scrollHeight;
-      setHeight(!isOpened ? `${height}px` : "0px");
+      setHeight(
+        !isOpened ? `${contentElement.current!.scrollHeight}px` : "0px"
+      );
+      onStateChange(!isOpened);
     }
   };
   return (
-    <div onClick={HandleOpening} className="">
-      <div className={"flex justify-between "}>
-        <h4 className="font-semibold">{title}</h4>
-        {isOpened ? (
-          <FIcon icon={solid("angle-left")} />
-        ) : (
-          <FIcon icon={solid("angle-down")} />
-        )}
+    <div onClick={HandleOpening} className="flex flex-col w-full">
+      <div className="flex items-center">
+        <div className="flex-1">{title}</div>
       </div>
       <div
         ref={contentElement}
         style={{ height: height }}
-        className="bg-gray-200 overflow-hidden transition-all duration-200"
+        className="overflow-hidden transition-all duration-200 ease-in-expo"
       >
-        <p className="p-4">{children}</p>
+        {children && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            {children}
+          </div>
+        )}
       </div>
     </div>
   );
