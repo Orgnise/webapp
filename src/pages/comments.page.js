@@ -1,39 +1,39 @@
-import React, { useEffect, useState } from "react";
-import socketIO from "socket.io-client";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from 'react'
+import socketIO from 'socket.io-client'
+import { useParams } from 'react-router-dom'
 
-const socket = socketIO.connect("http://localhost:4000");
+const socket = socketIO.connect('http://localhost:4000')
 
 // 👇🏻 This is the component that will be rendered
 const Comments = () => {
-  const { category, id } = useParams();
-  const [comment, setComment] = useState("");
-  const [commentList, setCommentList] = useState([]);
+  const { category, id } = useParams()
+  const [comment, setComment] = useState('')
+  const [commentList, setCommentList] = useState([])
 
   // 👇🏻 Gets the comments from the server
   useEffect(() => {
-    socket.emit("fetchComments", { category, id });
-  }, [category, id]);
+    socket.emit('fetchComments', { category, id })
+  }, [category, id])
 
-  //👇🏻 Listens to the comments event
+  // 👇🏻 Listens to the comments event
   useEffect(() => {
-    socket.on("comments", (data) => setCommentList(data));
-  }, []);
+    socket.on('comments', (data) => setCommentList(data))
+  }, [])
 
   const addComment = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     /*
       sends the comment, the task category, item's id and the userID.
      */
-    socket.emit("addComment", {
+    socket.emit('addComment', {
       comment,
       category,
       id,
-      userId: localStorage.getItem("userId"),
-      date: new Date().toUTCString(),
-    });
-    setComment("");
-  };
+      userId: localStorage.getItem('userId'),
+      date: new Date().toUTCString()
+    })
+    setComment('')
+  }
 
   return (
     <div className="commentContainer">
@@ -70,7 +70,7 @@ const Comments = () => {
                   </div>
                   <div
                     className="autoResizeTextarea"
-                    style={{ height: "88px" }}
+                    style={{ height: '88px' }}
                   >
                     <span className="inputContainer">
                       <textarea
@@ -86,7 +86,7 @@ const Comments = () => {
                   <button
                     type="submit"
                     className="button buttonStyle cannyButton"
-                    style={{ background: "#525df9" }}
+                    style={{ background: '#525df9' }}
                   >
                     <span className="label">Create&nbsp;Post</span>
                     <span className="loader"> </span>
@@ -96,13 +96,13 @@ const Comments = () => {
             </div>
           </div>
 
-          {/** 👇🏻 Displays all the available comments*/}
+          {/** 👇🏻 Displays all the available comments */}
           <div className="comments__section ">
             <h2>Existing Comments</h2>
             {commentList.map((comment, index) => (
               <div key={index}>
                 <p>
-                  <span style={{ fontWeight: "bold" }}>{comment.text} </span>by{" "}
+                  <span style={{ fontWeight: 'bold' }}>{comment.text} </span>by{' '}
                   {comment.name}
                 </p>
               </div>
@@ -111,7 +111,7 @@ const Comments = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Comments;
+export default Comments

@@ -1,139 +1,138 @@
-import React, { useState } from "react";
-import cx from "classnames";
-import { Link, useNavigate } from "react-router-dom";
-import loginSvg from "../../assets/secure-login-animate.svg";
-import { AppRoutes } from "../../helper/app-routes";
-import useLocalStorage from "../../hooks/use-local-storage";
-import { useAppService } from "../../hooks/use-app-service";
-import useAuth from "../../hooks/use-auth";
-import useSocket from "../../hooks/use-socket.hook";
-import { SocketEvent } from "../../constant/socket-event-constant";
+import React, { useState } from 'react'
+import cx from 'classnames'
+import { Link, useNavigate } from 'react-router-dom'
+import loginSvg from '../../assets/secure-login-animate.svg'
+import { AppRoutes } from '../../helper/app-routes'
+import useLocalStorage from '../../hooks/use-local-storage'
+import { useAppService } from '../../hooks/use-app-service'
+import useAuth from '../../hooks/use-auth'
+import useSocket from '../../hooks/use-socket.hook'
+import { SocketEvent } from '../../constant/socket-event-constant'
 
 const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [errors, setError] = useState({});
-  const [password, setPassword] = useState("");
-  const [cPassword, setCPassword] = useState("");
+  const [email, setEmail] = useState('')
+  const [name, setName] = useState('')
+  const [errors, setError] = useState({})
+  const [password, setPassword] = useState('')
+  const [cPassword, setCPassword] = useState('')
 
-  const navigate = useNavigate();
-  const auth = useAuth();
-  const { authService } = useAppService();
+  const navigate = useNavigate()
+  const auth = useAuth()
+  const { authService } = useAppService()
 
-  const socket = useSocket([]);
+  const socket = useSocket([])
 
   const validEmailRegex = RegExp(
     /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
-  );
+  )
 
   const handleLogin = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!email || !password || !cPassword || !name) {
       setError({
         ...errors,
-        email: "Email is required",
-        password: "Password is required",
-        cPassword: "Confirm Password is required",
-        name: "Name is required",
-      });
-      return;
+        email: 'Email is required',
+        password: 'Password is required',
+        cPassword: 'Confirm Password is required',
+        name: 'Name is required'
+      })
+      return
     } else if (password !== cPassword) {
       setError({
         ...errors,
-        confirmPassword: "Password and confirm password should be same",
-      });
-      return;
+        confirmPassword: 'Password and confirm password should be same'
+      })
+      return
     }
     if (errors.email || errors.password || errors.name) {
       if (errors.email) {
-        alert(errors.email);
+        alert(errors.email)
       } else if (errors.password) {
-        alert(errors.password);
+        alert(errors.password)
       } else if (errors.name) {
-        alert(errors.name);
+        alert(errors.name)
       }
-      return;
     } else {
-      setError({});
+      setError({})
       authService
         .register({
-          name: name,
-          email: email,
-          password: password,
-          confirmPassword: cPassword,
+          name,
+          email,
+          password,
+          confirmPassword: cPassword
         })
         .then(({ user }) => {
-          console.log("User registered successfully");
+          console.log('User registered successfully')
 
           socket.emit(SocketEvent.auth.register, {
-            jwtToken: user.jwtToken,
-          });
-          console.log("New user created", user);
-          auth.signIn(user);
-          navigate(AppRoutes.workspace.team, { replace: true });
+            jwtToken: user.jwtToken
+          })
+          console.log('New user created', user)
+          auth.signIn(user)
+          navigate(AppRoutes.workspace.team, { replace: true })
         })
         .catch(({ response }) => {
-          const { status, errorCode, message, error } = response.data;
+          const { status, errorCode, message, error } = response.data
           if (status === 422 && Array.isArray(error)) {
-            const errors = {};
+            const errors = {}
             error.forEach((err) => {
-              errors[Object.keys(err)[0]] = Object.values(err)[0];
-            });
-            setError(errors);
+              errors[Object.keys(err)[0]] = Object.values(err)[0]
+            })
+            setError(errors)
             if (errors.confirmPassword) {
               setError({
                 ...errors,
-                confirmPassword: "Password and confirm password should be same",
-              });
+                confirmPassword: 'Password and confirm password should be same'
+              })
             }
             console.log(
-              "🚀 ~ file: signup.page.js ~ line 89 ~ handleLogin ~ errors",
+              '🚀 ~ file: signup.page.js ~ line 89 ~ handleLogin ~ errors',
               errors
-            );
+            )
           } else {
-            alert(Array.isArray(error) ? error[0] : message);
+            alert(Array.isArray(error) ? error[0] : message)
           }
-        });
+        })
     }
-  };
+  }
 
   const handleChange = (event) => {
-    event.preventDefault();
-    const { name, value } = event.target;
+    event.preventDefault()
+    const { name, value } = event.target
     switch (name) {
-      case "name":
+      case 'name':
         setError({
           ...errors,
           name:
             value.length < 5
-              ? "Full Name must be at least 5 characters long!"
-              : undefined,
-        });
-        break;
-      case "email":
+              ? 'Full Name must be at least 5 characters long!'
+              : undefined
+        })
+        break
+      case 'email':
         setError({
           ...errors,
           email:
             !value || validEmailRegex.test(value)
               ? undefined
-              : "Email is not valid!",
-        });
-        break;
-      case "password":
+              : 'Email is not valid!'
+        })
+        break
+      case 'password':
         setError({
           ...errors,
           password:
             value.length < 6
-              ? "Password must be at least 6 characters long!"
-              : undefined,
-        });
-        break;
+              ? 'Password must be at least 6 characters long!'
+              : undefined
+        })
+        break
 
-        break;
+        break
       default:
-        break;
+        break
     }
-  };
+  }
 
   return (
     <div className="max-w-screen-xl m-auto h-full">
@@ -155,8 +154,8 @@ const Signup = () => {
             label="Fullname"
             name="name"
             onChange={(e) => {
-              setName(e.target.value);
-              handleChange(e);
+              setName(e.target.value)
+              handleChange(e)
             }}
             value={name}
             autoComplete="name"
@@ -167,8 +166,8 @@ const Signup = () => {
             label="Email"
             name="email"
             onChange={(e) => {
-              setEmail(e.target.value);
-              handleChange(e);
+              setEmail(e.target.value)
+              handleChange(e)
             }}
             value={email}
             autoComplete="email"
@@ -179,8 +178,8 @@ const Signup = () => {
             label="Password"
             name="password"
             onChange={(e) => {
-              setPassword(e.target.value);
-              handleChange(e);
+              setPassword(e.target.value)
+              handleChange(e)
             }}
             value={password}
             autoComplete="password"
@@ -191,8 +190,8 @@ const Signup = () => {
             label="Confirm Password"
             name="cpassword"
             onChange={(e) => {
-              setCPassword(e.target.value);
-              handleChange(e);
+              setCPassword(e.target.value)
+              handleChange(e)
             }}
             value={cPassword}
             autoComplete="confirm-password"
@@ -212,18 +211,18 @@ const Signup = () => {
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
 
-function TextField({
+function TextField ({
   label,
-  inputType = "text",
+  inputType = 'text',
   name,
   placeholder,
   value,
   onChange,
   error,
-  autoComplete,
+  autoComplete
 }) {
   return (
     <div className="flex flex-col space-y-2 w-9/12">
@@ -233,9 +232,9 @@ function TextField({
         name={name}
         placeholder={`Enter ${label}`}
         className={cx(
-          "border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase",
+          'border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase',
           {
-            "border-red-500 ": error,
+            'border-red-500 ': error
           }
         )}
         required
@@ -244,15 +243,15 @@ function TextField({
         autoComplete={autoComplete}
       />
       <label
-        className={cx("text-red-500 text-xs", {
-          "inline-block  scale-100": error !== "" && error !== undefined,
-          "h-0": !error,
+        className={cx('text-red-500 text-xs', {
+          'inline-block  scale-100': error !== '' && error !== undefined,
+          'h-0': !error
         })}
       >
         {error}
       </label>
     </div>
-  );
+  )
 }
 
-export default Signup;
+export default Signup

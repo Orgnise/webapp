@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
-import ReactDOM from "react-dom";
-import cx from "classnames";
-import { type } from "@testing-library/user-event/dist/type";
-import { useLocation } from "react-router-dom";
+import React, { useState, useRef, useEffect } from 'react'
+import ReactDOM from 'react-dom'
+import cx from 'classnames'
+import { type } from '@testing-library/user-event/dist/type'
+import { useLocation } from 'react-router-dom'
 
-export default function ModalForm({
+export default function ModalForm ({
   children,
   footer,
   button,
@@ -12,31 +12,31 @@ export default function ModalForm({
   className,
   path,
   visible,
-  setVisible,
+  setVisible
 }) {
   // const [visible, setVisible] = useState(false);
-  const wrapperRef = useRef(null);
+  const wrapperRef = useRef(null)
 
-  const search = useLocation().search;
+  const search = useLocation().search
 
   useEffect(() => {
-    function handleClickOutside(event) {
+    function handleClickOutside (event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setVisible(false);
+        setVisible(false)
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [wrapperRef]);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [wrapperRef])
 
   useEffect(() => {
-    let html = document.querySelector("html");
+    const html = document.querySelector('html')
 
     if (html) {
       if (visible && html) {
-        html.style.overflowY = "hidden";
+        html.style.overflowY = 'hidden'
 
         // const focusableElements =
         //   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -52,15 +52,15 @@ export default function ModalForm({
         // const lastFocusableElement =
         //   focusableContent[focusableContent.length - 1]; // get last element to be focused inside modal
 
-        document.addEventListener("keydown", function(e) {
+        document.addEventListener('keydown', function (e) {
           if (e.keyCode === 27) {
-            setVisible(false);
+            setVisible(false)
           }
 
-          let isTabPressed = e.key === "Tab" || e.keyCode === 9;
+          const isTabPressed = e.key === 'Tab' || e.keyCode === 9
 
           if (!isTabPressed) {
-            return;
+
           }
 
           //   if (e.shiftKey) {
@@ -77,29 +77,31 @@ export default function ModalForm({
           //       e.preventDefault();
           //     }
           //   }
-        });
+        })
 
         // firstFocusableElement.focus();
       } else {
-        html.style.overflowY = "visible";
+        html.style.overflowY = 'visible'
       }
     }
-  }, [visible]);
+  }, [visible])
 
   return (
     <>
-      {button ? (
+      {button
+        ? (
         <div onClick={() => setVisible(true)}>{button}</div>
-      ) : (
+          )
+        : (
         <button
           onClick={() => setVisible(true)}
           className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
         >
           <span>Open Modal</span>
         </button>
-      )}
+          )}
 
-      {visible && typeof document !== "undefined"
+      {visible && typeof document !== 'undefined'
         ? ReactDOM.createPortal(
             <div
               className="fixed top-0 left-0 z-20 flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm"
@@ -112,7 +114,7 @@ export default function ModalForm({
               <div
                 ref={wrapperRef}
                 className={cx(
-                  "flex max-h-[90vh] max-w-7xl flex-col overflow-hidden rounded bg-white text-slate-500 shadow-xl shadow-slate-700/10",
+                  'flex max-h-[90vh] max-w-7xl flex-col overflow-hidden rounded bg-white text-slate-500 shadow-xl shadow-slate-700/10',
                   className
                 )}
                 id="modal"
@@ -164,8 +166,8 @@ export default function ModalForm({
               </div>
             </div>,
             document.body
-          )
+        )
         : null}
     </>
-  );
+  )
 }

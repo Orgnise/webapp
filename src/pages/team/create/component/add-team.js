@@ -1,33 +1,33 @@
-import React, { useState } from "react";
-import cx from "classnames";
-import { faker } from "@faker-js/faker";
-import useSocket from "../../../../hooks/use-socket.hook";
-import { useNavigate } from "react-router-dom";
-import { history } from "../../../../helper/history.config";
-import DropDown from "../../../../components/dropdown";
-import { SocketEvent } from "../../../../constant/socket-event-constant";
+import React, { useState } from 'react'
+import cx from 'classnames'
+import { faker } from '@faker-js/faker'
+import useSocket from '../../../../hooks/use-socket.hook'
+import { useNavigate } from 'react-router-dom'
+import { history } from '../../../../helper/history.config'
+import DropDown from '../../../../components/dropdown'
+import { SocketEvent } from '../../../../constant/socket-event-constant'
 
 const AddTeam = ({ setVisible = () => {} }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [error, setError] = useState({});
-  const createTeam = SocketEvent.team.create;
-  const socket = useSocket();
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [error, setError] = useState({})
+  const createTeam = SocketEvent.team.create
+  const socket = useSocket()
 
   const handleAddTodo = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     // Use faker.js to generate random data
     const data = {
       name: faker.company.name(),
-      description: faker.lorem.paragraph().substring(0, 20),
-    };
+      description: faker.lorem.paragraph().substring(0, 20)
+    }
 
-    //👇🏻 sends the task to the Socket.io server
-    socket.emit(createTeam, data);
-    setName("");
-    setDescription("");
-    setVisible(false);
-  };
+    // 👇🏻 sends the task to the Socket.io server
+    socket.emit(createTeam, data)
+    setName('')
+    setDescription('')
+    setVisible(false)
+  }
 
   return (
     <form className="max-w-lg min-w-full" onSubmit={handleAddTodo}>
@@ -44,8 +44,8 @@ const AddTeam = ({ setVisible = () => {} }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={cx(
-                "peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500  focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400",
-                { "invalid:text-pink-500": error.task }
+                'peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500  focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400',
+                { 'invalid:text-pink-500': error.task }
               )}
             />
             <label
@@ -87,9 +87,9 @@ const AddTeam = ({ setVisible = () => {} }) => {
         <button
           disabled={name.length === 0}
           className={cx(
-            "inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none",
+            'inline-flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none',
             {
-              "disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-gray-300 disabled:text-gray-400 disabled:shadow-none": true,
+              'disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-gray-300 disabled:text-gray-400 disabled:shadow-none': true
             }
           )}
         >
@@ -97,7 +97,7 @@ const AddTeam = ({ setVisible = () => {} }) => {
         </button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default AddTeam;
+export default AddTeam

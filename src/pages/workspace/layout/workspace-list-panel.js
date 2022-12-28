@@ -1,19 +1,19 @@
-import React from "react";
-import cx from "classnames";
-import { LoadingSpinner } from "../../../components/atom/spinner";
-import { SlideModal } from "../../../components/molecule/slide-modal";
-import { Fold } from "../../../helper/typescript-utils";
-import CustomDropDown from "../../../components/custom_dropdown";
-import FIcon from "../../../components/ficon";
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { ListView } from "../../../components/compound/list-view";
-import { NavLink, useNavigate } from "react-router-dom";
-import Button from "../../../components/atom/button";
-import useWorkspace from "../hook/use-workspace.hook";
+import React from 'react'
+import cx from 'classnames'
+import { LoadingSpinner } from '../../../components/atom/spinner'
+import { SlideModal } from '../../../components/molecule/slide-modal'
+import { Fold } from '../../../helper/typescript-utils'
+import CustomDropDown from '../../../components/custom_dropdown'
+import FIcon from '../../../components/ficon'
+import { regular, solid } from '@fortawesome/fontawesome-svg-core/import.macro'
+import { ListView } from '../../../components/compound/list-view'
+import { NavLink, useNavigate } from 'react-router-dom'
+import Button from '../../../components/atom/button'
+import useWorkspace from '../hook/use-workspace.hook'
 
-export default function WorkspaceSidePanel({ setActive, active }) {
-  const navigate = useNavigate();
-  const { teamSlug, workspacesList, team } = useWorkspace();
+export default function WorkspaceSidePanel ({ setActive, active }) {
+  const navigate = useNavigate()
+  const { teamSlug, workspacesList, team } = useWorkspace()
 
   return (
     <SlideModal
@@ -33,7 +33,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                 button={
                   <div className="flex items-center gap-2 text-sm font-medium text-gray-900 flex-1">
                     <span>{team.name}</span>
-                    <FIcon icon={solid("angle-down")} />
+                    <FIcon icon={solid('angle-down')} />
                   </div>
                 }
               >
@@ -49,7 +49,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                       <div
                         className="px-2 py-3 rounded hover:bg-gray-100 cursor-pointer"
                         onClick={() => {
-                          navigate("/team");
+                          navigate('/team')
                         }}
                       >
                         Switch and manage workspaces
@@ -61,7 +61,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
 
               {/* Close this panel */}
               <button onClick={() => setActive(false)}>
-                <FIcon icon={solid("angles-left")} className="text-slate-500" />
+                <FIcon icon={solid('angles-left')} className="text-slate-500" />
               </button>
             </div>
 
@@ -74,7 +74,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                 type="link"
                 size="small"
                 leadingIcon={
-                  <FIcon icon={solid("plus")} className="text-teal-500" />
+                  <FIcon icon={solid('plus')} className="text-teal-500" />
                 }
               />
             </div>
@@ -89,22 +89,22 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                       to={`/team/${teamSlug}/${workspace.meta.slug}`}
                       className={(data) =>
                         cx(
-                          " group flex items-center space-x-2 px-2  lg:mx-2 py-3 text-sm font-medium rounded-md ",
-                          "transition-all ease-in duration-200",
+                          ' group flex items-center space-x-2 px-2  lg:mx-2 py-3 text-sm font-medium rounded-md ',
+                          'transition-all ease-in duration-200',
                           {
-                            "bg-gray-100 text-slate-700 border-l-4 rounded-l border-red-500":
+                            'bg-gray-100 text-slate-700 border-l-4 rounded-l border-red-500':
                               data.isActive,
-                            "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
-                              !data.isActive,
+                            'text-gray-600 hover:bg-gray-50 hover:text-gray-900':
+                              !data.isActive
                           }
                         )
                       }
                       onClick={() => {
-                        setActive(false);
+                        setActive(false)
                       }}
                     >
                       <FIcon
-                        icon={regular("circle")}
+                        icon={regular('circle')}
                         className="text-slate-500 scale-75 z-0"
                         size="1x"
                       />
@@ -116,7 +116,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                   noItemsElement={
                     <div className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer">
                       <FIcon
-                        icon={solid("folder")}
+                        icon={solid('folder')}
                         className="text-slate-500"
                       />
                       <p className="text-sm font-medium text-gray-900">
@@ -143,5 +143,5 @@ export default function WorkspaceSidePanel({ setActive, active }) {
         )}
       />
     </SlideModal>
-  );
+  )
 }

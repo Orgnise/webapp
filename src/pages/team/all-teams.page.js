@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import toast from "react-hot-toast";
-import Nav from "../task/component/nav";
+import React, { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
+import Nav from '../task/component/nav'
 
 import {
   Link,
@@ -8,78 +8,78 @@ import {
   Route,
   Routes,
   useLocation,
-  useNavigate,
-} from "react-router-dom";
-import { AppRoutes } from "../../helper/app-routes";
-import { useAppService } from "../../hooks/use-app-service";
-import { SocketEvent } from "../../constant/socket-event-constant";
-import useSocket from "../../hooks/use-socket.hook";
-import FIcon from "../../components/ficon";
-import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { NavbarLayout } from "../layout";
-import Button from "../../components/atom/button";
-import CustomDropDown from "../../components/custom_dropdown";
-import { ListView } from "../../components/compound/list-view";
-import useAuth from "../../hooks/use-auth";
-import ErrorPage from "../error/error-page";
-import { RequireAuth } from "../../helper/protected-route";
-import WorkspaceView from "../workspace/pages/workspace-view";
-import WorkSpacePage from "../workspace";
-import { WorkspaceProvider } from "../workspace/provider/workspace.provider";
+  useNavigate
+} from 'react-router-dom'
+import { AppRoutes } from '../../helper/app-routes'
+import { useAppService } from '../../hooks/use-app-service'
+import { SocketEvent } from '../../constant/socket-event-constant'
+import useSocket from '../../hooks/use-socket.hook'
+import FIcon from '../../components/ficon'
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro'
+import { NavbarLayout } from '../layout'
+import Button from '../../components/atom/button'
+import CustomDropDown from '../../components/custom_dropdown'
+import { ListView } from '../../components/compound/list-view'
+import useAuth from '../../hooks/use-auth'
+import ErrorPage from '../error/error-page'
+import { RequireAuth } from '../../helper/protected-route'
+import WorkspaceView from '../workspace/pages/workspace-view'
+import WorkSpacePage from '../workspace'
+import { WorkspaceProvider } from '../workspace/provider/workspace.provider'
 
-export default function AllTeamsPage() {
+export default function AllTeamsPage () {
   return (
     <WorkspaceProvider>
       <Routes>
-        <Route path={"/"} element={<Teams />} />
+        <Route path={'/'} element={<Teams />} />
         <Route path=":id" element={<WorkSpacePage />} />
-        <Route path={":id/*"} errorElement={<ErrorPage />}>
+        <Route path={':id/*'} errorElement={<ErrorPage />}>
           {/* <Route path="" element={<WorkSpacePage />}></Route> */}
         </Route>
         <Route path="/:id/:slug" element={<WorkSpacePage />} />
         <Route path=":id/:slug/:item" element={<WorkSpacePage />} />
       </Routes>
     </WorkspaceProvider>
-  );
+  )
 }
 
-function Teams() {
-  const [team, setOrganization] = useState([]);
-  const [loading, setLoading] = useState();
-  const [visible, setVisible] = useState(false);
-  const { teamService } = useAppService();
+function Teams () {
+  const [team, setOrganization] = useState([])
+  const [loading, setLoading] = useState()
+  const [visible, setVisible] = useState(false)
+  const { teamService } = useAppService()
 
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   useSocket([SocketEvent.team.create], (event, data) => {
     if (event === SocketEvent.team.create) {
-      setOrganization((prev) => [...prev, data]);
-      toast.success("Team created successfully", {
-        position: "top-right",
-      });
+      setOrganization((prev) => [...prev, data])
+      toast.success('Team created successfully', {
+        position: 'top-right'
+      })
     }
-  });
+  })
 
   // Fetch team list in which authenticated user is member | owner | admin
   useEffect(() => {
     if (user) {
-      setLoading(true);
+      setLoading(true)
       teamService
         .getAllTeams()
         .then(({ teams }) => {
-          setOrganization(teams);
+          setOrganization(teams)
         })
         .catch(({ response }) => {
           if (response && response.data) {
-            console.log(response.data);
+            console.log(response.data)
           }
         })
         .finally(() => {
-          setLoading(false);
-        });
+          setLoading(false)
+        })
     }
-  }, [user]);
+  }, [user])
 
   return (
     <div className="OrganizationList h-screen flex flex-col">
@@ -96,7 +96,7 @@ function Teams() {
                 type="link"
                 size="small"
                 onClick={() => {
-                  navigate(AppRoutes.team.create);
+                  navigate(AppRoutes.team.create)
                 }}
               />
             </div>
@@ -132,10 +132,10 @@ function Teams() {
         </div>
       </section>
     </div>
-  );
+  )
 }
 
-function OrganizationRow({ org, index }) {
+function OrganizationRow ({ org, index }) {
   return (
     <div className="flex items-center border-b-[1px] py-2 first:border-t border-gray-100 hover:bg-gray-50 cursor-pointer px-4">
       <div className=" mr-2 hover:cursor-pointer w-full">
@@ -149,7 +149,7 @@ function OrganizationRow({ org, index }) {
           <CustomDropDown
             button={
               <FIcon
-                icon={solid("ellipsis-vertical")}
+                icon={solid('ellipsis-vertical')}
                 className="text-slate-400  w-5 h-5 z-0"
               />
             }
@@ -161,5 +161,5 @@ function OrganizationRow({ org, index }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

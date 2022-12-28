@@ -1,6 +1,4 @@
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import React from "react";
-import FIcon from "../../components/ficon";
 
 interface SidebarPageLayoutProps {
   header?: React.ReactNode;

@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import cx from "classnames";
-import AddTeam from "./component/add-team";
-import { Link, useNavigate } from "react-router-dom";
-import { NavbarLayout } from "../../layout";
-import Nav from "../../task/component/nav";
-import { Fold } from "../../../helper/typescript-utils";
-import { AppRoutes } from "../../../helper/app-routes";
-import useSocket from "../../../hooks/use-socket.hook";
-import { SocketEvent } from "../../../constant/socket-event-constant";
+import React, { useState, useEffect } from 'react'
+import cx from 'classnames'
+import AddTeam from './component/add-team'
+import { Link, useNavigate } from 'react-router-dom'
+import { NavbarLayout } from '../../layout'
+import Nav from '../../task/component/nav'
+import { Fold } from '../../../helper/typescript-utils'
+import { AppRoutes } from '../../../helper/app-routes'
+import useSocket from '../../../hooks/use-socket.hook'
+import { SocketEvent } from '../../../constant/socket-event-constant'
 
-export default function CreateTeamPage() {
-  const navigate = useNavigate();
+export default function CreateTeamPage () {
+  const navigate = useNavigate()
   const socket = useSocket([SocketEvent.team.create], (event, data) => {
-    console.log("🚀 ~ file: create-team.js:15 ~ socket ~ data", data);
+    console.log('🚀 ~ file: create-team.js:15 ~ socket ~ data', data)
     if (event === SocketEvent.team.create) {
-      navigate(`/onboard/${data.meta.slug}`);
+      navigate(`/onboard/${data.meta.slug}`)
     }
-    console.log("🚀 ~data", data);
-  });
+    console.log('🚀 ~data', data)
+  })
   return (
     <div className="w-full h-full bg-white flex flex-col">
       <NavbarLayout>
@@ -31,11 +31,11 @@ export default function CreateTeamPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-function CreateTeam() {
-  const [isVisible, setIsVisible] = useState();
+function CreateTeam () {
+  const [isVisible, setIsVisible] = useState()
 
   return (
     <div className="flex flex-col gap-6 py-6 items-center bg-white shadow w-full  rounded-md max-w-[500px]">
@@ -55,5 +55,5 @@ function CreateTeam() {
         </span>
       </div>
     </div>
-  );
+  )
 }

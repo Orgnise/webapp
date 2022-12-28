@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react'
 
-export function VerticalEllipse() {
+export function VerticalEllipse () {
   return (
     <svg
       width="24"
@@ -29,5 +29,5 @@ export function VerticalEllipse() {
         </clipPath>
       </defs>
     </svg>
-  );
+  )
 }

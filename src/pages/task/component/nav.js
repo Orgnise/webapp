@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { AppRoutes } from "../../../helper/app-routes";
-import CustomDropDown from "../../../components/custom_dropdown";
-import Logo from "../../../components/atom/logo";
-import useAuth from "../../../hooks/use-auth";
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { AppRoutes } from '../../../helper/app-routes'
+import CustomDropDown from '../../../components/custom_dropdown'
+import Logo from '../../../components/atom/logo'
+import useAuth from '../../../hooks/use-auth'
 
 const Nav = () => {
-  const auth = useAuth();
-  const user = auth.user;
-  const navigate = useNavigate();
+  const auth = useAuth()
+  const user = auth.user
+  const navigate = useNavigate()
 
   const handleLogout = () => {
-    auth.signOut(() => navigate("/"));
-  };
+    auth.signOut(() => navigate('/'))
+  }
 
   return (
     <div className="flex items-center place-content-between w-full">
@@ -22,8 +22,9 @@ const Nav = () => {
 
       <div className="">
         {
-          //👇🏻 if user is logged in, show logout button
-          user && Object.keys(user).length !== 0 ? (
+          // 👇🏻 if user is logged in, show logout button
+          user && Object.keys(user).length !== 0
+            ? (
             <div className="flex items-center space-x-4 ">
               <CustomDropDown
                 button={
@@ -49,19 +50,20 @@ const Nav = () => {
                 </div>
               </CustomDropDown>
             </div>
-          ) : (
+              )
+            : (
             <button
               className="bg-blue-400 text-white px-4 py-2 rounded-md my-2"
               onClick={() => {
-                window.location.href = AppRoutes.login;
+                window.location.href = AppRoutes.login
               }}
             >
               Login
             </button>
-          )
+              )
         }
       </div>
     </div>
-  );
-};
-export default Nav;
+  )
+}
+export default Nav

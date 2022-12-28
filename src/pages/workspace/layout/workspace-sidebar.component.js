@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import cx from "classnames";
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { Link, NavLink, useParams } from "react-router-dom";
-import FIcon from "../../../components/ficon";
-import { SidebarPageLayout } from "../../layout";
-import { AppRoutes } from "../../../helper/app-routes";
-import useAuth from "../../../hooks/use-auth";
+import React, { useState, useEffect } from 'react'
+import cx from 'classnames'
+import { regular, solid } from '@fortawesome/fontawesome-svg-core/import.macro'
+import { Link, NavLink, useParams } from 'react-router-dom'
+import FIcon from '../../../components/ficon'
+import { SidebarPageLayout } from '../../layout'
+import { AppRoutes } from '../../../helper/app-routes'
+import useAuth from '../../../hooks/use-auth'
 
 /**
  * @deprecated This component is not used anymore
  */
-function WorkspaceSidebarLayout() {
-  const { user } = useAuth();
-  const params = useParams();
-  const id = params.id;
+function WorkspaceSidebarLayout () {
+  const { user } = useAuth()
+  const params = useParams()
+  const id = params.id
 
   return (
     <>
@@ -47,32 +47,32 @@ function WorkspaceSidebarLayout() {
               to={`/workspace/${id}/workspace`}
               className={(data) =>
                 cx(
-                  " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
+                  ' group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md',
                   {
-                    "bg-gray-100 text-slate-700": data.isActive,
-                    "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
-                      !data.isActive,
+                    'bg-gray-100 text-slate-700': data.isActive,
+                    'text-gray-600 hover:bg-gray-50 hover:text-gray-900':
+                      !data.isActive
                   }
                 )
               }
             >
-              <FIcon icon={solid("users")} />
+              <FIcon icon={solid('users')} />
               <span className="hidden lg:block">Workspaces</span>
             </NavLink>
             <NavLink
               to={`/workspace/${id}/team`}
               className={(data) =>
                 cx(
-                  " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
+                  ' group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md',
                   {
-                    "bg-gray-100 text-slate-700": data.isActive,
-                    "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
-                      !data.isActive,
+                    'bg-gray-100 text-slate-700': data.isActive,
+                    'text-gray-600 hover:bg-gray-50 hover:text-gray-900':
+                      !data.isActive
                   }
                 )
               }
             >
-              <FIcon icon={solid("users")} />
+              <FIcon icon={solid('users')} />
               <span className="hidden lg:block">Team</span>
             </NavLink>
           </div>
@@ -82,7 +82,7 @@ function WorkspaceSidebarLayout() {
             <div>
               <Link to="#" className="flex space-x-3 items-center">
                 <FIcon
-                  icon={solid("user")}
+                  icon={solid('user')}
                   className="bg-gray-300 rounded-full p-2"
                 />
                 <span className="hidden lg:block">{user && user.name}</span>
@@ -92,6 +92,6 @@ function WorkspaceSidebarLayout() {
         }
       ></SidebarPageLayout>
     </>
-  );
+  )
 }
-export default WorkspaceSidebarLayout;
+export default WorkspaceSidebarLayout

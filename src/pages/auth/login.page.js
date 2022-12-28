@@ -1,35 +1,35 @@
-import React, { useState } from "react";
-import cx from "classnames";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import loginSvg from "../../assets/secure-login-animate.svg";
-import { AppRoutes } from "../../helper/app-routes";
-import { useAppService } from "../../hooks/use-app-service";
-import useSocket from "../../hooks/use-socket.hook";
-import { SocketEvent } from "../../constant/socket-event-constant";
-import Validator from "../../helper/validator";
-import useAuth from "../../hooks/use-auth";
+import React, { useState } from 'react'
+import cx from 'classnames'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import loginSvg from '../../assets/secure-login-animate.svg'
+import { AppRoutes } from '../../helper/app-routes'
+import { useAppService } from '../../hooks/use-app-service'
+import useSocket from '../../hooks/use-socket.hook'
+import { SocketEvent } from '../../constant/socket-event-constant'
+import Validator from '../../helper/validator'
+import useAuth from '../../hooks/use-auth'
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setError] = useState({});
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errors, setError] = useState({})
 
   /// 👇🏻  Use the useSocket hook to get the socket
-  const socket = useSocket([], {});
-  const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const socket = useSocket([], {})
+  const navigate = useNavigate()
+  const { setUser } = useAuth()
 
-  const { authService } = useAppService();
-  const location = useLocation();
-  const pathname = location.pathname;
+  const { authService } = useAppService()
+  const location = useLocation()
+  const pathname = location.pathname
 
-  let auth = useAuth();
+  const auth = useAuth()
 
-  let from =
-    Validator.getLeaf(location, "state.from.pathname") || AppRoutes.dashboard;
+  const from =
+    Validator.getLeaf(location, 'state.from.pathname') || AppRoutes.dashboard
 
   // get the redirect url from the query params
-  const redirect = new URLSearchParams(useLocation().search).get("redirect");
+  const redirect = new URLSearchParams(useLocation().search).get('redirect')
 
   // if the user is already logged in, redirect to the dashboard
   React.useEffect(() => {
@@ -38,61 +38,61 @@ const Login = () => {
       //   navigate(`${AppRoutes.login}?redirect=${pathname}`);
       // }
       // navigate(AppRoutes.workspace.team, { replace: true });
-      if (from === "/login") {
-        navigate(AppRoutes.workspace.team, { replace: true });
+      if (from === '/login') {
+        navigate(AppRoutes.workspace.team, { replace: true })
       } else {
-        navigate(from, { replace: true });
+        navigate(from, { replace: true })
       }
     }
-  }, [auth.user]);
+  }, [auth.user])
 
   const login = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (password.length < 6) {
       setError({
         ...errors,
-        password: "Password should be at least 6 characters long",
-      });
-      return;
+        password: 'Password should be at least 6 characters long'
+      })
+      return
     }
-    setError({});
+    setError({})
     authService
       .login({ email, password })
       .then(({ user }) => {
-        console.log("User authenticate successfully");
+        console.log('User authenticate successfully')
 
         socket.emit(SocketEvent.auth.register, {
-          jwtToken: user.jwtToken,
-        });
-        auth.signIn(user);
-        if (from === "/login") {
-          navigate(AppRoutes.workspace.team, { replace: true });
+          jwtToken: user.jwtToken
+        })
+        auth.signIn(user)
+        if (from === '/login') {
+          navigate(AppRoutes.workspace.team, { replace: true })
         } else {
-          navigate(from, { replace: true });
+          navigate(from, { replace: true })
         }
       })
       .catch((err) => {
-        const response = err.response;
+        const response = err.response
         if (!response) {
           console.error(
-            "🚀 ~ file: login.page.js ~ line 43 ~ login ~ response",
+            '🚀 ~ file: login.page.js ~ line 43 ~ login ~ response',
             response
-          );
+          )
 
-          return;
+          return
         }
-        const { status, errorCode, message, error } = response.data;
+        const { status, errorCode, message, error } = response.data
         if (status === 422 && Array.isArray(error)) {
-          const errors = {};
+          const errors = {}
           error.forEach((err) => {
-            errors[Object.keys(err)[0]] = Object.values(err)[0];
-          });
-          setError(errors);
+            errors[Object.keys(err)[0]] = Object.values(err)[0]
+          })
+          setError(errors)
         } else {
-          alert(Array.isArray(error) ? error[0] : message);
+          alert(Array.isArray(error) ? error[0] : message)
         }
-      });
-  };
+      })
+  }
 
   return (
     <div className="max-w-screen-xl m-auto h-full">
@@ -114,7 +114,7 @@ const Login = () => {
             label="Email"
             name="email"
             onChange={(e) => {
-              setEmail(e.target.value);
+              setEmail(e.target.value)
             }}
             value={email}
             autoComplete="email"
@@ -125,7 +125,7 @@ const Login = () => {
             label="Password"
             name="password"
             onChange={(e) => {
-              setPassword(e.target.value);
+              setPassword(e.target.value)
             }}
             value={password}
             autoComplete="password"
@@ -155,17 +155,17 @@ const Login = () => {
         </form>
       </div>
     </div>
-  );
-};
-function TextField({
+  )
+}
+function TextField ({
   label,
-  inputType = "text",
+  inputType = 'text',
   name,
   placeholder,
   value,
   onChange,
   error,
-  autoComplete,
+  autoComplete
 }) {
   return (
     <div className="flex flex-col space-y-2 w-9/12">
@@ -175,9 +175,9 @@ function TextField({
         name={name}
         placeholder={`Enter ${label}`}
         className={cx(
-          "border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase",
+          'border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase',
           {
-            "border-red-500 ": error,
+            'border-red-500 ': error
           }
         )}
         required
@@ -186,15 +186,15 @@ function TextField({
         autoComplete={autoComplete}
       />
       <label
-        className={cx("text-red-500 text-xs", {
-          "inline-block  scale-100": error !== "" && error !== undefined,
-          "h-0": !error,
+        className={cx('text-red-500 text-xs', {
+          'inline-block  scale-100': error !== '' && error !== undefined,
+          'h-0': !error
         })}
       >
         {error}
       </label>
     </div>
-  );
+  )
 }
 
-export default Login;
+export default Login
