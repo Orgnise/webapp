@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
 import cx from "classnames";
 import Validator from "../../../../helper/validator";
-import FIcon from "../../../../components/ficon";
 import useWorkspace from "../../hook/use-workspace.hook";
 import CustomDropDown from "../../../../components/custom_dropdown";
-import { VerticalEllipse } from "../../../../components/svg-icon/verticle-ellipse";
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import CustomEditor from "../../../../components/compound/editorjs/editor";
-import EditorTextParser from "../../../../components/compound/editorjs/parser/editor-parser";
 import { Fold } from "../../../../helper/typescript-utils";
 import { Article } from "../../../../components/compound/editorjs/parser/editorjs-block";
+import SvgIcon from "../../../../components/svg-icon/svg-icon";
+import { Link, useLocation } from "react-router-dom";
 
 export default function ItemPage({ item }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState();
   const [displayEditors, setDisplayEditors] = useState(false);
-  const { deleteCollection, updateCollection } = useWorkspace();
+  const { deleteCollection, updateCollection, allCollection } = useWorkspace();
 
   useEffect(() => {
     if (Validator.hasValue(item)) {
@@ -23,6 +21,10 @@ export default function ItemPage({ item }) {
       setContent(item.content);
     }
   }, [item]);
+
+  const currentCollection = allCollection.find((c) => c.id === item.parent);
+  const path = useLocation().pathname.split("/");
+  console.log(" path", path);
 
   const onKeyDown = (e) => {
     if (e.metaKey && e.which === 83) {
@@ -52,19 +54,34 @@ export default function ItemPage({ item }) {
   return (
     <div className="flex flex-col gap-3 h-full  py-5">
       <div className="flex items-center place-content-between">
-        <FIcon
-          icon={!displayEditors ? solid("edit") : regular("circle-check")}
-          className="hidden hover:bg-gray-200 rounded p-2 outline-1 outline-gray-500  cursor-pointer h-3 "
-          onClick={(e) => {
-            setDisplayEditors(!displayEditors);
-          }}
-        />
-        <CustomDropDown
-          button={
-            <div className="h-4">
-              <VerticalEllipse />
+        <div className="flex items-center gap-2">
+          <SvgIcon icon="Copy" size={3} className="h-5" />
+          <Link to={`/${path[1]}/${path[2]}/${path[3]}/${item.parent}`}>
+            <div className="text-slate-400 text-xs">
+              {currentCollection.title}{" "}
             </div>
-          }
+          </Link>
+          {/* <CustomDropDown
+            button={<div className="text-slate-400 text-xs"> Collection</div>}
+          >
+            <ListView
+              items={allCollection}
+              renderItem={(item) => (
+                <div
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
+                  onClick={() => {
+                    // deleteCollection(item.id, item.parent);
+                  }}
+                >
+                  {item.title}
+                </div>
+              )}
+            />
+          </CustomDropDown> */}
+        </div>
+
+        <CustomDropDown
+          button={<SvgIcon icon="VerticalEllipse" size={4} className="h-5" />}
         >
           <div className="flex flex-col gap-2">
             <div

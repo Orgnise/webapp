@@ -1,7 +1,7 @@
 import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import cx from "classnames";
 import React, { useState, useRef } from "react";
 import Validator from "../../helper/validator";
-import FIcon from "../ficon";
 
 type AccordionProps = {
   title: React.ReactNode;
@@ -21,10 +21,15 @@ export const Accordion = ({
 
   React.useEffect(() => {
     if (isOpen && !isOpened) {
-      console.log("open", !isOpened);
       HandleOpening();
     }
   }, [isOpen]);
+
+  React.useEffect(() => {
+    if (contentElement !== null && isOpened) {
+      setHeight(children ? `${contentElement.current!.scrollHeight}px` : "0px");
+    }
+  }, [children]);
 
   const HandleOpening = () => {
     if (contentElement !== null) {
@@ -44,7 +49,9 @@ export const Accordion = ({
       <div
         ref={contentElement}
         style={{ height: height }}
-        className="overflow-hidden transition-all duration-200 ease-in-expo"
+        className={cx("transition-all duration-200 ease-in-expo", {
+          "overflow-hidden": !isOpened,
+        })}
       >
         {children && (
           <div

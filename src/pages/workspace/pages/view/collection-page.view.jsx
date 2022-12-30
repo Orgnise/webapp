@@ -1,10 +1,8 @@
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ListView } from "../../../../components/compound/list-view";
 import CustomDropDown from "../../../../components/custom_dropdown";
-import FIcon from "../../../../components/ficon";
-import { VerticalEllipse } from "../../../../components/svg-icon/verticle-ellipse";
+import SvgIcon from "../../../../components/svg-icon/svg-icon";
 import Validator from "../../../../helper/validator";
 import useWorkspace from "../../hook/use-workspace.hook";
 
@@ -27,15 +25,11 @@ export default function CollectionPage({ collection }) {
   }
 
   return (
-    <div className="flex flex-col gap-8 h-full  py-10">
+    <div className="flex flex-col gap-4 h-full  py-5">
       <div className="flex items-center place-content-between">
-        <FIcon icon={regular("copy")} className="pr-1" />
+        <SvgIcon icon="Copy" size={3} className="text-slate-400" />
         <CustomDropDown
-          button={
-            <div className="h-4">
-              <VerticalEllipse />
-            </div>
-          }
+          button={<SvgIcon icon="VerticalEllipse" size={4} className="h-4" />}
         >
           <div className="flex flex-col gap-2">
             <div
@@ -61,22 +55,21 @@ export default function CollectionPage({ collection }) {
           />
         </form>
       </div>
-      <div className="flex flex-col gap-4">
-        <ListView
-          items={collection.children}
-          renderItem={(item) => {
-            return (
-              <Link
-                to={`${relativePath}/${item.id}`}
-                className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer"
-              >
-                <FIcon icon={solid("angle-right")} className="pr-1" />
-                <div className="font-sans">{item.title}</div>
-              </Link>
-            );
-          }}
-        />
-      </div>
+
+      <ListView
+        items={collection.children}
+        renderItem={(item) => {
+          return (
+            <Link
+              to={`${relativePath}/${item.id}`}
+              className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer text-gray-500"
+            >
+              <SvgIcon icon="chevronRight" className="pr-1" size={5} />
+              <div className="font-sans ">{item.title}</div>
+            </Link>
+          );
+        }}
+      />
     </div>
   );
 }

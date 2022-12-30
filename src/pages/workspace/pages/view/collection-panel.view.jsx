@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import cx from "classnames";
-import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 import { NavLink, useLocation } from "react-router-dom";
 import { ListView } from "../../../../components/compound/list-view";
-import FIcon from "../../../../components/ficon";
 import useWorkspace from "../../hook/use-workspace.hook";
 import { LeftPanelSize } from "../../layout/workspace-content-view";
 import Button from "../../../../components/atom/button";
 import Accordion from "../../../../components/compound/accordion";
 import Validator from "../../../../helper/validator";
+import CustomDropDown from "../../../../components/custom_dropdown";
+import SvgIcon from "../../../../components/svg-icon/svg-icon";
 
 export default function CollectionPanel({
   workspace,
@@ -21,14 +21,15 @@ export default function CollectionPanel({
     return null;
   }
 
-  const { createCollection, createItem, allCollection } = useWorkspace();
+  const { createCollection, createItem, allCollection, deleteCollection } =
+    useWorkspace();
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <PanelTopToolbar />
 
       <ListView
-        className="h-full overflow-y-auto"
+        className="h-full overflow-y-auto pb-28"
         items={allCollection}
         loading={isLoadingCollection}
         renderItem={(collection, index) => (
@@ -36,6 +37,7 @@ export default function CollectionPanel({
             workspace={workspace}
             collection={collection}
             createItem={createItem}
+            deleteCollection={deleteCollection}
           />
         )}
         noItemsElement={
@@ -77,22 +79,23 @@ export default function CollectionPanel({
         </p>
 
         <div className="flex items-center h-4">
-          <FIcon
-            icon={solid("plus")}
-            size="lg"
-            className="hover:bg-gray-200 rounded p-2 outline-1 outline-gray-500 text-teal-500 cursor-pointer h-3 "
+          <SvgIcon
+            icon="Plus"
+            size={7}
+            className="hover:bg-gray-200 rounded p-1  text-teal-500 cursor-pointer "
             onClick={() => {
               createCollection();
             }}
           />
 
-          <FIcon
+          <SvgIcon
+            size={7}
             icon={
               leftPanelSize === LeftPanelSize.max
-                ? solid("down-left-and-up-right-to-center")
-                : solid("up-right-and-down-left-from-center")
+                ? "DownLeftAndUpRight"
+                : "UpRightAndDownLeft"
             }
-            className="hover:bg-gray-200 rounded p-2  outline-1 outline-gray-500 text-gray-500 cursor-pointer h-3"
+            className="hover:bg-gray-200 rounded p-1  outline-1  text-gray-700 cursor-pointer"
             onClick={() => {
               if (leftPanelSize === LeftPanelSize.max) {
                 setLeftPanelSize(LeftPanelSize.default);
@@ -101,12 +104,10 @@ export default function CollectionPanel({
               }
             }}
           />
-          <FIcon
-            icon={solid("angles-left")}
-            className={cx(
-              "p-2  outline-1 outline-gray-700 text-gray-500 rounded cursor-pointer h-3",
-              "hover:bg-gray-200"
-            )}
+          <SvgIcon
+            icon="AngleLeft"
+            size={7}
+            className="hover:bg-gray-200 rounded p-1  outline-1  text-gray-700 cursor-pointer "
             onClick={() => {
               setLeftPanelSize(LeftPanelSize.min);
             }}
@@ -117,7 +118,12 @@ export default function CollectionPanel({
   }
 }
 
-function RenderCollection({ workspace, collection, createItem }) {
+function RenderCollection({
+  workspace,
+  collection,
+  createItem,
+  deleteCollection,
+}) {
   const [active, setActive] = React.useState(true);
   const pathArray = useLocation().pathname.split(workspace.meta.slug);
   const relativePath = pathArray[0] + workspace.meta.slug;
@@ -145,12 +151,11 @@ function RenderCollection({ workspace, collection, createItem }) {
           // className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
           className={(data) =>
             cx(
-              " group flex items-center space-x-2 px-2  py-3 text-sm font-medium",
+              "group flex items-center space-x-2 px-2 py-2 text-sm font-medium border-l-4",
               "transition-all ease-in duration-200",
               {
-                "bg-gray-100 text-slate-700 border-l-4 border-red-500":
-                  data.isActive,
-                "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
+                "bg-gray-100 text-slate-700  border-red-500": data.isActive,
+                "text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-transparent":
                   !data.isActive,
               }
             )
@@ -158,52 +163,62 @@ function RenderCollection({ workspace, collection, createItem }) {
         >
           <div className="flex-1 text-sm font-sans text-gray-900">
             <span>
-              <span>
-                {collection.object === "collection" ? (
-                  !active ? (
-                    <FIcon icon={solid("angle-right")} className="pr-1" />
-                  ) : (
-                    <FIcon icon={solid("angle-down")} className=" pr-1" />
-                  )
-                ) : (
-                  <div className="w-1 pr-1" />
-                )}
-              </span>
+              {collection.object === "collection" ? (
+                <SvgIcon
+                  icon={!active ? "chevronRight" : "chevronDown"}
+                  size={3}
+                  className="text-slate-600 mr-1"
+                />
+              ) : (
+                <span className="w-1 pr-1" />
+              )}
+
               <span>{collection.title}</span>
             </span>
           </div>
 
-          <FIcon
-            icon={solid("plus")}
-            className="invisible group-hover:visible hover:bg-gray-200 rounded p-2 outline-1 outline-gray-500 text-teal-500 cursor-pointer h-3 "
+          <SvgIcon
+            icon="CirclePlus"
+            size={7}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               createItem(collection);
             }}
+            className="invisible group-hover:visible hover:bg-gray-200 rounded p-1 outline-1 outline-gray-500 text-teal-500 cursor-pointer"
           />
         </NavLink>
       }
     >
       <ListView
         items={collection.children}
-        className="pl-3"
+        className="pl-3 pr-1"
         renderItem={(item, index) => (
-          <RenderItem item={item} index={index} relativePath={relativePath} />
+          <RenderItem
+            item={item}
+            index={index}
+            relativePath={relativePath}
+            deleteCollection={deleteCollection}
+          />
         )}
       />
     </Accordion>
   );
 }
 
-function RenderItem({ item, index, relativePath }) {
+function RenderItem({
+  item,
+  index,
+  relativePath,
+  deleteCollection = (i, p) => {},
+}) {
   return (
     <NavLink
       key={index}
       to={`${relativePath}/${item.id}`}
       className={(data) =>
         cx(
-          "group flex items-center space-x-2 px-2 py-3 text-sm font-medium ",
+          "group flex items-center space-x-2 px-2 py-3 text-sm font-medium",
           "transition-all ease-in duration-200",
           {
             "bg-gray-100 text-slate-700 border-l-4 border-red-500":
@@ -214,17 +229,32 @@ function RenderItem({ item, index, relativePath }) {
         )
       }
     >
-      <div className="flex-1 text-sm font-sans text-gray-900">
+      <div className="group flex-1 flex items-center place-content-between text-sm font-sans text-gray-900">
         <span>
           <span>
             {item.object === "collection" ? (
-              <FIcon icon={solid("angle-right")} className="w-1 pr-1" />
+              <SvgIcon icon="chevronRight" size={3} />
             ) : (
               <div className="w-1 pr-1" />
             )}
           </span>
           <span>{item.title}</span>
         </span>
+        <CustomDropDown
+          button={<SvgIcon icon="VerticalEllipse" size={4} className="h-4" />}
+          className="group-hover:visible invisible"
+        >
+          <div className="flex flex-col gap-2">
+            <div
+              className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
+              onClick={() => {
+                deleteCollection(item.id, item.parent);
+              }}
+            >
+              Delete
+            </div>
+          </div>
+        </CustomDropDown>
       </div>
     </NavLink>
   );

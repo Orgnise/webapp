@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import cx from "classnames";
-import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import FIcon from "../../../components/ficon";
+import SvgIcon from "../../../components/svg-icon/svg-icon";
 
 export const LeftPanelSize = Object.freeze({
   min: 0,
@@ -53,15 +52,14 @@ function WorkspaceContentView({
             }
           )}
         >
-          <FIcon
-            icon={solid("angles-right")}
-            size="1x"
-            stroke="1px"
+          <SvgIcon
+            icon={"AngleRight"}
+            size={7}
+            onClick={() => setLeftPanelSize(LeftPanelSize.default)}
             className={cx(
-              "p-2 my-2 ml-1 outline-1 outline-gray-700 text-gray-500 rounded cursor-pointer",
+              "my-2 ml-1 p-1 outline-1  text-slate-500 rounded cursor-pointer",
               "hover:bg-gray-200"
             )}
-            onClick={() => setLeftPanelSize(LeftPanelSize.default)}
           />
         </div>
         <LeftPanel leftPanelSize={leftPanelSize}>{leftPanel}</LeftPanel>
