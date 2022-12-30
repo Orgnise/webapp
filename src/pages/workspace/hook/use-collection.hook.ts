@@ -90,7 +90,21 @@ export default function useCollection(teamId: String, workspaceId: String,
                 title: title,
                 object: "item",
                 parent: collectionId,
-                content: faker.lorem.paragraphs(),
+                content: {
+                    blocks: [
+                        {
+                            type: "paragraph",
+                            data: {
+                                text: faker.lorem.paragraph()
+                            },
+                            id: faker.database.mongodbObjectId()
+
+                        },
+
+                    ],
+                    version: "2.26.4",
+                    time: faker.date.past().getUTCMilliseconds(),
+                },
             })
             .then(({ item }: any) => {
                 onItemCreate(item);
@@ -161,6 +175,19 @@ export default function useCollection(teamId: String, workspaceId: String,
             return;
         }
         const { id, parent, title, content }: any = data;
+        if (content && content.blocks && content.blocks.length == 0) {
+            content.blocks = [
+                {
+                    type: "paragraph",
+                    data: {
+                        text: ""
+                    },
+                    id: faker.database.mongodbObjectId()
+
+                },
+
+            ];
+        }
         setIsCreatingCollection(true);
         collectionService
             .updateCollection(id, {
