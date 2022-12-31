@@ -10,6 +10,7 @@ import ChevronDown from "./chevron-down";
 import ChevronUp from "./chevron-up";
 import ChevronLeft from "./chevron-left";
 import ChevronRight from "./chevron-right";
+import Arrow from "./arrow";
 
 export {
   CirclePlus,
@@ -24,4 +25,5 @@ export {
   ChevronUp,
   ChevronLeft,
   ChevronRight,
+  Arrow,
 };

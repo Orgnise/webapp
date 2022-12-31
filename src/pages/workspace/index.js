@@ -1,7 +1,7 @@
-import { regular, solid } from '@fortawesome/fontawesome-svg-core/import.macro'
-import cx from 'classnames'
-import React, { useState, useEffect } from 'react'
-import toast, { LoaderIcon, Toaster } from 'react-hot-toast'
+import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import cx from "classnames";
+import React, { useState, useEffect } from "react";
+import toast, { LoaderIcon, Toaster } from "react-hot-toast";
 import {
   Link,
   NavLink,
@@ -10,51 +10,49 @@ import {
   useLocation,
   useNavigate,
   useNavigation,
-  useParams
-} from 'react-router-dom'
-import Button from '../../components/atom/button'
-import { LoadingSpinner } from '../../components/atom/spinner'
-import { ListView } from '../../components/compound/list-view'
-import CustomDropDown from '../../components/custom_dropdown'
-import FIcon from '../../components/ficon'
-import { SlideModal } from '../../components/molecule/slide-modal'
-import { AppRoutes } from '../../helper/app-routes'
-import { Fold, ExtractPath } from '../../helper/typescript-utils'
-import Validator from '../../helper/validator'
+  useParams,
+} from "react-router-dom";
+import Button from "../../components/atom/button";
+import { LoadingSpinner } from "../../components/atom/spinner";
+import { ListView } from "../../components/compound/list-view";
+import CustomDropDown from "../../components/custom_dropdown";
+import FIcon from "../../components/ficon";
+import { SlideModal } from "../../components/molecule/slide-modal";
+import { AppRoutes } from "../../helper/app-routes";
+import { Fold, ExtractPath } from "../../helper/typescript-utils";
+import Validator from "../../helper/validator";
 
-import { useAppService } from '../../hooks/use-app-service'
-import useAuth from '../../hooks/use-auth'
-import useSearchPath from '../../hooks/use-search-path-hook'
-import useWorkspace from './hook/use-workspace.hook'
-import { NavbarLayout } from '../layout'
-import Nav from '../task/component/nav'
-import WorkspaceContentView from './layout/workspace-content-view'
-import WorkspaceSidePanel from './layout/workspace-list-panel'
-import WorkspaceView from './pages/workspace-view'
+import { useAppService } from "../../hooks/use-app-service";
+import useAuth from "../../hooks/use-auth";
+import useSearchPath from "../../hooks/use-search-path-hook";
+import useWorkspace from "./hook/use-workspace.hook";
+import { NavbarLayout } from "../layout";
+import Nav from "../task/component/nav";
+import WorkspaceContentView from "./layout/workspace-content-view";
+import WorkspaceSidePanel from "./layout/workspace-list-panel";
+import WorkspaceView from "./pages/workspace-view";
 
-function WorkSpacePage () {
-  const [active, setActive] = useState(false)
+function WorkSpacePage() {
+  const [active, setActive] = useState(false);
 
-  const { isLoadingWorkSpace, workspace, workspacesList } = useWorkspace()
+  const { isLoadingWorkSpace, workspace, workspacesList } = useWorkspace();
 
   return (
     <>
-      {isLoadingWorkSpace
-        ? (
+      {isLoadingWorkSpace ? (
         <div className="flex justify-center items-center h-full">
           <LoadingSpinner />
         </div>
-          )
-        : (
+      ) : (
         <div className="h-full flex flex-col">
           <NavbarLayout>
             <div className="flex items-center gap-5 w-full">
               <button
                 onClick={() => {
-                  setActive(true)
+                  setActive(true);
                 }}
               >
-                <FIcon icon={solid('bars')} className="text-slate-500" />
+                <FIcon icon={solid("bars")} className="text-slate-500" />
               </button>
               <Nav />
             </div>
@@ -75,14 +73,14 @@ function WorkSpacePage () {
             ifAbsent={() => <EmptyWorkspaceView />}
           />
         </div>
-          )}
+      )}
     </>
-  )
+  );
 
   /**
    * Display empty workspace view
    */
-  function EmptyWorkspaceView () {
+  function EmptyWorkspaceView() {
     return (
       <div className="flex-1">
         <div className="h-full flex flex-col gap-4 w-full items-center place-content-center max-w-xl mx-auto text-center">
@@ -93,7 +91,7 @@ function WorkSpacePage () {
               organize your work.
             </span>
             You can create workspaces for different teams, clients, or even for
-            yourself. For example, an{' '}
+            yourself. For example, an{" "}
             <span className="font-medium mx-2 text-slate-700">engineering</span>
             workspace could contains all engineering-related tasks.
           </span>
@@ -110,13 +108,13 @@ function WorkSpacePage () {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   /**
    * Suggest to open workspace
    */
-  function SuggestOpenWorkspace ({ setActive }) {
+  function SuggestOpenWorkspace({ setActive }) {
     return (
       <div className="flex-1">
         <div className="h-full flex flex-col gap-4 w-full items-center place-content-center max-w-xl mx-auto text-center">
@@ -131,7 +129,7 @@ function WorkSpacePage () {
               className="rounded-full"
               size="small"
               onClick={() => {
-                setActive(true)
+                setActive(true);
               }}
             />
           </div>
@@ -140,8 +138,8 @@ function WorkSpacePage () {
           </span>
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default WorkSpacePage
+export default WorkSpacePage;

@@ -3,7 +3,10 @@ import cx from "classnames";
 import { type } from "@testing-library/user-event/dist/type";
 import { SvgIconProps } from "./svg-icon";
 
-export default function CirclePlus({ className = "", size }: SvgIconProps) {
+export default function CirclePlus({
+  className = "",
+  size,
+}: SvgIconProps<void>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,10 +15,10 @@ export default function CirclePlus({ className = "", size }: SvgIconProps) {
       width={size ? size * 4 : "100%"}
       stroke="currentColor"
       viewBox="0 0 24 24"
-      stroke-width="1.5"
+      strokeWidth="1.5"
       fill="none"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <circle cx="12" cy="12" r="9" />

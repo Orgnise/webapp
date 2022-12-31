@@ -2,6 +2,7 @@ import React from "react";
 import cx from "classnames";
 import * as SVGs from "./index";
 import { type } from "@testing-library/user-event/dist/type";
+import { config } from "@fortawesome/fontawesome-svg-core";
 
 type Icons =
   | "CirclePlus"
@@ -15,12 +16,22 @@ type Icons =
   | "chevronDown"
   | "chevronUp"
   | "chevronLeft"
-  | "chevronRight";
-export type SvgIconSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  | "chevronRight"
+  | "Arrow";
 
-export type SvgIconProps = {
+export type SvgIconSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export class Config<T> {
+  public variant: Variant<T>;
+  constructor(public value: T) {
+    this.variant = value as Variant<T>;
+  }
+}
+export type Variant<T> = T;
+
+export type SvgIconProps<Config> = {
   className?: string;
   size?: SvgIconSize;
+  config?: Config;
 };
 
 type SvgIconButtonProps = {
@@ -28,19 +39,31 @@ type SvgIconButtonProps = {
   className?: string;
   onClick?: (e: any) => void;
   size?: SvgIconSize;
+  variant?: any;
 };
 
-const SvgIcon = ({ icon, className, size, onClick }: SvgIconButtonProps) => {
+const SvgIcon = ({
+  icon,
+  className,
+  size,
+  variant,
+  onClick,
+}: SvgIconButtonProps) => {
   return (
     <span onClick={onClick} style={{ display: "inline-block" }}>
-      {getSVGIcon(icon, size, className)}
+      {getSVGIcon(icon, size, className, variant)}
     </span>
   );
 };
 
 export default SvgIcon;
 
-function getSVGIcon(icon: Icons, size?: SvgIconSize, className: string = "") {
+function getSVGIcon(
+  icon: Icons,
+  size?: SvgIconSize,
+  className: string = "",
+  variant?: any
+) {
   switch (icon) {
     case "CirclePlus":
       return <SVGs.CirclePlus size={size} className={className} />;
@@ -66,6 +89,16 @@ function getSVGIcon(icon: Icons, size?: SvgIconSize, className: string = "") {
       return <SVGs.ChevronLeft size={size} className={className} />;
     case "chevronRight":
       return <SVGs.ChevronRight size={size} className={className} />;
+    case "Arrow":
+      return (
+        <SVGs.Arrow
+          size={size}
+          className={className}
+          config={
+            new Config<Variant<"up" | "down" | "left" | "right">>(variant)
+          }
+        />
+      );
 
     default:
       return <></>;
