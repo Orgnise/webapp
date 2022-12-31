@@ -1,6 +1,7 @@
+import { ForceGraph2D } from "react-force-graph";
 import React, { useEffect } from "react";
 import cx from "classnames";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ListView } from "../../../../components/compound/list-view";
 import useWorkspace from "../../hook/use-workspace.hook";
 import { LeftPanelSize } from "../../layout/workspace-content-view";
@@ -15,6 +16,7 @@ const PanelLayout = Object.freeze({
   list: "List",
   board: "Board",
   table: "Table",
+  graph: "Graph",
 });
 
 export default function CollectionPanel({
@@ -59,6 +61,14 @@ export default function CollectionPanel({
             setLeftPanelSize(LeftPanelSize.large);
           }}
         />
+        <Tab
+          tab="Graph"
+          selected={activeLayout === PanelLayout.graph}
+          onClick={() => {
+            setActiveLayout(PanelLayout.graph);
+            setLeftPanelSize(LeftPanelSize.large);
+          }}
+        />
       </div>
       <PanelTopToolbar />
       {activeLayout === PanelLayout.list && <CollectionList />}
@@ -74,6 +84,16 @@ export default function CollectionPanel({
       )}
       {activeLayout === PanelLayout.table && (
         <CollectionTable
+          leftPanelSize={leftPanelSize}
+          setLeftPanelSize={setLeftPanelSize}
+          workspace={workspace}
+          createCollection={createCollection}
+          allCollection={allCollection}
+          isLoadingCollection={isLoadingCollection}
+        />
+      )}
+      {activeLayout === PanelLayout.graph && (
+        <CollectionGraph
           leftPanelSize={leftPanelSize}
           setLeftPanelSize={setLeftPanelSize}
           workspace={workspace}
@@ -521,6 +541,151 @@ function CollectionTable({
           }
         />
       </section>
+    </div>
+  );
+}
+
+function CollectionGraph({
+  workspace,
+  createCollection,
+  allCollection,
+  isLoadingCollection,
+  leftPanelSize,
+  setLeftPanelSize = (i) => {},
+}) {
+  if (!allCollection) {
+    return <div>loading</div>;
+  }
+  const slug = workspace?.meta?.slug;
+  const pathArray = useLocation().pathname.split(slug);
+  const relativePath = pathArray[0] + workspace.meta.slug;
+  const currentItem = pathArray[1].split("/")[1];
+
+  const allItems =
+    allCollection &&
+    allCollection.reduce((acc, collection) => {
+      return [
+        ...acc,
+        ...collection.children.map((item) => ({ ...item, collection })),
+        collection,
+      ];
+    }, []);
+
+  const links = [],
+    node = [];
+
+  allItems.forEach((item, index) => {
+    node.push({
+      id: item.id,
+      name: item.title,
+      val: index + 2,
+      size: 10 * index,
+      color:
+        currentItem == item.id ? "red" : item.parent ? "black" : "SlateBlue",
+    });
+    // Add item
+    if (item.parent) {
+      links.push({
+        source: item.id,
+        target: item.parent,
+      });
+    } else {
+      // add collection
+      links.push({
+        source: item.id,
+        target: "root",
+      });
+    }
+  });
+
+  // Add root node
+  node.push({
+    id: "root",
+    name: workspace.name,
+    val: 1,
+    size: 0,
+    color: "red",
+  });
+
+  const tree2 = {
+    nodes: node,
+    links: links,
+  };
+
+  if (!tree2) {
+    return <div>loading</div>;
+  }
+
+  const fgRef = React.useRef();
+  const navigate = useNavigate();
+
+  const handleClick = React.useCallback(
+    (node) => {
+      // Aim at node from outside it
+      const distance = 40;
+      const distRatio = 1 + distance / Math.hypot(node.x, node.y, node.z);
+
+      navigate(`${relativePath}/${node.id}`);
+      fgRef.current.zoomToFit(1400);
+      setLeftPanelSize(LeftPanelSize.large);
+    },
+    [fgRef]
+  );
+  return (
+    <div
+      style={{ width: `${leftPanelSize}px` }}
+      className="items-center flex place-content-center"
+    >
+      <ForceGraph2D
+        ref={fgRef}
+        graphData={tree2}
+        nodeColor={(node) => node.color}
+        nodeRelSize={4}
+        linkDirectionalParticles={3}
+        linkDirectionalParticleWidth={1}
+        linkDirectionalParticleSpeed={0.006}
+        nodeLabel={(node) => node.name}
+        warmupTicks={60}
+        cooldownTicks={10}
+        nodeAutoColorBy="group"
+        nodeCanvasObject={(node, ctx, globalScale) => {
+          // Draw node
+          if (node.id === "root") {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.val * 4, 0, 2 * Math.PI, false);
+            ctx.fillStyle = node.color;
+            ctx.fill();
+          } else {
+            const label = node.name;
+            const fontSize = 12 / globalScale;
+            ctx.font = `${fontSize}px Sans-Serif`;
+            const textWidth = ctx.measureText(label).width;
+            const backgroundDimensions = [textWidth, fontSize].map(
+              (n) => n + fontSize * 1.2
+            ); // some padding
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.fillRect(
+              node.x - backgroundDimensions[0] / 2,
+              node.y - backgroundDimensions[1] / 2,
+              ...backgroundDimensions
+            );
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = node.color;
+            ctx.fillText(label, node.x, node.y);
+
+            // Shadow
+            ctx.shadowColor = "#DADADA7D";
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 20;
+            ctx.shadowOffsetY = 20;
+          }
+        }}
+        onNodeClick={handleClick}
+        onEngineStop={() => fgRef.current.zoomToFit(1400)}
+      />
     </div>
   );
 }

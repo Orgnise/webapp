@@ -23,6 +23,7 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-editor-js": "latest",
+    "react-force-graph": "^1.41.18",
     "react-hot-toast": "^2.4.0",
     "react-router-dom": "^6.4.1",
     "react-scripts": "^5.0.1",

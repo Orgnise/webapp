@@ -24,7 +24,6 @@ export default function ItemPage({ item }) {
 
   const currentCollection = allCollection.find((c) => c.id === item.parent);
   const path = useLocation().pathname.split("/");
-  console.log(" path", path);
 
   const onKeyDown = (e) => {
     if (e.metaKey && e.which === 83) {

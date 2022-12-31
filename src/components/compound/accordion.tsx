@@ -27,7 +27,9 @@ export const Accordion = ({
 
   React.useEffect(() => {
     if (contentElement !== null && isOpened) {
-      setHeight(children ? `${contentElement.current!.scrollHeight}px` : "0px");
+      setHeight(
+        children ? `${contentElement.current!.scrollHeight - 30}px` : "0px"
+      );
     }
   }, [children]);
 
