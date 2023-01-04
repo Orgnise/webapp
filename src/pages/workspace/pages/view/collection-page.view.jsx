@@ -27,13 +27,13 @@ export default function CollectionPage({ collection }) {
   return (
     <div className="flex flex-col gap-4 h-full  py-5">
       <div className="flex items-center place-content-between">
-        <SvgIcon icon="Copy" size={3} className="text-slate-400" />
+        <SvgIcon icon="Copy" size={3} />
         <CustomDropDown
           button={<SvgIcon icon="VerticalEllipse" size={4} className="h-4" />}
         >
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 rounded border theme-border">
             <div
-              className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer transition-all ease-in duration-200"
+              className="flex items-center gap-2 px-3 py-2 hover:bg-surface cursor-pointer transition-all ease-in duration-200 rounded"
               onClick={() => {
                 deleteCollection(collection.id);
               }}
@@ -62,7 +62,7 @@ export default function CollectionPage({ collection }) {
           return (
             <Link
               to={`${relativePath}/${item.id}`}
-              className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer text-gray-500"
+              className="flex items-center gap-2 p-2 hover:bg-surface rounded cursor-pointer "
             >
               <SvgIcon icon="chevronRight" className="pr-1" size={5} />
               <div className="font-sans ">{item.title}</div>

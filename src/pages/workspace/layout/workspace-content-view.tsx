@@ -35,7 +35,7 @@ function WorkspaceContentView({
   }, [leftPanelSize]);
 
   return (
-    <div className="Workspace  bg-gray-50 h-full">
+    <div className="WorkspaceContent h-full">
       <div className="relative h-full  w-full  overflow-y-auto bottom-0 left-0 right-0">
         <Divider
           leftPanelSize={leftPanelSize}
@@ -57,8 +57,7 @@ function WorkspaceContentView({
             size={7}
             onClick={() => setLeftPanelSize(LeftPanelSize.default)}
             className={cx(
-              "my-2 ml-1 p-1 outline-1  text-slate-500 rounded cursor-pointer",
-              "hover:bg-gray-200"
+              "hover:bg-onSurface rounded p-1 outline-1 cursor-pointer m-2"
             )}
           />
         </div>
@@ -93,7 +92,7 @@ function LeftPanel({ leftPanelSize, children }: ILeftPanelProps) {
   return (
     <div
       className={cx(
-        `fixed top-[64px] bg-gray-100 w-[${leftPanelSize}px] h-full`,
+        `fixed top-[64px] bg-surface w-[${leftPanelSize}px] h-full`,
         "transition-all duration-500 ease-in-expo"
       )}
     >

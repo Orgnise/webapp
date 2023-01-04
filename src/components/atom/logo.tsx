@@ -21,12 +21,11 @@ const Logo: React.FC = () => {
           >
             <rect
               data-uid="o_f46di0adf_4"
-              data-fl-background=""
               x="0"
               y="0"
               width="512"
               height="512"
-              fill="#fffbf5"
+              fill="none"
             ></rect>
             <g
               data-icon=""

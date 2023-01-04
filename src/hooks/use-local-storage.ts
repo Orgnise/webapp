@@ -16,14 +16,18 @@ const useLocalStorage = <T>(
         // Retrieve from localStorage
         const item = localStorage.getItem(key);
         if (item && item != null) {
-            setStoredValue(JSON.parse(item));
+            if (typeof value === 'object') {
+
+                setStoredValue(JSON.parse(item));
+            } else {
+                setStoredValue(item as T);
+            }
         }
     }, [key]);
 
     const setValue = (value: any) => {
         // Save state
         setStoredValue(value);
-        console.log("[Local storage]: User Updated", value);
         if (typeof value === 'object') {
             // Save to localStorage
             localStorage.setItem(key, JSON.stringify(value));

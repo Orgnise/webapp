@@ -1,19 +1,19 @@
-import React, { useState } from 'react'
-import cx from 'classnames'
+import React, { useState } from "react";
+import cx from "classnames";
 
-export default function CheckBox ({
+export default function CheckBox({
   label,
   subText,
   checked,
   onChange,
-  className
+  className,
 }) {
-  const [isChecked, setChecked] = useState(false)
-  const [id, setId] = useState(Math.random().toString(36).substr(2, 9))
+  const [isChecked, setChecked] = useState(false);
+  const [id, setId] = useState(Math.random().toString(36).substr(2, 9));
 
   return (
     <>
-      <div className={cx('relative flex flex-wrap items-center', className)}>
+      <div className={cx("relative flex flex-wrap items-center", className)}>
         <input
           className="w-4 h-4 transition-colors bg-white border-2 rounded appearance-none cursor-pointer peer border-slate-500 checked:border-emerald-500 checked:bg-emerald-500 checked:hover:border-emerald-600 checked:hover:bg-emerald-600 focus:outline-none checked:focus:border-emerald-700 checked:focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-slate-100 disabled:bg-slate-50"
           type="checkbox"
@@ -21,22 +21,22 @@ export default function CheckBox ({
           checked={checked}
           onChange={() => {
             if (onChange) {
-              onChange(!checked)
+              onChange(!checked);
             }
-            setChecked(!checked)
+            setChecked(!checked);
           }}
           id={id}
         />
         {label && (
           <label
-            className="pl-2 cursor-pointer text-slate-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400"
+            className="pl-2 cursor-pointer  peer-disabled:cursor-not-allowed peer-disabled:text-slate-400"
             htmlFor={id}
           >
             {label}
           </label>
         )}
         {subText && (
-          <small className="w-full py-2 pl-6 text-xs transition text-slate-400 peer-invalid:text-pink-500">
+          <small className="w-full py-2 pl-6 text-xs transition  peer-invalid:text-pink-500">
             <span>subText</span>
           </small>
         )}
@@ -63,5 +63,5 @@ export default function CheckBox ({
         </svg>
       </div>
     </>
-  )
+  );
 }

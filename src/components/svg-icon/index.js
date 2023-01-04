@@ -11,7 +11,7 @@ import ChevronUp from "./chevron-up";
 import ChevronLeft from "./chevron-left";
 import ChevronRight from "./chevron-right";
 import Arrow from "./arrow";
-
+import LightDark from "./light-dark";
 export {
   CirclePlus,
   VerticalEllipse,
@@ -26,4 +26,5 @@ export {
   ChevronLeft,
   ChevronRight,
   Arrow,
+  LightDark,
 };

@@ -2,6 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /** BACKGROUND */
+  .theme-bg-primary {
+    @apply bg-primary-500 dark:bg-primary-100;
+  }
+  .bg-default {
+    @apply bg-gray-50 dark:bg-[#1C1B1B];
+  }
+  .bg-surface {
+    @apply bg-gray-100 dark:bg-[#222121];
+  }
+  .bg-onSurface {
+    @apply bg-gray-200 dark:bg-[#2F2E2E];
+  }
+  .bg-card {
+    @apply bg-white dark:bg-[#121212];
+  }
+
+  /* TEXT */
+  .theme-text-on-primary {
+    @apply text-white dark:text-primary-900;
+  }
+  .theme-text-primary {
+    @apply text-primary-500 dark:text-primary-200;
+  }
+  .theme-text {
+    @apply text-slate-700 dark:text-slate-400;
+  }
+  .theme-text-h1 {
+    @apply text-slate-800 dark:text-slate-100;
+  }
+  .theme-text-h2 {
+    @apply text-slate-700 dark:text-slate-200;
+  }
+  .theme-text-h3 {
+    @apply text-slate-600 dark:text-slate-300;
+  }
+  .theme-text-sub1 {
+    @apply text-slate-500 dark:text-slate-400;
+  }
+  .theme-text-sub2 {
+    @apply text-slate-400 dark:text-slate-500;
+  }
+
+  /** BORDER */
+  .theme-border {
+    @apply border-gray-300 divide-gray-300 dark:border-gray-700 dark:divide-gray-700;
+  }
+}
+@layer components {
+  /** Link */
+  .link {
+    @apply flex items-center space-x-2 px-2  border-l-4 transition-all ease-in duration-200;
+  }
+  .link-active {
+    @apply bg-onSurface  border-primary-500;
+  }
+  .link-inactive {
+    @apply hover:bg-surface  border-transparent;
+  }
+  /** INPUT FIELD */
+  .theme-input {
+    @apply bg-surface border theme-border placeholder:theme-text-sub2 placeholder:text-sm  placeholder:first-letter:uppercase p-2 rounded-md bg-surface;
+  }
+}
+
 #root {
   height: 100vh;
 }
@@ -18,7 +84,7 @@ body {
   font-family: "Inter", "sans-serif";
   box-sizing: border-box;
 }
-@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,300&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700;1,900&display=swap");
 * {
   font-family: "Source Sans Pro", sans-serif;
 }

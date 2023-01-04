@@ -17,7 +17,8 @@ type Icons =
   | "chevronUp"
   | "chevronLeft"
   | "chevronRight"
-  | "Arrow";
+  | "Arrow"
+  | "LightDark";
 
 export type SvgIconSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export class Config<T> {
@@ -97,6 +98,14 @@ function getSVGIcon(
           config={
             new Config<Variant<"up" | "down" | "left" | "right">>(variant)
           }
+        />
+      );
+    case "LightDark":
+      return (
+        <SVGs.LightDark
+          size={size}
+          className={className}
+          config={new Config<Variant<"light" | "dark">>(variant)}
         />
       );
 

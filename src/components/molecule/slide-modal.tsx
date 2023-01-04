@@ -28,7 +28,7 @@ export function SlideModal({
           {/* <!-- Background backdrop, show/hide based on slide-over state--> */}
           <div
             className={cx(
-              "BackgroundBackdrop fixed inset-0 bg-slate-600 bg-opacity-70 transition ease-in-out",
+              "BackgroundBackdrop fixed inset-0 bg-slate-600 bg-opacity-70 dark:bg-gray-800 dark:bg-opacity-50  transition ease-in-out",
               {
                 "opacity-0 translate-x-0 h-0 w-0": !active,
                 "opacity-90 h-screen w-full": active,

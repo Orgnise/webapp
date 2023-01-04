@@ -1,33 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import cx from 'classnames'
-import Validator from '../../../helper/validator'
-import { LoaderIcon } from 'react-hot-toast'
-import { useLocation, useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import cx from "classnames";
+import Validator from "../../../helper/validator";
+import { LoaderIcon } from "react-hot-toast";
+import { useLocation, useNavigate } from "react-router-dom";
 import WorkspaceContentView, {
-  LeftPanelSize
-} from '../layout/workspace-content-view'
-import Button from '../../../components/atom/button'
-import useWorkspace from '../hook/use-workspace.hook'
-import CollectionPage from './view/collection-page.view'
-import ItemPage from './view/item-page.view'
-import CollectionPanel from './view/collection-panel.view'
+  LeftPanelSize,
+} from "../layout/workspace-content-view";
+import Button from "../../../components/atom/button";
+import useWorkspace from "../hook/use-workspace.hook";
+import CollectionPage from "./view/collection-page.view";
+import ItemPage from "./view/item-page.view";
+import CollectionPanel from "./view/collection-panel/collection-panel.view";
+import Label from "../../../components/typography";
 
 /**
  * Displays the workspace view
  */
-export default function WorkspaceView () {
-  const [isLoading, setIsLoading] = useState()
+export default function WorkspaceView() {
+  const [isLoading, setIsLoading] = useState();
 
-  const [leftPanelSize, setLeftPanelSize] = useState(LeftPanelSize.default)
+  const [leftPanelSize, setLeftPanelSize] = useState(LeftPanelSize.default);
 
-  const { isLoadingCollection, workspace } = useWorkspace()
+  const { isLoadingCollection, workspace } = useWorkspace();
 
   if (isLoading) {
     return (
       <div className="h-full w-full flex place-content-center items-center">
         <LoaderIcon />
       </div>
-    )
+    );
   }
 
   return (
@@ -44,24 +45,24 @@ export default function WorkspaceView () {
         />
       }
     />
-  )
+  );
 }
 
-function CollectionContent () {
-  const [collection, setCollection] = useState()
-  const [item, setItem] = useState()
-  const { createCollection, allCollection } = useWorkspace()
-  const activeCollection = useLocation().pathname.split('/').pop()
+function CollectionContent() {
+  const [collection, setCollection] = useState();
+  const [item, setItem] = useState();
+  const { createCollection, allCollection } = useWorkspace();
+  const activeCollection = useLocation().pathname.split("/").pop();
 
   useEffect(() => {
     if (!Validator.hasValue(allCollection)) {
-      return
+      return;
     }
     const col = allCollection.find(
       (collection) => collection.id === activeCollection
-    )
+    );
 
-    let item
+    let item;
 
     // if collection is not found, check if it is a child item
     if (col === undefined) {
@@ -69,32 +70,37 @@ function CollectionContent () {
         if (Validator.hasValue(allCollection[i].children)) {
           item = allCollection[i].children.find(
             (item) => item.id === activeCollection
-          )
+          );
           if (item !== undefined) {
-            break
+            break;
           }
         }
       }
     }
     if (item) {
-      setItem(item)
-      setCollection()
+      setItem(item);
+      setCollection();
     } else if (col) {
-      setItem()
-      setCollection(col)
+      setItem();
+      setCollection(col);
     } else {
-      setItem()
-      setCollection()
+      setItem();
+      setCollection();
     }
-  }, [activeCollection, allCollection])
+  }, [activeCollection, allCollection]);
 
   if (!Validator.hasValue(allCollection)) {
     return (
       <div className="flex-1 flex flex-col items-center place-content-center h-full max-w-xl text-center">
         <span className="font-normal">
-          Items are{' '}
-          <span className="font-semibold">collaborative documents</span> that
-          help you capture knowledge. For example, a <span>meeting note</span>{' '}
+          Items are{" "}
+          <Label variant="t2" className="mx-1 ">
+            collaborative documents
+          </Label>
+          that help you capture knowledge. For example, a{" "}
+          <Label variant="t2" className="mx-1 ">
+            meeting note
+          </Label>
           item could contain decisions made in a meeting. Items can be grouped
           and nested with collections.
         </span>
@@ -102,31 +108,32 @@ function CollectionContent () {
           label="Create Item"
           size="small"
           type="outline"
-          className="mt-2 "
+          className="mt-4 "
           onClick={() => {
-            createCollection()
+            createCollection();
           }}
         />
       </div>
-    )
+    );
   }
 
   if (!collection && !item) {
     return (
       <div className="flex flex-col items-center place-content-center h-full py-8">
-        <div className="font-semibold text-xs text-slate-700">
+        <Label size="body" variant="t2">
           Nothing is selected
-        </div>
-        <div className="font-semibold text-xs text-slate-400">
+        </Label>
+
+        <Label size="caption" variant="s1">
           Select and item or collection from the left panel
-        </div>
+        </Label>
       </div>
-    )
+    );
   }
   return (
     <>
       {collection && <CollectionPage collection={collection} />}
       {item && <ItemPage item={item} />}
     </>
-  )
+  );
 }
