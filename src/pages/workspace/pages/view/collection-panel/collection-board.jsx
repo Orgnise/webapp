@@ -107,8 +107,7 @@ export default function CollectionBoard({
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="RootDroppable flex flex-row gap-4 h-full"
-          >
+            className="RootDroppable flex flex-row gap-4 h-full">
             <ListView
               items={collections}
               className="CollectionRowsList flex h-full overflow-x-auto  gap-4  mx-2"
@@ -116,15 +115,13 @@ export default function CollectionBoard({
                 <Draggable
                   draggableId={collection.id}
                   key={collection.id}
-                  index={index}
-                >
+                  index={index}>
                   {(provided) => (
                     <div
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
-                      className="CollectionDraggableColumn h-full"
-                    >
+                      className="CollectionDraggableColumn h-full">
                       <CollectionColumn
                         key={collection.id}
                         collection={collection}
@@ -164,8 +161,7 @@ function CollectionColumn({ collection, relativePath, setLeftPanelSize }) {
         <div
           {...provided.droppableProps}
           ref={provided.innerRef}
-          className=" CollectionColumn h-full  p-2 w-64"
-        >
+          className=" CollectionColumn h-full  p-2 w-64">
           <div className="w-76 overflow-hidden overflow-ellipsis whitespace-nowrap">
             <Label size="body" variant="t2">
               {collection.title}
@@ -181,8 +177,7 @@ function CollectionColumn({ collection, relativePath, setLeftPanelSize }) {
                   <div
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    ref={provided.innerRef}
-                  >
+                    ref={provided.innerRef}>
                     <NavLink
                       to={`${relativePath}/${item.id}`}
                       onClick={(e) => {
@@ -196,8 +191,7 @@ function CollectionColumn({ collection, relativePath, setLeftPanelSize }) {
                             "link-inactive": !data.isActive,
                           }
                         )
-                      }
-                    >
+                      }>
                       <Label size="body">{item.title}</Label>
                     </NavLink>
                   </div>

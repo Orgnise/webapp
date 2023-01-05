@@ -50,8 +50,7 @@ function WorkspaceContentView({
               "hidden opacity-0": leftPanelSize > LeftPanelSize.min,
               "block opacity-100": leftPanelSize < LeftPanelSize.min,
             }
-          )}
-        >
+          )}>
           <SvgIcon
             icon={"AngleRight"}
             size={7}
@@ -94,8 +93,7 @@ function LeftPanel({ leftPanelSize, children }: ILeftPanelProps) {
       className={cx(
         `fixed top-[64px] bg-surface w-[${leftPanelSize}px] h-full`,
         "transition-all duration-500 ease-in-expo"
-      )}
-    >
+      )}>
       {children}
     </div>
   );
@@ -112,8 +110,7 @@ function Content({ leftPanelSize, children }: IContentProps) {
         "absolute  h-full right-0",
         "transition-all duration-500 ease-in-expo",
         `w-[calc(100%-${leftPanelSize}px)]`
-      )}
-    >
+      )}>
       <div className="px-6 w-full h-full">
         <div className="mx-auto w-full max-w-[720px] h-full">{children}</div>
       </div>

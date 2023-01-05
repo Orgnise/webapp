@@ -17,8 +17,7 @@ export default function DownLeftAndUpRight({
       stroke="currentColor"
       fill="none"
       strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+      strokeLinejoin="round">
       <path d="M13 4v5h5" />
       <path d="M4 13h5v5" />
     </svg>

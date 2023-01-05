@@ -56,8 +56,7 @@ const Label: React.FC<TextProps> = ({
         {
           "theme-text-primary": primary,
         }
-      )}
-    >
+      )}>
       {children}
     </span>
   );
@@ -97,8 +96,7 @@ export const Typography: React.FC<void> = () => {
                 key={index}
                 size={size}
                 variant={variant}
-                className="uppercase"
-              >{`${size} ${variant}`}</Label>
+                className="uppercase">{`${size} ${variant}`}</Label>
             );
           });
         })}

@@ -1,92 +1,92 @@
-import React, { useState } from 'react'
-import cx from 'classnames'
-import useSocket from '../../../hooks/use-socket.hook'
-import { useNavigate } from 'react-router-dom'
-import { history } from '../../../helper/history.config'
-import DropDown from '../../../components/dropdown'
+import React, { useState } from "react";
+import cx from "classnames";
+import useSocket from "../../../hooks/use-socket.hook";
+import { useNavigate } from "react-router-dom";
+import { history } from "../../../helper/history.config";
+import DropDown from "../../../components/dropdown";
 
 const AddTask = ({ setVisible = () => {} }) => {
-  const [task, setTask] = useState('')
-  const [description, setDescription] = useState('')
-  const [priority, setPriority] = useState()
-  const [status, setStatus] = useState()
-  const [error, setError] = useState({})
-  const socket = useSocket(['createTask'], {})
+  const [task, setTask] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState();
+  const [status, setStatus] = useState();
+  const [error, setError] = useState({});
+  const socket = useSocket(["createTask"], {});
 
   const handleAddTodo = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (task.length === 0) {
-      setError({ task: 'Task is required' })
-      return
+      setError({ task: "Task is required" });
+      return;
     }
     const data = {
       task,
-      description
-    }
+      description,
+    };
     if (status) {
-      data.status = status.value
+      data.status = status.value;
     } else {
-      data.status = 'Todo'
+      data.status = "Todo";
     }
     if (priority) {
-      data.priority = priority
+      data.priority = priority;
     } else {
-      data.priority = 'Low'
+      data.priority = "Low";
     }
 
     // 👇🏻 sends the task to the Socket.io server
-    socket.emit('createTask', data)
-    console.log(data)
-    setTask('')
-    setDescription('')
-    setVisible(false)
-  }
+    socket.emit("createTask", data);
+    console.log(data);
+    setTask("");
+    setDescription("");
+    setVisible(false);
+  };
 
   const statusType = [
     {
-      label: 'Todo',
+      label: "Todo",
       disabled: false,
-      value: 'Todo'
+      value: "Todo",
     },
     {
-      label: 'In Progress',
+      label: "In Progress",
       disabled: false,
-      value: 'In Progress'
+      value: "In Progress",
     },
     {
-      label: 'Done',
+      label: "Done",
       disabled: false,
-      value: 'Done'
+      value: "Done",
     },
     {
-      label: 'In Review',
+      label: "In Review",
       disabled: false,
-      value: 'In Review'
-    }
-  ]
+      value: "In Review",
+    },
+  ];
 
   const PriorityType = [
     {
-      label: 'Low',
+      label: "Low",
       disabled: false,
-      value: 'low'
+      value: "low",
     },
     {
-      label: 'Medium',
+      label: "Medium",
       disabled: false,
-      value: 'medium'
+      value: "medium",
     },
     {
-      label: 'High',
+      label: "High",
       disabled: false,
-      value: 'high'
+      value: "high",
     },
     {
-      label: 'Highest',
+      label: "Highest",
       disabled: false,
-      value: 'highest'
-    }
-  ]
+      value: "highest",
+    },
+  ];
 
   return (
     <form className="max-w-lg min-w-full" onSubmit={handleAddTodo}>
@@ -100,7 +100,7 @@ const AddTask = ({ setVisible = () => {} }) => {
                 className="w-full"
                 value={status}
                 onChange={(value) => {
-                  setStatus(value)
+                  setStatus(value);
                 }}
               />
             </div>
@@ -112,7 +112,7 @@ const AddTask = ({ setVisible = () => {} }) => {
                 className="w-full"
                 value={priority}
                 onChange={(value) => {
-                  setPriority(value)
+                  setPriority(value);
                 }}
               />
             </div>
@@ -128,14 +128,13 @@ const AddTask = ({ setVisible = () => {} }) => {
               value={task}
               onChange={(e) => setTask(e.target.value)}
               className={cx(
-                'peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500  focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400',
-                { 'invalid:text-pink-500': error.task }
+                "peer relative h-10 w-full rounded border border-slate-200 px-4 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500  focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400",
+                { "invalid:text-pink-500": error.task }
               )}
             />
             <label
               htmlFor="id-b03"
-              className="absolute left-2 -top-2 z-[1] px-2 text-xs text-slate-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
-            >
+              className="absolute left-2 -top-2 z-[1] px-2 text-xs text-slate-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent">
               Task title
             </label>
             <small className="absolute flex w-full justify-between px-4 py-1 text-xs text-slate-400 invisible peer-invalid:visible transition peer-invalid:text-pink-500">
@@ -149,9 +148,9 @@ const AddTask = ({ setVisible = () => {} }) => {
               className="peer relative  w-full rounded border border-slate-200 px-4 pr-12 py-2 max-h-96 text-sm text-slate-500 placeholder-transparent outline-none transition-all autofill:bg-white invalid:border-pink-500 invalid:text-pink-500 focus:border-emerald-500 focus:outline-none invalid:focus:border-pink-500 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               placeholder="Task description"
               onChange={(e) => {
-                setDescription(e.target.value)
-                e.target.style.height = 'inherit'
-                e.target.style.height = `${e.target.scrollHeight}px`
+                setDescription(e.target.value);
+                e.target.style.height = "inherit";
+                e.target.style.height = `${e.target.scrollHeight}px`;
               }}
               id="id-b13"
               name="id-b13"
@@ -159,8 +158,7 @@ const AddTask = ({ setVisible = () => {} }) => {
             />
             <label
               htmlFor="id-b13"
-              className="absolute left-2 -top-2 z-[1] px-2 text-xs text-slate-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent"
-            >
+              className="absolute left-2 -top-2 z-[1] px-2 text-xs text-slate-400 transition-all before:absolute before:top-0 before:left-0 before:z-[-1] before:block before:h-full before:w-full before:bg-white before:transition-all peer-placeholder-shown:top-2.5 peer-placeholder-shown:text-sm peer-required:after:text-pink-500 peer-required:after:content-['\00a0*'] peer-invalid:text-pink-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-emerald-500 peer-invalid:peer-focus:text-pink-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400 peer-disabled:before:bg-transparent">
               Description
             </label>
 
@@ -176,7 +174,7 @@ const AddTask = ({ setVisible = () => {} }) => {
         </button>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default AddTask
+export default AddTask;

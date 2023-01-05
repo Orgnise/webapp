@@ -15,8 +15,7 @@ export default function ChevronLeft({ className, size }: SvgIconProps<void>) {
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
-      style={{ display: "inline-block" }}
-    >
+      style={{ display: "inline-block" }}>
       <polyline points="15 6 9 12 15 18" />
     </svg>
   );

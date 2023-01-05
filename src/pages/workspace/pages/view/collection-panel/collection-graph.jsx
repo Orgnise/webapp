@@ -100,8 +100,7 @@ export default function CollectionGraph({
   return (
     <div
       style={{ width: `${leftPanelSize}px` }}
-      className="items-center flex place-content-center"
-    >
+      className="items-center flex place-content-center">
       <ForceGraph2D
         ref={ref}
         graphData={tree2}

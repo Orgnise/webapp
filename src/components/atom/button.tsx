@@ -108,8 +108,7 @@ const Button = (props: Props) => {
         className
       )}
       disabled={disabled}
-      onClick={onClick}
-    >
+      onClick={onClick}>
       {leadingIcon && leadingIcon}
       <p>{label}</p>
       {trailingIcon && trailingIcon}

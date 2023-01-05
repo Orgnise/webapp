@@ -21,8 +21,7 @@ export default function Arrow({
           stroke="currentColor"
           fill="none"
           strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+          strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="16" y1="9" x2="12" y2="5" />
@@ -40,8 +39,7 @@ export default function Arrow({
           stroke="currentColor"
           fill="none"
           strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+          strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="16" y1="15" x2="12" y2="19" />
@@ -59,8 +57,7 @@ export default function Arrow({
           stroke="currentColor"
           fill="none"
           strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+          strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <line x1="5" y1="12" x2="19" y2="12" />
           <line x1="5" y1="12" x2="11" y2="18" />
@@ -78,8 +75,7 @@ export default function Arrow({
           stroke="currentColor"
           fill="none"
           strokeLinecap="round"
-          strokeLinejoin="round"
-        >
+          strokeLinejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
           <line x1="5" y1="12" x2="19" y2="12" />
           <line x1="15" y1="16" x2="19" y2="12" />

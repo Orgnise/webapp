@@ -23,16 +23,14 @@ function WorkspaceSidebarLayout() {
           <div className="flex flex-col space-y-2">
             <Link
               to={AppRoutes.team.allOrganizations}
-              className="hover:bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md"
-            >
+              className="hover:bg-gray-100  group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md">
               <svg
                 className="h-6 w-6"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                aria-hidden="true"
-              >
+                aria-hidden="true">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -54,8 +52,7 @@ function WorkspaceSidebarLayout() {
                       !data.isActive,
                   }
                 )
-              }
-            >
+              }>
               <FIcon icon={solid("users")} />
               <span className="hidden lg:block">Workspaces</span>
             </NavLink>
@@ -66,8 +63,7 @@ function WorkspaceSidebarLayout() {
                   "link-active": data.isActive,
                   "link-inactive": !data.isActive,
                 })
-              }
-            >
+              }>
               <FIcon icon={solid("users")} />
               <span className="hidden lg:block">Team</span>
             </NavLink>
@@ -85,8 +81,7 @@ function WorkspaceSidebarLayout() {
               </Link>
             </div>
           </div>
-        }
-      ></SidebarPageLayout>
+        }></SidebarPageLayout>
     </>
   );
 }

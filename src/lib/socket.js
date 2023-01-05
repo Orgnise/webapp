@@ -1,4 +1,4 @@
-import socketIO from 'socket.io-client'
+import socketIO from "socket.io-client";
 
-const socket = socketIO(`http://${window.location.hostname}:4000`)
-export default socket
+const socket = socketIO(`http://${window.location.hostname}:4000`);
+export default socket;

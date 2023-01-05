@@ -23,8 +23,7 @@ function Tab({ tab, selected, onClick, className, disabled = false }: Props) {
             "pointer-events-none": disabled,
           }
         )}
-        onClick={onClick}
-      >
+        onClick={onClick}>
         {tab}
       </div>
     </div>

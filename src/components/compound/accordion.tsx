@@ -53,14 +53,12 @@ export const Accordion = ({
         style={{ height: height }}
         className={cx("transition-all duration-200 ease-in-expo", {
           "overflow-hidden": !isOpened,
-        })}
-      >
+        })}>
         {children && (
           <div
             onClick={(e) => {
               e.stopPropagation();
-            }}
-          >
+            }}>
             {children}
           </div>
         )}

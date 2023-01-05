@@ -14,8 +14,7 @@ export default function AngleRight({ className, size }: SvgIconProps<void>) {
       stroke="currentColor"
       fill="none"
       strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+      strokeLinejoin="round">
       <polyline points="7 7 12 12 7 17" />
       <polyline points="13 7 18 12 13 17" />
     </svg>

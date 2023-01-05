@@ -102,8 +102,7 @@ const Login = () => {
         <img className="hidden md:inline-block" src={loginSvg} />
         <form
           className="flex flex-col items-center place-content-center space-y-6 h-full  rounded-md"
-          onSubmit={login}
-        >
+          onSubmit={login}>
           <div className="flex flex-col items-center font-normal">
             <Label size="h1" variant="t2">
               Welcome back
@@ -177,8 +176,7 @@ function TextField({
         className={cx("text-red-500 text-xs", {
           "inline-block  scale-100": error !== "" && error !== undefined,
           "h-0": !error,
-        })}
-      >
+        })}>
         {error}
       </label>
     </div>

@@ -15,8 +15,7 @@ export default function VerticalEllipse({ className }: SvgIconProps<void>) {
       preserveAspectRatio="xMidYMid meet"
       fill="none"
       strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+      strokeLinejoin="round">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <circle cx="12" cy="12" r="1" />
       <circle cx="12" cy="19" r="1" />

@@ -1,9 +1,9 @@
-import React from 'react'
-import { useRouteError } from 'react-router-dom'
+import React from "react";
+import { useRouteError } from "react-router-dom";
 
-export default function ErrorPage () {
-  const error = useRouteError()
-  console.error(error)
+export default function ErrorPage() {
+  const error = useRouteError();
+  console.error(error);
 
   return (
     <div className="h-screen w-full flex flex-col items-center place-content-center bg-white">
@@ -15,5 +15,5 @@ export default function ErrorPage () {
         </p>
       </div>
     </div>
-  )
+  );
 }

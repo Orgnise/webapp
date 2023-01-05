@@ -143,8 +143,7 @@ const Signup = () => {
 
         <form
           className="flex flex-col items-center place-content-center space-y-6 h-full  rounded-md py-10"
-          onSubmit={handleLogin}
-        >
+          onSubmit={handleLogin}>
           <div className="flex flex-col items-center font-normal">
             <h3 className="text-3xl font-bold ">Welcome back</h3>
             <Label>
@@ -244,8 +243,7 @@ function TextField({
         className={cx("text-red-500 text-xs", {
           "inline-block  scale-100": error !== "" && error !== undefined,
           "h-0": !error,
-        })}
-      >
+        })}>
         {error}
       </label>
     </div>

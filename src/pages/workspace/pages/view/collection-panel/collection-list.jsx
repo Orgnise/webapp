@@ -93,8 +93,7 @@ function RenderCollection({
             console.log("active", active);
           }
           setActive(!active);
-        }}
-      >
+        }}>
         <div className="flex-1 max-w-[320]">
           <Label size="body" variant="t2">
             {collection.object === "collection" ? (
@@ -155,8 +154,7 @@ function RenderCollection({
             "link-active ": data.isActive,
             "link-inactive hover:bg-onSurface": !data.isActive,
           })
-        }
-      >
+        }>
         <div className="group flex-1 flex items-center place-content-between ">
           <span>
             <span>
@@ -170,15 +168,13 @@ function RenderCollection({
           </span>
           <CustomDropDown
             button={<SvgIcon icon="VerticalEllipse" size={4} className="h-4" />}
-            className="group-hover:visible invisible"
-          >
+            className="group-hover:visible invisible">
             <div className="flex flex-col gap-2 border theme-border rounded">
               <div
                 className="flex items-center gap-2 px-3 py-2 hover:on-default cursor-pointer transition-all ease-in duration-200"
                 onClick={() => {
                   deleteCollection(item.id, item.parent);
-                }}
-              >
+                }}>
                 Delete
               </div>
             </div>

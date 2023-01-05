@@ -17,8 +17,7 @@ export default function UpRightAndDownLeft({
       stroke="currentColor"
       fill="none"
       strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+      strokeLinejoin="round">
       <path d="M10 7h5v5" />
       <path d="M5 11v5h5" />
     </svg>

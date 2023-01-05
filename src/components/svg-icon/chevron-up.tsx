@@ -14,8 +14,7 @@ export default function ChevronUp({ className, size }: SvgIconProps<void>) {
       stroke="currentColor"
       fill="none"
       strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+      strokeLinejoin="round">
       <polyline points="6 15 12 9 18 15" />
     </svg>
   );

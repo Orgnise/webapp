@@ -141,8 +141,7 @@ function OrganizationRow({ org, index }) {
             </Label>
           </Link>
           <CustomDropDown
-            button={<SvgIcon icon="VerticalEllipse" className="h-4" />}
-          >
+            button={<SvgIcon icon="VerticalEllipse" className="h-4" />}>
             <Label className="text-left px-4 py-2 bg-surface w-56 rounded-md">
               Team Settings
             </Label>

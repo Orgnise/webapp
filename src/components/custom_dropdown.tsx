@@ -32,8 +32,7 @@ export default function CustomDropDown({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-        }}
-      >
+        }}>
         {button}
       </button>
 
@@ -43,8 +42,7 @@ export default function CustomDropDown({
             "absolute w-max mt-2 right-1 origin-top-right bg-card theme-border divide-y  rounded-md shadow-lg outline-none z-50",
             align
           )}
-          role="menu"
-        >
+          role="menu">
           {children}
         </div>
       </div>

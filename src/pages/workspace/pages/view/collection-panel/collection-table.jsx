@@ -113,8 +113,7 @@ export default function CollectionTable({
                         "link-active ": data.isActive,
                         "link-inactive ": !data.isActive,
                       })
-                    }
-                  >
+                    }>
                     <Label size="body">{item.title}</Label>
                   </NavLink>
                 </div>
@@ -130,8 +129,7 @@ export default function CollectionTable({
                           "link-inactive ": !data.isActive,
                         }
                       )
-                    }
-                  >
+                    }>
                     <Label size="body">{item.collection.title}</Label>
                   </NavLink>
                 </div>

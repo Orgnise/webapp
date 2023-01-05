@@ -1,9 +1,9 @@
 import Validator from "./validator";
 
 interface FoldProps<T, K> {
-    value: T | null | undefined;
-    ifPresent: (value: T) => K;
-    ifAbsent?: () => K;
+  value: T | null | undefined;
+  ifPresent: (value: T) => K;
+  ifAbsent?: () => K;
 }
 
 /**
@@ -14,25 +14,20 @@ interface FoldProps<T, K> {
  * @param ifPresent The callback to call if the value is not null or undefined
  * @param ifAbsent The callback to call if the value is null or undefined
  * @returns The result inside the ```ifPresent``` callback
- * @example to use the fold as component 
+ * @example to use the fold as component
  * <Fold value={null} ifPresent={v => <div>{v}</div>} ifAbsent={() => <div>Nothing</div>} />
  * @example to use the fold as a function
  * Fold(42, v => console.log(v), () => console.log("Nothing"))
  */
-export const Fold = <T, K>({
-    value,
-    ifPresent,
-    ifAbsent,
-}: FoldProps<T, K>) => {
-    if (!Validator.hasValue(value)) {
-        if (ifAbsent) {
-            return ifAbsent();
-        }
-        return null;
+export const Fold = <T, K>({ value, ifPresent, ifAbsent }: FoldProps<T, K>) => {
+  if (!Validator.hasValue(value)) {
+    if (ifAbsent) {
+      return ifAbsent();
     }
-    return ifPresent(value!);
+    return null;
+  }
+  return ifPresent(value!);
 };
-
 
 /**
  * FoldRaw is a utility component that has two callbacks,
@@ -46,11 +41,10 @@ export const Fold = <T, K>({
  * FoldRaw(42, v => console.log(v), () => console.log("Nothing"))
  */
 export const FoldRaw = <T, K>(
-    value: T | null | undefined,
-    ifPresent: (value: T) => K,
-    ifAbsent: () => K | undefined,
+  value: T | null | undefined,
+  ifPresent: (value: T) => K,
+  ifAbsent: () => K | undefined
 ) => Fold({ value, ifPresent, ifAbsent });
-
 
 /**
  * Search and return path from a URL
@@ -70,20 +64,22 @@ export const FoldRaw = <T, K>(
  * ExtractPath("/a/b/c/d", ["a", "b", "c", "d", "e", "f"]) // { a: "b", b: "c", c: "d" }
  */
 
-export function ExtractPath(path: string, keys: string[]): { [key: string]: string | undefined } {
-    try {
-        const map: { [key: string]: string | undefined } = {};
-        const parts = path.split('/');
+export function ExtractPath(
+  path: string,
+  keys: string[]
+): { [key: string]: string | undefined } {
+  try {
+    const map: { [key: string]: string | undefined } = {};
+    const parts = path.split("/");
 
-        for (let i = 0; i < parts.length; i++) {
-            if (keys.includes(parts[i])) {
-                map[parts[i]] = parts[i + 1];
-            }
-        }
-
-        return map;
-    } catch (error) {
-        return {};
+    for (let i = 0; i < parts.length; i++) {
+      if (keys.includes(parts[i])) {
+        map[parts[i]] = parts[i + 1];
+      }
     }
-}
 
+    return map;
+  } catch (error) {
+    return {};
+  }
+}

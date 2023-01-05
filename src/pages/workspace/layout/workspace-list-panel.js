@@ -22,8 +22,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
       width="320px"
       setActive={setActive}
       active={active}
-      align="left"
-    >
+      align="left">
       <Fold
         value={team}
         ifPresent={(team) => (
@@ -38,8 +37,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                     <span>{team.name}</span>
                     <SvgIcon icon="chevronDown" size={5} />
                   </Label>
-                }
-              >
+                }>
                 <div className="Menu relative w-full">
                   <div className="absolute  flex flex-col p-2 gap-[2px] rounded bg-card text-sm shadow-lg theme-border border divide-y">
                     <p className=" py-2 w-64 ">My Awesome Workspace</p>
@@ -51,8 +49,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                         className="px-2 py-3 rounded hover:bg-surface cursor-pointer"
                         onClick={() => {
                           navigate("/team");
-                        }}
-                      >
+                        }}>
                         Switch and manage workspaces
                       </div>
                     </div>
@@ -98,8 +95,7 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                       }
                       onClick={() => {
                         setActive(false);
-                      }}
-                    >
+                      }}>
                       <FIcon
                         icon={regular("circle")}
                         className="scale-75 z-0"

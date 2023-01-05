@@ -106,8 +106,7 @@ export default function CollectionPanel({
     return (
       <div
         className="flex items-center place-content-between
-       p-2"
-      >
+       p-2">
         <Label className="mx-1 uppercase" size="body" variant="s1">
           {workspace.name}
         </Label>

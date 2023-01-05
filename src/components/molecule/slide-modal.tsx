@@ -23,8 +23,7 @@ export function SlideModal({
           className="relative "
           aria-labelledby="slide-over-title"
           role="dialog"
-          aria-modal="true"
-        >
+          aria-modal="true">
           {/* <!-- Background backdrop, show/hide based on slide-over state--> */}
           <div
             className={cx(
@@ -44,8 +43,7 @@ export function SlideModal({
 
           <div
             className="absolute inset-0 overflow-hidden"
-            style={{ zIndex: 999 }}
-          >
+            style={{ zIndex: 999 }}>
             <div
               className={cx(
                 "pointer-events-none fixed inset-y-0 right-0 flex max-w-full ",
@@ -53,8 +51,7 @@ export function SlideModal({
                   "right-0 pl-10": align === "right",
                   "left-0 pr-10": align === "left",
                 }
-              )}
-            >
+              )}>
               {/* <!-- Slide-over panel, show/hide based on slide-over state.--> */}
               <div
                 className={cx(
@@ -69,8 +66,7 @@ export function SlideModal({
                   width: width || "500px",
                   height: "100",
                   zIndex: 999,
-                }}
-              >
+                }}>
                 <div className="flex h-full flex-col overflow-y-scroll theme-bg-surface shadow-xl">
                   <div className="flex-1">
                     <div className="h-full" aria-hidden="true">

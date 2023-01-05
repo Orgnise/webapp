@@ -35,7 +35,8 @@
     "tailwind:build": "npx tailwindcss -i ./src/index.css --config tailwind.config.js -o ./public/index.css --watch",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "beautify": "npx prettier --write ."
   },
   "eslintConfig": {
     "extends": [
@@ -79,6 +80,7 @@
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "autoprefixer": "^10.4.13",
     "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-config-standard-with-typescript": "^24.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.6.0",

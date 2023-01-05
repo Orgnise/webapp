@@ -43,8 +43,7 @@ const Nav = () => {
                   <div className="flex items-center place-content-center font-bold text-lg h-10 w-10 rounded-full bg-teal-200 text-teal-500 hover:text-teal-700">
                     {/* {user.name[0].toUpperCase()} */}
                   </div>
-                }
-              >
+                }>
                 <div className="bg-card px-3 py-3 border theme-border rounded">
                   <div className="px-4 py-2 hover:bg-onSurface rounded">
                     <Label size="body1" variant="t3" className="cursor-pointer">
@@ -53,8 +52,7 @@ const Nav = () => {
                   </div>
                   <div
                     className="px-4 py-2 hover:bg-red-200 rounded"
-                    onClick={handleLogout}
-                  >
+                    onClick={handleLogout}>
                     <p className="cursor-pointer text-red-700 hover:text-red-500 ">
                       Logout
                     </p>
