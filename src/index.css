@@ -11,13 +11,22 @@
     @apply bg-gray-50 dark:bg-[#1C1B1B];
   }
   .bg-surface {
-    @apply bg-gray-100 dark:bg-[#222121];
+    @apply bg-gray-100 dark:bg-[#252525];
   }
   .bg-onSurface {
-    @apply bg-gray-200 dark:bg-[#2F2E2E];
+    @apply bg-gray-200 dark:bg-[#2A2831];
+  }
+  .bg-surface2 {
+    @apply bg-[#EEE8F4] dark:bg-[#302D38];
+  }
+  .bg-surface3 {
+    @apply bg-[#EDE6F3] dark:bg-[#322E3A];
+  }
+  .bg-surface4 {
+    @apply bg-[#EDE6F3] dark:bg-[#35323E];
   }
   .bg-card {
-    @apply bg-white dark:bg-[#121212];
+    @apply bg-white dark:bg-[#000000];
   }
 
   /* TEXT */

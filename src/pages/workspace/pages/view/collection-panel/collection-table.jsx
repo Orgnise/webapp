@@ -126,7 +126,7 @@ export default function CollectionTable({
                       cx(
                         "group link p-2 w-full overflow-hidden text-ellipsis whitespace-nowrap",
                         {
-                          "link-active ": data.isActive,
+                          "link-active  bg-surface": data.isActive,
                           "link-inactive ": !data.isActive,
                         }
                       )
