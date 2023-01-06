@@ -7,19 +7,20 @@ import { AppRoutes } from "./helper/app-routes";
 import useSocket from "./hooks/use-socket.hook";
 import Signup from "./pages/auth/signup.page";
 import { SocketEvent } from "./constant/socket-event-constant";
-import WorkSpacePage from "./pages/workspace";
 import ErrorPage from "./pages/error/error-page";
 import OnboardingPage from "./pages/onboarding/onboarding";
-import AllOrganizationsPage from "./pages/organization/all-organizations.page";
-import CreateOrganizationPage from "./pages/organization/create/create-organization";
-import AddExampleProjectsPage from "./pages/onboarding/add-example-projects";
 import useAuth from "./hooks/use-auth";
 import { RequireAuth } from "./helper/protected-route";
 import { Login } from "./pages/auth";
 import NoPageFound from "./pages/no-page-found.page";
+import AllTeamsPage from "./pages/team/all-teams.page";
+import CreateTeamPage from "./pages/team/create/create-team";
+import AddExampleWorkspacePage from "./pages/onboarding/add-example-workspace";
+import useTheme from "./pages/workspace/hook/use-theme.hook";
 
 function App() {
   const socket = useSocket([SocketEvent.auth.checkAuth], retryAuth);
+  const { toggleTheme, darkMode } = useTheme();
 
   // Flag to check and retry socket connection in case of unexpected disconnection from server
   const [auhRetry, setAuthRetry] = useState(0);
@@ -56,7 +57,7 @@ function App() {
   }
 
   return (
-    <>
+    <div className="bg-default theme-text h-full">
       <Toaster />
 
       <Routes>
@@ -68,38 +69,27 @@ function App() {
             element={<RequireAuth children={<OnboardingPage />} />}
           />
           <Route
-            path={AppRoutes.users.myOrganization}
-            element={<RequireAuth children={<AllOrganizationsPage />} />}
+            path={"team/*"}
+            element={<RequireAuth children={<AllTeamsPage />} />}
           />
           <Route
-            path={AppRoutes.organization.create}
-            element={<RequireAuth children={<CreateOrganizationPage />} />}
+            path={AppRoutes.team.create}
+            element={<RequireAuth children={<CreateTeamPage />} />}
           />
           <Route
             path={AppRoutes.onboard.addExamples}
-            element={<RequireAuth children={<AddExampleProjectsPage />} />}
+            element={<RequireAuth children={<AddExampleWorkspacePage />} />}
           />
 
-          <Route
-            path={AppRoutes.users.myOrganization}
-            element={<RequireAuth children={<AllOrganizationsPage />} />}
-          />
-
-          <Route
-            path={AppRoutes.workspace.root}
-            errorElement={<ErrorPage />}
-            element={<RequireAuth children={<WorkSpacePage />} />}
-          />
-          <Route
-            path={AppRoutes.workspace.project}
-            errorElement={<ErrorPage />}
-            element={<RequireAuth children={<WorkSpacePage />} />}
-          />
+          {/* <Route
+            path={AppRoutes.users.myTeam}
+            element={<RequireAuth children={<AllTeamsPage />} />}
+          /> */}
 
           <Route path={AppRoutes.notFound} element={<NoPageFound />} />
         </Route>
       </Routes>
-    </>
+    </div>
   );
 }
 export default App;

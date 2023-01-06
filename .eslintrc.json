@@ -1,0 +1,42 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  // "extends": ["plugin:react/recommended", "standard-with-typescript"],
+  "overrides": [],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
+  },
+  "plugins": ["react"],
+  "rules": {
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/display-name": "off",
+    "react/jsx-uses-react": "off",
+    "react/jsx-uses-vars": "off",
+    "react/jsx-no-undef": "off",
+    "react/jsx-no-target-blank": "off",
+    "react/jsx-no-comment-textnodes": "off",
+    "react/jsx-no-duplicate-props": "off",
+    "react/jsx-pascal-case": "off",
+    "react/no-danger-with-children": "off",
+    "react/no-deprecated": "off",
+    "react/no-direct-mutation-state": "off",
+    "react/no-is-mounted": "off",
+    "react/no-unknown-property": "off",
+    "react/require-render-return": "off",
+    "react/self-closing-comp": "off",
+    "react/sort-comp": "off",
+    "react/sort-prop-types": "off",
+    "react/single-quote": "off",
+    "react/style-prop-object": "off",
+    "react/void-dom-elements-no-children": "off",
+    "react/semicolon": "off",
+    "react/jsx-boolean-value": "off",
+    "react/jsx-closing-bracket-location": "off",
+    "react/jsx-curly-spacing": "off"
+  }
+}

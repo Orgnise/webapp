@@ -13,7 +13,7 @@ const TasksContainer = () => {
   const [errors, setErrors] = useState({});
   const [dragFirstTask, setDragFirstTask] = useState(false);
   const { user } = useAuth();
-  const { boardService, organizationService } = useAppService();
+  const { boardService, teamService } = useAppService();
 
   const params = useParams();
   const id = params.id;
@@ -23,8 +23,8 @@ const TasksContainer = () => {
       return;
     }
     function fetchTasks() {
-      organizationService
-        .getCompanyById(id)
+      teamService
+        .getTeamById(id)
         .then(({ board }) => {
           setTasks(board);
           setErrors({});
@@ -48,14 +48,15 @@ const TasksContainer = () => {
     }
   }, [user, id]);
 
-  //👇🏻 This function is the value of the onDragEnd prop
+  // 👇🏻 This function is the value of the onDragEnd prop
   const handleDragEnd = ({ destination, source }) => {
     if (!destination) return;
     if (
       destination.index === source.index &&
       destination.droppableId === source.droppableId
-    )
+    ) {
       return;
+    }
 
     socket.emit("taskDragged", {
       source,
@@ -82,23 +83,22 @@ const TasksContainer = () => {
     <section className="w-full pt-12 flex-grow">
       <div
         className="max-w-screen-xl m-auto  flex flex-col sm:flex-row space-x-2 items-start "
-        style={{ maxHeight: "calc(100vh - 124px)", marginBottom: "20px" }}
-      >
+        style={{ maxHeight: "calc(100vh - 124px)", marginBottom: "20px" }}>
         <DragDropContext
           onDragEnd={handleDragEnd}
           onDragUpdate={(e) => {
             handleDragUpdate(e);
-          }}
-        >
+          }}>
           {Object.entries(tasks).map((task) => (
             <div
-              className={`w-full  select-none bg-slate-100 rounded h-full sm:overflow-y-auto`}
+              className={
+                "w-full  select-none bg-slate-100 rounded h-full sm:overflow-y-auto"
+              }
               key={task[1].title}
               style={{
                 maxHeight: "calc(100vh - 124px)",
                 marginBottom: "20px",
-              }}
-            >
+              }}>
               <h3 className="font-bold text-lg first-letter:uppercase p-5 sticky top-0 bg-slate-100 rounded">
                 {task[1].title}
               </h3>
@@ -109,8 +109,7 @@ const TasksContainer = () => {
                     <div
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className="px-2"
-                    >
+                      className="px-2">
                       {task[1].items.map((item, index) => (
                         <Task
                           key={item.id}
@@ -127,8 +126,7 @@ const TasksContainer = () => {
                               "opacity-0 bg-gray-50 text-slate-100 scale-75":
                                 dragFirstTask === task[1].title,
                             }
-                          )}
-                        >
+                          )}>
                           No task available here
                         </div>
                       )}

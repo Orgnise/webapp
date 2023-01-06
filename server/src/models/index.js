@@ -1,17 +1,13 @@
-const Organization = require("./Organization.modal");
+const Team = require("./team.modal");
 const User = require("./user");
-const Project = require("./project.model");
-const Comment = require("./comment.model");
-const Issue = require("./issue.model");
-const IssueType = require("./issue-type.model");
-const Column = require("./column.model");
+const Workspace = require("./workspace.model");
+const RefreshToken = require("./refresh-token.model");
+const Collection = require("./collection.model");
 
 module.exports = {
-  Organization,
+  Team,
   User,
-  Project,
-  Comment,
-  Issue,
-  IssueType,
-  Column,
+  Workspace,
+  RefreshToken,
+  Collection,
 };

@@ -8,6 +8,8 @@ import useSocket from "../../hooks/use-socket.hook";
 import { SocketEvent } from "../../constant/socket-event-constant";
 import Validator from "../../helper/validator";
 import useAuth from "../../hooks/use-auth";
+import Button from "../../components/atom/button";
+import Label from "../../components/typography";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -23,13 +25,13 @@ const Login = () => {
   const location = useLocation();
   const pathname = location.pathname;
 
-  let auth = useAuth();
+  const auth = useAuth();
 
-  let from = getLeaf(location, "state.from.pathname") || AppRoutes.dashboard;
+  const from =
+    Validator.getLeaf(location, "state.from.pathname") || AppRoutes.dashboard;
 
   // get the redirect url from the query params
   const redirect = new URLSearchParams(useLocation().search).get("redirect");
-  console.log("🚀 ~ file: login.page.js:35 ~ Login ~ redirect", redirect);
 
   // if the user is already logged in, redirect to the dashboard
   React.useEffect(() => {
@@ -37,21 +39,14 @@ const Login = () => {
       // if (![AppRoutes.login, AppRoutes.signup, "/"].includes(pathname)) {
       //   navigate(`${AppRoutes.login}?redirect=${pathname}`);
       // }
-      navigate(AppRoutes.users.myOrganization, { replace: true });
+      // navigate(AppRoutes.workspace.team, { replace: true });
+      if (from === "/login") {
+        navigate(AppRoutes.workspace.team, { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
   }, [auth.user]);
-
-  function getLeaf(node, path) {
-    if (node) {
-      const keys = path.split(".");
-      for (let i = 0; i < keys.length; i++) {
-        if (node[keys[i]]) {
-          node = node[keys[i]];
-        }
-      }
-      return node;
-    }
-  }
 
   const login = (e) => {
     e.preventDefault();
@@ -73,7 +68,7 @@ const Login = () => {
         });
         auth.signIn(user);
         if (from === "/login") {
-          navigate(AppRoutes.users.myOrganization, { replace: true });
+          navigate(AppRoutes.workspace.team, { replace: true });
         } else {
           navigate(from, { replace: true });
         }
@@ -102,20 +97,20 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-screen-xl m-auto h-full">
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 h-full place-content-center">
+    <div className="bg- max-w-screen-xl m-auto h-full">
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 h-full  items-center place-content-center">
         <img className="hidden md:inline-block" src={loginSvg} />
-
         <form
-          className="flex flex-col items-center place-content-center space-y-6 h-full bg-slate-50 rounded-md"
-          onSubmit={login}
-        >
+          className="flex flex-col items-center place-content-center space-y-6 h-full  rounded-md"
+          onSubmit={login}>
           <div className="flex flex-col items-center font-normal">
-            <h3 className="text-3xl font-bold ">Welcome back</h3>
-            <p className="text-xl  mb-12">
-              We are <span className="text-teal-500">happy</span> to see you
-              back
-            </p>
+            <Label size="h1" variant="t2">
+              Welcome back
+            </Label>
+            <Label className="mb-12">
+              We are <strong className="theme-text-primary">happy</strong> to
+              see you back
+            </Label>
           </div>
           <TextField
             label="Email"
@@ -139,25 +134,13 @@ const Login = () => {
             error={errors.password}
             inputType="password"
           />
-          <div className="flex items-center w-9/12 text-slate-500">
-            <input
-              className="h-5 w-5 rounded mr-3"
-              type="checkbox"
-              onChange={(e) => {}}
-              value={true}
-              enterKeyHint="done"
-            />
-            Remember me
-          </div>
-          <button className="bg-teal-400 px-6 py-2 rounded text-white w-9/12 font-normal mt-8">
-            Sign In
-          </button>
+          <Button label="Sign in" onClick={() => {}} className=" w-9/12" />
           <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
-            <span className="border-t flex-1" />
-            <span className="text-slate-500 px-4 text-sm hover:underline cursor-pointer">
+            <span className="border-t theme-border flex-1" />
+            <span className="px-4 text-sm hover:underline cursor-pointer">
               <Link to={AppRoutes.signup}>CREATE AN ACCOUNT</Link>
             </span>
-            <span className="border-t flex-1" />
+            <span className="border-t theme-border flex-1" />
           </div>
         </form>
       </div>
@@ -176,17 +159,14 @@ function TextField({
 }) {
   return (
     <div className="flex flex-col space-y-2 w-9/12">
-      <label className="text-md text-slate-500 "> {label}</label>
+      <Label> {label}</Label>
       <input
         type={inputType}
         name={name}
         placeholder={`Enter ${label}`}
-        className={cx(
-          "border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase",
-          {
-            "border-red-500 ": error,
-          }
-        )}
+        className={cx("theme-input  mb-5 ", {
+          "border-red-500 ": error,
+        })}
         required
         onChange={onChange}
         value={value}
@@ -196,8 +176,7 @@ function TextField({
         className={cx("text-red-500 text-xs", {
           "inline-block  scale-100": error !== "" && error !== undefined,
           "h-0": !error,
-        })}
-      >
+        })}>
         {error}
       </label>
     </div>

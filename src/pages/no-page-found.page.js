@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 
 function NoPageFound() {
   useEffect(() => {
-    document.title = "Page not found - instagram";
+    document.title = "Page not found | Pulse";
   });
   return (
     <div className="bg-gray-100">

@@ -5,12 +5,11 @@ const mw = require("./src//middleware/middleware");
 const errorHandler = require("./src/middleware/handle-error/error-handler");
 const {
   UserController,
-  BoardController,
-  IssueController,
-  OrganizationController,
-  ProjectController,
-} = require("./src/routes");
-const SocketHandler = require("./src/routes/socket_handler");
+  TeamController,
+  WorkspaceController,
+  CollectionController,
+} = require("./src/controller");
+const SocketHandler = require("./src/controller/socket_handler");
 
 const { API_PORT } = require("./src/config/config");
 
@@ -31,9 +30,9 @@ io.on("connection", (socket) => {
 
 // global error middleware
 app.use("/", UserController);
-app.use("/", OrganizationController);
-app.use("/", ProjectController);
-app.use("/", IssueController);
+app.use("/", TeamController);
+app.use("/", WorkspaceController);
+app.use("/", CollectionController);
 
 // Handle unknown routes
 app.use("*", function (req, res, next) {

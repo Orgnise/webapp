@@ -32,7 +32,7 @@ export default function ModalForm({
   }, [wrapperRef]);
 
   useEffect(() => {
-    let html = document.querySelector("html");
+    const html = document.querySelector("html");
 
     if (html) {
       if (visible && html) {
@@ -52,15 +52,14 @@ export default function ModalForm({
         // const lastFocusableElement =
         //   focusableContent[focusableContent.length - 1]; // get last element to be focused inside modal
 
-        document.addEventListener("keydown", function(e) {
+        document.addEventListener("keydown", function (e) {
           if (e.keyCode === 27) {
             setVisible(false);
           }
 
-          let isTabPressed = e.key === "Tab" || e.keyCode === 9;
+          const isTabPressed = e.key === "Tab" || e.keyCode === 9;
 
           if (!isTabPressed) {
-            return;
           }
 
           //   if (e.shiftKey) {
@@ -93,8 +92,7 @@ export default function ModalForm({
       ) : (
         <button
           onClick={() => setVisible(true)}
-          className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none"
-        >
+          className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none">
           <span>Open Modal</span>
         </button>
       )}
@@ -106,8 +104,7 @@ export default function ModalForm({
               aria-labelledby="header-4a content-4a footer-4a"
               aria-modal="true"
               tabIndex="-1"
-              role="dialog"
-            >
+              role="dialog">
               {/*    <!-- Modal --> */}
               <div
                 ref={wrapperRef}
@@ -116,8 +113,7 @@ export default function ModalForm({
                   className
                 )}
                 id="modal"
-                role="document"
-              >
+                role="document">
                 {/*        <!-- Modal header --> */}
                 <header id="header-4a" className="flex items-center px-6 pt-1">
                   <h3 className="flex-1 text-lg font-semibold text-slate-700">
@@ -126,8 +122,7 @@ export default function ModalForm({
                   <button
                     onClick={() => setVisible(false)}
                     className="inline-flex h-10 items-center justify-center gap-2 justify-self-center whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide  text-emerald-500 transition duration-300 hover:bg-emerald-100 hover:text-emerald-600 focus:bg-emerald-200 focus:text-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:text-emerald-300 disabled:shadow-none disabled:hover:bg-transparent"
-                    aria-label="close dialog"
-                  >
+                    aria-label="close dialog">
                     <span className="relative only:-mx-5">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -137,8 +132,7 @@ export default function ModalForm({
                         stroke="currentColor"
                         strokeWidth="2"
                         role="graphics-symbol"
-                        aria-labelledby="title-79 desc-79"
-                      >
+                        aria-labelledby="title-79 desc-79">
                         <title id="title-79">Icon title</title>
                         <desc id="desc-79">
                           A more detailed description of the icon

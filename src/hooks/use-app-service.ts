@@ -1,4 +1,3 @@
-
 import { useContext } from "react";
 import { AppServiceContext } from "../provider/app-service.provider";
 import AppService from "../service/app-service";
@@ -11,10 +10,10 @@ import AppService from "../service/app-service";
  * appService.boardService.getBoard();
  */
 export function useAppService() {
-    const appService = useContext<AppService>(AppServiceContext as any);
-    const boardService = appService.boardService;
-    const authService = appService.authService;
-    const organizationService = appService.organizationService;
-    const projectService = appService.projectService;
-    return { boardService, authService, organizationService, projectService };
+  const appService = useContext<AppService>(AppServiceContext as any);
+  const authService = appService.authService;
+  const teamService = appService.teamService;
+  const workspaceService = appService.workspaceService;
+  const collectionService = appService.collectionService;
+  return { authService, teamService, workspaceService, collectionService };
 }

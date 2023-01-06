@@ -15,7 +15,7 @@ const Comments = () => {
     socket.emit("fetchComments", { category, id });
   }, [category, id]);
 
-  //👇🏻 Listens to the comments event
+  // 👇🏻 Listens to the comments event
   useEffect(() => {
     socket.on("comments", (data) => setCommentList(data));
   }, []);
@@ -70,15 +70,13 @@ const Comments = () => {
                   </div>
                   <div
                     className="autoResizeTextarea"
-                    style={{ height: "88px" }}
-                  >
+                    style={{ height: "88px" }}>
                     <span className="inputContainer">
                       <textarea
                         placeholder="Any additional details…"
                         id="9a712603-9c6d-2b4d-efde-dcc0462e6a84"
                         name="9a712603-9c6d-2b4d-efde-dcc0462e6a84"
-                        rows="3"
-                      ></textarea>
+                        rows="3"></textarea>
                     </span>
                   </div>
                 </div>
@@ -86,8 +84,7 @@ const Comments = () => {
                   <button
                     type="submit"
                     className="button buttonStyle cannyButton"
-                    style={{ background: "#525df9" }}
-                  >
+                    style={{ background: "#525df9" }}>
                     <span className="label">Create&nbsp;Post</span>
                     <span className="loader"> </span>
                   </button>
@@ -96,7 +93,7 @@ const Comments = () => {
             </div>
           </div>
 
-          {/** 👇🏻 Displays all the available comments*/}
+          {/** 👇🏻 Displays all the available comments */}
           <div className="comments__section ">
             <h2>Existing Comments</h2>
             {commentList.map((comment, index) => (

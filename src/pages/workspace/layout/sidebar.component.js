@@ -19,7 +19,7 @@ function SidebarComponent() {
         children={
           <>
             <NavLink
-              to={AppRoutes.organization.allOrganizations}
+              to={AppRoutes.team.allOrganizations}
               className={(data) =>
                 cx(
                   " group flex items-center space-x-2 px-2  lg:mx-2 py-2 text-sm font-medium rounded-md",
@@ -29,16 +29,14 @@ function SidebarComponent() {
                       !data.isActive,
                   }
                 )
-              }
-            >
+              }>
               <svg
                 className="h-6 w-6"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                aria-hidden="true"
-              >
+                aria-hidden="true">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -46,7 +44,7 @@ function SidebarComponent() {
                   d="M4 6h16M4 12h16M4 18h7"
                 />
               </svg>
-              <span className="hidden lg:block">Organizations</span>
+              <span className="hidden lg:block">Teams</span>
             </NavLink>
           </>
         }
@@ -62,8 +60,7 @@ function SidebarComponent() {
               </Link>
             </div>
           </div>
-        }
-      ></SidebarPageLayout>
+        }></SidebarPageLayout>
     </>
   );
 }

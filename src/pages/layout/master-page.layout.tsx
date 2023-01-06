@@ -18,7 +18,7 @@ export const MasterPageLayout = ({
   navbar,
 }: MasterPageLayoutProps) => {
   return (
-    <div className="MasterPageLayout flex flex-col h-screen bg-slate-100">
+    <div className="MasterPageLayout flex flex-col h-screen ">
       <NavbarLayout>{navbar}</NavbarLayout>
 
       {/* Content */}

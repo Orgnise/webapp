@@ -29,14 +29,13 @@ export default function CheckBox({
         />
         {label && (
           <label
-            className="pl-2 cursor-pointer text-slate-500 peer-disabled:cursor-not-allowed peer-disabled:text-slate-400"
-            htmlFor={id}
-          >
+            className="pl-2 cursor-pointer  peer-disabled:cursor-not-allowed peer-disabled:text-slate-400"
+            htmlFor={id}>
             {label}
           </label>
         )}
         {subText && (
-          <small className="w-full py-2 pl-6 text-xs transition text-slate-400 peer-invalid:text-pink-500">
+          <small className="w-full py-2 pl-6 text-xs transition  peer-invalid:text-pink-500">
             <span>subText</span>
           </small>
         )}
@@ -48,8 +47,7 @@ export default function CheckBox({
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
           aria-labelledby="title-3 description-3"
-          role="graphics-symbol"
-        >
+          role="graphics-symbol">
           <title id="title-3">Check mark icon</title>
           <desc id="description-3">
             Check mark icon to indicate whether the radio input is checked or
