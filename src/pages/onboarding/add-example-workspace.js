@@ -10,12 +10,13 @@ import { AppRoutes } from "../../helper/app-routes";
 import { useAppService } from "../../hooks/use-app-service";
 import CheckBox from "../../components/atom/checkbox";
 import Button from "../../components/atom/button";
+import Label from "../../components/typography";
 
 export default function AddExampleWorkspacePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full h-full bg-slate-50">
+    <div className="w-full h-full">
       <NavbarLayout>
         <Nav />
       </NavbarLayout>
@@ -52,7 +53,7 @@ function AddExampleSpace() {
     const examples = Object.keys(workspaces).map((key) => key);
 
     const payload = {
-      examples: examples,
+      examples,
     };
 
     workspaceService
@@ -63,7 +64,7 @@ function AddExampleSpace() {
         });
         // Navigate to workspace page after 1 second delay
         // TODO: Open workspace navigation
-        navigate(`/workspace/${slug}`);
+        navigate(`/team/${slug}`);
       })
       .catch(({ response }) => {
         console.log(
@@ -78,12 +79,14 @@ function AddExampleSpace() {
   };
 
   return (
-    <div className="bg-white shadow rounded-md px-4 py-2 w-96">
+    <div className="bg-card shadow rounded-md px-4 py-2 w-96">
       <div className="flex flex-col gap-2 py-6  px-4">
-        <h2 className="font-medium text-2xl">Add examples</h2>
+        <Label size="h2" variant="t2">
+          Add examples
+        </Label>
 
-        <p className="">Select any example you'd like to add to your team</p>
-        <div className="flex flex-col gap-6 py-4">
+        <p>Select any example you'd like to add to your team</p>
+        <div className="flex flex-col gap-6 py-4 select-none">
           <CheckBox
             label="Engineering"
             checked={workspaces.Engineering}
@@ -130,10 +133,9 @@ function AddExampleSpace() {
 
         <div className="flex w-full">
           <Button
-            label="Continue"
-            size="small"
+            label={Object.keys(workspaces).length === 0 ? "Skip" : "Continue"}
             className="flex-1"
-            disabled={Object.keys(workspaces).length === 0 || isLoading}
+            // disabled={Object.keys(workspaces).length === 0 || isLoading}
             onClick={createWorkspace}
             leadingIcon={isLoading ? <LoaderIcon /> : null}
           />

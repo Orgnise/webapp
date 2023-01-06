@@ -16,9 +16,11 @@ import NoPageFound from "./pages/no-page-found.page";
 import AllTeamsPage from "./pages/team/all-teams.page";
 import CreateTeamPage from "./pages/team/create/create-team";
 import AddExampleWorkspacePage from "./pages/onboarding/add-example-workspace";
+import useTheme from "./pages/workspace/hook/use-theme.hook";
 
 function App() {
   const socket = useSocket([SocketEvent.auth.checkAuth], retryAuth);
+  const { toggleTheme, darkMode } = useTheme();
 
   // Flag to check and retry socket connection in case of unexpected disconnection from server
   const [auhRetry, setAuthRetry] = useState(0);
@@ -55,7 +57,7 @@ function App() {
   }
 
   return (
-    <>
+    <div className="bg-default theme-text h-full">
       <Toaster />
 
       <Routes>
@@ -87,7 +89,7 @@ function App() {
           <Route path={AppRoutes.notFound} element={<NoPageFound />} />
         </Route>
       </Routes>
-    </>
+    </div>
   );
 }
 export default App;

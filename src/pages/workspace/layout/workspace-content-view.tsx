@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import cx from "classnames";
-import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import FIcon from "../../../components/ficon";
+import SvgIcon from "../../../components/svg-icon/svg-icon";
 
 export const LeftPanelSize = Object.freeze({
   min: 0,
@@ -36,7 +35,7 @@ function WorkspaceContentView({
   }, [leftPanelSize]);
 
   return (
-    <div className="Workspace  bg-gray-50 h-full">
+    <div className="WorkspaceContent h-full">
       <div className="relative h-full  w-full  overflow-y-auto bottom-0 left-0 right-0">
         <Divider
           leftPanelSize={leftPanelSize}
@@ -51,17 +50,14 @@ function WorkspaceContentView({
               "hidden opacity-0": leftPanelSize > LeftPanelSize.min,
               "block opacity-100": leftPanelSize < LeftPanelSize.min,
             }
-          )}
-        >
-          <FIcon
-            icon={solid("angles-right")}
-            size="1x"
-            stroke="1px"
-            className={cx(
-              "p-2 my-2 ml-1 outline-1 outline-gray-700 text-gray-500 rounded cursor-pointer",
-              "hover:bg-gray-200"
-            )}
+          )}>
+          <SvgIcon
+            icon={"AngleRight"}
+            size={7}
             onClick={() => setLeftPanelSize(LeftPanelSize.default)}
+            className={cx(
+              "hover:bg-onSurface rounded p-1 outline-1 cursor-pointer m-2"
+            )}
           />
         </div>
         <LeftPanel leftPanelSize={leftPanelSize}>{leftPanel}</LeftPanel>
@@ -95,10 +91,9 @@ function LeftPanel({ leftPanelSize, children }: ILeftPanelProps) {
   return (
     <div
       className={cx(
-        `fixed top-[64px] bg-gray-100 w-[${leftPanelSize}px] h-full`,
+        `fixed top-[64px] bg-surface w-[${leftPanelSize}px] h-full`,
         "transition-all duration-500 ease-in-expo"
-      )}
-    >
+      )}>
       {children}
     </div>
   );
@@ -115,8 +110,7 @@ function Content({ leftPanelSize, children }: IContentProps) {
         "absolute  h-full right-0",
         "transition-all duration-500 ease-in-expo",
         `w-[calc(100%-${leftPanelSize}px)]`
-      )}
-    >
+      )}>
       <div className="px-6 w-full h-full">
         <div className="mx-auto w-full max-w-[720px] h-full">{children}</div>
       </div>

@@ -13,13 +13,12 @@ import { ExtractPath } from "../helper/typescript-utils";
  * useSearchPath(["a", "b","c"]) // { a: "b" }
  */
 function useSearchPath(keys: string[]): { [key: string]: string | undefined } {
+  const currentPath = useLocation().pathname;
+  useEffect(() => {
+    // console.log("Current path: ", currentPath);
+  }, [currentPath]);
 
-    const currentPath = useLocation().pathname;
-    useEffect(() => {
-        // console.log("Current path: ", currentPath);
-    }, [currentPath]);
-
-    return ExtractPath(currentPath, keys);
+  return ExtractPath(currentPath, keys);
 }
 
 export default useSearchPath;

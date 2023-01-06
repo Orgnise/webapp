@@ -33,7 +33,7 @@ const CollectionSchema = new Schema(
       default: "Undefined",
     },
     content: {
-      type: String,
+      type: Object,
       default: "",
     },
     index: {

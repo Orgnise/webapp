@@ -113,6 +113,8 @@ export const WorkspaceProvider = ({ children }) => {
       .then(({ Workspaces }) => {
         if (Workspaces.length != 0) {
           setWorkspaceList(Workspaces);
+        } else {
+          setWorkspaceList([]);
         }
       })
       .catch((err) => {

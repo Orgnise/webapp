@@ -10,7 +10,8 @@ import Button from "../../../components/atom/button";
 import useWorkspace from "../hook/use-workspace.hook";
 import CollectionPage from "./view/collection-page.view";
 import ItemPage from "./view/item-page.view";
-import CollectionPanel from "./view/collection-panel.view";
+import CollectionPanel from "./view/collection-panel/collection-panel.view";
+import Label from "../../../components/typography";
 
 /**
  * Displays the workspace view
@@ -93,8 +94,13 @@ function CollectionContent() {
       <div className="flex-1 flex flex-col items-center place-content-center h-full max-w-xl text-center">
         <span className="font-normal">
           Items are{" "}
-          <span className="font-semibold">collaborative documents</span> that
-          help you capture knowledge. For example, a <span>meeting note</span>{" "}
+          <Label variant="t2" className="mx-1 ">
+            collaborative documents
+          </Label>
+          that help you capture knowledge. For example, a{" "}
+          <Label variant="t2" className="mx-1 ">
+            meeting note
+          </Label>
           item could contain decisions made in a meeting. Items can be grouped
           and nested with collections.
         </span>
@@ -102,7 +108,7 @@ function CollectionContent() {
           label="Create Item"
           size="small"
           type="outline"
-          className="mt-2 "
+          className="mt-4 "
           onClick={() => {
             createCollection();
           }}
@@ -114,12 +120,13 @@ function CollectionContent() {
   if (!collection && !item) {
     return (
       <div className="flex flex-col items-center place-content-center h-full py-8">
-        <div className="font-semibold text-xs text-slate-700">
+        <Label size="body" variant="t2">
           Nothing is selected
-        </div>
-        <div className="font-semibold text-xs text-slate-400">
+        </Label>
+
+        <Label size="caption" variant="s1">
           Select and item or collection from the left panel
-        </div>
+        </Label>
       </div>
     );
   }

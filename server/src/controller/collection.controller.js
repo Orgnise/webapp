@@ -22,7 +22,7 @@ function validateItemSchema(req, res, next) {
     parent: Joi.string(),
     object: Joi.string().default("item"),
     title: Joi.string().optional(),
-    content: Joi.string(),
+    content: Joi.object().optional(),
     index: Joi.number(),
   });
   ValidationRequest(req, next, schema);

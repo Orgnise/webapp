@@ -130,7 +130,7 @@ async function getBySlug(slug) {
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
       "No team found",
-      "Team does not exist with slug -" + slug
+      "Team does not exist with slug: " + slug
     );
   }
 

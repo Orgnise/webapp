@@ -8,6 +8,8 @@ import { useAppService } from "../../hooks/use-app-service";
 import useAuth from "../../hooks/use-auth";
 import useSocket from "../../hooks/use-socket.hook";
 import { SocketEvent } from "../../constant/socket-event-constant";
+import Button from "../../components/atom/button";
+import Label from "../../components/typography";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -52,14 +54,13 @@ const Signup = () => {
       } else if (errors.name) {
         alert(errors.name);
       }
-      return;
     } else {
       setError({});
       authService
         .register({
-          name: name,
-          email: email,
-          password: password,
+          name,
+          email,
+          password,
           confirmPassword: cPassword,
         })
         .then(({ user }) => {
@@ -137,18 +138,18 @@ const Signup = () => {
 
   return (
     <div className="max-w-screen-xl m-auto h-full">
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 h-full place-content-center">
+      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 h-full items-center  place-content-center">
         <img className="hidden md:inline-block" src={loginSvg} />
 
         <form
-          className="flex flex-col items-center place-content-center space-y-6 h-full bg-slate-50 rounded-md py-10"
-          onSubmit={handleLogin}
-        >
+          className="flex flex-col items-center place-content-center space-y-6 h-full  rounded-md py-10"
+          onSubmit={handleLogin}>
           <div className="flex flex-col items-center font-normal">
             <h3 className="text-3xl font-bold ">Welcome back</h3>
-            <p className="text-xl  mb-12">
-              We are <span className="text-teal-500">happy</span> to have you
-            </p>
+            <Label>
+              We are <strong className="theme-text-primary">happy</strong> to
+              have you
+            </Label>
           </div>
 
           <TextField
@@ -189,7 +190,7 @@ const Signup = () => {
           />
           <TextField
             label="Confirm Password"
-            name="cpassword"
+            name="confirmPassword"
             onChange={(e) => {
               setCPassword(e.target.value);
               handleChange(e);
@@ -199,15 +200,13 @@ const Signup = () => {
             error={errors.confirmPassword}
             inputType="password"
           />
-          <button className="bg-teal-400 px-6 py-2 rounded text-white w-9/12 font-normal mt-8">
-            Sign up
-          </button>
+          <Button label="Sign up" onClick={() => {}} className=" w-9/12" />
           <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
-            <span className="border-t flex-1" />
-            <span className="text-slate-500 px-4 text-sm hover:underline cursor-pointer">
+            <span className="border-t theme-border flex-1" />
+            <span className="px-4 text-sm hover:underline cursor-pointer">
               <Link to={AppRoutes.login}>DO YOU HAVE AN ACCOUNT?</Link>
             </span>
-            <span className="border-t flex-1" />
+            <span className="border-t theme-border flex-1" />
           </div>
         </form>
       </div>
@@ -227,17 +226,14 @@ function TextField({
 }) {
   return (
     <div className="flex flex-col space-y-2 w-9/12">
-      <label className="text-md text-slate-500 "> {label}</label>
+      <Label> {label}</Label>
       <input
         type={inputType}
         name={name}
         placeholder={`Enter ${label}`}
-        className={cx(
-          "border border-slate-400 rounded-md p-2 mb-5 placeholder:text-slate-300 placeholder:text-sm  placeholder:first-letter:uppercase",
-          {
-            "border-red-500 ": error,
-          }
-        )}
+        className={cx("theme-input  mb-5", {
+          "border-red-500 ": error,
+        })}
         required
         onChange={onChange}
         value={value}
@@ -247,8 +243,7 @@ function TextField({
         className={cx("text-red-500 text-xs", {
           "inline-block  scale-100": error !== "" && error !== undefined,
           "h-0": !error,
-        })}
-      >
+        })}>
         {error}
       </label>
     </div>

@@ -10,6 +10,8 @@ import { ListView } from "../../../components/compound/list-view";
 import { NavLink, useNavigate } from "react-router-dom";
 import Button from "../../../components/atom/button";
 import useWorkspace from "../hook/use-workspace.hook";
+import Label from "../../../components/typography";
+import SvgIcon from "../../../components/svg-icon/svg-icon";
 
 export default function WorkspaceSidePanel({ setActive, active }) {
   const navigate = useNavigate();
@@ -20,38 +22,34 @@ export default function WorkspaceSidePanel({ setActive, active }) {
       width="320px"
       setActive={setActive}
       active={active}
-      align="left"
-    >
+      align="left">
       <Fold
         value={team}
         ifPresent={(team) => (
-          <div className="Layout bg-white w-full h-full">
+          <div className="Layout bg-card w-full h-full">
             {/* Workspace Settings and Toggle */}
             <div className="flex justify-between items-center p-4">
               <CustomDropDown
                 className="z-10"
+                align="left-1"
                 button={
-                  <div className="flex items-center gap-2 text-sm font-medium text-gray-900 flex-1">
+                  <Label className="flex1 flex items-center gap-2">
                     <span>{team.name}</span>
-                    <FIcon icon={solid("angle-down")} />
-                  </div>
-                }
-              >
-                <div className="relative">
-                  <div className="absolute -right-20 flex flex-col p-2 gap-[2px] rounded bg-white text-sm shadow-lg border">
-                    <p className="text-slate-400 py-2 w-64 ">
-                      My Awesome Workspace
-                    </p>
-                    <div className="flex flex-col gap-1">
-                      <div className="px-2 py-3 rounded hover:bg-gray-100 cursor-pointer">
+                    <SvgIcon icon="chevronDown" size={5} />
+                  </Label>
+                }>
+                <div className="Menu relative w-full">
+                  <div className="absolute  flex flex-col p-2 gap-[2px] rounded bg-card text-sm shadow-lg theme-border border divide-y">
+                    <p className=" py-2 w-64 ">My Awesome Workspace</p>
+                    <div className="flex flex-col gap-1 pt-2">
+                      <div className="px-2 py-3 rounded hover:bg-surface cursor-pointer">
                         Team Settings
                       </div>
                       <div
-                        className="px-2 py-3 rounded hover:bg-gray-100 cursor-pointer"
+                        className="px-2 py-3 rounded hover:bg-surface cursor-pointer"
                         onClick={() => {
                           navigate("/team");
-                        }}
-                      >
+                        }}>
                         Switch and manage workspaces
                       </div>
                     </div>
@@ -60,22 +58,24 @@ export default function WorkspaceSidePanel({ setActive, active }) {
               </CustomDropDown>
 
               {/* Close this panel */}
-              <button onClick={() => setActive(false)}>
-                <FIcon icon={solid("angles-left")} className="text-slate-500" />
-              </button>
+
+              <SvgIcon
+                icon="AngleLeft"
+                onClick={() => setActive(false)}
+                size={4}
+                className="cursor-pointer"
+              />
             </div>
 
             {/* CREATE WORKSPACE */}
 
             <div className="flex gap-2 px-3 items-center mt-3">
-              <p className="flex-1 text-[13px] text-slate-400">WORKSPACES</p>
+              <p className="flex-1 text-[13px]">WORKSPACES</p>
               <Button
                 label="create Workspace"
                 type="link"
                 size="small"
-                leadingIcon={
-                  <FIcon icon={solid("plus")} className="text-teal-500" />
-                }
+                leadingIcon={<FIcon icon={solid("plus")} />}
               />
             </div>
 
@@ -88,49 +88,36 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                     <NavLink
                       to={`/team/${teamSlug}/${workspace.meta.slug}`}
                       className={(data) =>
-                        cx(
-                          " group flex items-center space-x-2 px-2  lg:mx-2 py-3 text-sm font-medium rounded-md ",
-                          "transition-all ease-in duration-200",
-                          {
-                            "bg-gray-100 text-slate-700 border-l-4 rounded-l border-red-500":
-                              data.isActive,
-                            "text-gray-600 hover:bg-gray-50 hover:text-gray-900":
-                              !data.isActive,
-                          }
-                        )
+                        cx("group link py-3", {
+                          "link-active": data.isActive,
+                          "link-inactive": !data.isActive,
+                        })
                       }
                       onClick={() => {
                         setActive(false);
-                      }}
-                    >
+                      }}>
                       <FIcon
                         icon={regular("circle")}
-                        className="text-slate-500 scale-75 z-0"
+                        className="scale-75 z-0"
                         size="1x"
                       />
-                      <p className="text-sm font-medium text-gray-900">
-                        {workspace.name}
-                      </p>
+                      <p className="text-sm font-medium ">{workspace.name}</p>
                     </NavLink>
                   )}
                   noItemsElement={
-                    <div className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer">
-                      <FIcon
-                        icon={solid("folder")}
-                        className="text-slate-500"
-                      />
-                      <p className="text-sm font-medium text-gray-900">
+                    <div className="px-3 py-2 bg-surface hover:bg-surface  m-3 ">
+                      <Label size="body" variant="s1">
                         Create a workspace to get started
-                      </p>
+                      </Label>
                     </div>
                   }
                 />
               )}
               ifAbsent={() => (
-                <div className="px-3 py-2 bg-gray-100 hover:bg-gray-100  m-3 ">
-                  <span className="text-sm text-slate-600">
+                <div className="px-3 py-2 bg-surface hover:bg-surface  m-3 ">
+                  <Label size="body" variant="s1">
                     Create a workspace to get started
-                  </span>
+                  </Label>
                 </div>
               )}
             />
