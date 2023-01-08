@@ -54,7 +54,6 @@ router.put(
 function createTeamSchema(req, res, next) {
   const schema = Joi.object({
     name: Joi.string().min(3).max(30).trim().required(),
-    description: Joi.string().min(3).max(180),
     members: Joi.array().items(Joi.string()),
   });
   ValidationRequest(req, next, schema);
