@@ -11,6 +11,7 @@ function useWorkspace(): {
   workspacesList: object;
   isLoadingWorkSpaceList: boolean;
   allCollection: Array<object>;
+  setAllCollection: React.Dispatch<React.SetStateAction<undefined>>
   isLoadingCollection: boolean;
   createCollection: Function;
   createItem: (collection: Object) => void;

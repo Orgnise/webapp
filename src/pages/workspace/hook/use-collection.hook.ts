@@ -6,6 +6,8 @@ import Validator from "../../../helper/validator";
 import { useLocation } from "react-router-dom";
 import { faker } from "@faker-js/faker";
 import { Fold } from "../../../helper/typescript-utils";
+import useSocket from "../../../hooks/use-socket.hook";
+import { SocketEvent } from "../../../constant/socket-event-constant";
 
 interface IProps {
   onCollectionCreate?: (collection: any) => void;
@@ -14,14 +16,15 @@ interface IProps {
   onItemCreate?: (item: any) => void;
   onItemUpdate?: (item: any) => void;
   onItemDelete?: (id: any, parent: String) => void;
+  onItemPositionUpdate?: (item: any, parent: string, index: number) => void;
 }
 
 export default function useCollection(
   teamId: String,
   workspaceId: String,
   {
-    onCollectionCreate = (_: any) => {},
-    onItemCreate = (_: any) => {},
+    onCollectionCreate = (_: any) => { },
+    onItemCreate = (_: any) => { },
     /**
      * Update collection/ item
      * @param {Object} data - object containing id, title and content
@@ -30,10 +33,11 @@ export default function useCollection(
      * @param {String} data.parent - parent id of item (if any)
      * @param {String} data.content - content of collection
      */
-    onCollectionUpdate = (_: any) => {},
-    onCollectionDelete = (_: any) => {},
-    onItemDelete = (id: any, parent: String) => {},
-    onItemUpdate = (_: any) => {},
+    onCollectionUpdate = (_: any) => { },
+    onCollectionDelete = (_: any) => { },
+    onItemDelete = (id: any, parent: String) => { },
+    onItemUpdate = (_: any) => { },
+    onItemPositionUpdate = (item: any, parent: string, index: number) => { }
   }: IProps
 ): {
   isLoadingCollection: boolean;
@@ -49,6 +53,13 @@ export default function useCollection(
   const [isDeletingCollection, setIsDeletingCollection] = useState(false);
 
   const { collectionService } = useAppService();
+
+  useSocket([SocketEvent.item.updateParent
+  ], (event, payload) => {
+    if (event == SocketEvent.item.updateParent) {
+      onItemPositionUpdate({ ...payload.item }, payload.oldParent, payload.index);
+    }
+  });
 
   // Create collection
   function createCollection() {

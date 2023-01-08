@@ -55,6 +55,7 @@ export const WorkspaceProvider = ({ children }) => {
           return [...prev];
         });
       },
+      onItemPositionUpdate: onItemPositionUpdate,
 
       onCollectionUpdate: (collection) => {
         setAllCollection((prev) => {
@@ -81,6 +82,24 @@ export const WorkspaceProvider = ({ children }) => {
         });
       },
     });
+
+  // update item parent and position
+  function onItemPositionUpdate(item, oldParent, index) {
+    setAllCollection((prev) => {
+      const oldCollection = prev.find((c) => c.id === oldParent);
+      const newCollection = {
+        ...oldCollection,
+        children: oldCollection.children.filter((c) => c.id !== item.id),
+      };
+      const oldCollectionIndex = prev.findIndex((c) => c.id === oldParent);
+      prev[oldCollectionIndex] = newCollection;
+
+      const newCollectionIndex = prev.findIndex((c) => c.id === item.parent);
+      prev[newCollectionIndex].children.splice(index, 0, item);
+
+      return [...prev];
+    });
+  }
 
   // Get current teams for current user
   useEffect(() => {
@@ -165,6 +184,7 @@ export const WorkspaceProvider = ({ children }) => {
     workspacesList,
     isLoadingWorkSpaceList,
     allCollection,
+    setAllCollection,
     isLoadingCollection,
     createCollection,
     createItem,
