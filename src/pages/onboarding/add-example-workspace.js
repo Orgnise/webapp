@@ -85,7 +85,7 @@ function AddExampleSpace() {
           Add examples
         </Label>
 
-        <p>Select any example you'd like to add to your team</p>
+        <p>Select any example you&apos;d like to add to your team</p>
         <div className="flex flex-col gap-6 py-4 select-none">
           <CheckBox
             label="Engineering"

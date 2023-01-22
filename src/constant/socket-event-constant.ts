@@ -21,6 +21,10 @@ export const SocketEvent = {
     delete: "board:delete",
     get: "board:get",
   },
+  item: {
+    updateParent: "item:update-parent",
+    updateParentError: "item:update-parent:error",
+  },
   // Socket events for tasks
   tasks: {
     create: "tasks:create",

@@ -6,6 +6,9 @@ import { ListView } from "../../../../../components/compound/list-view";
 import Label from "../../../../../components/typography";
 import { LeftPanelSize } from "../../../layout/workspace-content-view";
 import NoCollectionView from "./no-collection.view";
+import useSocket from "../../../../../hooks/use-socket.hook";
+import { SocketEvent } from "../../../../../constant/socket-event-constant";
+import { toast } from "react-hot-toast";
 
 /**
  * Display collection board
@@ -20,6 +23,15 @@ export default function CollectionBoard({
   const [collections, setCollection] = useState([]);
   const [groups, setGroups] = useState({});
 
+  // Socket
+  const socket = useSocket([SocketEvent.item.error], (event, data) => {
+    if (event === SocketEvent.item.updateParentError) {
+      console.error("Error", data);
+      toast.error(data.error, { position: "top-right" });
+    }
+  });
+
+  // path
   const slug = workspace?.meta?.slug;
   const pathArray = useLocation().pathname.split(slug);
   const relativePath = pathArray[0] + workspace.meta.slug;
@@ -71,19 +83,20 @@ export default function CollectionBoard({
       return;
     }
 
-    const targetCollectionId = source.droppableId;
+    const sourceCollectionId = source.droppableId;
     const destinationCollectionId = destination.droppableId;
 
-    const sourceDroppableIndex = groups[targetCollectionId];
+    const sourceDroppableIndex = groups[sourceCollectionId];
     const targetDroppableIndex = groups[destinationCollectionId];
     const sourceItems = collections[sourceDroppableIndex].children.slice();
     const targetItems =
-      targetCollectionId !== destinationCollectionId
+      sourceCollectionId !== destinationCollectionId
         ? collections[targetDroppableIndex].children.slice()
         : sourceItems;
 
     // Pull the item from the source.
     const [deletedItem] = sourceItems.splice(source.index, 1);
+
     targetItems.splice(destination.index, 0, deletedItem);
 
     const workValue = collections.slice();
@@ -97,8 +110,17 @@ export default function CollectionBoard({
       ...collections[targetDroppableIndex],
       children: targetItems,
     };
+    const item = {
+      id: draggableId,
+      teamId: workspace.team,
+      workspaceId: workspace.id,
+      newParent: destinationCollectionId,
+      index: destination.index,
+      oldParent: sourceCollectionId,
+    };
+    socket.emit("item:update-parent", item);
 
-    setCollection(workValue);
+    // setCollection(workValue);
   }
   return (
     <DragDropContext onDragEnd={onDragEnd}>

@@ -6,6 +6,8 @@ import Validator from "../../../helper/validator";
 import { useLocation } from "react-router-dom";
 import { faker } from "@faker-js/faker";
 import { Fold } from "../../../helper/typescript-utils";
+import useSocket from "../../../hooks/use-socket.hook";
+import { SocketEvent } from "../../../constant/socket-event-constant";
 
 interface IProps {
   onCollectionCreate?: (collection: any) => void;
@@ -14,6 +16,7 @@ interface IProps {
   onItemCreate?: (item: any) => void;
   onItemUpdate?: (item: any) => void;
   onItemDelete?: (id: any, parent: String) => void;
+  onItemPositionUpdate?: (item: any, parent: string, index: number) => void;
 }
 
 export default function useCollection(
@@ -34,6 +37,7 @@ export default function useCollection(
     onCollectionDelete = (_: any) => {},
     onItemDelete = (id: any, parent: String) => {},
     onItemUpdate = (_: any) => {},
+    onItemPositionUpdate = (item: any, parent: string, index: number) => {},
   }: IProps
 ): {
   isLoadingCollection: boolean;
@@ -49,6 +53,16 @@ export default function useCollection(
   const [isDeletingCollection, setIsDeletingCollection] = useState(false);
 
   const { collectionService } = useAppService();
+
+  useSocket([SocketEvent.item.updateParent], (event, payload) => {
+    if (event == SocketEvent.item.updateParent) {
+      onItemPositionUpdate(
+        { ...payload.item },
+        payload.oldParent,
+        payload.index
+      );
+    }
+  });
 
   // Create collection
   function createCollection() {

@@ -20,6 +20,7 @@ module.exports = {
   addExamplesBySlug,
   getAllWorkspace,
   getAllWorkspaceBySlug,
+  UpdateWorkspaceBySlug,
 };
 
 /**
@@ -88,6 +89,43 @@ async function crateWorkspace({ orgId, name, description, members, userId }) {
     throw error;
   }
 }
+
+/**
+ * Update workspace by slug
+ * @param {string} slug
+ * @param {Object} workspaceBody
+ * @returns {Promise<Workspace>}
+ */
+async function UpdateWorkspaceBySlug({slug,teamId,name,members,visibility,userId}) {
+  try {
+    // Get user
+    
+    const team = await TeamService.getById(teamId);
+    
+    // Check if user exists in team
+    if(!team.members.find(member => member.user.id === userId)){
+      throw new HttpException(
+        HttpStatusCode.FORBIDDEN,
+        "You are not a member of this team",
+        "Not allowed to update workspace"
+      );
+    }
+
+    const workspace = await getBySlug(slug);
+
+    const filter = { _id: workspace.id };
+    const update = {
+      name: name,
+      visibility: visibility,
+    };
+    
+    // Find workspace and update
+    return await Workspace.findOneAndUpdate(filter, update,{new:true});
+  } catch (error) {
+    throw error;
+  }
+}
+
 
 /**
  * Add example workspaces to team

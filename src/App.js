@@ -1,3 +1,4 @@
+/* eslint-disable react/no-children-prop */
 import React, { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import "./style/App.css";
@@ -16,6 +17,7 @@ import NoPageFound from "./pages/no-page-found.page";
 import AllTeamsPage from "./pages/team/all-teams.page";
 import CreateTeamPage from "./pages/team/create/create-team";
 import AddExampleWorkspacePage from "./pages/onboarding/add-example-workspace";
+import CreateWorkspacePage from "./pages/workspace/pages/create/create-workspace";
 import useTheme from "./pages/workspace/hook/use-theme.hook";
 
 function App() {
@@ -80,11 +82,6 @@ function App() {
             path={AppRoutes.onboard.addExamples}
             element={<RequireAuth children={<AddExampleWorkspacePage />} />}
           />
-
-          {/* <Route
-            path={AppRoutes.users.myTeam}
-            element={<RequireAuth children={<AllTeamsPage />} />}
-          /> */}
 
           <Route path={AppRoutes.notFound} element={<NoPageFound />} />
         </Route>

@@ -12,6 +12,7 @@ const HttpException = require("../helper/exception/http-exception");
 router.post("/items", authorize(), validateItemSchema, createCollection);
 router.get("/items", authorize(), getAllCollection);
 router.put("/items/:id", authorize(), validateItemSchema, updateCollection);
+router.put("/items/:id/update-parent", authorize(), validateUpdateParentSchema, updateItemParent);
 router.get("/items/:id", authorize(), getCollection);
 router.delete("/items/:id", authorize(), deleteCollection);
 
@@ -23,6 +24,16 @@ function validateItemSchema(req, res, next) {
     object: Joi.string().default("item"),
     title: Joi.string().optional(),
     content: Joi.object().optional(),
+    index: Joi.number(),
+  });
+  ValidationRequest(req, next, schema);
+}
+
+function validateUpdateParentSchema(req, res, next) {
+  const schema = Joi.object({
+    teamId: Joi.string().required(),
+    workspaceId: Joi.string().required(),
+    parent: Joi.string().required(),
     index: Joi.number(),
   });
   ValidationRequest(req, next, schema);
@@ -123,6 +134,30 @@ function updateCollection(req, res, next) {
   };
 
   CollectionService.updateCollection(item)
+    .then((collection) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: collection,
+        message: "Item updated successfully",
+        dataKey: "item",
+        status: HttpStatusCode.OK,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Update collection/item parent. This is used to move item from one collection to another
+ */
+function updateItemParent(req, res, next) {
+  const id = req.params.id;
+  const data = req.body;
+  const user = req.auth;
+  const { workspaceId, index, teamId, parent } = data;
+
+  const payload = {workspaceId, index, teamId, newParent: parent, id, user};
+
+  CollectionService.updateItemParent(payload)
     .then((collection) => {
       return ApiResponseHandler.success({
         res: res,

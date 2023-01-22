@@ -8,7 +8,7 @@ interface ILocalStorage<T> {
 
 const useLocalStorage = <T>(
   key: string,
-  initialValue?: T,
+  initialValue?: T
 ): ILocalStorage<T> => {
   const [value, setStoredValue] = useState<T | undefined>(initialValue);
 
@@ -16,7 +16,11 @@ const useLocalStorage = <T>(
     // Retrieve from localStorage
     const item = localStorage.getItem(key);
     if (item && item != null) {
-      if ((item.startsWith("{") || item.startsWith("[") && (item.startsWith('}')) || item.endsWith(']'))) {
+      if (
+        item.startsWith("{") ||
+        (item.startsWith("[") && item.startsWith("}")) ||
+        item.endsWith("]")
+      ) {
         setStoredValue(JSON.parse(item));
       } else {
         setStoredValue(item as T);

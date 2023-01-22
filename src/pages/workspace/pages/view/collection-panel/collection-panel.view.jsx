@@ -1,4 +1,6 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import CustomDropDown from "../../../../../components/custom_dropdown";
 import Tab from "../../../../../components/molecule/tab";
 import SvgIcon from "../../../../../components/svg-icon/svg-icon";
 import Label from "../../../../../components/typography";
@@ -30,6 +32,8 @@ export default function CollectionPanel({
 
   const { createCollection, createItem, allCollection, deleteCollection } =
     useWorkspace();
+
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -66,6 +70,20 @@ export default function CollectionPanel({
             setLeftPanelSize(LeftPanelSize.large);
           }}
         />
+
+        <CustomDropDown
+          className="pt-1 mx-3"
+          button={<SvgIcon icon="VerticalEllipse" size={4} className="h-5" />}>
+          <div className="flex flex-col gap-2 border theme-border rounded">
+            <div
+              className="flex items-center gap-2 px-3 py-2 hover:bg-surface rounded cursor-pointer transition-all ease-in duration-200"
+              onClick={() => {
+                navigate("settings");
+              }}>
+              Workspace Settings
+            </div>
+          </div>
+        </CustomDropDown>
       </div>
       <PanelTopToolbar />
       {activeLayout === PanelLayout.list && <CollectionList />}

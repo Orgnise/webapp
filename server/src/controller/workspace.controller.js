@@ -10,6 +10,8 @@ const ApiResponseHandler = require("../helper/response/api-response");
 const {
   HttpStatusCode,
 } = require("../helper/http-status-code/http-status-code");
+const { Private, Archived,Deleted,Public} = require("../helper/entity-visibility");
+const { logInfo } = require("../helper/logger");
 
 router.get("/team/:id/workspace/all", authorize(), getAllWorkspace);
 router.get(
@@ -25,6 +27,7 @@ router.post(
 );
 router.get("/workspace/get_by_id/:id", authorize(), getWorkspaceById);
 router.get("/workspace/slug/:slug", authorize(), getWorkspaceBySlug);
+router.put("/workspace/slug/:slug", authorize(),UpdateWorkspaceSchema, UpdateWorkspaceBySlug);
 router.post(
   "/team/:id/workspace/add_examples",
   authorize(),
@@ -49,6 +52,16 @@ function createWorkspaceSchema(req, res, next) {
     name: Joi.string().min(3).max(30).required(),
     description: Joi.string().min(3).max(280),
     members: Joi.array().items(Joi.string()),
+  });
+  ValidationRequest(req, next, schema);
+}
+function UpdateWorkspaceSchema(req, res, next) {
+  const schema = Joi.object({
+    name: Joi.string().min(3).max(30).required(),
+    description: Joi.string().min(3).max(280),
+    members: Joi.array().items(Joi.string()),
+    teamId: Joi.string().required(),
+    visibility: Joi.string().valid(Private, Archived,Deleted,Public).optional(),
   });
   ValidationRequest(req, next, schema);
 }
@@ -80,6 +93,34 @@ function createWorkspace(req, res, next) {
         message: "Workspace created successfully",
         dataKey: "workspace",
         status: HttpStatusCode.CREATED,
+      });
+    })
+    .catch(next);
+}
+
+/**
+ * Update workspace by slug
+ */
+function UpdateWorkspaceBySlug(req, res, next) {
+  const user = req.auth;
+  const slug = req.params.slug;
+  const { name,  members,visibility,teamId } = req.body;
+
+  WorkspaceService.UpdateWorkspaceBySlug({
+    slug: slug,
+    name: name,
+    teamId: teamId,
+    members: members,
+    visibility:visibility,
+    userId: user.id,
+  })
+    .then((workspace) => {
+      return ApiResponseHandler.success({
+        res: res,
+        data: workspace,
+        message: "Workspace updated successfully",
+        dataKey: "workspace",
+        status: HttpStatusCode.OK,
       });
     })
     .catch(next);

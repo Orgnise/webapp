@@ -16,6 +16,7 @@ module.exports = {
   updateCollection,
   deleteCollection,
   getAllCollection,
+  updateItemParent,
 };
 
 /**
@@ -141,15 +142,64 @@ async function updateCollection(body) {
 }
 
 /**
+ * Update item's parent
+ */
+async function updateItemParent(body){
+  try {
+    const { workspaceId, index, teamId, newParent, id, user} = body;
+
+    // Get item
+    const item = await getById(id,false);
+
+    // Get new parent
+    const newParentCollection = await getById(newParent);
+
+    // const oldParentCollection = await getById(item.parent)
+
+    // TODO: Check if user has access to update item
+
+    const filter = { _id: id };
+
+    const update = {
+      parent:newParent,
+      lastUpdatedUserId:user.id
+    };
+
+    // Replace old parent with new parent
+    const updatedItem = await Collection.findOneAndUpdate(filter, update);
+    // console.log("🚀 ~ file: collection.service.js:162 ~ updateItemParent ~ updatedItem", updatedItem)
+
+    // Remove item from the old parent children list
+    const oldCollection = await Collection.findOneAndUpdate({_id:item.parent},{ $pull: { children: id } });
+    // console.log("🚀 ~ file: collection.service.js:167 ~ updateItemParent ~ oldCollection", oldCollection)
+
+
+    // Add item to the new parent children list
+    const newCollection = await Collection.findOneAndUpdate({_id:newParent},{ $push: { children: id } });
+
+
+    return getById(id);
+
+  } catch (error) {
+    throw new HttpException(
+      error.status || HttpStatusCode.INTERNAL_SERVER_ERROR,
+      error.message,
+      error.error
+    );
+  }
+}
+
+/**
  * Get collection by id
  * @param {string} Id
  * @returns {Promise<Collection>}
  * @throws {HttpException}
  */
-async function getById(id) {
+async function getById(id,isCollection = true) {
   // Validate workspace id
   if (!Mongoose.isValidObjectId(id)) {
-    throw new HttpException(HttpStatusCode.NOT_FOUND, "Invalid collection id");
+    const error = `Invalid ${isCollection ? 'collection': 'item'} id`;
+    throw new HttpException(HttpStatusCode.NOT_FOUND,'Collection not found', error);
   }
 
   // Get workspace from database if exists
@@ -163,8 +213,8 @@ async function getById(id) {
   if (!collection)
     throw new HttpException(
       HttpStatusCode.NOT_FOUND,
-      "Item not found",
-      "Item does not exists with id " + id
+      `${isCollection ? 'collection': 'item'} not found`,
+      `${isCollection ? 'collection': 'item'} does not exists with id ` + id
     );
   // Return workspace
   return collection;

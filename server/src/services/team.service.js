@@ -85,7 +85,6 @@ async function createTeam(body, userId) {
 /**
  * Get team by id
  * @param {ObjectId} orgId
- * @returns {Promise<Team>}
  * @throws {Error}
  */
 async function getById(orgId) {
@@ -348,5 +347,6 @@ function getBasicTeamInfo(team) {
     description: team.description,
     members: team.members,
     createdBy: team.createdBy,
+    meta: team.meta,
   };
 }

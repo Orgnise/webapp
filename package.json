@@ -36,7 +36,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "beautify": "npx prettier --write ."
+    "format": "npx prettier --write ."
   },
   "eslintConfig": {
     "extends": [
@@ -77,6 +77,8 @@
     "@editorjs/underline": "^1.1.0",
     "@editorjs/warning": "^1.3.0",
     "@faker-js/faker": "^7.6.0",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "autoprefixer": "^10.4.13",
     "eslint": "^8.30.0",

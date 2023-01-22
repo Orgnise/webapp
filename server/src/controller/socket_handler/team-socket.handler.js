@@ -7,13 +7,13 @@ module.exports = (io, socket) => {
   // Register socket handlers
   const getJoinedTeams = async (payload) => {
     // Check if user is authenticated
-    if (!auth) {
+    if (!io.auth) {
       logError("User is not authenticated", "getJoinedTeams ~ line 16");
       socket.emit("auth:authorized", false);
       return;
     }
     try {
-      const user = await UserService.getUserFromJwtToken(auth.token);
+      const user = await UserService.getUserFromJwtToken(io.auth.token);
       const list = await TeamService.getJoinedTeams(user.id);
       const teams = {
         data: list,

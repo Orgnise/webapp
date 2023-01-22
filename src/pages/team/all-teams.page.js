@@ -17,6 +17,8 @@ import WorkSpacePage from "../workspace";
 import { WorkspaceProvider } from "../workspace/provider/workspace.provider";
 import SvgIcon from "../../components/svg-icon/svg-icon";
 import Label from "../../components/typography";
+import CreateWorkspacePage from "../workspace/pages/create/create-workspace";
+import WorkspaceSettingsPage from "../workspace/pages/settings/workspace-settngs-page";
 
 export default function AllTeamsPage() {
   return (
@@ -29,6 +31,11 @@ export default function AllTeamsPage() {
         </Route>
         <Route path="/:id/:slug" element={<WorkSpacePage />} />
         <Route path=":id/:slug/:item" element={<WorkSpacePage />} />
+        <Route
+          path=":slug/create-workspace"
+          element={<CreateWorkspacePage />}
+        />
+        <Route path="/:id/:slug/settings" element={<WorkspaceSettingsPage />} />
       </Routes>
     </WorkspaceProvider>
   );

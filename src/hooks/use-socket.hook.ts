@@ -15,7 +15,7 @@ import { SocketContext } from "../provider/socket.provider";
  */
 const useSocket = (
   events: string[],
-  callback = (event: string, data: (_: any) => void) => {}
+  callback = (event: string, data: any) => {}
 ): Socket => {
   const socket = useContext<any>(SocketContext);
 

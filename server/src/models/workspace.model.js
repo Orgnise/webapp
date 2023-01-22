@@ -1,5 +1,6 @@
 const Mongoose = require("mongoose");
 const Role = require("../helper/role");
+const Visibility = require("../helper/entity-visibility");
 
 const WorkspaceSchema = new Mongoose.Schema(
   {
@@ -33,9 +34,10 @@ const WorkspaceSchema = new Mongoose.Schema(
         },
       },
     ],
-    completedAt: {
-      type: Date,
-      default: undefined,
+    visibility: {
+      type: String,
+      enum: [Visibility.Private, Visibility.Public,Visibility.Archived, Visibility.Deleted],
+      default: Visibility.Private,
     },
     createdBy: {
       type: Mongoose.Schema.Types.ObjectId,

@@ -19,7 +19,7 @@ interface Props {
     | "outline"
     | "link";
   size?: "small" | "base" | "large";
-  label: string;
+  label: React.ReactNode;
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
   notificationBadge?: number;
@@ -110,12 +110,12 @@ const Button = (props: Props) => {
       disabled={disabled}
       onClick={onClick}>
       {leadingIcon && leadingIcon}
-      <p>{label}</p>
+      <>{label}</>
       {trailingIcon && trailingIcon}
       {notificationBadge && (
-        <p className="relative inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium leading-4 bg-red-100 theme-text-primary">
+        <div className="relative inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium leading-4 bg-red-100 theme-text-primary">
           {notificationBadge}
-        </p>
+        </div>
       )}
     </button>
   );

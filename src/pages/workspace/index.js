@@ -83,6 +83,7 @@ function WorkSpacePage() {
    * Display empty workspace view
    */
   function EmptyWorkspaceView() {
+    const navigate = useNavigate();
     return (
       <div className="flex-1">
         <div className="h-full flex flex-col gap-4 w-full items-center place-content-center max-w-xl mx-auto text-center">
@@ -108,7 +109,7 @@ function WorkSpacePage() {
             className="rounded-full"
             size="small"
             onClick={() => {
-              // navigation(AppRoutes.workspace.);
+              navigate("create-workspace");
             }}
           />
         </div>
