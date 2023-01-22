@@ -10,6 +10,7 @@ import useSocket from "../../hooks/use-socket.hook";
 import { SocketEvent } from "../../constant/socket-event-constant";
 import Button from "../../components/atom/button";
 import Label from "../../components/typography";
+import { TextField } from "../../components/molecule/text-field";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -142,7 +143,7 @@ const Signup = () => {
         <img className="hidden md:inline-block" src={loginSvg} />
 
         <form
-          className="flex flex-col items-center place-content-center space-y-6 h-full  rounded-md py-10"
+          className="flex flex-col items-center place-content-center h-full  rounded-md py-10"
           onSubmit={handleLogin}>
           <div className="flex flex-col items-center font-normal">
             <h3 className="text-3xl font-bold ">Welcome back</h3>
@@ -162,7 +163,8 @@ const Signup = () => {
             value={name}
             autoComplete="name"
             error={errors.name}
-            inputType="text"
+            type="text"
+            wrapperClassName="w-9/12"
           />
           <TextField
             label="Email"
@@ -174,7 +176,8 @@ const Signup = () => {
             value={email}
             autoComplete="email"
             error={errors.email}
-            inputType="email"
+            type="email"
+            wrapperClassName="w-9/12"
           />
           <TextField
             label="Password"
@@ -186,8 +189,10 @@ const Signup = () => {
             value={password}
             autoComplete="password"
             error={errors.password}
-            inputType="password"
+            type="password"
+            wrapperClassName="w-9/12"
           />
+
           <TextField
             label="Confirm Password"
             name="confirmPassword"
@@ -198,7 +203,8 @@ const Signup = () => {
             value={cPassword}
             autoComplete="confirm-password"
             error={errors.confirmPassword}
-            inputType="password"
+            type="password"
+            wrapperClassName="w-9/12"
           />
           <Button label="Sign up" onClick={() => {}} className=" w-9/12" />
           <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
@@ -213,41 +219,5 @@ const Signup = () => {
     </div>
   );
 };
-
-function TextField({
-  label,
-  inputType = "text",
-  name,
-  placeholder,
-  value,
-  onChange,
-  error,
-  autoComplete,
-}) {
-  return (
-    <div className="flex flex-col space-y-2 w-9/12">
-      <Label> {label}</Label>
-      <input
-        type={inputType}
-        name={name}
-        placeholder={`Enter ${label}`}
-        className={cx("theme-input  mb-5", {
-          "border-red-500 ": error,
-        })}
-        required
-        onChange={onChange}
-        value={value}
-        autoComplete={autoComplete}
-      />
-      <label
-        className={cx("text-red-500 text-xs", {
-          "inline-block  scale-100": error !== "" && error !== undefined,
-          "h-0": !error,
-        })}>
-        {error}
-      </label>
-    </div>
-  );
-}
 
 export default Signup;

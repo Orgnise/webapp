@@ -83,11 +83,6 @@ function App() {
             element={<RequireAuth children={<AddExampleWorkspacePage />} />}
           />
 
-          <Route
-            path={AppRoutes.workspace.create}
-            element={<RequireAuth children={<CreateWorkspacePage />} />}
-          />
-
           <Route path={AppRoutes.notFound} element={<NoPageFound />} />
         </Route>
       </Routes>

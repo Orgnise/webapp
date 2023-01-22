@@ -1,14 +1,25 @@
 import React from "react";
 import { WorkspaceContext } from "../provider/workspace.provider";
 
+type Workspace = {
+  id: string;
+  name?: string;
+  description?: string;
+  team: string;
+  members: string[];
+  visibility?: 'public' | 'private' | 'archived' | 'deleted';
+}
+
 /**
  * Hook to get the user from the context
  */
 function useWorkspace(): {
   team: object;
-  workspace: object;
+  workspace: Partial<Workspace>;
   isLoadingTeam: boolean;
   workspacesList: object;
+  isUpdatingWorkspace: boolean;
+  handleUpdateWorkspace: (workspace: Workspace) => Promise<void>;
   isLoadingWorkSpaceList: boolean;
   allCollection: Array<object>;
   setAllCollection: React.Dispatch<React.SetStateAction<undefined>>;

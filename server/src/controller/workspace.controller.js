@@ -11,6 +11,7 @@ const {
   HttpStatusCode,
 } = require("../helper/http-status-code/http-status-code");
 const { Private, Archived,Deleted,Public} = require("../helper/entity-visibility");
+const { logInfo } = require("../helper/logger");
 
 router.get("/team/:id/workspace/all", authorize(), getAllWorkspace);
 router.get(
@@ -114,7 +115,6 @@ function UpdateWorkspaceBySlug(req, res, next) {
     userId: user.id,
   })
     .then((workspace) => {
-      // global.socket.emit("team:workspace:update", workspace);
       return ApiResponseHandler.success({
         res: res,
         data: workspace,

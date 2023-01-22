@@ -10,6 +10,7 @@ import Validator from "../../helper/validator";
 import useAuth from "../../hooks/use-auth";
 import Button from "../../components/atom/button";
 import Label from "../../components/typography";
+import { TextField } from "../../components/molecule/text-field";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -101,7 +102,7 @@ const Login = () => {
       <div className="grid md:grid-cols-2 grid-cols-1 gap-2 h-full  items-center place-content-center">
         <img className="hidden md:inline-block" src={loginSvg} />
         <form
-          className="flex flex-col items-center place-content-center space-y-6 h-full  rounded-md"
+          className="flex flex-col items-center place-content-center  h-full  rounded-md"
           onSubmit={login}>
           <div className="flex flex-col items-center font-normal">
             <Label size="h1" variant="t2">
@@ -121,7 +122,8 @@ const Login = () => {
             value={email}
             autoComplete="email"
             error={errors.email}
-            inputType="email"
+            type="email"
+            wrapperClassName="w-9/12"
           />
           <TextField
             label="Password"
@@ -132,7 +134,8 @@ const Login = () => {
             value={password}
             autoComplete="password"
             error={errors.password}
-            inputType="password"
+            type="password"
+            wrapperClassName="w-9/12"
           />
           <Button label="Sign in" onClick={() => {}} className=" w-9/12" />
           <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
@@ -147,40 +150,5 @@ const Login = () => {
     </div>
   );
 };
-function TextField({
-  label,
-  inputType = "text",
-  name,
-  placeholder,
-  value,
-  onChange,
-  error,
-  autoComplete,
-}) {
-  return (
-    <div className="flex flex-col space-y-2 w-9/12">
-      <Label> {label}</Label>
-      <input
-        type={inputType}
-        name={name}
-        placeholder={`Enter ${label}`}
-        className={cx("theme-input  mb-5 ", {
-          "border-red-500 ": error,
-        })}
-        required
-        onChange={onChange}
-        value={value}
-        autoComplete={autoComplete}
-      />
-      <label
-        className={cx("text-red-500 text-xs", {
-          "inline-block  scale-100": error !== "" && error !== undefined,
-          "h-0": !error,
-        })}>
-        {error}
-      </label>
-    </div>
-  );
-}
 
 export default Login;

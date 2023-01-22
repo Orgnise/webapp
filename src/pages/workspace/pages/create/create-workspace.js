@@ -9,6 +9,7 @@ import Nav from "../../../task/component/nav";
 import useWorkspace from "../../hook/use-workspace.hook";
 import { useNavigate } from "react-router-dom";
 import { NavbarLayout } from "../../../layout";
+import { TextField } from "../../../../components/molecule/text-field";
 
 const CreateWorkspacePage = () => {
   const [name, setName] = useState();
@@ -62,23 +63,13 @@ const CreateWorkspacePage = () => {
             </div>
             <div className="mt-8">
               <form onSubmit={createWorkspace}>
-                <div className="relative mt-5">
-                  <input
-                    type="text"
-                    name="text"
-                    id="text"
-                    // value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    placeholder="Workspace name"
-                    className="peer w-full rounded-md border theme-border px-3 py-3 bg-card placeholder:text-transparent focus:theme-border focus:outline-none"
-                  />
-                  <label
-                    htmlFor="text"
-                    className="pointer-events-none absolute top-0 left-0 ml-3 bg-card origin-left -translate-y-1/2 transform px-1 text-sm  transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:ml-4 peer-placeholder-shown:text-base peer-placeholder-shown:theme-text-sub2 peer-focus:-top-0 peer-focus:ml-3 peer-focus:text-sm peer-focus:theme-text-h1">
-                    Workspace name
-                  </label>
-                </div>
+                <TextField
+                  label="Workspace Name"
+                  required
+                  onChange={(e) => {
+                    setName(e.target.value);
+                  }}
+                />
               </form>
               <div className="flex place-content-end gap-4 my-6 mt-8">
                 <Button

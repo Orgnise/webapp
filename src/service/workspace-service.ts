@@ -99,4 +99,22 @@ export default class WorkspaceService {
       .post(Endpoints.team.workspaceBySlug(slug).addExampleWorkspaces, payload)
       .then((response) => response.data);
   }
+
+  /**
+   * Update workspace by slug
+   * @param {string} slug - workspace slug
+   * @param {Object} payload - workspace payload. Example: { name: 'Workspace 1', description: 'Workspace 1 description', visibility: 'Public' }
+   * @example payload:
+   * {
+   *   name: "Workspace 1",
+   *   description: "Workspace 1 description",
+   *   visibility: "public" | "private" | "deleted" | "archived"
+   * }
+   * @returns {Promise<AxiosResponse<any>>}
+   */
+  async handleUpdateWorkspaceBySlug(slug: string, payload: any): Promise<AxiosResponse<any>> {
+    return this.client
+      .put(Endpoints.team.workspaceBySlug(slug).updateBySlug, payload)
+      .then((response) => response.data);
+  }
 }

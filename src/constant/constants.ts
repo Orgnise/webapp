@@ -31,6 +31,7 @@ export const Endpoints = {
         getAll: `/team/slug/${slug}/workspace/all`,
         addExampleWorkspaces: `/team/slug/${slug}/workspace/add_examples`,
         getBySlug: () => `/workspace/slug/${slug}`,
+        updateBySlug: `/workspace/slug/${slug}`,
       };
     },
   },

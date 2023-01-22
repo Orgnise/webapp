@@ -1,10 +1,10 @@
 module.exports = {
-    Private: "Private",
-    Public: "Public",
-    Archived: "Archived",
-    Active: "Active",
-    Pending: "Pending",
-    Deleted: "Deleted",
-    Draft: "Draft",
-    Completed: "Completed",
+    Private: "private",
+    Public: "public",
+    Archived: "archived",
+    Active: "active",
+    Pending: "pending",
+    Deleted: "deleted",
+    Draft: "draft",
+    Completed: "completed",
 }

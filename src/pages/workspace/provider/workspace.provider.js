@@ -12,6 +12,8 @@ WorkspaceContext.displayName = "WorkspaceContext";
 
 export const WorkspaceProvider = ({ children }) => {
   const [workspace, setWorkspace] = useState();
+  const [isUpdatingWorkspace, setIsUpdateWorkspace] = useState(false);
+
   const [isLoadingTeam, setIsLoadingTeam] = useState(false);
 
   const [allCollection, setAllCollection] = useState();
@@ -175,12 +177,49 @@ export const WorkspaceProvider = ({ children }) => {
       });
   }, [workspaceId]);
 
+  async function handleUpdateWorkspace(workspace) {
+    if (!workspace || isUpdatingWorkspace) return;
+    setIsUpdateWorkspace(true);
+    try {
+      workspaceService
+        .handleUpdateWorkspaceBySlug(workspace.meta.slug, {
+          name: workspace.name,
+          description: workspace.description,
+          teamId: workspace.team,
+          visibility: workspace.visibility,
+        })
+        .then(({ workspace }) => {
+          toast.success("Workspace updated");
+          onWorkspaceUpdate(workspace);
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {
+          setIsUpdateWorkspace(false);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function onWorkspaceUpdate(workspace) {
+    setWorkspace(workspace);
+    setWorkspaceList((prev) => {
+      const index = prev.findIndex((w) => w.id === workspace.id);
+      prev[index] = workspace;
+      return [...prev];
+    });
+  }
+
   const value = {
     team,
     isLoadingTeam,
     teamSlug,
     isLoadingTeam,
     workspace,
+    isUpdatingWorkspace,
+    handleUpdateWorkspace,
     workspacesList,
     isLoadingWorkSpaceList,
     allCollection,
