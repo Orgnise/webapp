@@ -16,6 +16,7 @@ export const AppRoutes = {
     team: "/team/",
     workspace: ":slug/*",
     item: ":id",
+    create: "team:/create-workspace",
   },
   users: {
     root: "/users/*",

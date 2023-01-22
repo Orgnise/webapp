@@ -23,8 +23,8 @@ export default function useCollection(
   teamId: String,
   workspaceId: String,
   {
-    onCollectionCreate = (_: any) => { },
-    onItemCreate = (_: any) => { },
+    onCollectionCreate = (_: any) => {},
+    onItemCreate = (_: any) => {},
     /**
      * Update collection/ item
      * @param {Object} data - object containing id, title and content
@@ -33,11 +33,11 @@ export default function useCollection(
      * @param {String} data.parent - parent id of item (if any)
      * @param {String} data.content - content of collection
      */
-    onCollectionUpdate = (_: any) => { },
-    onCollectionDelete = (_: any) => { },
-    onItemDelete = (id: any, parent: String) => { },
-    onItemUpdate = (_: any) => { },
-    onItemPositionUpdate = (item: any, parent: string, index: number) => { }
+    onCollectionUpdate = (_: any) => {},
+    onCollectionDelete = (_: any) => {},
+    onItemDelete = (id: any, parent: String) => {},
+    onItemUpdate = (_: any) => {},
+    onItemPositionUpdate = (item: any, parent: string, index: number) => {},
   }: IProps
 ): {
   isLoadingCollection: boolean;
@@ -54,10 +54,13 @@ export default function useCollection(
 
   const { collectionService } = useAppService();
 
-  useSocket([SocketEvent.item.updateParent
-  ], (event, payload) => {
+  useSocket([SocketEvent.item.updateParent], (event, payload) => {
     if (event == SocketEvent.item.updateParent) {
-      onItemPositionUpdate({ ...payload.item }, payload.oldParent, payload.index);
+      onItemPositionUpdate(
+        { ...payload.item },
+        payload.oldParent,
+        payload.index
+      );
     }
   });
 

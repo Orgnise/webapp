@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import cx from "classnames";
 
@@ -6,7 +7,8 @@ function Pattern({ className }: { className?: string }) {
     <svg
       aria-hidden="true"
       className={cx(
-        "absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/[0.02] stroke-black/5 fill-white/1 stroke-white/2.5"
+        "absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/[0.02] stroke-black/5 fill-white/1 stroke-white/2.5",
+        className
       )}>
       <defs>
         <pattern
@@ -31,3 +33,5 @@ function Pattern({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export default Pattern;

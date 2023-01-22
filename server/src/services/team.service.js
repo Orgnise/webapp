@@ -348,5 +348,6 @@ function getBasicTeamInfo(team) {
     description: team.description,
     members: team.members,
     createdBy: team.createdBy,
+    meta: team.meta,
   };
 }

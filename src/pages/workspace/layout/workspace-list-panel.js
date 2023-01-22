@@ -76,6 +76,9 @@ export default function WorkspaceSidePanel({ setActive, active }) {
                 type="link"
                 size="small"
                 leadingIcon={<FIcon icon={solid("plus")} />}
+                onClick={() => {
+                  navigate(`/team/${teamSlug}/create-workspace`);
+                }}
               />
             </div>
 
