@@ -3,7 +3,7 @@
  */
 
 export const Endpoints = {
-  baseUrl: "http://localhost:4000",
+  baseUrl: process.env.REACT_APP_BASE_URL || "http://localhost:4000",
   login: "/login",
   register: "/register",
   logout: "/logout",

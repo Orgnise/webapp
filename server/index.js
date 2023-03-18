@@ -13,9 +13,8 @@ const SocketHandler = require("./src/controller/socket_handler");
 
 const { API_PORT } = require("./src/config/config");
 
-const port = API_PORT;
-const server = app.listen(port, () => {
-  console.log(`Server listening on ${port}`);
+const server = app.listen(API_PORT, () => {
+  console.log(`Server listening on ${API_PORT}`);
 });
 
 const io = SocketIO(server);

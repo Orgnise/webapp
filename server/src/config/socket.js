@@ -4,13 +4,14 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const authConfig = require("../config/auth.config");
 const UserService = require("../services/user.service");
+const { SOCKET_URL } = require("./config");
 
-const socket = (serer) => {
+const socket = (server) => {
   console.log("🚀: socket initialized");
 
-  const io = socketIO(serer, {
+  const io = socketIO(server, {
     cors: {
-      origin: `http://localhost:3000`,
+      origin: SOCKET_URL,
       methods: ["GET", "POST"],
     },
   });
@@ -38,7 +39,7 @@ const socket = (serer) => {
       if (err && err.message === "unauthorized event") {
         socket.disconnect();
       }
-      console.log("🚀 ~ file: socket.js ~ line 36 ~ socket.on ~ err", err);
+      console.log("🚀 ~ file: socket.js ~ line 42 ~ socket.on ~ err", err);
     });
   });
 
