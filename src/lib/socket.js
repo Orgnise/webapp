@@ -1,4 +1,6 @@
-import socketIO from "socket.io-client";
+import { io } from "socket.io-client";
 
-const socket = socketIO(`http://${window.location.hostname}:4000`);
+const socketURL = process.env.REACT_APP_SOCKET_URL || "http://localhost:3000";
+const socket = io(socketURL);
+
 export default socket;

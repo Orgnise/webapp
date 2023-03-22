@@ -5,7 +5,7 @@ export class AxiosClient {
   public constructor() {
     this.axios = axios.create({
       baseURL: Endpoints.baseUrl,
-      timeout: 1000,
+      timeout: 30000,
       headers: {
         "Content-Type": "application/json",
       },

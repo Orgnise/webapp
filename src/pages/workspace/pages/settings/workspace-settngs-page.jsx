@@ -93,6 +93,22 @@ function WorkspaceSettingsPage() {
             />
           </div>
         </div>
+
+        {/* Integration */}
+        <Label size="h2" variant="t1">
+          Integration
+        </Label>
+        <hr className="my-4 theme-border" />
+        <div className="mt-4 flex flex-col gap-4">
+          <TileComponent
+            title="Slack"
+            subtext="Connect your workspace with Slack"
+            buttonText="Connect"
+            disabled
+          />
+        </div>
+
+        {/* Danger Zone */}
         <Label size="h2" variant="t1" className="mt-8">
           Danger Zone
         </Label>
@@ -150,6 +166,7 @@ function WorkspaceSettingsPage() {
     buttonText,
     onClick = () => {},
     disabled = false,
+    trailing,
   }) {
     return (
       <div
@@ -165,15 +182,18 @@ function WorkspaceSettingsPage() {
           )}
         </div>
         <div className="w-3/12 flex place-content-end">
-          <div>
-            <Button
-              label={buttonText}
-              type="link"
-              className="w-full"
-              onClick={onClick}
-              disabled={isUpdatingWorkspace || disabled}
-            />
-          </div>
+          {trailing && trailing}
+          {buttonText && (
+            <div>
+              <Button
+                label={buttonText}
+                type="link"
+                className="w-full"
+                onClick={onClick}
+                disabled={isUpdatingWorkspace || disabled}
+              />
+            </div>
+          )}
         </div>
       </div>
     );

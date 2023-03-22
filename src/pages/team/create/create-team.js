@@ -39,19 +39,19 @@ function CreateTeam() {
   const [isVisible, setIsVisible] = useState();
 
   return (
-    <div className="flex flex-col gap-6 py-6 items-center bg-card shadow w-full  rounded-md max-w-[500px]">
+    <div className="flex flex-col gap-6 p-6 items-center bg-card shadow w-full  rounded-md max-w-[500px]">
       <Label size="h2" variant="t2">
         Create your Team
       </Label>
       <div className="flex flex-col w-full px-4 max-w-[400px] ">
         <AddTeam setVisible={setIsVisible} />
         <span className="p-6">
-          <span className="text-slate-500">
+          <span>
             Looking to join an existing team? Ask someone of that team to invite
             you and
           </span>
           <span className="pl-2 text-primary">
-            <Link to={AppRoutes.workspace.team} className="text-emerald-500">
+            <Link to={AppRoutes.workspace.team} className="theme-text-primary">
               check your team
             </Link>
           </span>

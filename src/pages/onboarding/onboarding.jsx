@@ -11,7 +11,7 @@ import useSocket from "../../hooks/use-socket.hook";
 function OnboardingPage() {
   const navigate = useNavigate();
   const { teamService } = useAppService();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   const socket = useSocket([SocketEvent.team.create], (event, data) => {
     if (event === SocketEvent.team.create) {
@@ -36,6 +36,10 @@ function OnboardingPage() {
         }
       })
       .catch(({ response }) => {
+        if (response.status === 401) {
+          signOut();
+        }
+        console.log("🚀 ~ response", { response });
         toast.error(response.data.message);
       })
       .finally(() => {});
