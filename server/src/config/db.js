@@ -2,8 +2,8 @@ const Mongoose = require("mongoose");
 const { MONGO_URI } = require("./config");
 
 exports.connect = () => {
-  console.log("🚀 ~ file: db.js:1 ~ MONGO_URI", process.env.MONGO_URI);
-  Mongoose.connect(process.env.MONGO_URI, {
+  console.log("🚀 ~ Connecting Db at:", MONGO_URI);
+  Mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

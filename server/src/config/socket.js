@@ -4,14 +4,13 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const authConfig = require("../config/auth.config");
 const UserService = require("../services/user.service");
-const { SOCKET_URL } = require("./config");
 
 const socket = (server) => {
-  console.log("🚀: socket initialized");
+  console.log("🚀: socket initialized",{'origin':process.env.SOCKET_URL});
 
   const io = socketIO(server, {
     cors: {
-      origin: SOCKET_URL,
+      // origin: process.env.SOCKET_URL,
       methods: ["GET", "POST"],
     },
   });
