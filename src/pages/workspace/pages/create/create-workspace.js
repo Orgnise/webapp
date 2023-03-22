@@ -49,8 +49,8 @@ const CreateWorkspacePage = () => {
       <NavbarLayout>
         <Nav />
       </NavbarLayout>
-      <div className="flex-1 flex flex-col justify-center overflow-hidden bg-default py-6 sm:py-12">
-        <div className="relative mx-auto w-full max-w-md bg-card px-6 pt-10   border theme-border sm:rounded-xl sm:px-10">
+      <div className="flex-1 flex flex-col justify-center overflow-hidden mx-3">
+        <div className="relative mx-auto w-full max-w-md bg-card px-6 pt-10 shadow rounded ">
           <div className="w-full">
             <div className="text-center">
               <Label size="h1" variant="t2">

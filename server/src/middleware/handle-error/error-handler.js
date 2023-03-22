@@ -6,9 +6,12 @@ module.exports = function (options) {
   return function (err, req, res, next) {
     console.log("🚀 ~ file: error-handler.js:7 ~ err", err);
     if (err.code === "invalid_token") {
-      global.socket.emit("auth:authorized", {
-        isAuthenticated: false,
-      });
+      if(global.socket){
+
+        global.socket.emit("auth:authorized", {
+          isAuthenticated: false,
+        });
+      }
     }
     console.log("❤️‍🔥", chalk.red("[errorHandler]"), err);
 
