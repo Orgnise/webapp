@@ -112,7 +112,7 @@ function Content({ leftPanelSize, children }: IContentProps) {
         `w-[calc(100%-${leftPanelSize}px)]`
       )}>
       <div className="px-6 w-full h-full">
-        <div className="mx-auto w-full max-w-[720px] h-full">{children}</div>
+        <div className="mx-auto w-full max-w-3xl h-full">{children}</div>
       </div>
     </div>
   );

@@ -75,7 +75,7 @@ export default function ItemPage({ item }) {
           </div>
         </CustomDropDown>
       </div>
-      <div className="flex flex-col bg-card px-16 py-10 rounded-lg shadow-md">
+      <div className="flex flex-col bg-card p-10 rounded-lg shadow-md">
         {/* <Typography /> */}
         <form id={item.id} onSubmit={handleSubmit}>
           <input
@@ -87,7 +87,7 @@ export default function ItemPage({ item }) {
             className="w-full bg-transparent font-semibold text-4xl"
           />
 
-          <div className="Editor_Wrapper">
+          <div className="Editor_Wrapper prose max-w-none">
             <Fold
               value={!displayEditors ? "content" : null}
               ifPresent={(v) => (
