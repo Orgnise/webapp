@@ -212,6 +212,26 @@ export const WorkspaceProvider = ({ children }) => {
     });
   }
 
+  function onWorkspaceDelete(workspace) {
+    setWorkspaceList((prev) => {
+      return prev.filter((w) => w.id !== workspace.id);
+    });
+  }
+
+  function handleDeleteWorkspace(slug) {
+    if (!slug) return;
+    try {
+      const deletedWorkspace = workspaceService.deleteWorkspaceBySlug(slug);
+      if (deletedWorkspace) {
+        toast.success("Workspace deleted");
+        onWorkspaceDelete(workspace);
+        return true;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const value = {
     team,
     isLoadingTeam,
@@ -220,6 +240,7 @@ export const WorkspaceProvider = ({ children }) => {
     workspace,
     isUpdatingWorkspace,
     handleUpdateWorkspace,
+    deleteWorkspace: handleDeleteWorkspace,
     workspacesList,
     isLoadingWorkSpaceList,
     allCollection,

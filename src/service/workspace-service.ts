@@ -120,4 +120,15 @@ export default class WorkspaceService {
       .put(Endpoints.team.workspaceBySlug(slug).updateBySlug, payload)
       .then((response) => response.data);
   }
+
+  /**
+   * Delete workspace by slug
+   * @param {string} slug - workspace slug
+   * @returns {Promise<AxiosResponse<any>>}
+   */
+  async deleteWorkspaceBySlug(slug: string): Promise<AxiosResponse<any>> {
+    return this.client
+      .delete(Endpoints.team.workspaceBySlug(slug).deleteBySlug)
+      .then((response) => response.data);
+  }
 }

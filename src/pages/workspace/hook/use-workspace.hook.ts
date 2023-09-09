@@ -36,6 +36,7 @@ function useWorkspace(): {
    */
   updateCollection: (body: Object) => void;
   deleteCollection: (id: String, parent: String | undefined) => void;
+  deleteWorkspace: (id: String) => Promise<boolean | undefined>;
 } {
   return React.useContext(WorkspaceContext);
 }
