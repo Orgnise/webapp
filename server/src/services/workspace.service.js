@@ -8,9 +8,11 @@ const {
 const HttpException = require("../helper/exception/http-exception");
 const UserService = require("./user.service");
 const TeamService = require("./team.service");
+const CollectionService = require("./collection.service");
 const role = require("../helper/role");
 const Mongoose = require("mongoose");
 const { generateSlug } = require("../helper/slug-helper");
+const { logInfo, logDebug } = require("../helper/logger");
 
 module.exports = {
   getById,
@@ -21,6 +23,7 @@ module.exports = {
   getAllWorkspace,
   getAllWorkspaceBySlug,
   UpdateWorkspaceBySlug,
+  deleteBySlug,
 };
 
 /**
@@ -299,6 +302,34 @@ async function getAllWorkspaceBySlug(slug) {
 
     // Return all workspaces
     return workspaces;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Delete workspace by slug
+ * @param {string} slug
+ * @returns {Promise<Workspace>}
+ * @throws {HttpException}
+ */
+async function deleteBySlug(slug) {
+  try {
+    // Check if user exists in team
+    const workspace = await getBySlug(slug);
+
+    const isAllCollectionDeleted =await CollectionService.deleteAllCollection(workspace.id);
+    if(isAllCollectionDeleted){
+      logInfo(`All collection deleted for workspace ${workspace.id}`,"deleteBySlug",4);
+    }
+
+    // Delete workspace from database
+    const dd = await workspace.deleteOne();
+    logInfo(`Workspace ${workspace.id} deleted`,"deleteBySlug",4);
+    
+
+    // return workspace
+    return workspace;
   } catch (error) {
     throw error;
   }

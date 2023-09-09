@@ -17,6 +17,7 @@ module.exports = {
   deleteCollection,
   getAllCollection,
   updateItemParent,
+  deleteAllCollection,
 };
 
 /**
@@ -291,6 +292,26 @@ async function getAllCollection(body) {
       error.message,
       error.error
     );
+  }
+}
+
+/**
+ * Delete all collections/items of a workspace
+ * @param {string} workspaceId
+ * @returns {Promise<boolean>}
+ */
+async function deleteAllCollection(workspaceId) {
+  try {
+    // Get all collections of a workspace from database if exists
+    const collections = await getAllCollection(workspaceId);
+
+    // Delete all collections from database
+    await Collection.deleteMany({ workspace: workspaceId });
+
+    // Return all collections
+    return true;
+  } catch (error) {
+    throw error;
   }
 }
 
