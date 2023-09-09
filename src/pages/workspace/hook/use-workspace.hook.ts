@@ -7,8 +7,8 @@ type Workspace = {
   description?: string;
   team: string;
   members: string[];
-  visibility?: 'public' | 'private' | 'archived' | 'deleted';
-}
+  visibility?: "public" | "private" | "archived" | "deleted";
+};
 
 /**
  * Hook to get the user from the context
@@ -36,6 +36,7 @@ function useWorkspace(): {
    */
   updateCollection: (body: Object) => void;
   deleteCollection: (id: String, parent: String | undefined) => void;
+  deleteWorkspace: (id: String) => Promise<boolean | undefined>;
 } {
   return React.useContext(WorkspaceContext);
 }

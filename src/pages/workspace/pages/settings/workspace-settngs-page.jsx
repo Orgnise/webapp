@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import cx from "classnames";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Breadcrumb from "../../../../components/breadcrumb";
 import Label from "../../../../components/typography";
 import { NavbarLayout } from "../../../layout";
@@ -15,10 +15,15 @@ import { LoadingSpinner } from "../../../../components/atom/spinner";
 function WorkspaceSettingsPage() {
   const [workspaceName, setWorkspaceName] = useState();
 
-  const { workspace, handleUpdateWorkspace, isUpdatingWorkspace } =
-    useWorkspace();
+  const {
+    workspace,
+    handleUpdateWorkspace,
+    isUpdatingWorkspace,
+    deleteWorkspace,
+  } = useWorkspace();
   const {} = useAppService();
   const param = useLocation().pathname.split("/");
+  const navigation = useNavigate();
 
   React.useEffect(() => {
     if (Validator.hasValue(workspace)) {
@@ -146,13 +151,12 @@ function WorkspaceSettingsPage() {
           <TileComponent
             title="Delete this workspace"
             buttonText="Delete"
-            disabled={true}
             subtext="This will delete all the collections in this workspace. Once you delete a workspace, there is no going back. Please be certain."
-            onClick={() => {
-              handleUpdateWorkspace({
-                ...workspace,
-                visibility: "deleted",
-              });
+            onClick={async () => {
+              const isDeleted = await deleteWorkspace(workspace.meta.slug);
+              if (isDeleted) {
+                navigation(-1);
+              }
             }}
           />
         </div>

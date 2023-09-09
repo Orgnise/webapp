@@ -36,8 +36,14 @@ const logSuccess = (message, label) => {
 };
 
 // Log info messages to the console
-const logInfo = (message, label) => {
-  console.info("📃:", chalk.dim("[Info]"), chalk.blue(label || ""), message);
+const logInfo = (message, label,initial = "📃 :") => {
+  let i = "";
+  if(initial && typeof initial === "number"){
+    for(let j = 0; j < initial; j++){
+      i += " ";
+    }
+  }
+  console.info(`${i}`, chalk.dim("[Info]"), chalk.blue(label || ""), message);
   // if (typeof message === "string") {
   // } else {
   //   console.info("📃:", chalk.blue("Info"), message);

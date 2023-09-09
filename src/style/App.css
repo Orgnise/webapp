@@ -35,10 +35,10 @@ h2.ce-header {
   margin: 2.33em 0;
 } */
 
-.Editor_Wrapper h2 {
+/* .Editor_Wrapper h2 {
   font-size: 1.5em;
   font-weight: bold;
-}
+} */
 
 /* To enable cursor in a single click in Header tool*/
 .ce-header[contentEditable="true"][data-placeholder]::before {

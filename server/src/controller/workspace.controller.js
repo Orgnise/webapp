@@ -28,6 +28,7 @@ router.post(
 router.get("/workspace/get_by_id/:id", authorize(), getWorkspaceById);
 router.get("/workspace/slug/:slug", authorize(), getWorkspaceBySlug);
 router.put("/workspace/slug/:slug", authorize(),UpdateWorkspaceSchema, UpdateWorkspaceBySlug);
+router.delete("/workspace/slug/:slug", authorize(), deleteWorkspaceBySlug);
 router.post(
   "/team/:id/workspace/add_examples",
   authorize(),
@@ -46,6 +47,7 @@ router.post(
   addExampleWorkspaceSchema,
   addExamplesBySlug
 );
+
 
 function createWorkspaceSchema(req, res, next) {
   const schema = Joi.object({
@@ -258,6 +260,26 @@ function getWorkspaceBySlug(req, res, next) {
       });
     })
     .catch(next);
+}
+
+/**
+ * Delete workspace by slug.
+ * Delete all collections of workspace.
+ */
+function deleteWorkspaceBySlug(req,res,next){
+  const user = req.auth;
+  const slug = req.params.slug;
+  WorkspaceService.deleteBySlug(slug)
+  .then((workspace) => {
+    return ApiResponseHandler.success({
+      res: res,
+      data: workspace,
+      message: "Workspace deleted successfully",
+      dataKey: "workspace",
+      status: HttpStatusCode.OK,
+    });
+  })
+  .catch(next);
 }
 
 module.exports = router;
