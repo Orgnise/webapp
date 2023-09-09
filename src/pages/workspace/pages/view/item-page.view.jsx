@@ -1,17 +1,15 @@
+import { Editor } from "novel";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import CustomEditor from "../../../../components/compound/editorjs/editor";
-import { Article } from "../../../../components/compound/editorjs/parser/editorjs-block";
 import CustomDropDown from "../../../../components/custom_dropdown";
 import SvgIcon from "../../../../components/svg-icon/svg-icon";
-import Label, { Typography } from "../../../../components/typography";
-import { Fold } from "../../../../helper/typescript-utils";
+import Label from "../../../../components/typography";
 import Validator from "../../../../helper/validator";
 import useWorkspace from "../../hook/use-workspace.hook";
 
 export default function ItemPage({ item }) {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState();
+  const [content, setContent] = useState({});
   const [displayEditors, setDisplayEditors] = useState(false);
   const { deleteCollection, updateCollection, allCollection } = useWorkspace();
 
@@ -33,12 +31,16 @@ export default function ItemPage({ item }) {
   };
 
   useEffect(() => {
+    const data = window.localStorage.getItem(item.id);
+    if (data && !content) {
+      setContent(JSON.parse(data));
+    }
     document.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
-  });
+  }, [content, item.id]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -75,20 +77,44 @@ export default function ItemPage({ item }) {
           </div>
         </CustomDropDown>
       </div>
-      <div className="flex flex-col bg-card p-10 rounded-lg shadow-md">
-        {/* <Typography /> */}
-        <form id={item.id} onSubmit={handleSubmit}>
+      <form id={item.id} onSubmit={handleSubmit}>
+        <div className="bg-card mb-2 px-10 py-2 rounded-md shadow-md">
           <input
             type="text"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
             }}
-            className="w-full bg-transparent font-semibold text-4xl"
+            className="w-full bg-transparent font-semibold text-3xl focus:outline-none "
           />
+        </div>
+        <div className="flex flex-col bg-card  rounded-lg shadow-md">
+          {/* <Typography /> */}
+          {/* <hr className="mt-4" /> */}
 
-          <div className="Editor_Wrapper prose max-w-none">
-            <Fold
+          <Editor
+            key={item.id}
+            className="shadow-none p-0 m-0"
+            storageKey={item.id}
+            onUpdate={(editor) => {}}
+            extensions={["header", "list", "image"]}
+            defaultValue={content}
+            editorProps={{
+              placeholder: "Let's write an awesome story!",
+              autofocus: true,
+            }}
+            onDebouncedUpdate={(editor) => {
+              // console.log({
+              //   text: editor.getText(),
+              //   html: editor.getHTML(),
+              //   json: editor.getJSON(),
+              //   // attributes: editor.getAttributes(),
+              // });
+              setContent(editor.getJSON());
+            }}
+          />
+          <div className="Editor_Wrapper prose max-w-none  dark:prose-invert">
+            {/* <Fold
               value={!displayEditors ? "content" : null}
               ifPresent={(v) => (
                 <CustomEditor
@@ -107,10 +133,11 @@ export default function ItemPage({ item }) {
               ifAbsent={() => (
                 <Article data={content && content.blocks && content.blocks} />
               )}
-            />
+            /> */}
+            {/* <Article data={content} /> */}
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }

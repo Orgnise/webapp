@@ -60,6 +60,7 @@ export default function CollectionPage({ collection }) {
           return (
             <Link
               to={`${relativePath}/${item.id}`}
+              preventScrollReset={false}
               className="flex items-center gap-2 p-2 hover:bg-surface rounded cursor-pointer ">
               <SvgIcon icon="chevronRight" className="pr-1" size={5} />
               <div className="font-sans ">{item.title}</div>

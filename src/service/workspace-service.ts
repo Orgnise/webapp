@@ -112,7 +112,10 @@ export default class WorkspaceService {
    * }
    * @returns {Promise<AxiosResponse<any>>}
    */
-  async handleUpdateWorkspaceBySlug(slug: string, payload: any): Promise<AxiosResponse<any>> {
+  async handleUpdateWorkspaceBySlug(
+    slug: string,
+    payload: any
+  ): Promise<AxiosResponse<any>> {
     return this.client
       .put(Endpoints.team.workspaceBySlug(slug).updateBySlug, payload)
       .then((response) => response.data);

@@ -7,8 +7,8 @@ type Workspace = {
   description?: string;
   team: string;
   members: string[];
-  visibility?: 'public' | 'private' | 'archived' | 'deleted';
-}
+  visibility?: "public" | "private" | "archived" | "deleted";
+};
 
 /**
  * Hook to get the user from the context
