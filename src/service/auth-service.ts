@@ -57,4 +57,17 @@ export default class AuthService {
       })
       .then((response) => response.data);
   }
+
+  /**
+   * Login with google
+   * @param {any} accessToken
+   * @returns {Promise<any>}
+   * @memberof AuthService
+   * @throws {AxiosError}
+   */
+  async loginWithGoogle(accessToken: string): Promise<any> {
+    return this.client
+      .post(Endpoints.auth.loginWithGoogle, { accessToken: accessToken })
+      .then((response) => response.data);
+  }
 }

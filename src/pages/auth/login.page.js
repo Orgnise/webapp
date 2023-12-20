@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import cx from "classnames";
+import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import loginSvg from "../../assets/secure-login-animate.svg";
 import { AppRoutes } from "../../helper/app-routes";
 import { useAppService } from "../../hooks/use-app-service";
 import useSocket from "../../hooks/use-socket.hook";
@@ -11,8 +10,9 @@ import useAuth from "../../hooks/use-auth";
 import Button from "../../components/atom/button";
 import Label from "../../components/typography";
 import { TextField } from "../../components/molecule/text-field";
+import { toast } from "react-hot-toast";
 
-const Login = () => {
+const LoginComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setError] = useState({});
@@ -59,48 +59,74 @@ const Login = () => {
       return;
     }
     setError({});
+    authService.login({ email, password }).then(({ user }) => {
+      console.log("User authenticate successfully");
+
+      socket.emit(SocketEvent.auth.register, {
+        jwtToken: user.jwtToken,
+      });
+      auth.signIn(user);
+      if (from === "/login") {
+        navigate(AppRoutes.workspace.team, { replace: true });
+      } else {
+        alert(Array.isArray(errors) ? errors[0] : message);
+      }
+    });
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
+      const { access_token, expire_in } = tokenResponse;
+      loginWithGoogle(access_token);
+    },
+    onError: (errorResponse) => console.log(errorResponse),
+  });
+
+  const loginWithGoogle = (accessToken) => {
+    if (!accessToken) {
+      setError({
+        ...errors,
+        googleAuth: "Something went wrong. Please try again later",
+      });
+      return;
+    }
+    setError({});
     authService
-      .login({ email, password })
+      .loginWithGoogle(accessToken)
       .then(({ user }) => {
-        console.log("User authenticate successfully");
+        console.log("User registered successfully");
 
         socket.emit(SocketEvent.auth.register, {
           jwtToken: user.jwtToken,
         });
+        console.log("New user created", user);
         auth.signIn(user);
-        if (from === "/login") {
-          navigate(AppRoutes.workspace.team, { replace: true });
-        } else {
-          navigate(from, { replace: true });
-        }
+        navigate(AppRoutes.workspace.team, { replace: true });
       })
       .catch((err) => {
-        const response = err.response;
-        if (!response) {
-          console.error(
-            "🚀 ~ file: login.page.js ~ line 43 ~ login ~ response",
-            response
-          );
-
-          return;
-        }
-        const { status, errorCode, message, error } = response.data;
-        if (status === 422 && Array.isArray(error)) {
-          const errors = {};
-          error.forEach((err) => {
-            errors[Object.keys(err)[0]] = Object.values(err)[0];
+        const { status, error } = err;
+        if (status === 400) {
+          setError({
+            ...errors,
+            googleAuth: "Something went wrong. Please try again later",
           });
-          setError(errors);
+          return;
         } else {
-          alert(Array.isArray(error) ? error[0] : message);
+          setError({
+            ...errors,
+            googleAuth: error,
+          });
         }
+        toast.error("Something went wrong. Please try again later", {
+          position: "top-right",
+        });
       });
   };
 
   return (
     <div className="bg- max-w-screen-xl m-auto h-full">
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 h-full  items-center place-content-center">
-        <img className="hidden md:inline-block" src={loginSvg} />
+      <div className="max-w-xl mx-auto grid md:grid-cols-1 grid-cols-1 gap-2 h-full  items-center place-content-center">
         <form
           className="flex flex-col items-center place-content-center  h-full  rounded-md"
           onSubmit={login}>
@@ -138,9 +164,24 @@ const Login = () => {
             wrapperClassName="w-9/12"
           />
           <Button label="Sign in" onClick={() => {}} className=" w-9/12" />
+          {/* GOOGLE LOGIN */}
+          <div className="mt-4">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                googleLogin();
+              }}
+              className="px-4 theme-input  my-6 bg-white shadow">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png"
+                className="h-6 w-6"
+              />
+              <span className="ml-2">Sign in with Google</span>
+            </button>
+          </div>
           <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
             <span className="border-t theme-border flex-1" />
-            <span className="px-4 text-sm hover:underline cursor-pointer">
+            <span className="px-4 text-sm underline cursor-pointer">
               <Link to={AppRoutes.signup}>CREATE AN ACCOUNT</Link>
             </span>
             <span className="border-t theme-border flex-1" />
@@ -150,5 +191,13 @@ const Login = () => {
     </div>
   );
 };
+
+function Login() {
+  return (
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+      <LoginComponent />
+    </GoogleOAuthProvider>
+  );
+}
 
 export default Login;

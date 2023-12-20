@@ -16,7 +16,7 @@ const UserSchema = new Mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
       minlength: 3,
     },
@@ -38,6 +38,15 @@ const UserSchema = new Mongoose.Schema(
       type: String,
       required: false,
     },
+    picture:{
+      type: String,
+      required: false,
+    },
+    authProvider:{
+      type: String,
+      required: false,
+      default: "default",
+    }
   },
   {
     timestamps: true,
@@ -74,6 +83,7 @@ UserSchema.methods.userBasicInfo = function () {
   delete user.token;
   delete user.role;
   delete user.updatedAt;
+  delete user.authProvider;
   return user;
 };
 

@@ -12,6 +12,7 @@ const { updateCache } = require("../helper/redis/redis-client");
 // routes
 router.post("/auth/register", registerSchema, registerUser);
 router.post("/auth/login", authenticateSchema, authenticate);
+router.post("/auth/google-login", googleAuthScheme, googleAuthenticate);
 router.post("/auth/refresh-token", refreshToken);
 router.post("/auth/revoke-token", authorize(), revokeTokenSchema, revokeToken);
 router.get("/auth/all", authorize(Role.User), getAll);
@@ -33,6 +34,13 @@ function authenticateSchema(req, res, next) {
   const schema = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),
+  });
+  ValidationRequest(req, next, schema);
+}
+
+function googleAuthScheme(req, res,next) {
+  const schema = Joi.object({
+    accessToken: Joi.string().required(),
   });
   ValidationRequest(req, next, schema);
 }
@@ -67,6 +75,27 @@ function authenticate(req, res, next) {
     ipAddress: "ipAddress",
   })
     .then(({ refreshToken, ...user }) => {
+      setTokenCookie(res, refreshToken);
+      ApiResponseHandler.success({
+        res: res,
+        message: "User authenticated successfully",
+        data: { ...user, refreshToken },
+        dataKey: "user",
+      });
+    })
+    .catch(next);
+}
+
+// Authentication with Google auth
+function googleAuthenticate(req, res, next) {
+  const { accessToken } = req.body;
+  const ipAddress = req.socket.localAddress;
+
+  UserService.authenticateWithGoogle({
+    accessToken: accessToken,
+    ipAddress: ipAddress,
+  })
+    .then(({ user, refreshToken }) => {
       setTokenCookie(res, refreshToken);
       ApiResponseHandler.success({
         res: res,

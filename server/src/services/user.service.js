@@ -13,6 +13,7 @@ const HttpException = require("../helper/exception/http-exception");
 
 module.exports = {
   authenticate,
+  authenticateWithGoogle,
   refreshToken,
   revokeToken,
   getAll,
@@ -44,6 +45,60 @@ async function authenticate({ email, password, ipAddress }) {
   return {
     ...user.userBasicInfo(),
     jwtToken,
+    refreshToken: refreshToken.token,
+  };
+}
+
+// Authenticate user with google
+async function authenticateWithGoogle({ accessToken, ipAddress }) {
+  const data = await fetch(
+    "https://www.googleapis.com/oauth2/v3/userinfo",{
+        headers: { Authorization: `Bearer ${accessToken}` }
+    }
+  ).then((res) => res.json());
+
+  if(data?.error){
+    throw new HttpException(
+      HttpStatusCode.BAD_REQUEST,
+      data.error,
+      data?.error_description
+    );
+  }
+
+  
+  const { email,name,picture } = data;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    // Create new user
+    const newUser = new User({
+      name,
+      email,
+      picture,
+      authProvider: "google",
+      role: "user",
+    });
+    await newUser.save();
+  }
+
+  const user2 = await User.findOne({ email });
+
+  // Authenticate successful so generate jwt and refresh tokens
+  const jwtToken = generateJwtToken(user2);
+  const refreshToken = generateRefreshToken(user2, ipAddress);
+
+  // Save refresh token
+  await refreshToken.save();
+  return {
+    user: {
+      id: user2._id,
+      role: user2.role,
+      name: user2.name,
+      email: user2.email,
+      picture: user2.picture,
+      jwtToken: jwtToken,
+      createdAt: user2.createdAt,
+    },
     refreshToken: refreshToken.token,
   };
 }

@@ -42,6 +42,13 @@ const Nav = () => {
                 button={
                   <div className="flex items-center place-content-center font-bold text-lg h-10 w-10 rounded-full bg-teal-200 text-teal-500 hover:text-teal-700">
                     {/* {user.name[0].toUpperCase()} */}
+                    {user.picture && (
+                      <img
+                        src={user.picture}
+                        alt="user"
+                        className="h-8 w-8 rounded-full"
+                      />
+                    )}
                   </div>
                 }>
                 <div className="bg-card px-3 py-3 border theme-border rounded">

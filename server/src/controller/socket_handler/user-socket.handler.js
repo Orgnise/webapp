@@ -33,7 +33,7 @@ module.exports = (io, socket) => {
       return true;
     } catch (error) {
       socket.emit("auth:authorized", error);
-      logError("User is not authenticated", "registerUser ~ line 31");
+      logError("User is not authenticated", "User-socket ~ line 36");
     }
   };
 
