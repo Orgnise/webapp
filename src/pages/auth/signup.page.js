@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import cx from "classnames";
 import { Link, useNavigate } from "react-router-dom";
-import loginSvg from "../../assets/secure-login-animate.svg";
 import { AppRoutes } from "../../helper/app-routes";
 import useLocalStorage from "../../hooks/use-local-storage";
 import { useAppService } from "../../hooks/use-app-service";
@@ -139,9 +137,7 @@ const Signup = () => {
 
   return (
     <div className="max-w-screen-xl m-auto h-full">
-      <div className="grid md:grid-cols-2 grid-cols-1 gap-2 h-full items-center  place-content-center">
-        <img className="hidden md:inline-block" src={loginSvg} />
-
+      <div className="max-w-xl mx-auto grid md:grid-cols-1 grid-cols-1 gap-2 h-full  items-center place-content-center">
         <form
           className="flex flex-col items-center place-content-center h-full  rounded-md py-10"
           onSubmit={handleLogin}>

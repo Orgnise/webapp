@@ -41,7 +41,9 @@ export default class Validator {
     if (node) {
       const keys = path.split(".");
       for (let i = 0; i < keys.length; i++) {
+        // @ts-ignore
         if (node[keys[i]]) {
+          // @ts-ignore
           node = node[keys[i]];
         }
       }

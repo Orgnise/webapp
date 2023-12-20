@@ -23,6 +23,7 @@ function WorkspaceContentView({
   onLeftPanelStateChange = (_: number) => {},
 }: IWorkspaceContentViewProps) {
   const [leftPanelSize, setLeftPanelSize] = useState(
+    // @ts-ignore
     LeftPanelSize[leftPanelState]
   );
 

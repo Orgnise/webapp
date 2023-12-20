@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import SocketProvider from "./provider/socket.provider";
-import AppServiceContext from "./provider/app-service.provider";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./provider/auth-provider";
 import AppServiceProvider from "./provider/app-service.provider";
