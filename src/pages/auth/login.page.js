@@ -76,7 +76,6 @@ const LoginComponent = () => {
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      console.log(tokenResponse);
       const { access_token, expire_in } = tokenResponse;
       loginWithGoogle(access_token);
     },
@@ -100,7 +99,7 @@ const LoginComponent = () => {
         socket.emit(SocketEvent.auth.register, {
           jwtToken: user.jwtToken,
         });
-        console.log("New user created", user);
+
         auth.signIn(user);
         navigate(AppRoutes.workspace.team, { replace: true });
       })
@@ -185,6 +184,20 @@ const LoginComponent = () => {
               <Link to={AppRoutes.signup}>CREATE AN ACCOUNT</Link>
             </span>
             <span className="border-t theme-border flex-1" />
+          </div>
+
+          {/* Terms & Conditions and Privacy Policy */}
+          <div className="flex flex-col items-center place-content-center text-center w-9/12 pt-10">
+            <span className="text-sm">
+              By signing in, you agree to our{" "}
+              <span className="underline cursor-pointer">
+                <Link to={AppRoutes.terms}>Terms & Conditions</Link>
+              </span>{" "}
+              and{" "}
+              <span className="underline cursor-pointer">
+                <Link to={AppRoutes.privacy}>Privacy Policy</Link>
+              </span>
+            </span>
           </div>
         </form>
       </div>
