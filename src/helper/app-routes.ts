@@ -30,4 +30,6 @@ export const AppRoutes = {
   addTask: "?task=create",
   task: "task",
   comments: "/comments/:category/:id",
+  privacy: "/privacy",
+  terms: "/terms",
 };

@@ -18,6 +18,8 @@ import AllTeamsPage from "./pages/team/all-teams.page";
 import CreateTeamPage from "./pages/team/create/create-team";
 import AddExampleWorkspacePage from "./pages/onboarding/add-example-workspace";
 import useTheme from "./pages/workspace/hook/use-theme.hook";
+import PrivacyPolicyPage from "./pages/workspace/pages/privacy-policy/privacy-policy.page";
+import TermsAndConditionPage from "./pages/workspace/pages/privacy-policy/terms-and-conditions.page";
 
 function App() {
   const socket = useSocket([SocketEvent.auth.checkAuth], retryAuth);
@@ -83,6 +85,8 @@ function App() {
           />
 
           <Route path={AppRoutes.notFound} element={<NoPageFound />} />
+          <Route path={AppRoutes.privacy} element={<PrivacyPolicyPage />} />
+          <Route path={AppRoutes.terms} element={<TermsAndConditionPage />} />
         </Route>
       </Routes>
     </div>
