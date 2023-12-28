@@ -1,47 +1,72 @@
 "use client";
-import React, { useState } from "react";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 import Link from "next/link";
 import Label from "@/components/atom/label";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/molecule/text-field";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { AuthSessionProvider } from "@/components/molecule/session";
+import { useFormState, useFormStatus } from "react-dom";
+import { authenticate } from "@/lib/actions";
 
-const LoginComponent = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setError] = useState({
+type LoginInput = {
+  email: string;
+  password: string;
+};
+const LoginPage = () => {
+  const [inputs, setInputs] = useState<LoginInput>({
     email: "",
     password: "",
   });
 
-  /// 👇🏻  Use the useSocket hook to get the socket
+  const [errors, setError] = useState<{
+    email?: string;
+    password?: string;
+    other?: string;
+  }>({});
 
-  // const location = useLocation();
-  // const pathname = location.pathname;
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setInputs((values) => ({ ...values, [name]: value }));
+  };
 
-  // get the redirect url from the query params
-  // const redirect = new URLSearchParams(useLocation().search).get("redirect");
-
-  const login = (e: any) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
+
+    if (inputs.password.length < 6) {
       setError({
         ...errors,
         password: "Password should be at least 6 characters long",
       });
       return;
     }
-    setError({
-      email: "",
-      password: "",
+    setError({});
+    await signIn("credentials", {
+      email: inputs.email,
+      password: inputs.password,
+      callbackUrl: "/",
+    }).catch((error) => {
+      console.log(error);
     });
   };
+
+  const { data: session } = useSession();
+  if (session) {
+    return (
+      <>
+        Signed in as {session.user.email} <br />
+        <button onClick={() => signOut()}>Sign out</button>
+      </>
+    );
+  }
 
   return (
     <div className="bg- max-w-screen-xl m-auto h-screen">
       <div className="max-w-xl mx-auto grid md:grid-cols-1 grid-cols-1 gap-2 h-full  items-center place-content-center">
         <form
           className="flex flex-col items-center place-content-center  h-full  rounded-md"
-          onSubmit={login}>
+          onSubmit={handleSubmit}>
           <div className="flex flex-col items-center font-normal">
             <Label size="h1" variant="t2">
               Welcome back
@@ -55,47 +80,86 @@ const LoginComponent = () => {
             label="Email"
             name="email"
             required={true}
-            onChange={(e: any) => {
-              setEmail(e.target.value);
-            }}
-            value={email}
+            // onChange={(e: any) => {
+            //   setEmail(e.target.value);
+            // }}
+            onChange={handleChange}
+            value={inputs.email}
             autoComplete="email"
             error={errors.email}
             type="email"
             wrapperClassName="w-9/12"
+            props={{
+              name: "email",
+            }}
           />
           <TextField
             label="Password"
             name="password"
             minLength={6}
             required={true}
-            onChange={(e: any) => {
-              setPassword(e.target.value);
-            }}
-            value={password}
+            onChange={handleChange}
+            value={inputs.password}
             autoComplete="password"
             error={errors.password}
             type="password"
             wrapperClassName="w-9/12"
+            props={{
+              name: "password",
+            }}
           />
-          <Button onClick={login} className=" w-9/12" type="submit">
-            Sign in
-          </Button>
-          {/* GOOGLE LOGIN */}
-          <div className="mt-4">
-            <Button
-              variant={"secondary"}
-              onClick={(e) => {
+          <Button className="mt-4 w-9/12">Log in</Button>
+          <div
+            className="flex h-8 items-end space-x-1"
+            aria-live="polite"
+            aria-atomic="true">
+            {errors?.other && (
+              <>
+                {/* <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> */}
+                <p className="text-sm text-red-500">{errors?.other}</p>
+              </>
+            )}
+          </div>
+          <div className="flex gap-4 mt-4">
+            {/* GOOGLE LOGIN */}
+            <button
+              onClick={async (e) => {
                 e.preventDefault();
                 // googleLogin();
+                await signIn("google");
               }}
-              className="px-4 theme-input  my-6 bg-white shadow">
+              className=" bg-white shadow rounded-full p-2">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png"
-                className="h-6 w-6"
+                className="h-8 w-8"
               />
-              <span className="ml-2 text-foreground">Sign in with Google</span>
-            </Button>
+            </button>
+            {/* Github Login */}
+            <button
+              onClick={async (e) => {
+                e.preventDefault();
+                // googleLogin();
+                await signIn("github");
+              }}
+              className="bg-white shadow rounded-full p-2">
+              <img
+                src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"
+                className="h-8 w-8"
+              />
+            </button>
+            {/* Twitter Login */}
+            <button
+              className=" bg-white shadow rounded-full p-2"
+              onClick={async (e) => {
+                e.preventDefault();
+                // googleLogin();
+                await signIn("twitter");
+              }}>
+              <img
+                src="https://abs.twimg.com/favicons/twitter.ico"
+                className="h-8 w-8"
+              />
+            </button>
           </div>
           <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
             <span className="border-t theme-border flex-1" />
@@ -124,12 +188,4 @@ const LoginComponent = () => {
   );
 };
 
-function Login() {
-  return (
-    // <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
-    <LoginComponent />
-    // </GoogleOAuthProvider>
-  );
-}
-
-export default Login;
+export default LoginPage;
