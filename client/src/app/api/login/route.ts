@@ -1,13 +1,12 @@
 
 import { ObjectId } from "mongodb";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { User } from "../../../../types/user.type";
 import mongoDb from "@/lib/mongodb";
 
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const client = await mongoDb
   try {
     const credentials: credentials = await request.json();

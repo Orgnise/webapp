@@ -14,7 +14,6 @@ import Logo from "../atom/logo";
 const Nav = () => {
   const { data: session } = useSession();
   const user = session?.user as any;
-  console.log(user);
   const handleLogout = () => {};
 
   return (
