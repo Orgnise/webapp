@@ -1,4 +1,5 @@
 // import Mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 import { User } from "./user.model";
 // const Schema = Mongoose.Schema;
 
@@ -10,17 +11,21 @@ export const Role = {
 };
 export interface Teams {
   name: string;
+  description?: string;
+  createdBy: ObjectId,
+  members: {
+    user: ObjectId,
+    role: keyof typeof Role
+  }[],
+  meta: Meta,
+  createdAt: Date;
+  membersCount: number;
+}
+
+export interface Meta {
+  title: string;
   description: string;
-  createdBy: String;
-  members: User[],
-  meta: {},
-  deactivatedAt: Date;
-  // deactivatedBy: typeof Mongoose.Schema.Types.ObjectId;
-  deactivatedNote: string;
-  reactivatedAt: Date;
-  timestamps: string;
-  membersCount: string;
-  isDeactivated: string;
+  slug: string;
 }
 
 // const TeamSchema = new Schema<Teams>(

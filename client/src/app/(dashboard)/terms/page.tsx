@@ -8,10 +8,9 @@ import { NavbarLayout } from "@/components/layout/nav-layout";
 export default function TermsAndConditionPage() {
   return (
     <div className="flex flex-col h-screen bg-default">
-      <NavbarLayout>
-        {/* <Nav /> */}
-        <></>
-      </NavbarLayout>
+      {/* <NavbarLayout>
+        <Nav />
+      </NavbarLayout> */}
       <div className="flex-1 pointer-events-none">
         <Editor
           key={"privacy-policy"}

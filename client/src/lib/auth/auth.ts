@@ -7,8 +7,7 @@ import { AuthOptions, } from "next-auth";
 import { MongoDBAdapter } from "@auth/mongodb-adapter"
 
 import { z } from 'zod';
-import mongoDb from './mongodb';
-import { profile } from 'console';
+import mongoDb from '../mongodb';
 import { mongoUserResult } from '@/app/api/signup/route';
 
 const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;

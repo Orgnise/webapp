@@ -1,4 +1,4 @@
-import { signIn } from '@/lib/auth';
+import { signIn } from '@/lib/auth/auth';
 
 export async function authenticate(
   prevState: string | undefined,

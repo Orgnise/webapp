@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 346.8 77.2% 49.8%;
+    --radius: 0.3rem;
+  }
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 95%;
+    --card: 24 9.8% 10%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 85.7% 97.3%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 346.8 77.2% 49.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom Theme */
+@layer base {
+
+  /** BACKGROUND */
+  .theme-bg-primary {
+    @apply bg-primary-500 dark:bg-primary-100;
+  }
+
+  .bg-default {
+    @apply bg-gray-50 dark:bg-[#1C1B1B];
+  }
+
+  .bg-surface {
+    @apply bg-gray-100 dark:bg-[#252525];
+  }
+
+  .bg-onSurface {
+    @apply bg-gray-200 dark:bg-[#2A2831];
+  }
+
+  .bg-surface2 {
+    @apply bg-[#EEE8F4] dark:bg-[#302D38];
+  }
+
+  .bg-surface3 {
+    @apply bg-[#EDE6F3] dark:bg-[#322E3A];
+  }
+
+  .bg-surface4 {
+    @apply bg-[#EDE6F3] dark:bg-[#35323E];
+  }
+
+  .bg-card {
+    @apply bg-white dark:bg-[#000000];
+  }
+
+  /* TEXT */
+  .theme-text-on-primary {
+    @apply text-white dark:text-primary-900;
+  }
+
+  .theme-text-primary {
+    @apply text-primary
+  }
+
+  .theme-text {
+    @apply text-slate-700 dark:text-slate-400;
+  }
+
+  .theme-text-h1 {
+    @apply text-slate-800 dark:text-slate-100;
+  }
+
+  .theme-text-h2 {
+    @apply text-slate-700 dark:text-slate-200;
+  }
+
+  .theme-text-h3 {
+    @apply text-slate-600 dark:text-slate-300;
+  }
+
+  .theme-text-sub1 {
+    @apply text-slate-500 dark:text-slate-400;
+  }
+
+  .theme-text-sub2 {
+    @apply text-slate-400 dark:text-slate-500;
+  }
+
+  /** BORDER */
+  .theme-border {
+    @apply border-gray-300 divide-gray-300 dark:border-gray-700 dark:divide-gray-700;
+  }
+}
+
+@layer components {
+
+  /** Link */
+  .link {
+    @apply flex items-center space-x-2 px-2 border-l-4 transition-all ease-in duration-200;
+  }
+
+  .link-active {
+    @apply bg-onSurface border-primary-500;
+  }
+
+  .link-inactive {
+    @apply hover: bg-surface border-transparent;
+  }
+
+  /** INPUT FIELD */
+  .theme-input {
+    @apply bg-surface border theme-border placeholder:theme-text-sub2 placeholder:text-sm placeholder:first-letter:uppercase p-2 rounded-md bg-surface;
+  }
+}
+
+.body {
+  scroll-behavior: smooth;
+  height: 100%;
+}

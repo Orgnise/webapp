@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import {
   DropdownMenu,
@@ -10,6 +11,7 @@ import {
 
 import { useSession, signOut } from "next-auth/react";
 import Logo from "../atom/logo";
+import { ModeToggle } from "../ui/toggle-theme";
 
 const Nav = () => {
   const { data: session } = useSession();
@@ -22,7 +24,8 @@ const Nav = () => {
         <Logo />
       </div>
 
-      <div className="">
+      <div className="flex gap-2 items-center">
+        <ModeToggle />
         {user && Object.keys(user).length !== 0 && (
           <div className="flex items-center space-x-4 ">
             <DropdownMenu>

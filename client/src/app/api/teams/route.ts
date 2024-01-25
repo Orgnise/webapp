@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoDb from "@/lib/mongodb";
 import { Teams } from "@/lib/models/team.modal";
 import { getServerSession } from "next-auth/next"
-import { NextAuthOptions } from "@/lib/auth";
+import { NextAuthOptions } from "@/lib/auth/auth";
 
 
 export async function GET(request: NextRequest) {

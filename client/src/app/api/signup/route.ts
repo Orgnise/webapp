@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
   try {
 
     const credentials: credentials = await request.json();
-    console.log(credentials);
     const parsedCredentials = z.object({ email: z.string().email(), password: z.string().min(6), name: z.string() }).safeParse(credentials);
     if (!parsedCredentials.success) {
       return NextResponse.json(
