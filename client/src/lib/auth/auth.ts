@@ -1,21 +1,20 @@
-import NextAuth from 'next-auth';
+import { AuthOptions, } from "next-auth";
+import Credentials from 'next-auth/providers/credentials';
 import GitHub from "@auth/core/providers/github"
 import Google from "next-auth/providers/google"
-import Credentials from 'next-auth/providers/credentials';
-import Twitter from "next-auth/providers/twitter"
-import { AuthOptions, } from "next-auth";
 import { MongoDBAdapter } from "@auth/mongodb-adapter"
-
-import { z } from 'zod';
+import NextAuth from 'next-auth';
+import Twitter from "next-auth/providers/twitter"
 import mongoDb from '../mongodb';
 import { mongoUserResult } from '@/app/api/signup/route';
+import { z } from 'zod';
 
-const backendURL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const backendURL = process.env.NEXT_PUBLIC_URL;
 
 export const NextAuthOptions = {
   adapter: MongoDBAdapter(mongoDb),
   pages: {
-    signIn: "/login",
+    error: "/login",
   },
   session: {
     strategy: "jwt",

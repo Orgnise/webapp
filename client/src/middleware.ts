@@ -1,29 +1,40 @@
-import { User } from "next-auth";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export const middleware = async (request: NextRequest) => {
-
-  const session: session = await fetch(`${process.env.SERVER_URL}/api/auth/session`, {
-    // headers: headers(),
-    cache: "no-store"
-  })
-    .then(async (res) => await res.json());
-
-  const loggedIn = Object.keys(session).length > 0 ? true : false;
-  const pathname = request.nextUrl.pathname;
-
-  if (pathname != "/login" && !loggedIn) {
-    return NextResponse.redirect(new URL('/login', process.env.SERVER_URL));
-  } else {
-    return NextResponse.next();
-  }
-
-}
+import { getToken } from "next-auth/jwt"
 
 export const config = {
-  // matcher: ["/admin/:path*"]
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
-}
+  matcher: [
+    /*
+     * Match all paths except for:
+     * 1. /api/ routes
+     * 2. /_next/ (Next.js internals)
+     * 3. /_proxy/ (special page for OG tags proxying)
+     * 4. /_static (inside /public)
+     * 5. /_vercel (Vercel internals)
+     * 6. Static files (e.g. /favicon.ico, /sitemap.xml, /robots.txt, etc.)
+     */
+    "/((?!api/|_next/|_proxy/|_static|_vercel|[\\w-]+\\.\\w+).*)",
+  ],
+};
 
-type session = {} | User;
+export const middleware = async (req: NextRequest) => {
+  const session = await getToken({
+    req: req,
+    secret: process.env.AUTH_SECRET,
+  });
+
+  const loggedIn = session?.user ? true : false;
+  const path = req.nextUrl.pathname;
+
+  // Redirect to login if not logged in
+  if (!['/login','/signup'].includes(path) && !loggedIn) {
+    return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_URL));
+  } 
+  // Redirect to home if logged in and trying to access login or signup
+  else if (path === "/login" || path === "/signup") {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+  else {
+    return NextResponse.next();
+  }
+}

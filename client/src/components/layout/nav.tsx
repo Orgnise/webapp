@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,21 +8,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { signOut, useSession } from "next-auth/react";
 
-import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 import Logo from "../atom/logo";
 import { ModeToggle } from "../ui/toggle-theme";
+import React from "react";
 
 const Nav = () => {
   const { data: session } = useSession();
-  const user = session?.user as any;
-  const handleLogout = () => {};
+  const user = session?.user;
 
   return (
     <div className="flex items-center place-content-between w-full">
-      <div className="flex items-center flex-shrink-0  w-64">
+      <Link href="/">
+      <div className="flex items-center flex-shrink-0 w-64">
         <Logo />
       </div>
+      </Link>
 
       <div className="flex gap-2 items-center">
         <ModeToggle />
@@ -36,6 +39,9 @@ const Nav = () => {
                       src={user.image}
                       alt="user"
                       className="h-8 w-8 rounded-full"
+                      onError={(e) => {
+                        (e.target as any).src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+                      }}
                     />
                   )}
                 </div>

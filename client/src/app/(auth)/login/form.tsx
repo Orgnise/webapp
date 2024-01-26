@@ -1,10 +1,12 @@
 "use client";
+
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import Link from "next/link";
-import Label from "@/components/atom/label";
+
 import { Button } from "@/components/ui/button";
+import Label from "@/components/atom/label";
+import Link from "next/link";
 import { TextField } from "@/components/molecule/text-field";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 
 type LoginInput = {
   email: string;
@@ -48,15 +50,7 @@ export function LoginForm() {
     });
   };
 
-  const { data: session } = useSession();
-  if (session) {
-    return (
-      <>
-        Signed in as {session.user.email} <br />
-        <button onClick={() => signOut()}>Sign out</button>
-      </>
-    );
-  }
+
 
   return (
     <form

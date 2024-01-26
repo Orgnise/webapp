@@ -1,9 +1,9 @@
 "use client";
 
 import LayoutLoader from "@/components/layout/loyout-loader";
+import { ReactNode } from "react";
 import TeamNotFound from "@/components/team/team-not-found";
 import useTeam from "@/lib/swr/use-team";
-import { ReactNode } from "react";
 
 export default function TeamAuth({ children }: { children: ReactNode }) {
   const { loading, error } = useTeam();
@@ -14,7 +14,7 @@ export default function TeamAuth({ children }: { children: ReactNode }) {
 
   if (error) {
     return (
-      <div className=" bg-default">
+      <div className="bg-background">
         <div className="max-w-3xl mx-auto">
           <TeamNotFound />
         </div>

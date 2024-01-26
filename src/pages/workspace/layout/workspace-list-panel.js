@@ -1,17 +1,18 @@
-import React from "react";
-import cx from "classnames";
-import { LoadingSpinner } from "../../../components/atom/spinner";
-import { SlideModal } from "../../../components/molecule/slide-modal";
-import { Fold } from "../../../helper/typescript-utils";
+import { NavLink, useNavigate } from "react-router-dom";
+
+import Button from "../../../components/atom/button";
 import CustomDropDown from "../../../components/custom_dropdown";
 import FIcon from "../../../components/ficon";
-import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
-import { ListView } from "../../../components/compound/list-view";
-import { NavLink, useNavigate } from "react-router-dom";
-import Button from "../../../components/atom/button";
-import useWorkspace from "../hook/use-workspace.hook";
+import { Fold } from "../../../helper/typescript-utils";
 import Label from "../../../components/typography";
+// import { regular, solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { ListView } from "../../../components/compound/list-view";
+import { LoadingSpinner } from "../../../components/atom/spinner";
+import React from "react";
+import { SlideModal } from "../../../components/molecule/slide-modal";
 import SvgIcon from "../../../components/svg-icon/svg-icon";
+import cx from "classnames";
+import useWorkspace from "../hook/use-workspace.hook";
 
 export default function WorkspaceSidePanel({ setActive, active }) {
   const navigate = useNavigate();
