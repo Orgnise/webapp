@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLabel, Logo } from "../atom/logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +12,6 @@ import {
 import { signOut, useSession } from "next-auth/react";
 
 import Link from "next/link";
-import Logo from "../atom/logo";
 import { ModeToggle } from "../ui/toggle-theme";
 import React from "react";
 
@@ -21,10 +21,9 @@ const Nav = () => {
 
   return (
     <div className="flex items-center place-content-between w-full">
-      <Link href="/">
-      <div className="flex items-center flex-shrink-0 w-64">
-        <Logo />
-      </div>
+      <Link href="/" className="Logo flex items-center gap-2">
+        <Logo className="h-12" />
+        <BrandLabel className="h-6" />
       </Link>
 
       <div className="flex gap-2 items-center">
