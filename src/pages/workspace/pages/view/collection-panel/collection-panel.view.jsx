@@ -1,15 +1,15 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import CustomDropDown from "../../../../../components/custom_dropdown";
-import Tab from "../../../../../components/molecule/tab";
-import SvgIcon from "../../../../../components/svg-icon/svg-icon";
-import Label from "../../../../../components/typography";
-import useWorkspace from "../../../hook/use-workspace.hook";
-import { LeftPanelSize } from "../../../layout/workspace-content-view";
 import CollectionBoard from "./collection-board";
 import CollectionGraph from "./collection-graph";
 import CollectionList from "./collection-list";
 import CollectionTable from "./collection-table";
+import CustomDropDown from "../../../../../components/custom_dropdown";
+import Label from "../../../../../components/typography";
+import { LeftPanelSize } from "../../../layout/workspace-content-view";
+import React from "react";
+import SvgIcon from "../../../../../components/svg-icon/svg-icon";
+import Tab from "../../../../../components/molecule/tab";
+import { useNavigate } from "react-router-dom";
+import useWorkspace from "../../../hook/use-workspace.hook";
 
 const PanelLayout = Object.freeze({
   list: "List",
@@ -85,7 +85,7 @@ export default function CollectionPanel({
           </div>
         </CustomDropDown>
       </div>
-      <PanelTopToolbar />
+      {/* <PanelTopToolbar /> */}
       {activeLayout === PanelLayout.list && <CollectionList />}
       {activeLayout === PanelLayout.board && (
         <CollectionBoard

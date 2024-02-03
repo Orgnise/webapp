@@ -10,6 +10,7 @@ export const Role = {
   Moderator: "Moderator",
 };
 export interface Teams {
+  _id: string;
   name: string;
   description?: string;
   createdBy: ObjectId,

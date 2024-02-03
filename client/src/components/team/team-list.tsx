@@ -59,14 +59,6 @@ function TeamRow({ team, index }: any) {
             <P>{team.name}</P>
             <MutedLabel> {team.members.length} team members</MutedLabel>
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <MoreVertical className="text-muted-foreground" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Settings</DropdownMenuLabel>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
     </div>

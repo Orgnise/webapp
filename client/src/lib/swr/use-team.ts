@@ -1,15 +1,14 @@
+import { fetcher } from "../fetcher";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
-import { fetcher } from "../fetcher";
 
 export default function useTeam() {
-  const { slug } = useParams() as { slug?: string };
-
+  const { team_slug } = useParams() as { team_slug?: string };
   const {
     data: team,
     error,
     mutate,
-  } = useSWR<any>(slug && `/api/teams/${slug}`, fetcher, {
+  } = useSWR<any>(team_slug && `/api/teams/${team_slug}`, fetcher, {
     dedupingInterval: 30000,
   });
 
@@ -17,6 +16,6 @@ export default function useTeam() {
     team,
     error,
     mutate,
-    loading: slug && !team && !error ? true : false,
+    loading: team_slug && !team && !error ? true : false,
   };
 }

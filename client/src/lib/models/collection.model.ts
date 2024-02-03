@@ -1,6 +1,30 @@
 // import Mongoose from "mongoose";
 // const Schema = Mongoose.Schema;
 
+import { Meta } from "./team.modal"
+import { ObjectId } from "mongodb"
+
+export interface CollectionDTO {
+    contentMeta: ContentMeta
+    object: string
+    workspace: string
+    children: any
+    team: ObjectId
+    parent: ObjectId
+    url: string
+    title: string
+    content: string
+    index: number
+    meta: Meta
+    createdAt: string
+    updatedAt: string
+    id: string
+  }
+  
+  export interface ContentMeta {
+    itemIds: any[]
+  }
+
 // const CollectionSchema = new Schema(
 //   {
 //     object: {

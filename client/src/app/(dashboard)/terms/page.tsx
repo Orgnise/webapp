@@ -1,27 +1,22 @@
-import React from "react";
 import { Editor } from "novel";
-import { NavbarLayout } from "@/components/layout/nav-layout";
+import React from "react";
 
 /**
  * Terms and conditions page
  */
 export default function TermsAndConditionPage() {
   return (
-    <div className="flex flex-col h-screen bg-default">
-      {/* <NavbarLayout>
-        <Nav />
-      </NavbarLayout> */}
-      <div className="flex-1 pointer-events-none">
+    <div className="flex flex-col bg-default">
+      <div className="flex-1 max-w-screen-lg mx-auto select-none pointer-events-none">
         <Editor
           key={"privacy-policy"}
           className="shadow-none p-0 m-0"
-          // onUpdate={(editor) => {}}
           defaultValue={data}
           disableLocalStorage={true}
+          // editorProps={{editable: (state) => false}}
         />
       </div>
-    </div>
-  );
+    </div>);
 }
 
 const data = {

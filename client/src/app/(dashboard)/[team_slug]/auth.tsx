@@ -1,12 +1,14 @@
 "use client";
 
+import { ReactNode, useContext } from "react";
+
 import LayoutLoader from "@/components/layout/loyout-loader";
-import { ReactNode } from "react";
+import { TeamContext } from "./providers";
 import TeamNotFound from "@/components/team/team-not-found";
-import useTeam from "@/lib/swr/use-team";
 
 export default function TeamAuth({ children }: { children: ReactNode }) {
-  const { loading, error } = useTeam();
+  let { teamData: { loading, error } } = useContext(TeamContext);
+
 
   if (loading) {
     return <LayoutLoader />;

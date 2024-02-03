@@ -1,9 +1,10 @@
-import mongodb from "@/lib/mongodb";
-import { getServerSession } from "next-auth/next";
-import { NextAuthOptions } from "./auth";
 import { PlanProps, Team } from "../types/types";
-import { getSearchParams } from "../url";
+
+import { NextAuthOptions } from "./auth";
 import { Teams } from "../models/team.modal";
+import { getSearchParams } from "../url";
+import { getServerSession } from "next-auth/next";
+import mongodb from "@/lib/mongodb";
 
 export interface Session {
   user: {
@@ -52,7 +53,7 @@ export const withAuth =
       { params }: { params: Record<string, string> | undefined },
     ) => {
       const searchParams = getSearchParams(req.url);
-      const slug = params?.slug || searchParams.projectSlug;
+      const team_slug = params?.team_slug || searchParams.projectSlug;
 
       const domain = params?.domain || searchParams.domain;
       const key = searchParams.key;
@@ -61,7 +62,7 @@ export const withAuth =
       let headers = {};
 
       // if there's no projectSlug defined
-      if (!slug) {
+      if (!team_slug) {
         return new Response(
           "Team slug not found. Did you forget to include a `projectSlug` query parameter?",
           {
@@ -70,7 +71,6 @@ export const withAuth =
         );
       }
 
-      const authorizationHeader = req.headers.get("Authorization");
       session = await getSession();
       if (!session?.user?.id) {
         return new Response("Unauthorized: Login required.", {
@@ -80,7 +80,7 @@ export const withAuth =
       }
       const client = await mongodb;
       const teamsCollection = client.db('pulse-db').collection<Teams>('teams')
-      const team = await teamsCollection.findOne({ "meta.slug": slug }) as unknown as Team;
+      const team = await teamsCollection.findOne({ "meta.slug": team_slug }) as unknown as Team;
 
       if (!team || !team.members) {
         // project doesn't exist

@@ -1,5 +1,6 @@
-import exp from "constants";
 import * as React from "react";
+
+import exp from "constants";
 
 interface Prop {}
 
@@ -10,7 +11,7 @@ const H1 = React.forwardRef<HTMLHeadingElement, H1Props>(
       <h1
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl ${className}`}
+        className={`scroll-m-20 text-2xl font-bold tracking-tight lg:text-3xl ${className}`}
       />
     );
   }
@@ -24,7 +25,7 @@ const H2 = React.forwardRef<HTMLHeadingElement, H2Props>(
       <h2
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl ${className}`}
+        className={`scroll-m-20 text-xl font-bold tracking-tight lg:text-2xl ${className}`}
       />
     );
   }
@@ -38,7 +39,7 @@ const H3 = React.forwardRef<HTMLHeadingElement, H3Props>(
       <h3
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-2xl font-semibold tracking-tight ${className}`}
+        className={`scroll-m-20 text-lg font-semibold tracking-tight ${className}`}
       />
     );
   }
@@ -52,12 +53,26 @@ const H4 = React.forwardRef<HTMLHeadingElement, H4Props>(
       <h4
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-xl font-semibold tracking-tight ${className}`}
+        className={`scroll-m-20 text-base font-semibold tracking-tight ${className}`}
       />
     );
   }
 );
 H4.displayName = "H4";
+
+interface H5Props extends React.HTMLAttributes<HTMLHeadingElement>, Prop {}
+const H5 = React.forwardRef<HTMLHeadingElement, H5Props>(
+  ({ className, ...props }, ref) => {
+    return (
+      <h5
+        {...props}
+        ref={ref}
+        className={`scroll-m-20 text-sm font-semibold tracking-tight ${className}`}
+      />
+    );
+  }
+);
+H5.displayName = "H5";
 
 interface PProps extends React.HTMLAttributes<HTMLParagraphElement>, Prop {}
 const P = React.forwardRef<HTMLParagraphElement, PProps>(
@@ -115,4 +130,4 @@ const MutedLabel = React.forwardRef<HTMLParagraphElement, MutedProps>(
 );
 MutedLabel.displayName = "MutedLabel";
 
-export { H1, H2, H3, H4, P, LargeLabel, SmallLabel, MutedLabel };
+export { H1, H2, H3, H4,H5, P, LargeLabel, SmallLabel, MutedLabel };

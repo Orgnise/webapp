@@ -1,8 +1,11 @@
+"use client";
+
 import Nav from "@/components/layout/nav";
 import { NavbarLayout } from "@/components/layout/nav-layout";
-import { Toaster } from "@/components/ui/toaster";
-import { ReactNode } from "react";
 import Providers from "./providers";
+import { ReactNode } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { usePathname } from "next/navigation";
 
 export const dynamic = "force-static";
 

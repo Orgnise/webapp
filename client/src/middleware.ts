@@ -31,7 +31,7 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_URL));
   } 
   // Redirect to home if logged in and trying to access login or signup
-  else if (path === "/login" || path === "/signup") {
+  else if (loggedIn &&(path === "/login" || path === "/signup")) {
     return NextResponse.redirect(new URL("/", req.url));
   }
   else {

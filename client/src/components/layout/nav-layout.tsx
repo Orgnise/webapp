@@ -11,7 +11,7 @@ interface NavbarLayoutProps {
 
 export const NavbarLayout = ({ children }: NavbarLayoutProps) => {
   return (
-    <div className="font-medium theme-border border-b px-4 bg-card ">
+    <div className="font-medium border-b border-border px-4 bg-card sticky top-0 z-10">
       <div className="h-16 flex items-center">
         <div className="mx-auto max-w-7xl w-full">{children}</div>
       </div>
