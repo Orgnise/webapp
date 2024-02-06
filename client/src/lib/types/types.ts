@@ -49,7 +49,7 @@ export interface User {
 export interface Collection {
   contentMeta: ContentMeta
   object: string
-  workspace: string
+  workspace: Workspace
   children: any
   parent: any
   team: Team

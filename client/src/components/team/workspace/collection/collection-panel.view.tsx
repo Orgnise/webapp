@@ -63,7 +63,7 @@ export default function CollectionPanel({
       style={{
         width: leftPanelSize,
       }}
-      className={`flex flex-col h-full overflow-hidden w-[${leftPanelSize}px]`}>
+      className={`flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-expo`}>
       <div className="flex items-center bg-background border  border-border">
         <Tab
           tab="List"
@@ -89,14 +89,14 @@ export default function CollectionPanel({
             setLeftPanelSize(LeftPanelSize.large);
           }}
         />
-        <Tab
+        {/* <Tab
           tab="Graph"
           selected={activeLayout === 'Graph'}
           onClick={() => {
             setActiveLayout('Graph');
             setLeftPanelSize(LeftPanelSize.large);
           }}
-        />
+        /> */}
 
 
         {/* <CustomDropDown
@@ -156,15 +156,16 @@ export function PanelTopToolbar({ workspace, leftPanelSize, setLeftPanelSize = (
 }) {
   return (
     <div
-      className="flex items-center place-content-between border-b border-border bg-muted/80 shadow-sm px-1">
+      className="flex items-center place-content-between border-b border-border bg-accent/60  px-1">
       <WorkspaceToggleDropDown />
       <div className="ml-2 flex items-center h-4">
-        <PlusIcon
+        {/* TODO: Add option tp create collection */}
+        {/* <PlusIcon
           className="theme-text-primary rounded p-1 outline-1 cursor-pointer"
           onClick={() => {
             // createCollection();
           }}
-        />
+        /> */}
         {
           leftPanelSize === LeftPanelSize.max ? <Maximize2 className="hover:bg-onSurface rounded p-1 outline-1 cursor-pointer"
             onClick={() => {
@@ -211,10 +212,10 @@ export function WorkspaceToggleDropDown() {
     <div>
       <Sheet>
         <SheetTrigger className="flex items-center">
-          <Button variant={'ghost'} className="flex items-center gap-2 px-2">
+          <button className="h-9 flex items-center gap-2 px-2">
             {workspace?.name}
             <ChevronDown />
-          </Button>
+          </button>
         </SheetTrigger>
         <SheetContent side='left' className="p-0 border-border">
           <SheetHeader className="p-4 border-b border-border">

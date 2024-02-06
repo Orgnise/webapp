@@ -1,22 +1,30 @@
+import { BrandLabel, Logo } from "@/components/atom/logo";
+
 import { Editor } from "novel";
+import Link from "next/link";
+import { NavbarLayout } from "@/components/layout/nav-layout";
 import React from "react";
+import TermsAndConditionPageClient from "./page-client";
 
 /**
  * Terms and conditions page
  */
 export default function TermsAndConditionPage() {
   return (
-    <div className="flex flex-col bg-default">
-      <div className="flex-1 max-w-screen-lg mx-auto select-none pointer-events-none">
-        <Editor
-          key={"privacy-policy"}
-          className="shadow-none p-0 m-0"
-          defaultValue={data}
-          disableLocalStorage={true}
-          // editorProps={{editable: (state) => false}}
-        />
+    <div className="flex flex-col bg-default" >
+      <NavbarLayout>
+        <div className="flex items-center place-content-between w-full">
+          <Link href="/" className="Logo flex items-center gap-2">
+            <Logo className="h-8" />
+            <BrandLabel className="h-4"/>
+          </Link>
+        </div>
+      </NavbarLayout>
+      <div className="flex-1 max-w-screen-lg mx-auto pointer-events-none" id='privacy-policy'>
+        <TermsAndConditionPageClient data={data} />
       </div>
-    </div>);
+    </div>
+  );
 }
 
 const data = {

@@ -9,7 +9,7 @@ type TextProps = {
   className?: string;
   size?: Size;
   variant?: Variant;
-  children: any;
+  children: React.ReactNode;
   primary?: boolean;
 };
 

@@ -26,10 +26,14 @@ export const middleware = async (req: NextRequest) => {
   const loggedIn = session?.user ? true : false;
   const path = req.nextUrl.pathname;
 
+  if (['/terms','/policy'].includes(path)) {
+    return NextResponse.next();
+  } 
   // Redirect to login if not logged in
-  if (!['/login','/signup'].includes(path) && !loggedIn) {
+  else if (!['/login','/signup','terms','policy'].includes(path) && !loggedIn) {
     return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_URL));
   } 
+  
   // Redirect to home if logged in and trying to access login or signup
   else if (loggedIn &&(path === "/login" || path === "/signup")) {
     return NextResponse.redirect(new URL("/", req.url));

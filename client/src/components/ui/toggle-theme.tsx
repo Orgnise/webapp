@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
 export function ModeToggle() {
-  const { setTheme } = useTheme();
+  const { setTheme,theme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -26,13 +26,23 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="border-border">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem onClick={() =>{
+          setTheme("light");
+          document.documentElement.classList.remove("dark-theme");
+        }}>
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem onClick={() =>{
+            setTheme("dark");
+            // Workaround for the Novel editor
+            document.documentElement.classList.add("dark-theme");
+        }}>
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem onClick={() => {
+          setTheme("system");
+          document.documentElement.classList.remove("dark-theme");
+        }}>
           System
         </DropdownMenuItem>
       </DropdownMenuContent>

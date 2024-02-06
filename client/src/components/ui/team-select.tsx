@@ -7,7 +7,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./sheet";
 import { useParams, usePathname } from "next/navigation";
 
 import { Button } from "./button";
@@ -17,14 +16,12 @@ import Label from "../atom/label";
 import Link from "next/link";
 import { ListView } from "./listview";
 import { LoadingSpinner } from "./loading-spinner";
+import { SheetClose } from "./sheet";
 import { Team } from "@/lib/types/types";
 import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
-import { WorkspaceListView } from "../team/workspace/collection/collection-panel.view";
 import cx from "classnames";
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 import { useContext } from "react";
-import { useRouter } from "next/router";
-import useWorkspaces from "@/lib/swr/use-wrorkspaces";
 
 export default function TeamToggleDropDown() {
   const data = useContext(TeamContext);
@@ -68,24 +65,14 @@ export default function TeamToggleDropDown() {
 function TeamRow({ team }: { team: Team }) {
   const pathname = usePathname();
   const slug = pathname?.split('/').slice(0, 2).join('/');
-  // const router = useNav
 
   return (
-    // <Link
-    //   href={`${team.meta.slug}`}
-    //   className={cx("group link py-1 flex items-center gap-2  rounded w-full", {
-    //     "bg-primary text-primary-foreground": pathname === `${slug}/${team.meta.slug}`,
-    //     "hover:bg-accent": pathname !== `${slug}/${team.meta.slug}`
-    //   })}
-    // >
-    //   <span className="text-sm">{team.name}</span>
-    // </Link>
     <div
-    className="cursor-pointer py-1"
-     onClick={() => {
-       console.log({ team });
-      redirect(`/${team.meta.slug}`)
-    }}>
+      className="cursor-pointer py-1"
+      onClick={() => {
+        console.log({ team });
+        redirect(`/${team.meta.slug}`)
+      }}>
       <span className="text-sm">{team.name}</span>
     </div>
   )

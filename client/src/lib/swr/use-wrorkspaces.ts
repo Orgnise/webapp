@@ -1,15 +1,14 @@
 "use client";
 
 import { useParams, usePathname } from "next/navigation";
+import useSWR, { KeyedMutator } from "swr";
 
-import { PrettiFy } from "../utils";
 import { Workspace } from "../types/types";
 import { fetcher } from "../fetcher";
-import useSWR from "swr";
 
 interface IWorkspaces {
   error: any;
-  // mutate: KeyedMutator<any>;
+  mutate: KeyedMutator<any>;
   loading: boolean;
   workspaces: Workspace[];
 }
@@ -18,6 +17,7 @@ export default function useWorkspaces(): IWorkspaces {
   const {
     data: data,
     error,
+    mutate
   } = useSWR<any>(`/api/teams/${team_slug}/workspaces`, fetcher, {
     dedupingInterval: 30000,
   });
@@ -25,6 +25,7 @@ export default function useWorkspaces(): IWorkspaces {
 
   if (!team_slug) {
     return {
+      mutate,
       error: "No slug",
       loading: false,
       workspaces: [],
@@ -32,6 +33,7 @@ export default function useWorkspaces(): IWorkspaces {
   }
 
   return {
+    mutate,
     workspaces: data?.workspaces,
     error,
     loading: !data && !error ? true : false,

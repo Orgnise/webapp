@@ -33,7 +33,7 @@ const Nav = ({ }) => {
         <Link href="/" className="Logo flex items-center gap-2">
           <Logo className="h-8" />
         </Link>
-        {team_slug && <TeamToggleDropDown />}
+        {user && team_slug && <TeamToggleDropDown />}
       </div>
       <div className="flex gap-2 items-center">
         <ModeToggle />

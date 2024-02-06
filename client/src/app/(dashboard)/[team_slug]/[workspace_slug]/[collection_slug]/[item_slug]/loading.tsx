@@ -2,12 +2,14 @@
 export default function Loading() {
   return (
     <main className=" w-full items-center justify-center animate-pulse">
-      <div className="CollectionContentPage h-full w-full pt-20" id="CollectionContentPage">
+      <div className="CollectionContentPage h-full w-full pt-12" id="CollectionContentPage">
         <div className="flex flex-col">
-          <div className="flex flex-col gap-2 pb-4">
+         
+          <div className="flex flex-col gap-2 p-8">
             <div className="h-8 w-1/5  bg-secondary-foreground/20 rounded" />
             <div className="h-px bg-secondary" />
           </div>
+
           <div className="flex flex-col gap-4 p-8">
             <div className="h-5 w-1/5 mb-6 bg-secondary-foreground/10" />
             <div className="h-10 w-5/12 mb-10 bg-secondary-foreground/10" />

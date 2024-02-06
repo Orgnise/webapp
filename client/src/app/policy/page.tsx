@@ -1,19 +1,23 @@
-import { Editor } from "novel";
-import React from "react";
+import { BrandLabel, Logo } from "@/components/atom/logo";
 
-/**
- * Privacy Policy page
- */
+import Link from "next/link";
+import { NavbarLayout } from "@/components/layout/nav-layout";
+import PrivacyPolicyPageClient from "./page-client";
+
 export default function PrivacyPolicyPage() {
+
   return (
-    <div className="flex flex-col bg-default">
-      <div className="flex-1 max-w-screen-lg mx-auto pointer-events-none">
-        <Editor
-          key={"privacy-policy"}
-          className="shadow-none p-0 m-0"
-          defaultValue={data}
-          disableLocalStorage={true}
-        />
+    <div className="flex flex-col bg-default" >
+      <NavbarLayout>
+        <div className="flex items-center place-content-between w-full">
+          <Link href="/" className="Logo flex items-center gap-2">
+            <Logo className="h-8" />
+            <BrandLabel className="h-4"/>
+          </Link>
+        </div>
+      </NavbarLayout>
+      <div className="flex-1 max-w-screen-lg mx-auto pointer-events-none" id='privacy-policy'>
+        <PrivacyPolicyPageClient data={data} />
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import slugify from "@sindresorhus/slugify";
+
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -85,3 +87,29 @@ export type PrettiFy<T> = {
   ? Array<PrettiFy<P>>
   : T[P];
 } & {};
+
+
+export async function generateSlug({ title, didExist = async () => false }: {
+  title: string;
+  didExist?: (val: string) => Promise<boolean>;
+}) {
+  if (!title) {
+    // Generate random string
+    title =
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
+  }
+  const normalizedName = slugify(title, { separator: "" });
+  let slug = normalizedName;
+  let newName = await didExist(slug);
+  if (newName) {
+    let num = 2;
+    while (newName) {
+      slug = `${slug}-${Math.random().toString(36).substring(2, 8)}`;
+      newName = await didExist(slug);
+      num++;
+    }
+  }
+
+  return slug;
+}

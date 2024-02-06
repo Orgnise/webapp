@@ -2,6 +2,8 @@
 
 import Label from "@/components/atom/label";
 import { LightbulbIcon } from "lucide-react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { MutedLabel } from "@/components/atom/typography";
 import { WorkspaceContext } from "./providers";
 import { hasValue } from "@/lib/utils";
 import { useContext } from "react";
@@ -9,15 +11,16 @@ import { useContext } from "react";
 export default async function WorkspacePageClient() {
   const { error, loading,collections  } = useContext(WorkspaceContext);
   if(loading) {
-    return <div>Loading...</div>
+    return <div className="flex flex-col items-center place-content-center h-[calc(100vh-64px)]"><LoadingSpinner/></div>
   }
+  
   if(error) {
     return <div>Error: {error}</div>
   }
   if(!hasValue(collections)) {
-    return <div>Nothing here to see</div>
+    return <MutedLabel className="text-center my-20">No collections available</MutedLabel>
   }
-  return <div className="WorkspacePageClient" id="WorkspacePageClient">
+  return <div className="WorkspacePageClient">
      <div className="pt-56 flex-1 flex flex-col gap-10 items-center place-content-center h-full max-w-xl text-center mx-auto">
         <LightbulbIcon size={64} className="text-accent" />
         <span className="font-normal">

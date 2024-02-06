@@ -3,11 +3,23 @@
 import { Button } from "@/components/ui/button";
 import { Collection } from "@/lib/types/types";
 import { Editor } from "novel";
+import {Editor as Editor$1} from '@tiptap/core';
 import Label from "@/components/atom/label";
 import { hasValue } from "@/lib/utils";
+import { useEffect } from "react";
 
-export default function CollectionContent({activeItem}:{activeItem?:Collection}) {
-  
+interface CollectionContentProps {
+  activeItem?: Collection;
+  isEditing?: boolean;
+  onDebouncedUpdate?: ((editor?:  Editor$1 | undefined) => void | Promise<void>) | undefined;
+}
+export default function CollectionContent({activeItem,isEditing=false,onDebouncedUpdate}:CollectionContentProps) {
+  const content = activeItem?.content;
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 1000);
+  }, [content]);
 
   if (!hasValue(activeItem)) {
     return (
@@ -56,16 +68,10 @@ export default function CollectionContent({activeItem}:{activeItem?:Collection})
         storageKey={activeItem!._id}
         onUpdate={(editor) => { }}
         // extensions={["header", "list", "image"]}
+        disableLocalStorage={true}
         defaultValue={activeItem?.content}
-        editorProps={{
-          // placeholder: "Let's write an awesome story!",
-          // autofocus: true,
-
-
-        }}
-        onDebouncedUpdate={(editor) => {
-          //   setContent(editor.getJSON());
-        }}
+        editorProps={{editable: (state) => isEditing}}
+        onDebouncedUpdate={onDebouncedUpdate}
       />
     </>
   );

@@ -96,10 +96,10 @@ export default function CollectionTable({
 
         <ListView
           items={allItems}
-          className="border divide-y border-border "
+          className="border border-border divide-y divide-border "
           renderItem={(item, index) => {
             return (<div key={index}>
-              <div className="flex items-center  divide-x theme-border w-full ">
+              <div className="flex items-center  divide-x divide-border w-full ">
                 <Link
                   key={index}
                   href={`/${team_slug}/${workspace_slug}/${item.collection?.meta?.slug}/${item.meta?.slug}/`}

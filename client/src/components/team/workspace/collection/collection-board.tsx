@@ -134,7 +134,7 @@ export default function CollectionBoard({
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
-                      className="CollectionDraggableColumn h-full">
+                      className="CollectionDraggableColumn h-full rounded hover:bg-accent/30">
                       <CollectionColumn
                         key={collection._id}
                         collection={collection}
@@ -187,7 +187,7 @@ function CollectionColumn({ collection, relativePath, setLeftPanelSize }: {
 
           <ListView
             items={collection.children}
-            className="flex flex-col gap-2 hover:bg-background  rounded h-full overflow-hidden p-2"
+            className="flex flex-col gap-2   rounded h-full overflow-hidden p-2"
             renderItem={(item, index) => (
               <Draggable draggableId={item._id} index={index}>
                 {(provided) => {

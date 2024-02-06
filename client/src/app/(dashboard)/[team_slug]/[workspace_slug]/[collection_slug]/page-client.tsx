@@ -9,6 +9,7 @@ import { H1 } from "@/components/atom/typography";
 import Link from "next/link";
 import { ListView } from "@/components/ui/listview";
 import Loading from "./loading";
+import NotFoundView from "@/components/team/team-not-found";
 import { WorkspaceContext } from "../providers";
 import { hasValue } from "@/lib/utils";
 import { useParams } from "next/navigation";
@@ -24,13 +25,16 @@ export default async function CollectionContentPageClient() {
     return <div>Error: {error.message}</div>
   }
   if (!hasValue(activeCollection)) {
-    return <div>Collection not found</div>
+    return <div className="CollectionContentPage h-full w-full py-12">
+      <NotFoundView item="Collection"/>
+    </div>
   }
+  
 
 
   return <div className="CollectionContentPage h-full  w-full" id="CollectionContentPage">
     <div className="flex flex-col  pt-20">
-      <H1 className="border-b-2 pb-2">{activeCollection?.title}</H1>
+      <H1 className="border-b-2 border-border pb-2">{activeCollection?.title}</H1>
       <ListView
         items={activeCollection!.children}
         className="flex flex-col gap-2 overflow-y-auto pb-28 pt-4"

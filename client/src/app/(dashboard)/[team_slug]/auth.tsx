@@ -3,8 +3,8 @@
 import { ReactNode, useContext } from "react";
 
 import LayoutLoader from "@/components/layout/loyout-loader";
+import NotFoundView from "@/components/team/team-not-found";
 import { TeamContext } from "./providers";
-import TeamNotFound from "@/components/team/team-not-found";
 
 export default function TeamAuth({ children }: { children: ReactNode }) {
   let { teamData: { loading, error } } = useContext(TeamContext);
@@ -18,7 +18,7 @@ export default function TeamAuth({ children }: { children: ReactNode }) {
     return (
       <div className="bg-background">
         <div className="max-w-3xl mx-auto">
-          <TeamNotFound />
+          <NotFoundView item="Team"/>
         </div>
       </div>
     );

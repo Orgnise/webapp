@@ -1,27 +1,18 @@
-"use client";
+"use client"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { MutedLabel, P } from "../atom/typography";
 
+import { DashBoardContext } from "@/app/(dashboard)/providers";
 import Link from "next/link";
 import { ListView } from "@/components/ui/listview";
-import { MoreVertical } from "lucide-react";
-import { Team } from "@/lib/types/types";
+import { useContext } from "react";
 
-interface Props {
-  teams: Team[];
-  loading: boolean;
-}
-export default async function TeamsList(prop: Props) {
+export default async function TeamsList() {
+  const {loading,teams} = useContext(DashBoardContext);
   return (
     <ListView
-      items={prop.teams}
-      loading={prop.loading}
+      items={teams}
+      loading={loading}
       noItemsElement={
         <P className="p-4 rounded bg-muted ">
           You are not a member of any team yet. Create a new team or ask someone
