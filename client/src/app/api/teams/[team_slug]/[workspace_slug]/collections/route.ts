@@ -74,6 +74,7 @@ export const GET = withAuth(async ({ team, params },) => {
         "createdAt": 1,
         "itemCount": 1,
         'title': 1,
+        'name': 1,
         'content': 1,
         'contentMeta': 1,
         'object': 1,

@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import mongoDb from "@/lib/mongodb";
 import { withAuth } from "@/lib/auth";
 import { Collection } from "@/lib/types/types";
+import { hasValue } from "@/lib/utils";
 
 
 export const PATCH = withAuth(async ({ req, session },) => {
@@ -51,7 +52,7 @@ export const PATCH = withAuth(async ({ req, session },) => {
       {
         "$set": {
           ...data,
-          name: collection?.name ?? collection?.title ?? collectionDb.title ?? collectionDb.name,
+          name: hasValue(collection?.name) ? collection?.name : hasValue(collectionDb.title) ? collectionDb.title : collectionDb.name,
           updatedAt: new Date().toISOString(),
           updatedBy: new ObjectId(session.user.id),
         }
@@ -63,6 +64,7 @@ export const PATCH = withAuth(async ({ req, session },) => {
         success: true,
         message: 'collection updated',
         collection: collection,
+        name: hasValue(collection?.name) ? collection?.name : hasValue(collectionDb.title),
       },
       { status: 200 }
     );
