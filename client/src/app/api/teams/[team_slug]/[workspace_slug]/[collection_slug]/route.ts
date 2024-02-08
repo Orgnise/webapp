@@ -8,30 +8,31 @@ import { Collection } from "@/lib/types/types";
 export const PATCH = withAuth(async ({ req, session },) => {
   try {
     const client = await mongoDb;
-    const { item } = await req.json() as { item?: Collection };
+    const { collection } = await req.json() as { collection?: Collection };
 
-    if (!item || !ObjectId.isValid(item!._id)) {
+    if (!collection || !ObjectId.isValid(collection!._id)) {
       return NextResponse.json(
-        { success: false, message: 'Operation failed', error: 'Invalid item' },
+        { success: false, message: 'Operation failed', error: 'Invalid collection' },
         { status: 400 }
       );
     }
 
     const collectionsDb = client.db('pulse-db').collection('collections');
-    const query = { "_id": new ObjectId(item._id), object: "item" };
-    const itemInDb = await collectionsDb.findOne(query) as unknown as Collection;
+    const query = { "_id": new ObjectId(collection._id), object: "collection" };
+    const collectionDb = await collectionsDb.findOne(query) as unknown as Collection;
 
-    if (!itemInDb) {
+    if (!collectionDb) {
       return NextResponse.json(
         {
           success: false,
           message: 'Operation failed',
-          error: 'item not found in database',
+          error: 'collection not found in database',
+          query
         },
         { status: 404 }
       );
     }
-    let data = { ...item } as any;
+    let data = { ...collection } as any;
     delete data._id;
     delete data.children;
     delete data.team;
@@ -39,7 +40,7 @@ export const PATCH = withAuth(async ({ req, session },) => {
     delete data.parent;
     delete data.ceratedBy;
     delete data.lastUpdatedUserId;
-    // remove all null or undefined fields from the item object and update the collection
+    // remove all null or undefined fields from the collection object and update the collection
     for (const key in data) {
       if (data[key] === null || data[key] === undefined) {
         delete data[key];
@@ -50,7 +51,7 @@ export const PATCH = withAuth(async ({ req, session },) => {
       {
         "$set": {
           ...data,
-          name: item?.name ?? item?.title ?? itemInDb.title ?? itemInDb.name,
+          name: collection?.name ?? collection?.title ?? collectionDb.title ?? collectionDb.name,
           updatedAt: new Date().toISOString(),
           updatedBy: new ObjectId(session.user.id),
         }
@@ -60,8 +61,8 @@ export const PATCH = withAuth(async ({ req, session },) => {
     return NextResponse.json(
       {
         success: true,
-        message: 'item updated',
-        item,
+        message: 'collection updated',
+        collection: collection,
       },
       { status: 200 }
     );
@@ -73,32 +74,40 @@ export const PATCH = withAuth(async ({ req, session },) => {
   }
 });
 
-export const DELETE = withAuth(async ({ req, params },) => {
+export const DELETE = withAuth(async ({ params },) => {
   try {
     const client = await mongoDb;
-    const { item_slug } = params as { item_slug: string };
+    const { collection_slug } = params as { collection_slug: string };
 
     const collectionsDb = client.db('pulse-db').collection('collections');
-    const query = { 'meta.slug': item_slug, object: "item" };
-    const itemInDb = await collectionsDb.findOne(query) as unknown as Collection;
+    const query = { 'meta.slug': collection_slug };
+    const collectionInDb = await collectionsDb.findOne(query) as unknown as Collection;
 
-    if (!itemInDb) {
+    if (!collectionInDb) {
       return NextResponse.json(
         {
           success: false,
           message: 'Operation failed',
-          error: 'Item not found in database',
+          error: 'collection not found in database',
           query
         },
         { status: 404 }
       );
     }
-    const deleteResult = await collectionsDb.deleteOne(query);
+    // const query to delete collections and all collection having parent as the collection
+    const deleteQuery = {
+      $or: [
+        { 'meta.slug': collection_slug },
+        { 'parent': new ObjectId(collectionInDb._id) }
+      ]
+    };
+
+    const deleteResult = await collectionsDb.deleteMany(deleteQuery);
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Item deleted',
+        message: 'collection deleted',
         deleteResult
       },
       { status: 200 }

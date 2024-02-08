@@ -93,7 +93,7 @@ export async function generateSlug({ title, didExist = async () => false }: {
   title: string;
   didExist?: (val: string) => Promise<boolean>;
 }) {
-  if (!title) {
+  if (!hasValue(title)) {
     // Generate random string
     title =
       Math.random().toString(36).substring(2, 15) +

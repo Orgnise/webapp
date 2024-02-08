@@ -47,15 +47,18 @@ export const POST = withAuth(async ({ team, session, req },) => {
         role: 'Admin',
         user: new ObjectId(userId),
       }],
-      createdAt: new Date().toISOString(),
-      createdBy: new ObjectId(userId),
       description: body.description || '',
       meta: {
         slug: slug,
-        description: body.description || '',
+        title: body?.name?.splice(0, 50),
+        description: body?.description?.splice(0, 150),
       },
-      visibility: 'Private',
+      visibility: body?.visibility ?? 'Private',
+      updatedBy: new ObjectId(userId),
+      createdAt: new Date().toISOString(),
+      createdBy: new ObjectId(userId),
       updatedAt: new Date().toISOString(),
+
     } as Workspace;
 
 

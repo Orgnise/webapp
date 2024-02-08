@@ -4,13 +4,12 @@ export interface Team {
   _id: string
   name: string
   description: string
-  createdBy: string
   members: Member[]
   plan: PlanProps
   meta: Meta
   createdAt: string
+  createdBy: string
   updatedAt: string
-  __v: number
 }
 
 export interface Member {
@@ -28,16 +27,17 @@ export interface Meta {
 export type PlanProps = "free" | "pro" | "business" | "enterprise"
 
 export interface Workspace {
+  _id: string
   team: string
   name: string
   description: string
   members: Member[]
-  visibility:  keyof typeof Visibility
+  visibility: keyof typeof Visibility
   createdBy: any
-  meta: Meta
   createdAt: string
   updatedAt: string
-  _id: string
+  updatedBy: string
+  meta: Meta
 }
 
 export interface User {
@@ -47,22 +47,21 @@ export interface User {
 }
 
 export interface Collection {
-  contentMeta: ContentMeta
-  object: string
-  workspace: Workspace
+  _id: string
   children: any
   parent: any
   team: Team
-  url: string
+  /**
+   * @deprecated title is deprecated, use name instead
+   */
   title: string
-  content: string
-  index: number
-  meta: Meta
+  name: string
+  content: any
+  sortIndex: number
   createdAt: string
   updatedAt: string
-  _id: string
-}
-
-export interface ContentMeta {
-  itemIds: any[]
+  updatedBy: string
+  workspace: Workspace
+  meta: Meta
+  object?: 'item' | 'collection'
 }

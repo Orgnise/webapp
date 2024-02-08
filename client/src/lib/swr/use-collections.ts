@@ -1,17 +1,17 @@
-import { Collection, Workspace } from "../types/types";
+import { Collection } from "../types/types";
+import useSWR, { KeyedMutator } from "swr";
 
 import { fetcher } from "../fetcher";
 import { useParams } from "next/navigation";
-import useSWR from "swr";
 
 interface IWorkspaces {
     error: any;
-    // mutate: KeyedMutator<any>;
+    mutate: KeyedMutator<any>;
     loading: boolean;
     collections: Collection[];
 }
 export default function useCollections(): IWorkspaces {
-    const { team_slug,workspace_slug } = useParams() as { team_slug?:string, workspace_slug?: string };
+    const { team_slug, workspace_slug } = useParams() as { team_slug?: string, workspace_slug?: string };
 
     const {
         data: data,
@@ -24,13 +24,14 @@ export default function useCollections(): IWorkspaces {
 
     if (!team_slug || !workspace_slug) {
         return {
+            mutate,
             error: "No slug or workspaceId provided",
             loading: false,
             collections: [],
         }
     }
-
     return {
+        mutate,
         collections: data?.collections,
         error,
         loading: !data && !error ? true : false,

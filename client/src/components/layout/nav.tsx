@@ -59,7 +59,7 @@ const Nav = ({ }) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem
-                  className="text-primary cursor-pointer"
+                  className="text-destructive cursor-pointer focus:bg-destructive focus:text-destructive-foreground"
                   onClick={() => signOut()}>
                   Logout
                 </DropdownMenuItem>
