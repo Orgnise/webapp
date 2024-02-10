@@ -8,49 +8,27 @@ import Link from "next/link";
 import { TextField } from "@/components/molecule/text-field";
 import { signIn } from "next-auth/react";
 
-type LoginInput = {
-  email: string;
-  password: string;
-};
 export function LoginForm() {
-  const [inputs, setInputs] = useState<LoginInput>({
-    email: "",
-    password: "",
-  });
-
   const [errors, setError] = useState<{
     email?: string;
     password?: string;
     other?: string;
   }>({});
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setInputs((values) => ({ ...values, [name]: value }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    if (inputs.password.length < 6) {
-      setError({
-        ...errors,
-        password: "Password should be at least 6 characters long",
-      });
-      return;
-    }
     setError({});
+    const email = e.target?.email?.value;
+    const password = e.target.password?.value;
     await signIn("credentials", {
-      email: inputs.email,
-      password: inputs.password,
+      email: email,
+      password: password,
       callbackUrl: "/",
     }).catch((error) => {
       console.log(error);
     });
   };
-
-
 
   return (
     <form
@@ -69,30 +47,20 @@ export function LoginForm() {
         label="Email"
         name="email"
         required={true}
-        onChange={handleChange}
-        value={inputs.email}
         autoComplete="email"
         error={errors.email}
         type="email"
         wrapperClassName="w-9/12"
-        props={{
-          name: "email",
-        }}
       />
       <TextField
         label="Password"
         name="password"
         minLength={6}
         required={true}
-        onChange={handleChange}
-        value={inputs.password}
         autoComplete="password"
         error={errors.password}
         type="password"
         wrapperClassName="w-9/12"
-        props={{
-          name: "password",
-        }}
       />
       <Button className="mt-4 w-9/12" type="submit">
         Log in
@@ -103,7 +71,6 @@ export function LoginForm() {
         aria-atomic="true">
         {errors?.other && (
           <>
-            {/* <ExclamationCircleIcon className="h-5 w-5 text-red-500" /> */}
             <p className="text-sm text-red-500">{errors?.other}</p>
           </>
         )}
@@ -131,7 +98,6 @@ export function LoginForm() {
         <button
           onClick={async (e) => {
             e.preventDefault();
-            // googleLogin();
             await signIn("github");
           }}
           className="bg-white shadow rounded-full p-2">

@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     if (mongoResult) {
       return NextResponse.json(
-        { success: false, message: 'Operation failed', error: 'User already exists' },
+        { success: false, message: 'User already exists with this', error: 'Operation failed' },
         { status: 400 }
       )
     }
@@ -50,9 +50,6 @@ export async function POST(request: NextRequest) {
   }
   catch (err) {
     return NextResponse.json(null);
-  }
-  finally {
-    client.close();
   }
 }
 

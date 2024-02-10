@@ -22,7 +22,7 @@ export const NextAuthOptions = {
   providers: [
     Credentials({
       credentials: {
-        login: { label: "username" },
+        email: { label: "email" },
         password: { label: "password", type: "password" }
       },
       name: "Credentials",

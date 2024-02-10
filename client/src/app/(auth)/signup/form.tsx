@@ -5,10 +5,9 @@ import Label from "@/components/atom/label";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/molecule/text-field";
 import { signIn } from "next-auth/react";
+import { fetcher } from "@/lib/fetcher";
 
 type SignupInput = {
-  name: string;
-  email: string;
   password: string;
   cPassword: string;
 };
@@ -17,8 +16,6 @@ type State = "IDLE" | "LOADING" | "ERROR" | "SUCCESS";
 
 export function SignupForm() {
   const [inputs, setInputs] = useState<SignupInput>({
-    name: "",
-    email: "",
     password: "",
     cPassword: "",
   });
@@ -49,30 +46,29 @@ export function SignupForm() {
     });
 
     setState("LOADING");
-    const { name, email, password } = inputs;
-    const response = await fetch("/api/signup", {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        email,
-        password,
-      }),
-    });
-    const body = await response.json();
-
-    console.log({ body });
-    if (response.ok && body.user) {
+    const name = e.target.name.value;
+    const email = e.target.email.value;
+    const { password } = inputs;
+    try {
+      const response = await fetcher("/api/signup", {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
       signIn("credentials", {
         email: email,
         password: password,
         callbackUrl: "/",
       });
       setState("SUCCESS");
-    } else {
+    } catch (error: any) {
       setState("ERROR");
       setError({
         ...errors,
-        email: body.error,
+        email: error?.message,
       });
     }
   };
@@ -87,7 +83,7 @@ export function SignupForm() {
     <form
       className="flex flex-col items-center place-content-center h-full  rounded-md py-10"
       onSubmit={handleSignup}>
-      <div className="flex flex-col items-center font-normal">
+      <div className="flex flex-col items-center font-normal py-12">
         <h3 className="text-3xl font-bold ">Welcome back</h3>
         <Label>
           We are <strong className="theme-text-primary">happy</strong> to have
@@ -100,21 +96,17 @@ export function SignupForm() {
         name="name"
         required={true}
         onChange={handleChange}
-        value={inputs.name}
         autoComplete="name"
         error={errors.name}
         type="text"
         wrapperClassName="w-9/12"
-        props={{
-          maxLength: 30,
-        }}
+        maxLength={30}
       />
       <TextField
         label="Email"
         name="email"
         required={true}
         onChange={handleChange}
-        value={inputs.email}
         autoComplete="email"
         error={errors.email}
         type="email"
@@ -126,12 +118,9 @@ export function SignupForm() {
         required={true}
         onChange={handleChange}
         value={inputs.password}
-        autoComplete="password"
         error={errors.password}
         type="password"
-        props={{
-          minLength: 6,
-        }}
+        minLength={6}
         wrapperClassName="w-9/12"
       />
 
@@ -141,12 +130,10 @@ export function SignupForm() {
         onChange={handleChange}
         required={true}
         value={inputs.cPassword}
-        autoComplete="confirm-password"
         error={errors.cPassword}
         type="password"
-        props={{
-          minLength: 6,
-        }}
+        minLength={6}
+        pattern={inputs.password}
         wrapperClassName="w-9/12"
       />
       <Button disabled={state === "LOADING"} className=" w-9/12">

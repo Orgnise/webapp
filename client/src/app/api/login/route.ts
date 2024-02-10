@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ user: customUser });
       } else {
         return NextResponse.json(
-          { success: false, message: 'authentication failed', error: 'email or password is incorrect' },
+          { success: false, message: 'email or password is incorrect', error: 'authentication failed' },
           { status: 401 }
         )
       }
@@ -53,9 +53,6 @@ export async function POST(request: Request) {
       { success: false, message: 'Internal Server Error', error: err.toString() },
       { status: 500 }
     )
-  }
-  finally {
-    client.close();
   }
 }
 
