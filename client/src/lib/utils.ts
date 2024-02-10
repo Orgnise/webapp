@@ -94,22 +94,54 @@ export async function generateSlug({ title, didExist = async () => false }: {
   didExist?: (val: string) => Promise<boolean>;
 }) {
   if (!hasValue(title)) {
-    // Generate random string
-    title =
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
+    title = randomId();
+    return title;
   }
-  const normalizedName = slugify(title, { separator: "" });
+  const normalizedName = slugify(title, { separator: "-" });
   let slug = normalizedName;
-  let newName = await didExist(slug);
-  if (newName) {
-    let num = 2;
-    while (newName) {
-      slug = `${slug}-${Math.random().toString(36).substring(2, 8)}`;
-      newName = await didExist(slug);
-      num++;
+  let exists = await didExist(slug);
+  if (exists) {
+    while (exists) {
+      slug = `${slug}-${randomId(6)}`;
+      exists = await didExist(slug);
     }
+  } else if (slug.length > 50) {
+    slug = slug.slice(0, 32);
+  } else if (slug.length <= 3) {
+    slug = `${slug}-${randomId(4)}`;
   }
-
   return slug;
+}
+
+/**
+   * Generate a uuid v4.
+   * @example
+   * const id = randomId();
+   * console.log(id); // 110ec58a-a0f2-4ac4-8393-c866d813b8d1
+   * @returns {string} A random id
+   */
+function randomId(length: 4 | 6 | 16 | 36 = 36): string {
+  let dt = new Date().getTime();
+  let format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+  if (length === 4) {
+    format = "xxxx";
+  }
+  else if (length === 6) {
+    format = "xxxxxx";
+  }
+  else if (length === 16) {
+    format = "xxxx-xxxx-xxxx-xxxx";
+  }
+  else if (length === 36) {
+    format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+  }
+  const uuid = format.replace(
+    /[xy]/g,
+    (c: string) => {
+      const r = (dt + Math.random() * 16) % 16 | 0;
+      dt = Math.floor(dt / 16);
+      return (c === "x" ? r : (r && 0x3) || 0x8).toString(16);
+    }
+  );
+  return uuid;
 }

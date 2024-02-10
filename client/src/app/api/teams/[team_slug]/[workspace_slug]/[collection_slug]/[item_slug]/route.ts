@@ -4,8 +4,9 @@ import mongoDb from "@/lib/mongodb";
 import { withAuth } from "@/lib/auth";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
+import { Workspace } from "@/lib/models/workspace.model";
 
-
+// Update an item
 export const PATCH = withAuth(async ({ req, session },) => {
   try {
     const client = await mongoDb;
@@ -74,13 +75,26 @@ export const PATCH = withAuth(async ({ req, session },) => {
   }
 });
 
-export const DELETE = withAuth(async ({ req, params },) => {
+// Delete an item
+export const DELETE = withAuth(async ({ req, params, team },) => {
   try {
     const client = await mongoDb;
-    const { item_slug } = params as { item_slug: string };
+    const { item_slug, workspace_slug } = params as { item_slug: string, collection_slug: string, workspace_slug: string };
 
+    const workspaceDb = client.db('pulse-db').collection('workspaces');
+    const workspace = await workspaceDb.findOne({ 'meta.slug': workspace_slug, team: new ObjectId(team._id) }) as unknown as Workspace;
+    if (!workspace) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'workspace not found in database',
+          error: 'Operation failed',
+        },
+        { status: 404 }
+      );
+    }
     const collectionsDb = client.db('pulse-db').collection('collections');
-    const query = { 'meta.slug': item_slug, object: "item" };
+    const query = { 'meta.slug': item_slug, workspace: new ObjectId(workspace._id), team: new ObjectId(team._id) };
     const itemInDb = await collectionsDb.findOne(query) as unknown as Collection;
 
     if (!itemInDb) {

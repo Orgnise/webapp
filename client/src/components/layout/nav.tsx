@@ -22,8 +22,8 @@ import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
 import cx from "classnames";
 import { useContext } from "react";
 
-const Nav = ({ }) => {
-  const { team_slug } = useParams() as { team_slug?: string } ?? {};
+const Nav = ({}) => {
+  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -48,7 +48,9 @@ const Nav = ({ }) => {
                       alt="user"
                       className="h-8 w-8 rounded-full"
                       onError={(e) => {
-                        (e.target as any).src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+                        (
+                          e.target as any
+                        ).src = `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
                       }}
                     />
                   )}
@@ -73,12 +75,10 @@ const Nav = ({ }) => {
 };
 export default Nav;
 
-
 export function TeamToggleDropDown() {
   const data = useContext(TeamContext);
   const { teams, error, loading } = useContext(DashBoardContext);
-  const { team_slug } = useParams() as { team_slug?: string } ?? {};
-
+  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
 
   if (!teams || loading) {
     return <TeamToggleDropdownPlaceholder />;
@@ -90,8 +90,8 @@ export function TeamToggleDropDown() {
     <div className="flex items-center bg-background ml-4 gap-2">
       <div className="h-6 w-[2px] bg-gray-200 rotate-[30deg]" />
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 ">
-          <Button variant={'ghost'} className="flex items-center gap-2">
+        <DropdownMenuTrigger className="flex items-center gap-2 focus-visible:outline-none">
+          <Button variant={"ghost"} className="flex items-center gap-2">
             {activeTeam?.name ?? "Not found"}
             <ChevronsUpDown size={18} />
           </Button>
@@ -99,12 +99,12 @@ export function TeamToggleDropDown() {
         <DropdownMenuContent className="border-border">
           <DropdownMenuLabel>My Teams</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {
-            teams.map((team: any, index) =>
+          <div className="px-4 flex flex-col gap-2">
+            {teams.map((team: any, index) => (
               <TeamRow team={team} key={index} />
-            )
-          }
-        </DropdownMenuContent >
+            ))}
+          </div>
+        </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
@@ -114,17 +114,18 @@ function TeamRow({ team }: { team: Team }) {
   const pathname = usePathname();
   return (
     <Link href={`/${team.meta.slug}`}>
-      <div className={cx("flex items-center gap-2 rounded w-full", {
-        "bg-primary text-primary-foreground": pathname === `/${team.meta.slug}`,
-        "hover:bg-accent": pathname !== `/${team.meta.slug}`
-      })}>
+      <div
+        className={cx("flex items-center gap-2 rounded w-full", {
+          "bg-primary text-primary-foreground":
+            pathname === `/${team.meta.slug}`,
+          "hover:bg-accent": pathname !== `/${team.meta.slug}`,
+        })}>
         <DropdownMenuItem className="w-full cursor-pointer">
           <span className="text-sm">{team.name}</span>
         </DropdownMenuItem>
       </div>
     </Link>
-  )
-
+  );
 }
 
 function TeamToggleDropdownPlaceholder() {

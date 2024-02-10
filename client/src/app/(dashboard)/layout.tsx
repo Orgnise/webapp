@@ -5,14 +5,13 @@ import { NavbarLayout } from "@/components/layout/nav-layout";
 import Providers from "./providers";
 import { ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
-import { usePathname } from "next/navigation";
 
 export const dynamic = "force-static";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
     <Providers>
-      <div className="min-h-screen w-full bg-background">
+      <div className="min-h-screen w-full bg-accent/15">
         <NavbarLayout>
           <Nav />
         </NavbarLayout>

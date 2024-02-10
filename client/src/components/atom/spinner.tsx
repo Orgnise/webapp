@@ -4,7 +4,7 @@ import cx from "classnames";
 export const Spinner = ({ className }: { className?: string }) => {
   return (
     <svg
-      className={cx("animate-spin h-5 w-5", className)}
+      className={cx("animate-spin h-10 w-10", className)}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24">
@@ -12,11 +12,11 @@ export const Spinner = ({ className }: { className?: string }) => {
         className="opacity-25"
         cx="12"
         cy="12"
-        r="10"
+        r="8"
         stroke="currentColor"
-        strokeWidth="4"></circle>
+        strokeWidth="2"></circle>
       <path
-        className="opacity-75"
+        className=""
         fill="currentColor"
         d="M4 12a8 8 0 018-8v1a7 7 0 00-7 7h1z"></path>
     </svg>

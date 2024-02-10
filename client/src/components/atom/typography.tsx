@@ -81,7 +81,7 @@ const P = React.forwardRef<HTMLParagraphElement, PProps>(
       <p
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-base font-normal tracking-tight lg:text-lg ${className}`}
+        className={`scroll-m-20 text-sm font-normal tracking-tight ${className}`}
       />
     );
   }
@@ -130,4 +130,4 @@ const MutedLabel = React.forwardRef<HTMLParagraphElement, MutedProps>(
 );
 MutedLabel.displayName = "MutedLabel";
 
-export { H1, H2, H3, H4,H5, P, LargeLabel, SmallLabel, MutedLabel };
+export { H1, H2, H3, H4, H5, P, LargeLabel, SmallLabel, MutedLabel };

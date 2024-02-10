@@ -1,6 +1,5 @@
-import CollectionContentPageClient from "./page-client";
+import ItemPageClient from "./page-client";
 
 export default async function CollectionContentPage() {
-
-  return <CollectionContentPageClient />
+  return <ItemPageClient />;
 }

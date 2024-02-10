@@ -6,7 +6,7 @@ import { Role, Teams } from "@/lib/models/team.modal";
 import { getServerSession } from "next-auth/next"
 import { NextAuthOptions } from "@/lib/auth/auth";
 import { z } from "zod";
-import { slugify } from "@/lib/utils";
+import { generateSlug } from "@/lib/utils";
 
 
 export async function POST(request: NextRequest) {
@@ -43,11 +43,12 @@ export async function POST(request: NextRequest) {
     }
     else {
       // Generate slug
-      const slug = slugify(parsedBody.data.name, async (slug) => {
-        const team = await teams.findOne({ slug });
-        return team === null;
+      const slug = await generateSlug({
+        title: parsedBody.data.name, didExist: async (val: string) => {
+          const work = await teams.findOne({ "meta.slug": val })
+          return !!work;
+        }
       });
-
       const newTeam = {
         name: parsedBody.data.name,
         description: parsedBody.data.description,

@@ -9,11 +9,10 @@ import { Input } from "@/components/ui/input";
 import { hasValue } from "@/lib/utils";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useDebouncedCallback } from "use-debounce";
 import { WorkspaceContext } from "../../providers";
 import Loading from "./loading";
 
-export default async function CollectionContentPageClient() {
+export default async function ItemPageClient() {
   const { activeCollection, loading, error, activeItem, UpdateActiveItem } =
     useContext(WorkspaceContext);
   const content = useRef<any>(undefined);
@@ -22,10 +21,13 @@ export default async function CollectionContentPageClient() {
   const onKeyDown = (e: any) => {
     if (e.metaKey && e.which === 83) {
       e.preventDefault();
-      UpdateActiveItem({
-        ...activeItem!,
-        content: content.current,
-      });
+      UpdateActiveItem(
+        {
+          ...activeItem!,
+          content: content.current,
+        },
+        activeCollection!
+      );
     }
   };
 
@@ -56,13 +58,17 @@ export default async function CollectionContentPageClient() {
         <div className="pb-2  bg-background flex flex-col gap-6 px-10">
           <Link
             href={`/${param?.team_slug}/${param?.workspace_slug}/${activeCollection?.meta?.slug}`}>
-            <SmallLabel className="">{activeCollection?.title}</SmallLabel>
+            <SmallLabel className="">{activeCollection?.name}</SmallLabel>
           </Link>
 
           <CollectionNameField
             name={activeItem?.name}
             onUpdateName={(name: string) => {
-              UpdateActiveItem({ ...activeItem!, name: name });
+              console.log("name", name);
+              UpdateActiveItem(
+                { ...activeItem!, name: name },
+                activeCollection!
+              );
             }}
           />
         </div>
@@ -87,25 +93,27 @@ function CollectionNameField({
   onUpdateName,
 }: {
   name?: string;
-  onUpdateName?: any;
+  onUpdateName: (name: string) => void;
 }) {
-  const debounced = useDebouncedCallback(
-    // function
-    (value) => {
-      onUpdateName(value);
-    },
-    2000
-  );
-
   return (
-    <Input
-      type="text"
-      autoFocus
-      className="border-none bg-transparent  text-2xl font-bold focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground placeholder:opacity-50 placeholder:text-2xl"
-      maxLength={30}
-      defaultValue={name}
-      placeholder="Untitled"
-      onChange={(e) => debounced(e.target.value)}
-    />
+    <form
+      onSubmit={(e: any) => {
+        e.preventDefault();
+        const value = e.target.name.value;
+        if (name !== value) {
+          onUpdateName(value);
+        }
+      }}>
+      <Input
+        type="text"
+        autoFocus
+        className="border-none bg-transparent  text-2xl font-bold focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground placeholder:opacity-50 placeholder:text-2xl"
+        maxLength={30}
+        defaultValue={name}
+        required
+        name="name"
+        placeholder="Untitled collection"
+      />
+    </form>
   );
 }

@@ -7,6 +7,7 @@ import { generateSlug } from "@/lib/utils";
 import mongoDb from "@/lib/mongodb";
 import { withAuth } from "@/lib/auth";
 
+// Get list of collections
 export const GET = withAuth(async ({ team, params },) => {
   const client = await mongoDb;
   try {
@@ -106,7 +107,7 @@ export const GET = withAuth(async ({ team, params },) => {
         sortIndex: { $first: "$sortIndex" },
       }
     },
-    { "$sort": { "createdAt": -1 } }
+    { "$sort": { "createdAt": 1 } }
     ]).toArray();
 
     return NextResponse.json({ collections: dbResult });
@@ -120,6 +121,7 @@ export const GET = withAuth(async ({ team, params },) => {
 });
 
 
+// Create a new collection
 export const POST = withAuth(async ({ team, session, req, params },) => {
   const client = await mongoDb;
   try {
@@ -145,7 +147,7 @@ export const POST = withAuth(async ({ team, session, req, params },) => {
     const collectionsDb = client.db('pulse-db').collection<CollectionDTO>('collections')
     const slug = await generateSlug({
       title: collectionToCreate?.name, didExist: async (val: string) => {
-        const work = await collectionsDb.findOne({ "meta.slug": val })
+        const work = await collectionsDb.findOne({ "meta.slug": val, workspace: new ObjectId(workspace._id) })
         return !!work;
       }
     });
@@ -157,6 +159,7 @@ export const POST = withAuth(async ({ team, session, req, params },) => {
         description: collectionToCreate?.description?.splice(0, 150),
       },
       sortIndex: 0,
+      children: [],
       title: collectionToCreate?.name ?? '',
       name: collectionToCreate?.name ?? '',
       content: collectionToCreate.content ?? '',
@@ -176,7 +179,8 @@ export const POST = withAuth(async ({ team, session, req, params },) => {
         collection: {
           ...collection,
           _id: dbResult.insertedId
-        }
+        },
+        message: collection.object === 'collection' ? 'Collection has been created successfully' : 'Item has been created successfully'
       });
   }
   catch (err: any) {

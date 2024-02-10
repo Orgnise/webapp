@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, createContext } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 import { Collection } from "@/lib/types/types";
@@ -24,7 +24,7 @@ interface WorkspaceProviderProps {
    * To create item, pass the parent collection slug
    */
   createCollection(collection: Collection): Promise<void>;
-  UpdateActiveItem: (item: Collection) => void;
+  UpdateActiveItem: (item: Collection, parent: Collection) => void;
   deleteCollection(collectionSlug: string): Promise<void>;
   deleteItem(itemSlug: string, collectionSlug: string): Promise<void>;
 }
@@ -35,29 +35,57 @@ export const WorkspaceContext = createContext(
 WorkspaceContext.displayName = "WorkspaceContext";
 
 function WorkspaceProvider({ children }: { children: ReactNode }) {
+  const [activeCollection, setActiveCollection] = useState<Collection>();
+  const [activeItem, setActiveItem] = useState<Collection>();
   const { error, loading, collections, mutate } = useCollections();
   const { toast } = useToast();
 
   const param = useParams();
   const router = useRouter();
-  const collectionSlug = param?.collection_slug;
-  const activeCollection = collections?.find(
-    (c) => c?.meta?.slug === collectionSlug
-  );
 
-  const itemSlug = param?.item_slug;
-  const activeItem = activeCollection?.children?.find(
-    (i: any) => i?.meta?.slug === itemSlug
-  );
+  // Set the active collection
+  useEffect(() => {
+    if (!param?.collection_slug) {
+      setActiveCollection(undefined);
+      return;
+    }
+    // Update the active collection if the collection slug has changed
+    if (
+      !activeCollection ||
+      activeCollection?.meta?.slug !== param?.collection_slug
+    ) {
+      setActiveCollection(
+        collections?.find((c) => c?.meta?.slug === param?.collection_slug)
+      );
+    }
+  }, [param?.collection_slug, collections]);
+
+  // Set the active item
+  useEffect(() => {
+    if (!param?.item_slug) {
+      setActiveItem(undefined);
+      return;
+    }
+    // Update the active item if the item slug has changed
+    if (!activeItem || activeItem?.meta?.slug !== param?.item_slug) {
+      setActiveItem(
+        activeCollection?.children?.find(
+          (i: any) => i?.meta?.slug === param?.item_slug
+        )
+      );
+    }
+  }, [param?.item_slug, activeCollection]);
 
   // Update the active item in database
-  async function UpdateActiveItem(item: Collection) {
+  async function UpdateActiveItem(item: Collection, parent: Collection) {
+    console.log("Updating active item", item.name);
     const teamSlug = param?.team_slug;
-    const collectionSlug = param?.collection_slug;
+    const collectionSlug = parent?.meta?.slug;
     const workspaceSlug = param?.workspace_slug;
+    const activeItemSlug = param?.item_slug;
     try {
       const response = await fetcher(
-        `/api/teams/${teamSlug}/${workspaceSlug}/${collectionSlug}/${activeItem?.meta?.slug}`,
+        `/api/teams/${teamSlug}/${workspaceSlug}/${collectionSlug}/${item?.meta?.slug}`,
         {
           method: "PATCH",
           headers: {
@@ -67,7 +95,7 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
         }
       );
       const list = collections.map((c) => {
-        if (c._id === item.parent) {
+        if (c._id === parent._id) {
           c.children = c.children.map((i: any) => {
             if (i._id === item._id) {
               return response.item;
@@ -77,13 +105,21 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
         }
         return c;
       });
+      setActiveItem(response.item);
+
+      if (activeItemSlug && activeItemSlug !== response.item?.meta?.slug) {
+        router.replace(
+          `/${teamSlug}/${workspaceSlug}/${collectionSlug}/${response?.item.meta.slug}`
+        );
+      }
+
       mutate({ collections: list }, { revalidate: false });
     } catch (error) {
       console.error("error", error);
     }
   }
 
-  // Create a new collection
+  // Create a new Collection/Item
   async function createCollection(collection: Collection) {
     const teamSlug = param?.team_slug;
     const workspaceSlug = param?.workspace_slug;
@@ -99,23 +135,27 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ collection: collection }),
         }
       );
+      toast({
+        title: "Success",
+        description: response?.message,
+      });
       if (collection.object === "collection") {
         const list = [...collections, response.collection];
+        setActiveCollection(response.collection);
         mutate({ collections: list }, { revalidate: false });
+        console.log("Collection created");
         router.push(
           `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`
         );
       } else {
         const list = collections.map((c) => {
-          if (c._id === collection._id) {
+          if (c._id === collection.parent) {
             c.children.push(response.collection);
           }
           return c;
         });
+        console.log("Item created");
         mutate({ collections: list }, { revalidate: false });
-        // router.push(
-        //   `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`
-        // );
       }
     } catch (error) {
       console.error("error", error);
@@ -127,10 +167,10 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
   async function updateCollection(collection: Collection) {
     const teamSlug = param?.team_slug;
     const workspaceSlug = param?.workspace_slug;
-    const collectionSlug = param?.collection_slug;
+    const collectionSlug = collection?.meta?.slug;
     try {
       const response = await fetcher(
-        `/api/teams/${teamSlug}/${workspaceSlug}/${collectionSlug}`,
+        `/api/teams/${teamSlug}/${workspaceSlug}/${collection?.meta?.slug}`,
         {
           method: "PATCH",
           headers: {
@@ -139,11 +179,22 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ collection: collection }),
         }
       );
-      const list = collections.filter((c) => c.meta.slug !== collectionSlug);
-      const index = collections.findIndex(
-        (c) => c.meta.slug === collectionSlug
-      );
-      list.splice(index, 0, response.collection);
+      const list = collections.map((c) => {
+        if (c.meta.slug === collectionSlug) {
+          return response.collection;
+        }
+        return c;
+      });
+      setActiveCollection(response.collection);
+      // Change the url if the collection slug has changed
+      if (
+        collectionSlug === activeCollection?.meta.slug &&
+        collectionSlug != response.collection.meta.slug
+      ) {
+        router.replace(
+          `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`
+        );
+      }
       mutate({ collections: list }, { revalidate: false });
     } catch (error) {
       console.error("error", error);

@@ -79,7 +79,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
       object: "item",
       parent: collection._id,
     } as Collection).finally(() => {
-      setDeleteStatus("IDLE");
+      setCreateItemStatus("IDLE");
     });
   }
 
@@ -90,7 +90,9 @@ function RenderCollection({ collection }: RenderCollectionProps) {
           href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}`}
           className="w-full">
           <H5 className="line-clamp-1 py-1 ">
-            {hasValue(collection.title) ? collection.title : "Untitled"}
+            {hasValue(collection.name)
+              ? collection.name
+              : "Untitled collection"}
           </H5>
         </Link>
         <div className="absolute -right-3  top-0 bottom-0 text-muted-foreground invisible group-hover:visible group-hover:bg-background">
@@ -181,11 +183,7 @@ function RenderItem({ item, collection }: RenderItemProps) {
           }
         )}>
         <span className="text-sm font-medium ">
-          {hasValue(item.name)
-            ? item.name
-            : hasValue(item.title)
-            ? item.title
-            : "Untitled"}
+          {hasValue(item.name) ? item.name : "Untitled item"}
         </span>
       </Link>
       <div className="absolute -right-3  top-0 bottom-0 text-muted-foreground invisible group-hover:visible group-hover:bg-background">

@@ -22,14 +22,14 @@ export default function useCollections(): IWorkspaces {
     });
 
 
-    if (!team_slug || !workspace_slug) {
-        return {
-            mutate,
-            error: "No slug or workspaceId provided",
-            loading: false,
-            collections: [],
-        }
-    }
+    // if (!team_slug || !workspace_slug) {
+    //     return {
+    //         mutate,
+    //         error: "No slug or workspaceId provided",
+    //         loading: false,
+    //         collections: [],
+    //     }
+    // }
     return {
         mutate,
         collections: data?.collections,

@@ -50,8 +50,8 @@ export const POST = withAuth(async ({ team, session, req },) => {
       description: body.description || '',
       meta: {
         slug: slug,
-        title: body?.name?.splice(0, 50),
-        description: body?.description?.splice(0, 150),
+        title: body?.name?.substring(0, 50),
+        description: body?.description?.substring(0, 150),
       },
       visibility: body?.visibility ?? 'Private',
       updatedBy: new ObjectId(userId),

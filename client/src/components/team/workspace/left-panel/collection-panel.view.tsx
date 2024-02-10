@@ -1,8 +1,17 @@
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ChevronDown,
   Circle,
   Maximize2,
   Minimize2,
+  MoreVerticalIcon,
   PanelRightOpen,
   PlusIcon,
 } from "lucide-react";
@@ -52,6 +61,10 @@ export default function CollectionPanel({
 }: CollectionPanelProps) {
   const { collections, loading, error } = useContext(WorkspaceContext);
   const [activeLayout, setActiveLayout] = React.useState<PanelLayout>("List");
+  const { team_slug, workspace_slug } = useParams() as {
+    team_slug: string;
+    workspace_slug: string;
+  };
 
   if (loading) {
     return (
@@ -104,28 +117,23 @@ export default function CollectionPanel({
             setLeftPanelSize(LeftPanelSize.large);
           }}
         />
-        {/* <Tab
-          tab="Graph"
-          selected={activeLayout === 'Graph'}
-          onClick={() => {
-            setActiveLayout('Graph');
-            setLeftPanelSize(LeftPanelSize.large);
-          }}
-        /> */}
-
-        {/* <CustomDropDown
-          className="pt-1 mx-3"
-          button={<SvgIcon icon="VerticalEllipse" size={4} className="h-5" />}>
-          <div className="flex flex-col gap-2 border theme-border rounded">
-            <div
-              className="flex items-center gap-2 px-3 py-2 hover:bg-surface rounded cursor-pointer transition-all ease-in duration-200"
-              onClick={() => {
-                navigate("settings");
-              }}>
-              Workspace Settings
-            </div>
-          </div>
-        </CustomDropDown> */}
+        <div className="flex-grow" />
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-2 ">
+            <button className="">
+              <MoreVerticalIcon size={15} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="border-border">
+            <DropdownMenuLabel>Options</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer rounded-sm">
+              <Link href={`/${team_slug}/${workspace_slug}/settings`}>
+                <P>Workspace Settings</P>
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <PanelTopToolbar
         leftPanelSize={leftPanelSize}
@@ -176,35 +184,17 @@ export function PanelTopToolbar({
   leftPanelSize: number;
   setLeftPanelSize?: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  const [status, setStatus] = useState<
-    "IDLE" | "LOADING" | "LOADING" | "SUCCESS" | "ERROR"
-  >("IDLE");
+  const [status, setStatus] = useState<"IDLE" | "LOADING">("IDLE");
   const { createCollection } = useContext(WorkspaceContext);
-  const { toast } = useToast();
 
   async function handleCreateCollection() {
     setStatus("LOADING");
-    try {
-      const col = {
-        object: "collection",
-      } as Collection;
-      const response = await createCollection(col);
-      setStatus("SUCCESS");
-      toast({
-        title: "Collection Created",
-        description: "Collection has been created",
-        duration: 3000,
-      });
-    } catch (error) {
-      setStatus("ERROR");
-      toast({
-        title: "Error",
-        description: "Something went wrong",
-        duration: 3000,
-        variant: "destructive",
-      });
-      console.error("Error creating collection", error);
-    }
+    const col = {
+      object: "collection",
+    } as Collection;
+    const response = await createCollection(col).finally(() => {
+      setStatus("IDLE");
+    });
   }
 
   return (

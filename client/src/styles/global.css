@@ -3,54 +3,6 @@
 @tailwind utilities;
 
 
-/* @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.3rem;
-  }
-
-  .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-  }
-} */
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -59,7 +11,7 @@
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 262.1 83.3% 57.8%;
+    --primary: 220.9 39.3% 11%;
     --primary-foreground: 210 20% 98%;
     --secondary: 220 14.3% 95.9%;
     --secondary-foreground: 220.9 39.3% 11%;
@@ -71,8 +23,8 @@
     --destructive-foreground: 210 20% 98%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.3rem;
+    --ring: 224 71.4% 4.1%;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -82,8 +34,8 @@
     --card-foreground: 210 20% 98%;
     --popover: 224 71.4% 4.1%;
     --popover-foreground: 210 20% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 210 20% 98%;
+    --primary-foreground: 220.9 39.3% 11%;
     --secondary: 215 27.9% 16.9%;
     --secondary-foreground: 210 20% 98%;
     --muted: 215 27.9% 16.9%;
@@ -94,111 +46,9 @@
     --destructive-foreground: 210 20% 98%;
     --border: 215 27.9% 16.9%;
     --input: 215 27.9% 16.9%;
-    --ring: 263.4 70% 50.4%;
+    --ring: 216 12.2% 83.9%;
   }
 }
-
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Custom Theme */
-/* @layer base {
-
-  .theme-bg-primary {
-    @apply bg-primary-500 dark:bg-primary-100;
-  }
-
-  .bg-default {
-    @apply bg-gray-50 dark:bg-[#1C1B1B];
-  }
-
-  .bg-surface {
-    @apply bg-gray-100 dark:bg-[#252525];
-  }
-
-  .bg-onSurface {
-    @apply bg-gray-200 dark:bg-[#2A2831];
-  }
-
-  .bg-surface2 {
-    @apply bg-[#EEE8F4] dark:bg-[#302D38];
-  }
-
-  .bg-surface3 {
-    @apply bg-[#EDE6F3] dark:bg-[#322E3A];
-  }
-
-  .bg-surface4 {
-    @apply bg-[#EDE6F3] dark:bg-[#35323E];
-  }
-
-  .bg-card {
-    @apply bg-white dark:bg-[#000000];
-  }
-
-  .theme-text-on-primary {
-    @apply text-white dark:text-primary-900;
-  }
-
-  .theme-text-primary {
-    @apply text-primary
-  }
-
-  .theme-text {
-    @apply text-slate-700 dark:text-slate-400;
-  }
-
-  .theme-text-h1 {
-    @apply text-slate-800 dark:text-slate-100;
-  }
-
-  .theme-text-h2 {
-    @apply text-slate-700 dark:text-slate-200;
-  }
-
-  .theme-text-h3 {
-    @apply text-slate-600 dark:text-slate-300;
-  }
-
-  .theme-text-sub1 {
-    @apply text-slate-500 dark:text-slate-400;
-  }
-
-  .theme-text-sub2 {
-    @apply text-slate-400 dark:text-slate-500;
-  }
-
-  .theme-border {
-    @apply border-gray-300 divide-gray-300 dark:border-gray-700 dark:divide-gray-700;
-  }
-}
-
-@layer components {
-
-  .link {
-    @apply flex items-center space-x-2 px-2 border-l-4 transition-all ease-in duration-200;
-  }
-
-  .link-active {
-    @apply bg-onSurface border-primary-500;
-  }
-
-  .link-inactive {
-    @apply hover: bg-surface border-transparent;
-  }
-
-  .theme-input {
-    @apply bg-surface border theme-border placeholder:theme-text-sub2 placeholder:text-sm placeholder:first-letter:uppercase p-2 rounded-md bg-surface;
-  }
-} */
 
 .body {
   scroll-behavior: smooth;
