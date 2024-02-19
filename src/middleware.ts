@@ -21,12 +21,13 @@ export const middleware = async (req: NextRequest) => {
   const session = await getToken({
     req: req,
     secret: process.env.AUTH_SECRET,
+    cookieName: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token'
   });
 
   const loggedIn = session?.user ? true : false;
   const path = req.nextUrl.pathname;
 
-  console.log("path", path, loggedIn, session,);
+  console.log("path", path, loggedIn, session, process.env.AUTH_SECRET);
 
   if (["/terms", "/policy"].includes(path)) {
     return NextResponse.next();
@@ -36,8 +37,9 @@ export const middleware = async (req: NextRequest) => {
     !["/login", "/signup", "terms", "policy"].includes(path) &&
     !loggedIn
   ) {
+    // console.log("redirecting to login", process.env.NEXT_PUBLIC_URL, req.nextUrl.origin);
     return NextResponse.redirect(
-      new URL("/login", process.env.NEXT_PUBLIC_URL),
+      new URL("/login", req.nextUrl.origin),
     );
   }
 

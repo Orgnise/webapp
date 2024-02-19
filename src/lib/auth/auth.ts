@@ -26,13 +26,15 @@ export const NextAuthOptions = {
       },
       name: "Credentials",
       async authorize(credentials, req) {
+        const feUrl = req?.headers?.origin;
+        console.log("authorize begin", { origin: req?.headers?.origin });
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
         if (parsedCredentials.success) {
           console.log("Mongo URI", process.env.MONGODB_URI);
           console.log("Mongo databaseName", databaseName);
-          const authResponse = await fetch(`${backendURL}/api/login`, {
+          const authResponse = await fetch(`${feUrl}/api/login`, {
             method: "POST",
             body: JSON.stringify(parsedCredentials.data),
             headers: {
@@ -190,7 +192,7 @@ export const NextAuthOptions = {
       console.warn(code, message);
     },
     debug(code, ...message) {
-      // console.debug(code, message)
+      console.debug(code, message)
     },
   },
 } as AuthOptions;
