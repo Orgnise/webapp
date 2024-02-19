@@ -26,6 +26,8 @@ export const middleware = async (req: NextRequest) => {
   const loggedIn = session?.user ? true : false;
   const path = req.nextUrl.pathname;
 
+  console.log("path", path, loggedIn, session,);
+
   if (["/terms", "/policy"].includes(path)) {
     return NextResponse.next();
   }

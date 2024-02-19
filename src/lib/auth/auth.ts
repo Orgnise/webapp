@@ -30,6 +30,8 @@ export const NextAuthOptions = {
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
         if (parsedCredentials.success) {
+          console.log("Mongo URI", process.env.MONGODB_URI);
+          console.log("Mongo databaseName", databaseName);
           const authResponse = await fetch(`${backendURL}/api/login`, {
             method: "POST",
             body: JSON.stringify(parsedCredentials.data),
@@ -38,10 +40,12 @@ export const NextAuthOptions = {
             },
             cache: "no-cache", //! To be removed after done testing
           });
+          const res = await authResponse.json();
           if (!authResponse.ok) {
+            console.log("authResponse [failure]", res);
             return null;
           }
-          const res = await authResponse.json();
+          console.log("authResponse [Success]", res);
           return res.user;
         }
         return null;
@@ -74,8 +78,11 @@ export const NextAuthOptions = {
   ],
 
   callbacks: {
-    async signIn({ account, profile }: any) {
-      console.log("signIn begin", { account, profile });
+    async signIn({ account, profile, user }: any) {
+      console.log("Mongo URI", process.env.MONGODB_URI);
+      console.log("Mongo db", process.env.DATABASE_NAME);
+      console.log("signIn begin", { account, profile, user });
+
       if (["google", "github"].includes(account.provider)) {
         const client = await mongoDb;
         const users = client.db(databaseName).collection("users");
@@ -121,7 +128,7 @@ export const NextAuthOptions = {
       return true; // Do different verification for other providers that don't have `email_verified`
     },
     async jwt({ token, user, account, profile }) {
-      // console.log("jwt begin", { token, user, account, profile })
+      console.log("jwt begin", { token, user, account, profile })
       if (account && account.type === "credentials") {
         token.userId = account.providerAccountId;
       }
