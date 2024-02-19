@@ -1,29 +1,25 @@
-'use client'
-
-import { Button } from "@/components/ui/button";
-import { Collection } from "@/lib/types/types";
-import { Editor } from "novel";
-import {Editor as Editor$1} from '@tiptap/core';
 import Label from "@/components/atom/label";
+import { Button } from "@/components/ui/button";
+import NovelEditor from "@/components/ui/editor/editor";
+import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
-import { useEffect } from "react";
+import { Editor as Editor$1 } from "@tiptap/core";
 
 interface CollectionContentProps {
   activeItem?: Collection;
   isEditing?: boolean;
-  onDebouncedUpdate?: ((editor?:  Editor$1 | undefined) => void | Promise<void>) | undefined;
+  onDebouncedUpdate?:
+    | ((editor?: Editor$1 | undefined) => void | Promise<void>)
+    | undefined;
 }
-export default function CollectionContent({activeItem,isEditing=false,onDebouncedUpdate}:CollectionContentProps) {
-  const content = activeItem?.content;
-  useEffect(() => {
-    setTimeout(() => {
-      window.scrollTo(0, 0);
-    }, 1000);
-  }, [content]);
-
+export default function ItemContent({
+  activeItem,
+  isEditing = false,
+  onDebouncedUpdate,
+}: CollectionContentProps) {
   if (!hasValue(activeItem)) {
     return (
-      <div className="CollectionContent flex-1 flex flex-col items-center place-content-center h-full max-w-xl text-center mx-auto">
+      <div className="CollectionContent mx-auto flex h-full max-w-xl flex-1 flex-col place-content-center items-center text-center">
         <span className="font-normal">
           Items are{" "}
           <Label variant="t2" className="mx-1 ">
@@ -42,14 +38,16 @@ export default function CollectionContent({activeItem,isEditing=false,onDebounce
           onClick={() => {
             // createCollection();
           }}
-        >Create Item</Button>
+        >
+          Create Item
+        </Button>
       </div>
     );
   }
 
   if (!activeItem) {
     return (
-      <div className="CollectionContent flex flex-col items-center place-content-center h-full py-8">
+      <div className="CollectionContent flex h-full flex-col place-content-center items-center py-8">
         <Label size="body" variant="t2">
           Nothing is selected
         </Label>
@@ -61,18 +59,10 @@ export default function CollectionContent({activeItem,isEditing=false,onDebounce
     );
   }
   return (
-    <>
-     <Editor
-        // key={activeItem!._id}
-        className="shadow-none p-0 m-0 w-full"
-        storageKey={activeItem!._id}
-        onUpdate={(editor) => { }}
-        // extensions={["header", "list", "image"]}
-        disableLocalStorage={true}
-        defaultValue={activeItem?.content}
-        editorProps={{editable: (state) => isEditing}}
-        onDebouncedUpdate={onDebouncedUpdate}
-      />
-    </>
+    <NovelEditor
+      content={activeItem?.content}
+      storageKey={activeItem!._id}
+      onDebouncedUpdate={onDebouncedUpdate}
+    />
   );
 }

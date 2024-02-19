@@ -1,6 +1,6 @@
-import { fetcher } from "../fetcher";
 import { useParams } from "next/navigation";
 import useSWR from "swr";
+import { fetcher } from "../fetcher";
 
 export default function useTeam() {
   const { team_slug } = useParams() as { team_slug?: string };

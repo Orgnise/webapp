@@ -3,7 +3,9 @@
 import { Team, Workspace } from "@/lib/types/types";
 import { ReactNode, createContext } from "react";
 
-import { useToast } from "@/components/ui/use-toast";
+// import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
+
 import { fetcher } from "@/lib/fetcher";
 import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-wrorkspaces";
@@ -31,7 +33,7 @@ interface TeamProviderProps {
 }
 
 export const TeamContext = createContext(
-  null
+  null,
 ) as unknown as React.Context<TeamProviderProps>;
 TeamContext.displayName = "TeamContext";
 
@@ -43,12 +45,12 @@ function TeamProvider({ children }: { children: ReactNode }) {
   const param = useParams();
   const workspace_slug = param?.workspace_slug;
   const workspace = workspacesResponse?.workspaces?.find(
-    (w) => w?.meta?.slug === workspace_slug
+    (w) => w?.meta?.slug === workspace_slug,
   );
   // const [createWorkspaceState, setCreateWorkspaceState] =
   //   useState<Status>("idle");
 
-  const { toast } = useToast();
+  // const { toast } = useToast();
 
   // Create workspace
   async function createWorkspace(name: string, description?: string) {
@@ -68,16 +70,16 @@ function TeamProvider({ children }: { children: ReactNode }) {
         },
         {
           revalidate: false,
-        }
+        },
       );
       document.getElementById("CreateWorkspaceCloseButton")?.click();
-      toast({
+      displayToast({
         title: "Workspace created",
         description: `Workspace ${name} has been created`,
         duration: 5000,
       });
     } catch (error) {
-      toast({
+      displayToast({
         title: "Error",
         description: `Error occurred while creating workspace ${name}`,
         duration: 2000,
@@ -98,11 +100,11 @@ function TeamProvider({ children }: { children: ReactNode }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ workspace }),
-        }
+        },
       );
       if (response.workspace?.meta?.slug !== param?.workspace_slug) {
         router.replace(
-          `/${teamSlug}/${response.workspace?.meta?.slug}/settings`
+          `/${teamSlug}/${response.workspace?.meta?.slug}/settings`,
         );
       }
       const list = workspacesResponse.workspaces.map((w) => {
@@ -112,13 +114,13 @@ function TeamProvider({ children }: { children: ReactNode }) {
         return w;
       });
       workspacesResponse.mutate({ workspaces: list }, { revalidate: false });
-      toast({
+      displayToast({
         title: "Workspace updated",
         description: `Workspace ${workspace.name} has been updated`,
         duration: 5000,
       });
     } catch (err: any) {
-      toast({
+      displayToast({
         title: "Error",
         description:
           err.message ??
@@ -142,24 +144,35 @@ function TeamProvider({ children }: { children: ReactNode }) {
       workspacesResponse.mutate(
         {
           workspaces: workspacesResponse.workspaces.filter(
-            (w) => w?.meta?.slug !== workspaceSlug
+            (w) => w?.meta?.slug !== workspaceSlug,
           ),
         },
-        { revalidate: false }
+        {
+          revalidate: false,
+        },
       );
-      toast({
+      displayToast({
         title: "Workspace deleted",
         description: `Workspace has been deleted`,
         duration: 5000,
       });
     } catch (error) {
-      toast({
+      displayToast({
         title: "Error",
         description: `Error occurred while deleting workspace`,
         duration: 2000,
         variant: "destructive",
       });
     }
+  }
+
+  function displayToast({ title, description, variant, duration }: any) {
+    toast(
+      <div>
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </div>,
+    );
   }
 
   return (
@@ -175,7 +188,8 @@ function TeamProvider({ children }: { children: ReactNode }) {
         createWorkspace,
         updateWorkspace,
         deleteWorkspace,
-      }}>
+      }}
+    >
       {children}
     </TeamContext.Provider>
   );

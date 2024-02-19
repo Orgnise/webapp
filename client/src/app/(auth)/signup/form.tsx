@@ -1,11 +1,11 @@
 "use client";
-import React, { ChangeEvent, useState } from "react";
-import Link from "next/link";
 import Label from "@/components/atom/label";
-import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/molecule/text-field";
-import { signIn } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 import { fetcher } from "@/lib/fetcher";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { ChangeEvent, useState } from "react";
 
 type SignupInput = {
   password: string;
@@ -81,9 +81,10 @@ export function SignupForm() {
 
   return (
     <form
-      className="flex flex-col items-center place-content-center h-full  rounded-md py-10"
-      onSubmit={handleSignup}>
-      <div className="flex flex-col items-center font-normal py-12">
+      className="flex h-full flex-col place-content-center items-center  rounded-md py-10"
+      onSubmit={handleSignup}
+    >
+      <div className="flex flex-col items-center py-12 font-normal">
         <h3 className="text-3xl font-bold ">Welcome back</h3>
         <Label>
           We are <strong className="theme-text-primary">happy</strong> to have
@@ -139,18 +140,18 @@ export function SignupForm() {
       <Button disabled={state === "LOADING"} className=" w-9/12">
         {state === "LOADING" ? (
           <div className="flex h-8 items-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-white"></div>
           </div>
         ) : (
           "Sign up"
         )}
       </Button>
-      <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
-        <span className="border-t theme-border flex-1" />
-        <span className="px-4 text-sm hover:underline cursor-pointer">
+      <div className="flex w-9/12 place-content-evenly items-center pt-10 text-center">
+        <span className="theme-border flex-1 border-t" />
+        <span className="cursor-pointer px-4 text-sm hover:underline">
           <Link href="login">DO YOU HAVE AN ACCOUNT?</Link>
         </span>
-        <span className="border-t theme-border flex-1" />
+        <span className="theme-border flex-1 border-t" />
       </div>
     </form>
   );

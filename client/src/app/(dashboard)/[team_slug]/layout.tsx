@@ -1,13 +1,13 @@
 "use client";
 
-import Providers from "./providers";
 import { ReactNode } from "react";
 import TeamAuth from "./auth";
+import Providers from "./providers";
 
 export default function TeamLayout({ children }: { children: ReactNode }) {
-  return <Providers>
-    <TeamAuth>
-      {children}
-    </TeamAuth>;
-  </Providers>
+  return (
+    <Providers>
+      <TeamAuth>{children}</TeamAuth>;
+    </Providers>
+  );
 }

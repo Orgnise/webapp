@@ -1,3 +1,4 @@
+import { P } from "@/components/atom/typography";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,6 +8,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   ChevronDown,
   Circle,
   Maximize2,
@@ -15,36 +24,25 @@ import {
   PanelRightOpen,
   PlusIcon,
 } from "lucide-react";
-import { P, SmallLabel } from "@/components/atom/typography";
 import React, { useContext, useState } from "react";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
-import { Button } from "@/components/ui/button";
+import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
+import Label from "@/components/atom/label";
+import { Spinner } from "@/components/atom/spinner";
+import Tab from "@/components/atom/tab";
+import { ListView } from "@/components/ui/listview";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { ToolTipWrapper } from "@/components/ui/tooltip";
+import useCollections from "@/lib/swr/use-collections";
+import { Collection, Workspace } from "@/lib/types/types";
+import { Fold } from "@/lib/utils";
+import cx from "classnames";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { LeftPanelSize } from "../workspace-view";
 import CollectionBoard from "./collection-board";
 import CollectionList from "./collection-list";
 import CollectionTable from "./collection-table";
-import { Fold } from "@/lib/utils";
-import Label from "@/components/atom/label";
-import { LeftPanelSize } from "../workspace-view";
-import Link from "next/link";
-import { ListView } from "@/components/ui/listview";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { Spinner } from "@/components/atom/spinner";
-import Tab from "@/components/atom/tab";
-import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
-import { ToolTipWrapper } from "@/components/ui/tooltip";
-import { Collection, Workspace } from "@/lib/types/types";
-import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
-import cx from "classnames";
-import { useParams } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
 
 type PanelLayout = "List" | "Board" | "Table" | "Graph";
 
@@ -59,26 +57,26 @@ export default function CollectionPanel({
   leftPanelSize,
   setLeftPanelSize = () => {},
 }: CollectionPanelProps) {
-  const { collections, loading, error } = useContext(WorkspaceContext);
+  // const {  loading, error } = useContext(WorkspaceContext);
   const [activeLayout, setActiveLayout] = React.useState<PanelLayout>("List");
   const { team_slug, workspace_slug } = useParams() as {
     team_slug: string;
     workspace_slug: string;
   };
 
-  if (loading) {
-    return (
-      <div className="h-full w-full flex place-content-center items-center">
-        <Spinner />
-      </div>
-    );
-  } else if (error) {
-    return (
-      <div className="h-full w-full flex place-content-center items-center">
-        <P>Something went wrong</P>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="h-full w-full flex place-content-center items-center">
+  //       <Spinner />
+  //     </div>
+  //   );
+  // } else if (error) {
+  //   return (
+  //     <div className="h-full w-full flex place-content-center items-center">
+  //       <P>Something went wrong</P>
+  //     </div>
+  //   );
+  // }
 
   const { createCollection } = {
     createCollection: () => {},
@@ -91,8 +89,9 @@ export default function CollectionPanel({
       style={{
         width: leftPanelSize,
       }}
-      className={`flex flex-col h-full overflow-hidden transition-all duration-300 ease-in-expo`}>
-      <div className="flex items-center bg-background border  border-border">
+      className={`flex h-full flex-col overflow-hidden transition-all duration-300 ease-in-expo`}
+    >
+      <div className="flex items-center border border-border  bg-background">
         <Tab
           tab="List"
           selected={activeLayout === "List"}
@@ -118,22 +117,24 @@ export default function CollectionPanel({
           }}
         />
         <div className="flex-grow" />
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 ">
-            <button className="">
-              <MoreVerticalIcon size={15} />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="border-border">
-            <DropdownMenuLabel>Options</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer rounded-sm">
-              <Link href={`/${team_slug}/${workspace_slug}/settings`}>
-                <P>Workspace Settings</P>
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="px-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-2 ">
+              <button className="">
+                <MoreVerticalIcon size={15} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="border-border">
+              <DropdownMenuLabel>Options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="cursor-pointer rounded-sm">
+                <Link href={`/${team_slug}/${workspace_slug}/settings`}>
+                  <P>Workspace Settings</P>
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <PanelTopToolbar
         leftPanelSize={leftPanelSize}
@@ -141,7 +142,10 @@ export default function CollectionPanel({
       />
       <div className="h-2" />
       {activeLayout === "List" && (
-        <CollectionList collections={collections} isLoading={loading} />
+        <CollectionList
+        //  collections={collections}
+        // isLoading={loading}
+        />
       )}
       {activeLayout === "Board" && (
         <CollectionBoard
@@ -149,8 +153,8 @@ export default function CollectionPanel({
           setLeftPanelSize={setLeftPanelSize}
           workspace={workspace}
           createCollection={createCollection}
-          allCollection={collections}
-          isLoadingCollection={false}
+          // allCollection={collections}
+          // isLoadingCollection={false}
         />
       )}
       {activeLayout === "Table" && (
@@ -159,8 +163,8 @@ export default function CollectionPanel({
           setLeftPanelSize={setLeftPanelSize}
           workspace={workspace}
           createCollection={createCollection}
-          allCollection={collections}
-          isLoadingCollection={false}
+          // allCollection={collections}
+          // isLoadingCollection={false}
         />
       )}
       {/* 
@@ -185,7 +189,8 @@ export function PanelTopToolbar({
   setLeftPanelSize?: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const [status, setStatus] = useState<"IDLE" | "LOADING">("IDLE");
-  const { createCollection } = useContext(WorkspaceContext);
+  // const { createCollection } = useContext(WorkspaceContext);
+  const { createCollection } = useCollections();
 
   async function handleCreateCollection() {
     setStatus("LOADING");
@@ -198,15 +203,15 @@ export function PanelTopToolbar({
   }
 
   return (
-    <div className="flex items-center place-content-between border-b border-border bg-accent/60  px-1">
+    <div className="flex place-content-between items-center border-b border-r border-border bg-background  px-1">
       <WorkspaceToggleDropDown />
-      <div className="ml-2 flex items-center h-4">
-        <ToolTipWrapper onHover={<>Create</>}>
+      <div className="ml-2 flex h-4 items-center">
+        <ToolTipWrapper content={<>Create Collection</>}>
           {status === "LOADING" ? (
-            <Spinner className="theme-text-primary" />
+            <Spinner className="theme-text-primary h-6" />
           ) : (
             <PlusIcon
-              className="theme-text-primary rounded p-1 outline-1 cursor-pointer"
+              className="theme-text-primary cursor-pointer rounded p-1 outline-1"
               onClick={async () => {
                 await handleCreateCollection();
               }}
@@ -215,7 +220,7 @@ export function PanelTopToolbar({
         </ToolTipWrapper>
         {leftPanelSize === LeftPanelSize.max ? (
           <Maximize2
-            className="hover:bg-onSurface rounded p-1 outline-1 cursor-pointer"
+            className="hover:bg-onSurface cursor-pointer rounded p-1 outline-1"
             onClick={() => {
               if (leftPanelSize === LeftPanelSize.max) {
                 setLeftPanelSize(LeftPanelSize.default);
@@ -226,7 +231,7 @@ export function PanelTopToolbar({
           />
         ) : (
           <Minimize2
-            className="hover:bg-onSurface rounded p-1 outline-1 cursor-pointer"
+            className="hover:bg-onSurface cursor-pointer rounded p-1 outline-1"
             onClick={() => {
               if (leftPanelSize === LeftPanelSize.max) {
                 setLeftPanelSize(LeftPanelSize.default);
@@ -238,7 +243,7 @@ export function PanelTopToolbar({
         )}
         <PanelRightOpen
           size={24}
-          className="hover:bg-onSurface rounded p-1 outline-1 cursor-pointer"
+          className="hover:bg-onSurface cursor-pointer rounded p-1 outline-1"
           onClick={() => {
             setLeftPanelSize(LeftPanelSize.min);
           }}
@@ -264,22 +269,20 @@ export function WorkspaceToggleDropDown() {
     workspaces?.[0];
 
   return (
-    <div>
-      <Sheet>
-        <SheetTrigger className="flex items-center">
-          <button className="h-9 flex items-center gap-2 px-2">
-            {workspace?.name}
-            <ChevronDown />
-          </button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 border-border">
-          <SheetHeader className="p-4 border-b border-border">
-            <SheetTitle>{workspace?.name}</SheetTitle>
-          </SheetHeader>
-          <WorkspaceListView workspaces={workspaces} />
-        </SheetContent>
-      </Sheet>
-    </div>
+    <Sheet>
+      <SheetTrigger className="flex items-center py-1">
+        <button className="flex h-9 items-center gap-2 px-2">
+          <span className="max-w-[190px] truncate">{workspace?.name}</span>
+          <ChevronDown size={15} />
+        </button>
+      </SheetTrigger>
+      <SheetContent side="left" className="border-border p-0">
+        <SheetHeader className="border-b border-border p-4">
+          <SheetTitle>{workspace?.name}</SheetTitle>
+        </SheetHeader>
+        <WorkspaceListView workspaces={workspaces} />
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -291,36 +294,37 @@ export function WorkspaceListView({ workspaces }: { workspaces: Workspace[] }) {
     <Fold
       value={workspaces}
       ifPresent={(workspaces) => (
-        <div className="Layout px-3 w-full h-full">
+        <div className="Layout h-full w-full px-3">
           {/* CREATE WORKSPACE */}
-          <div className="flex gap-2 px-1 items-center mt-3 place-content-between">
+          {/* <div className="flex gap-2 px-1 items-center mt-3 place-content-between">
             <SmallLabel>WORKSPACES</SmallLabel>
             <Button size={"sm"} variant={"ghost"} className="flex gap-2">
               <PlusIcon />
               create Workspace
             </Button>
-          </div>
+          </div> */}
 
           <Fold
             value={workspaces}
             ifPresent={(list) => (
               <ListView
                 items={list}
-                className="flex flex-col gap-1 overflow-y-auto h-full"
-                renderItem={(workspace) => {
+                className="flex h-full flex-col gap-1 overflow-y-auto pt-2"
+                renderItem={(workspace, index) => {
                   const isActive = workspace_slug === workspace.meta.slug;
                   return (
-                    <SheetClose asChild>
+                    <SheetClose asChild key={index}>
                       <Link
                         href={`/${team_slug}/${workspace.meta.slug}`}
                         className={cx(
-                          "group link py-3 flex items-center gap-2  rounded px-4",
+                          "link group flex items-center gap-2 rounded  px-4 py-3",
                           {
                             "hover:bg-accent":
                               workspace_slug !== workspace.meta.slug,
                             "text-primary ": isActive,
-                          }
-                        )}>
+                          },
+                        )}
+                      >
                         <Circle
                           size={15}
                           fill={isActive ? "true" : "none"}
@@ -335,7 +339,7 @@ export function WorkspaceListView({ workspaces }: { workspaces: Workspace[] }) {
                   );
                 }}
                 noItemsElement={
-                  <div className="px-3 py-2 bg-surface hover:bg-surface  m-3 ">
+                  <div className="bg-surface hover:bg-surface m-3 px-3  py-2 ">
                     <Label size="body" variant="s1">
                       Create a workspace to get started
                     </Label>
@@ -344,7 +348,7 @@ export function WorkspaceListView({ workspaces }: { workspaces: Workspace[] }) {
               />
             )}
             ifAbsent={() => (
-              <div className="px-3 py-2 bg-surface hover:bg-surface  m-3 ">
+              <div className="bg-surface hover:bg-surface m-3 px-3  py-2 ">
                 <Label size="body" variant="s1">
                   Create a workspace to get started
                 </Label>
@@ -354,7 +358,7 @@ export function WorkspaceListView({ workspaces }: { workspaces: Workspace[] }) {
         </div>
       )}
       ifAbsent={() => (
-        <div className=" px-3 py-2 bg-gray-100 hover:bg-gray-100  m-3 h-full flex flex-col items-center place-content-center">
+        <div className=" m-3 flex h-full flex-col  place-content-center items-center bg-gray-100 px-3 py-2 hover:bg-gray-100">
           <LoadingSpinner />
         </div>
       )}

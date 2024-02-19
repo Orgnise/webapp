@@ -1,21 +1,23 @@
+import React, { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import React, { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import Label from "@/components/atom/label";
-import { LeftPanelSize } from "../workspace-view";
-import Link from "next/link";
+import { P } from "@/components/atom/typography";
 import { ListView } from "@/components/ui/listview";
+import useCollections from "@/lib/swr/use-collections";
+import { hasValue } from "@/lib/utils";
 import cx from "classnames";
 import { useParams } from "next/dist/client/components/navigation";
+import Link from "next/link";
+import { LeftPanelSize } from "../workspace-view";
 
 // import { NavLink, useLocation } from "react-router-dom";
 
 interface CollectionBoardProps {
   workspace: any;
   createCollection: any;
-  allCollection: any;
-  isLoadingCollection: boolean;
+  // allCollection: any;
+  // isLoadingCollection: boolean;
   leftPanelSize: number;
   setLeftPanelSize?: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -26,28 +28,27 @@ interface CollectionBoardProps {
 export default function CollectionBoard({
   workspace,
   createCollection,
-  allCollection,
-  isLoadingCollection,
+  // allCollection,
+  // isLoadingCollection,
   leftPanelSize,
-  setLeftPanelSize = (i) => { },
+  setLeftPanelSize = (i) => {},
 }: CollectionBoardProps) {
-  const [collections, setCollection] = useState<any>(allCollection ?? []);
+  // const [collections, setCollection] = useState<any>(allCollection ?? []);
+  const { error, loading, collections, mutate } = useCollections();
   const [groups, setGroups] = useState<any>({});
 
   // path
   const slug = workspace?.meta?.slug;
-  const pathArray = '/'.split(slug);
-  const relativePath = pathArray[0] + workspace.meta?.slug ?? ""
+  const pathArray = "/".split(slug);
+  const relativePath = pathArray[0] + workspace.meta?.slug ?? "";
 
-  useEffect(() => {
-    if (!allCollection) return;
-    // Mock an API call.
-    buildAndSave(allCollection);
-  }, [allCollection]);
+  // useEffect(() => {
+  //   if (!allCollection) return;
+  //   // Mock an API call.
+  //   buildAndSave(allCollection);
+  // }, [allCollection]);
 
-  function buildAndSave(items: any) {
-
-  }
+  function buildAndSave(items: any) {}
 
   function onDragEnd(result: any) {
     const { destination, draggableId, source, type } = result;
@@ -120,21 +121,24 @@ export default function CollectionBoard({
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="RootDroppable flex flex-row gap-4 h-full">
+            className="RootDroppable flex h-full flex-row gap-4"
+          >
             <ListView
               items={collections}
-              className="CollectionRowsList flex w-full h-full overflow-x-auto  gap-4  px-2"
+              className="CollectionRowsList flex h-full w-full gap-4  overflow-x-auto  px-2"
               renderItem={(collection, index) => (
                 <Draggable
                   draggableId={collection._id}
                   key={collection._id}
-                  index={index}>
+                  index={index}
+                >
                   {(provided) => (
                     <div
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
-                      className="CollectionDraggableColumn h-full rounded hover:bg-accent/30">
+                      className="CollectionDraggableColumn h-full rounded hover:bg-accent/30"
+                    >
                       <CollectionColumn
                         key={collection._id}
                         collection={collection}
@@ -148,7 +152,7 @@ export default function CollectionBoard({
               noItemsElement={<NoCollectionView />}
               placeholder={
                 <>
-                  <div className="flex1 flex flex-col items-center place-content-center h-full">
+                  <div className="flex1 flex h-full flex-col place-content-center items-center">
                     <Label variant="t2">Loading...</Label>
                   </div>
                 </>
@@ -167,7 +171,11 @@ export default function CollectionBoard({
  * @param {*} param0
  * @returns
  */
-function CollectionColumn({ collection, relativePath, setLeftPanelSize }: {
+function CollectionColumn({
+  collection,
+  relativePath,
+  setLeftPanelSize,
+}: {
   collection: any;
   relativePath: any;
   setLeftPanelSize: any;
@@ -178,20 +186,27 @@ function CollectionColumn({ collection, relativePath, setLeftPanelSize }: {
         <div
           {...provided.droppableProps}
           ref={provided.innerRef}
-          className="CollectionColumn h-full  p-2 w-64">
+          className="CollectionColumn h-full  w-64 p-2"
+        >
           <div className="w-76 overflow-hidden overflow-ellipsis whitespace-nowrap">
             <Label size="body" variant="t2">
-              {collection.title}
+              {collection.name}
             </Label>
           </div>
 
           <ListView
             items={collection.children}
-            className="flex flex-col gap-2   rounded h-full overflow-hidden p-2"
+            className="flex h-full flex-col   gap-2 overflow-hidden rounded p-2"
             renderItem={(item, index) => (
               <Draggable draggableId={item._id} index={index}>
                 {(provided) => {
-                  const { team_slug, workspace_slug, item_slug } = useParams() as { team_slug?: string, workspace_slug?: string, collection_slug?: string, item_slug?: string };
+                  const { team_slug, workspace_slug, item_slug } =
+                    useParams() as {
+                      team_slug?: string;
+                      workspace_slug?: string;
+                      collection_slug?: string;
+                      item_slug?: string;
+                    };
 
                   const isActive = item_slug === item.meta?.slug;
                   return (
@@ -199,28 +214,31 @@ function CollectionColumn({ collection, relativePath, setLeftPanelSize }: {
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
-                      className={cx('flex items-center bg-card shadow-sm rounded border border-border ', {
-                        'bg-primary text-primary-foreground': isActive,
-                        'hover:bg-accent': !isActive
-                      })}
+                      className={cx(
+                        "flex items-center rounded border border-border bg-card hover:shadow-sm ",
+                        {
+                          "bg-primary text-primary-foreground hover:bg-primary/90":
+                            isActive,
+                        },
+                      )}
                     >
                       <Link
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className="p-2 w-full"
+                        className="w-full p-2"
                         ref={provided.innerRef}
                         href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}/${item.meta?.slug}/`}
                         onClick={(e) => {
                           setLeftPanelSize(LeftPanelSize.large);
                         }}
                       >
-                        <Label size="body">{item.title}</Label>
+                        <Label size="body">
+                          {hasValue(item.name) ? item.name : "Untitled item"}
+                        </Label>
                       </Link>
                     </div>
-                  )
-                }
-
-                }
+                  );
+                }}
               </Draggable>
             )}
           />
@@ -231,22 +249,11 @@ function CollectionColumn({ collection, relativePath, setLeftPanelSize }: {
   );
 }
 
-
 export function NoCollectionView() {
-
   return (
-    <div className="flex-1 flex flex-col items-center place-content-center">
-      <Label variant="s1">No items or collections</Label>
-      <Label variant="s2">Start by creating your first item</Label>
-      <Button
-        variant={"link"}
-        className="mt-2 "
-        onClick={() => {
-
-        }}
-      >
-        Create Item
-      </Button>
+    <div className="flex flex-1 flex-col place-content-center items-center">
+      <P>No items or collections</P>
+      <P className="text-muted-foreground">Start by creating your first item</P>
     </div>
   );
 }

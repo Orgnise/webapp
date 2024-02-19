@@ -1,5 +1,5 @@
-import React from "react";
 import cx from "classnames";
+import React from "react";
 
 type Size = "h1" | "h2" | "h3" | "body1" | "body" | "caption" | "small";
 
@@ -46,17 +46,18 @@ const Label: React.FC<TextProps> = ({
           "text-[11px]": size === "small",
         },
         {
-          "font-bold theme-text-h1": variant === "t1",
-          "font-semibold theme-text-h2": variant === "t2",
-          "font-sans theme-text-h3": variant === "t3",
+          "theme-text-h1 font-bold": variant === "t1",
+          "theme-text-h2 font-semibold": variant === "t2",
+          "theme-text-h3 font-sans": variant === "t3",
           "theme-text-sub1": variant === "s1",
           "theme-text-sub2": variant === "s2",
           "font-light": variant === "cap",
         },
         {
           "theme-text-primary": primary,
-        }
-      )}>
+        },
+      )}
+    >
       {children}
     </span>
   );
@@ -96,7 +97,8 @@ export const Typography: React.FC<void> = () => {
                 key={index}
                 size={size}
                 variant={variant}
-                className="uppercase">{`${size} ${variant}`}</Label>
+                className="uppercase"
+              >{`${size} ${variant}`}</Label>
             );
           });
         })}

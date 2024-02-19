@@ -5,8 +5,8 @@ import { CreateTeam } from "@/components/team/create/create-team";
  */
 export default function TermsAndConditionPage() {
   return (
-    <div className="py-24 bg-card">
-      <div className="flex flex-col space-y-3 items-center place-content-center text-sm">
+    <div className="h-full py-24">
+      <div className="flex flex-col place-content-center items-center space-y-3 text-sm">
         <CreateTeam />
       </div>
     </div>

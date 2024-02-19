@@ -1,36 +1,44 @@
-import { NextResponse } from "next/server";
-import mongoDb from "@/lib/mongodb";
 import { withAuth } from "@/lib/auth";
 import { Workspace } from "@/lib/models/workspace.model";
-import { ObjectId } from "mongodb";
+import mongoDb from "@/lib/mongodb";
 import { hasValue } from "@/lib/utils";
+import { ObjectId } from "mongodb";
+import { NextResponse } from "next/server";
 
 // Update a workspace
-export const PATCH = withAuth(async ({ req, session, team },) => {
+export const PATCH = withAuth(async ({ req, session, team }) => {
   try {
     const client = await mongoDb;
-    const { workspace: reqWorkspace } = await req.json() as { workspace: Workspace };
+    const { workspace: reqWorkspace } = (await req.json()) as {
+      workspace: Workspace;
+    };
 
     if (!reqWorkspace || !ObjectId.isValid(reqWorkspace!._id)) {
       return NextResponse.json(
-        { success: false, message: 'Operation failed', error: 'Invalid workspace' },
-        { status: 400 }
+        {
+          success: false,
+          message: "Operation failed",
+          error: "Invalid workspace",
+        },
+        { status: 400 },
       );
     }
 
-    const workspaceDb = client.db('pulse-db').collection('workspaces');
-    const query = { "_id": new ObjectId(reqWorkspace._id) };
-    const workspaceInDb = await workspaceDb.findOne(query) as unknown as Workspace;
+    const workspaceDb = client.db("pulse-db").collection("workspaces");
+    const query = { _id: new ObjectId(reqWorkspace._id) };
+    const workspaceInDb = (await workspaceDb.findOne(
+      query,
+    )) as unknown as Workspace;
 
     if (!workspaceInDb) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Operation failed',
-          error: 'workspace not found in database',
-          query
+          message: "Operation failed",
+          error: "workspace not found in database",
+          query,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
     let data = { ...reqWorkspace } as any;
@@ -46,78 +54,79 @@ export const PATCH = withAuth(async ({ req, session, team },) => {
     }
     let slug = reqWorkspace?.meta?.slug;
     if (hasValue(slug) && workspaceInDb?.meta?.slug !== slug) {
-      const work = await workspaceDb.findOne({ "meta.slug": reqWorkspace?.meta?.slug, team: new ObjectId(team._id) })
+      const work = await workspaceDb.findOne({
+        "meta.slug": reqWorkspace?.meta?.slug,
+        team: new ObjectId(team._id),
+      });
       if (work) {
         return NextResponse.json(
           {
             success: false,
-            message: 'workspace with this slug already exists',
-            error: 'Operation failed',
-            query
+            message: "workspace with this slug already exists",
+            error: "Operation failed",
+            query,
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
     } else {
       slug = workspaceInDb.meta.slug;
     }
 
-    const update = await workspaceDb.updateOne(
-      query,
-      {
-        "$set": {
-          ...data,
-          "meta": {
-            ...workspaceInDb.meta,
-            "slug": slug
-          },
-          updatedAt: new Date().toISOString(),
-          updatedBy: new ObjectId(session.user.id),
-        }
-      }
-    );
+    const update = await workspaceDb.updateOne(query, {
+      $set: {
+        ...data,
+        meta: {
+          ...workspaceInDb.meta,
+          slug: slug,
+        },
+        updatedAt: new Date().toISOString(),
+        updatedBy: new ObjectId(session.user.id),
+      },
+    });
 
     return NextResponse.json(
       {
         success: true,
-        message: 'workspace updated',
+        message: "workspace updated",
         workspace: {
           ...data,
-          "meta": {
+          meta: {
             ...workspaceInDb.meta,
-            "slug": slug
+            slug: slug,
           },
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: 'Operation failed', error: error.toString() },
-      { status: 500 }
+      { success: false, message: "Operation failed", error: error.toString() },
+      { status: 500 },
     );
   }
 });
 
-
-export const DELETE = withAuth(async ({ params },) => {
+export const DELETE = withAuth(async ({ params }) => {
   try {
     const client = await mongoDb;
     const { workspace_slug } = params as { workspace_slug: string };
 
-    const workspaceDb = client.db('pulse-db').collection('workspaces');
-    const query = { 'meta.slug': workspace_slug };
-    const workspaceInDb = await workspaceDb.findOne(query) as unknown as Workspace;
+    const workspaceDb = client.db("pulse-db").collection("workspaces");
+    const query = { "meta.slug": workspace_slug };
+    const workspaceInDb = (await workspaceDb.findOne(
+      query,
+    )) as unknown as Workspace;
 
     if (!workspaceInDb) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Operation failed',
-          error: 'Workspace not found in database',
-          query
+          message: "Operation failed",
+          error: "Workspace not found in database",
+          query,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -126,15 +135,15 @@ export const DELETE = withAuth(async ({ params },) => {
     return NextResponse.json(
       {
         success: true,
-        message: 'Workspace is deleted successfully',
-        deleteResult
+        message: "Workspace is deleted successfully",
+        deleteResult,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: 'Operation failed', error: error.toString() },
-      { status: 500 }
+      { success: false, message: "Operation failed", error: error.toString() },
+      { status: 500 },
     );
   }
 });

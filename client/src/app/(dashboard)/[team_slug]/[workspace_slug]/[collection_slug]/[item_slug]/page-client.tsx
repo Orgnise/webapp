@@ -1,22 +1,43 @@
 "use client";
 
-import { useContext, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { SmallLabel } from "@/components/atom/typography";
 import NotFoundView from "@/components/team/team-not-found";
-import CollectionContent from "@/components/team/workspace/collection/content/content";
+import ItemContent from "@/components/team/workspace/collection/content/content";
 import { Input } from "@/components/ui/input";
+import useCollections from "@/lib/swr/use-collections";
 import { hasValue } from "@/lib/utils";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { WorkspaceContext } from "../../providers";
 import Loading from "./loading";
 
 export default async function ItemPageClient() {
-  const { activeCollection, loading, error, activeItem, UpdateActiveItem } =
-    useContext(WorkspaceContext);
+  const {
+    collections,
+    UpdateItem: UpdateActiveItem,
+    error,
+    loading,
+  } = useCollections();
+
   const content = useRef<any>(undefined);
-  const param = useParams();
+  const { team_slug, workspace_slug, collection_slug, item_slug } =
+    useParams() as {
+      team_slug: string;
+      workspace_slug: string;
+      collection_slug: string;
+      item_slug: string;
+    };
+  const activeCollection = useMemo(
+    () => collections?.find((c) => c?.meta?.slug === collection_slug),
+    [collections, collection_slug],
+  );
+
+  const activeItem = useMemo(
+    () =>
+      activeCollection?.children?.find((c: any) => c?.meta?.slug === item_slug),
+    [activeCollection, item_slug],
+  );
 
   const onKeyDown = (e: any) => {
     if (e.metaKey && e.which === 83) {
@@ -26,7 +47,7 @@ export default async function ItemPageClient() {
           ...activeItem!,
           content: content.current,
         },
-        activeCollection!
+        activeCollection!,
       );
     }
   };
@@ -46,18 +67,19 @@ export default async function ItemPageClient() {
   }
   if (!hasValue(activeItem)) {
     return (
-      <div className="CollectionContentPage h-full w-full py-12">
+      <div className="ItemPageClient h-full w-full py-12">
         <NotFoundView item="Item" />
       </div>
     );
   }
 
   return (
-    <div className="CollectionContentPage h-full w-full py-12">
-      <div className="flex flex-col h-full ">
-        <div className="pb-2  bg-background flex flex-col gap-6 px-10">
+    <div className="ItemPageClient h-full w-full py-12">
+      <div className="flex h-full flex-col ">
+        <div className="flex flex-col gap-6 bg-background pb-2">
           <Link
-            href={`/${param?.team_slug}/${param?.workspace_slug}/${activeCollection?.meta?.slug}`}>
+            href={`/${team_slug}/${workspace_slug}/${activeCollection?.meta?.slug}`}
+          >
             <SmallLabel className="">{activeCollection?.name}</SmallLabel>
           </Link>
 
@@ -67,13 +89,13 @@ export default async function ItemPageClient() {
               console.log("name", name);
               UpdateActiveItem(
                 { ...activeItem!, name: name },
-                activeCollection!
+                activeCollection!,
               );
             }}
           />
         </div>
-        <div className="flex-grow flex flex-col h-full overflow-y-auto z-0">
-          <CollectionContent
+        <div className="z-0 flex h-full flex-grow flex-col overflow-y-auto">
+          <ItemContent
             activeItem={activeItem}
             isEditing={true}
             onDebouncedUpdate={(editor) => {
@@ -103,11 +125,12 @@ function CollectionNameField({
         if (name !== value) {
           onUpdateName(value);
         }
-      }}>
+      }}
+    >
       <Input
         type="text"
         autoFocus
-        className="border-none bg-transparent  text-2xl font-bold focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground placeholder:opacity-50 placeholder:text-2xl"
+        className="border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
         maxLength={30}
         defaultValue={name}
         required

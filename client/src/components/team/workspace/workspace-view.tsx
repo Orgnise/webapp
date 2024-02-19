@@ -2,12 +2,11 @@
 
 import { useContext, useEffect, useState } from "react";
 
-import CollectionPanel from "./left-panel/collection-panel.view";
-import NotFoundView from "../team-not-found";
-import { Spinner } from "@/components/atom/spinner";
 import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
+import { Spinner } from "@/components/atom/spinner";
+import NotFoundView from "../team-not-found";
+import CollectionPanel from "./left-panel/collection-panel.view";
 import WorkspaceContentView from "./workspace-content-view";
-import { useParams } from "next/navigation";
 
 export const LeftPanelSize = Object.freeze({
   min: 0,
@@ -27,7 +26,6 @@ export default function WorkspaceView({
   const {
     workspacesData: { error, loading, activeWorkspace },
   } = useContext(TeamContext);
-  const param = useParams();
 
   const [leftPanelSize, setLeftPanelSize] = useState<number>(LeftPanelSize.min);
 
@@ -39,19 +37,19 @@ export default function WorkspaceView({
 
   if (loading) {
     return (
-      <div className="h-full w-full flex place-content-center items-center">
+      <div className="flex h-full w-full place-content-center items-center">
         <Spinner />
       </div>
     );
   } else if (error) {
     return (
-      <div className="CollectionContentPage h-full w-full py-12 max-w-3xl mx-auto">
+      <div className="WorkspaceView mx-auto h-full w-full max-w-3xl py-12">
         Something went wrong
       </div>
     );
   } else if (!activeWorkspace) {
     return (
-      <div className="CollectionContentPage h-full w-full py-12 max-w-3xl mx-auto">
+      <div className="WorkspaceView mx-auto h-full w-full max-w-3xl py-12">
         <NotFoundView item="Workspace" />
       </div>
     );
@@ -67,8 +65,9 @@ export default function WorkspaceView({
           leftPanelSize={leftPanelSize}
           setLeftPanelSize={setLeftPanelSize}
         />
-      }>
-      <div className="max-w-screen-lg min-h-screen mx-auto px-4 lg:px-6">
+      }
+    >
+      <div className="max-w-screen flex h-full min-h-[calc(100vh-64px)] flex-col">
         {children}
       </div>
     </WorkspaceContentView>

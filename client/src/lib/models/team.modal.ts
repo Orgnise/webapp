@@ -1,8 +1,6 @@
 // import Mongoose from "mongoose";
 import { ObjectId } from "mongodb";
-import { User } from "./user.model";
 // const Schema = Mongoose.Schema;
-
 
 export const Role = {
   Admin: "Admin",
@@ -13,12 +11,12 @@ export interface Teams {
   _id: string;
   name: string;
   description?: string;
-  createdBy: ObjectId,
+  createdBy: ObjectId;
   members: {
-    user: ObjectId,
-    role: keyof typeof Role
-  }[],
-  meta: Meta,
+    user: ObjectId;
+    role: keyof typeof Role;
+  }[];
+  meta: Meta;
   createdAt: Date;
   membersCount: number;
 }

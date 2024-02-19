@@ -1,5 +1,5 @@
-import React from "react";
 import cx from "classnames";
+import React from "react";
 
 interface ListViewProps {
   items: Array<any> | undefined | null;
@@ -36,7 +36,7 @@ export const ListView: React.FC<ListViewProps> = ({
     return placeholder ? <>{placeholder}</> : null;
   }
 
-  if (!items || items === null || items.length === 0) {
+  if (!items || items === null || items.length === 0 || !Array.isArray(items)) {
     if (noItemsElement) {
       return <>{noItemsElement}</>;
     } else {
@@ -46,9 +46,7 @@ export const ListView: React.FC<ListViewProps> = ({
 
   return (
     <div style={{ listStyle: "none" }} className={cx("ListView ", className)}>
-      {items.map((item, index) => (
-        <div key={index}>{renderItem(item, index)}</div>
-      ))}
+      {items.map((item, index) => renderItem(item, index))}
       {footerElement && footerElement}
     </div>
   );

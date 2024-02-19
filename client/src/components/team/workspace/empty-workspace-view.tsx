@@ -1,29 +1,25 @@
-import { Button } from "@/components/ui/button";
-import Label from "@/components/atom/label";
+import { P } from "@/components/atom/typography";
+import { Shapes } from "lucide-react";
 
 export default function EmptyWorkspaceView() {
-    return <div className="EmptyWorkspaceView flex-1 flex my-2 mx-auto">
-        <div className="flex items-center place-content-center">
-            <div className="flex flex-col gap-4 w-full items-center place-content-center max-w-xl mx-auto text-center">
-                <Label size="h1" variant="t3">
-                    Create a workspace
-                </Label>
-                <span className="text-sm">
-                    Workspaces are where you
-                    <Label variant="t2" className="mx-1 ">
-                        organize your work
-                    </Label>
-                    You can create workspaces for different teams, clients, or even for
-                    yourself. For example, an{" "}
-                    <Label variant="t2" className="mx-1 ">
-                        engineering
-                    </Label>
-                    workspace could contains all engineering-related tasks.
-                </span>
-                <Button variant={"outline"}>
-                    Create Workspace
-                </Button>
-            </div>
+  return (
+    <div className="w-full">
+      <div className="EmptyWorkspaceView mx-auto my-2 flex-1">
+        <div className="flex h-full w-full flex-col place-content-center items-center py-20 text-center">
+          <Shapes className="text-accent" size={60} />
+          <P className="mt-6">No workspace available</P>
+          <div className="mx-auto max-w-xl py-8 text-center">
+            <span className="text-sm">
+              Workspaces are where you
+              <strong className="mx-1 ">organize your work</strong>
+              You can create workspaces for different teams, clients, or even
+              for yourself. For example, an
+              <strong className="mx-1 ">engineering</strong>
+              workspace could contains all engineering-related tasks.
+            </span>
+          </div>
         </div>
-    </div>;
-};
+      </div>
+    </div>
+  );
+}

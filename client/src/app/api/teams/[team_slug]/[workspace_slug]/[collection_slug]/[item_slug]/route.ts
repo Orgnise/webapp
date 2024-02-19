@@ -1,36 +1,38 @@
-import { NextResponse } from "next/server";
-import { ObjectId } from "mongodb";
-import mongoDb from "@/lib/mongodb";
 import { withAuth } from "@/lib/auth";
+import { Workspace } from "@/lib/models/workspace.model";
+import mongoDb from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
-import { Workspace } from "@/lib/models/workspace.model";
+import { ObjectId } from "mongodb";
+import { NextResponse } from "next/server";
 
 // Update an item
-export const PATCH = withAuth(async ({ req, session },) => {
+export const PATCH = withAuth(async ({ req, session }) => {
   try {
     const client = await mongoDb;
-    const { item } = await req.json() as { item?: Collection };
+    const { item } = (await req.json()) as { item?: Collection };
 
     if (!item || !ObjectId.isValid(item!._id)) {
       return NextResponse.json(
-        { success: false, message: 'Operation failed', error: 'Invalid item' },
-        { status: 400 }
+        { success: false, message: "Operation failed", error: "Invalid item" },
+        { status: 400 },
       );
     }
 
-    const collectionsDb = client.db('pulse-db').collection('collections');
-    const query = { "_id": new ObjectId(item._id), object: "item" };
-    const itemInDb = await collectionsDb.findOne(query) as unknown as Collection;
+    const collectionsDb = client.db("pulse-db").collection("collections");
+    const query = { _id: new ObjectId(item._id), object: "item" };
+    const itemInDb = (await collectionsDb.findOne(
+      query,
+    )) as unknown as Collection;
 
     if (!itemInDb) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Operation failed',
-          error: 'item not found in database',
+          message: "Operation failed",
+          error: "item not found in database",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
     let data = { ...item } as any;
@@ -47,65 +49,79 @@ export const PATCH = withAuth(async ({ req, session },) => {
         delete data[key];
       }
     }
-    const update = await collectionsDb.updateOne(
-      query,
-      {
-        "$set": {
-          ...data,
-          name: hasValue(item?.name) ? item?.name : hasValue(itemInDb.title) ? itemInDb.title : itemInDb.name,
-          updatedAt: new Date().toISOString(),
-          updatedBy: new ObjectId(session.user.id),
-        }
-      }
-    );
+    const update = await collectionsDb.updateOne(query, {
+      $set: {
+        ...data,
+        name: hasValue(item?.name)
+          ? item?.name
+          : hasValue(itemInDb.title)
+            ? itemInDb.title
+            : itemInDb.name,
+        updatedAt: new Date().toISOString(),
+        updatedBy: new ObjectId(session.user.id),
+      },
+    });
 
     return NextResponse.json(
       {
         success: true,
-        message: 'item updated',
+        message: "item updated",
         item,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: 'Operation failed', error: error.toString() },
-      { status: 500 }
+      { success: false, message: "Operation failed", error: error.toString() },
+      { status: 500 },
     );
   }
 });
 
 // Delete an item
-export const DELETE = withAuth(async ({ req, params, team },) => {
+export const DELETE = withAuth(async ({ req, params, team }) => {
   try {
     const client = await mongoDb;
-    const { item_slug, workspace_slug } = params as { item_slug: string, collection_slug: string, workspace_slug: string };
+    const { item_slug, workspace_slug } = params as {
+      item_slug: string;
+      collection_slug: string;
+      workspace_slug: string;
+    };
 
-    const workspaceDb = client.db('pulse-db').collection('workspaces');
-    const workspace = await workspaceDb.findOne({ 'meta.slug': workspace_slug, team: new ObjectId(team._id) }) as unknown as Workspace;
+    const workspaceDb = client.db("pulse-db").collection("workspaces");
+    const workspace = (await workspaceDb.findOne({
+      "meta.slug": workspace_slug,
+      team: new ObjectId(team._id),
+    })) as unknown as Workspace;
     if (!workspace) {
       return NextResponse.json(
         {
           success: false,
-          message: 'workspace not found in database',
-          error: 'Operation failed',
+          message: "workspace not found in database",
+          error: "Operation failed",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
-    const collectionsDb = client.db('pulse-db').collection('collections');
-    const query = { 'meta.slug': item_slug, workspace: new ObjectId(workspace._id), team: new ObjectId(team._id) };
-    const itemInDb = await collectionsDb.findOne(query) as unknown as Collection;
+    const collectionsDb = client.db("pulse-db").collection("collections");
+    const query = {
+      "meta.slug": item_slug,
+      workspace: new ObjectId(workspace._id),
+      team: new ObjectId(team._id),
+    };
+    const itemInDb = (await collectionsDb.findOne(
+      query,
+    )) as unknown as Collection;
 
     if (!itemInDb) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Operation failed',
-          error: 'Item not found in database',
-          query
+          message: "Operation failed",
+          error: "Item not found in database",
+          query,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
     const deleteResult = await collectionsDb.deleteOne(query);
@@ -113,15 +129,15 @@ export const DELETE = withAuth(async ({ req, params, team },) => {
     return NextResponse.json(
       {
         success: true,
-        message: 'Item deleted',
-        deleteResult
+        message: "Item deleted",
+        deleteResult,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, message: 'Operation failed', error: error.toString() },
-      { status: 500 }
+      { success: false, message: "Operation failed", error: error.toString() },
+      { status: 500 },
     );
   }
 });

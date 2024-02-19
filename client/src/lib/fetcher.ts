@@ -9,14 +9,23 @@ export async function fetcher<JSON = any>(
 ): Promise<JSON> {
   const res = await fetch(input, init);
 
-  if (!res.ok) {
-    const error = await res.text();
-    const body = JSON.parse(error);
-    const err = new Error(error) as SWRError;
-    err.status = res.status;
-    err.message = body?.message;
-    console.error(err);
-    throw err;
+  try {
+    if (!res.ok) {
+      const error = await res.text();
+      const body = JSON.parse(error);
+      const err = new Error(error) as SWRError;
+      err.status = res.status;
+      err.message = body?.message;
+      console.error(err);
+      throw err;
+    }
+  } catch (error) {
+    console.error("error[]", error);
+    if (res.body) {
+      const body = await res.json();
+      throw body;
+    }
+    throw error;
   }
 
   return res.json();

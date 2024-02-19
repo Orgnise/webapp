@@ -1,10 +1,10 @@
 import { PlanProps, Team } from "../types/types";
 
-import { NextAuthOptions } from "./auth";
+import mongodb from "@/lib/mongodb";
+import { getServerSession } from "next-auth/next";
 import { Teams } from "../models/team.modal";
 import { getSearchParams } from "../url";
-import { getServerSession } from "next-auth/next";
-import mongodb from "@/lib/mongodb";
+import { NextAuthOptions } from "./auth";
 
 export interface Session {
   user: {
@@ -26,7 +26,7 @@ interface WithAuthHandler {
     searchParams,
     headers,
     session,
-    team
+    team,
   }: {
     req: Request;
     params: Record<string, string>;
@@ -48,102 +48,101 @@ export const withAuth =
       requiredRole?: Array<"admin" | "member">;
     } = {},
   ) =>
-    async (
-      req: Request,
-      { params }: { params: Record<string, string> | undefined },
-    ) => {
-      const searchParams = getSearchParams(req.url);
-      const team_slug = params?.team_slug || searchParams.projectSlug;
+  async (
+    req: Request,
+    { params }: { params: Record<string, string> | undefined },
+  ) => {
+    const searchParams = getSearchParams(req.url);
+    const team_slug = params?.team_slug || searchParams.projectSlug;
 
-      const domain = params?.domain || searchParams.domain;
-      const key = searchParams.key;
+    const domain = params?.domain || searchParams.domain;
+    const key = searchParams.key;
 
-      let session: Session | undefined;
-      let headers = {};
+    let session: Session | undefined;
+    let headers = {};
 
-      // if there's no projectSlug defined
-      if (!team_slug) {
-        return new Response(
-          "Team slug not found. Did you forget to include a `projectSlug` query parameter?",
-          {
-            status: 400,
-          },
-        );
-      }
+    // if there's no projectSlug defined
+    if (!team_slug) {
+      return new Response(
+        "Team slug not found. Did you forget to include a `projectSlug` query parameter?",
+        {
+          status: 400,
+        },
+      );
+    }
 
-      session = await getSession();
-      if (!session?.user?.id) {
-        return new Response("Unauthorized: Login required.", {
-          status: 401,
-          headers,
-        });
-      }
-      const client = await mongodb;
-      const teamsCollection = client.db('pulse-db').collection<Teams>('teams')
-      const team = await teamsCollection.findOne({ "meta.slug": team_slug }) as unknown as Team;
+    session = await getSession();
+    if (!session?.user?.id) {
+      return new Response("Unauthorized: Login required.", {
+        status: 401,
+        headers,
+      });
+    }
+    const client = await mongodb;
+    const teamsCollection = client.db("pulse-db").collection<Teams>("teams");
+    const team = (await teamsCollection.findOne({
+      "meta.slug": team_slug,
+    })) as unknown as Team;
 
-      if (!team || !team.members) {
-        // project doesn't exist
+    if (!team || !team.members) {
+      // project doesn't exist
+      return new Response("Team not found.", {
+        status: 404,
+        headers,
+      });
+    }
+
+    // team exists but user is not part of it
+    if (team.members.length === 0) {
+      // Todo: check if the user is part of the team
+      const pendingInvites = {
+        expires: new Date(),
+      };
+      if (!pendingInvites) {
         return new Response("Team not found.", {
           status: 404,
           headers,
         });
-      }
-
-
-      // team exists but user is not part of it
-      if (team.members.length === 0) {
-        // Todo: check if the user is part of the team
-        const pendingInvites = {
-          expires: new Date(),
-        }
-        if (!pendingInvites) {
-          return new Response("Team not found.", {
-            status: 404,
-            headers,
-          });
-        } else if (pendingInvites.expires < new Date()) {
-          return new Response("Team invite expired.", {
-            status: 410,
-            headers,
-          });
-        } else {
-          return new Response("Team invite pending.", {
-            status: 409,
-            headers,
-          });
-        }
-      }
-
-      // project role checks (enterprise only)
-      if (
-        requiredRole &&
-        team.plan === "enterprise" &&
-        !requiredRole.includes(team.members[0].role) &&
-        !(searchParams.userId === session.user.id)
-      ) {
-        return new Response("Unauthorized: Insufficient permissions.", {
-          status: 403,
+      } else if (pendingInvites.expires < new Date()) {
+        return new Response("Team invite expired.", {
+          status: 410,
+          headers,
+        });
+      } else {
+        return new Response("Team invite pending.", {
+          status: 409,
           headers,
         });
       }
+    }
 
-
-      // plan checks
-      if (team.plan && !requiredPlan.includes(team.plan)) {
-        return new Response("Unauthorized: Need higher plan.", {
-          status: 403,
-          headers,
-        });
-      }
-
-
-      return handler({
-        req,
-        params: params || {},
-        searchParams,
+    // project role checks (enterprise only)
+    if (
+      requiredRole &&
+      team.plan === "enterprise" &&
+      !requiredRole.includes(team.members[0].role) &&
+      !(searchParams.userId === session.user.id)
+    ) {
+      return new Response("Unauthorized: Insufficient permissions.", {
+        status: 403,
         headers,
-        session,
-        team,
       });
-    };
+    }
+
+    // plan checks
+    if (team.plan && !requiredPlan.includes(team.plan)) {
+      return new Response("Unauthorized: Need higher plan.", {
+        status: 403,
+        headers,
+      });
+    }
+
+    return handler({
+      req,
+      params: params || {},
+      searchParams,
+      headers,
+      session,
+      team,
+    });
+  };

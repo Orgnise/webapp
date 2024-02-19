@@ -1,14 +1,14 @@
 import useSWR, { KeyedMutator } from "swr";
 
-import { Team } from "../types/types";
 import { fetcher } from "../fetcher";
+import { Team } from "../types/types";
 interface ITeam {
   error: any;
   loading: boolean;
   teams: Team[];
+  mutate: KeyedMutator<any>;
 }
 export default function useTeams(): ITeam {
-
   const {
     data: teams,
     error,
@@ -20,6 +20,7 @@ export default function useTeams(): ITeam {
   return {
     ...teams,
     error,
+    mutate,
     loading: !teams && !error ? true : false,
   };
 }

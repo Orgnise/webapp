@@ -1,5 +1,5 @@
-import React from "react";
 import cx from "classnames";
+import React from "react";
 import Label from "../atom/label";
 import { Input } from "../ui/input";
 
@@ -22,7 +22,7 @@ const TextField = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cx("flex flex-col gap-2", wrapperClassName)}>
         <Label variant="t2"> {label}</Label>
-        <div className={cx("flex flex-col mb-5 gap-1")}>
+        <div className={cx("mb-5 flex flex-col gap-1")}>
           <Input
             placeholder={props.placeholder || `Enter ${label}`}
             className={cx("theme-input   ", {
@@ -32,16 +32,17 @@ const TextField = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           <label
-            className={cx("text-red-500 text-xs", {
+            className={cx("text-xs text-red-500", {
               "inline-block  scale-100": error !== "" && error !== undefined,
               "h-0": !error,
-            })}>
+            })}
+          >
             {error}
           </label>
         </div>
       </div>
     );
-  }
+  },
 );
 
 TextField.displayName = "TextField";

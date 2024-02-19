@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { NextAuthOptions } from "@/lib/auth/auth";
-import { ObjectId } from "mongodb";
 import { Teams } from "@/lib/models/team.modal";
-import { getServerSession } from "next-auth/next"
 import mongoDb from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
+import { getServerSession } from "next-auth/next";
 
 export async function GET(request: NextRequest) {
   const client = await mongoDb;
@@ -14,23 +14,24 @@ export async function GET(request: NextRequest) {
 
     if (!session || session?.user === null) {
       return NextResponse.json(
-        { success: false, message: 'Operation failed', error: 'Session not found' },
-        { status: 400 }
-      )
+        {
+          success: false,
+          message: "Operation failed",
+          error: "Session not found",
+        },
+        { status: 400 },
+      );
     }
-    const teams = client.db('pulse-db').collection<Teams>('teams')
+    const teams = client.db("pulse-db").collection<Teams>("teams");
     const query = { createdBy: new ObjectId(session?.user?.id) };
-    const dbResult = await teams.aggregate([{ "$match": query }]).toArray();
+    const dbResult = await teams.aggregate([{ $match: query }]).toArray();
     return NextResponse.json({ teams: dbResult });
-
-  }
-  catch (err: any) {
+  } catch (err: any) {
     return NextResponse.json(
-      { success: false, message: 'Operation failed', error: err.toString() },
-      { status: 500 }
+      { success: false, message: "Operation failed", error: err.toString() },
+      { status: 500 },
     );
-  }
-  finally {
+  } finally {
     // client.close();
   }
 }

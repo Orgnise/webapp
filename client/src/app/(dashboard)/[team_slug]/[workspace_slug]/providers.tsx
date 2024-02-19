@@ -1,80 +1,54 @@
 "use client";
 
-import { ReactNode, createContext, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ReactNode, createContext } from "react";
 
-import { Collection } from "@/lib/types/types";
 import { fetcher } from "@/lib/fetcher";
 import useCollections from "@/lib/swr/use-collections";
-import { useToast } from "@/components/ui/use-toast";
-
+import { Collection } from "@/lib/types/types";
+import { toast } from "sonner";
 export default function Providers({ children }: { children: ReactNode }) {
   return <WorkspaceProvider>{children}</WorkspaceProvider>;
 }
 
 interface WorkspaceProviderProps {
-  loading: boolean;
-  error: any;
-  collections: Collection[];
-  activeCollection?: Collection;
-  activeItem?: Collection;
   updateCollection: (collection: Collection) => void;
-  /**
-   * Create a new collection / Item
-   * To create item, pass the parent collection slug
-   */
-  createCollection(collection: Collection): Promise<void>;
-  UpdateActiveItem: (item: Collection, parent: Collection) => void;
+  UpdateActiveItem: (item: Collection, parent: Collection) => Promise<void>;
   deleteCollection(collectionSlug: string): Promise<void>;
   deleteItem(itemSlug: string, collectionSlug: string): Promise<void>;
 }
 
 export const WorkspaceContext = createContext(
-  null
+  null,
 ) as unknown as React.Context<WorkspaceProviderProps>;
 WorkspaceContext.displayName = "WorkspaceContext";
 
 function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const [activeCollection, setActiveCollection] = useState<Collection>();
-  const [activeItem, setActiveItem] = useState<Collection>();
-  const { error, loading, collections, mutate } = useCollections();
-  const { toast } = useToast();
+  const { collections, mutate } = useCollections();
+  // const { toast } = useToast();
 
   const param = useParams();
   const router = useRouter();
 
   // Set the active collection
-  useEffect(() => {
-    if (!param?.collection_slug) {
-      setActiveCollection(undefined);
-      return;
-    }
-    // Update the active collection if the collection slug has changed
-    if (
-      !activeCollection ||
-      activeCollection?.meta?.slug !== param?.collection_slug
-    ) {
-      setActiveCollection(
-        collections?.find((c) => c?.meta?.slug === param?.collection_slug)
-      );
-    }
-  }, [param?.collection_slug, collections]);
-
-  // Set the active item
-  useEffect(() => {
-    if (!param?.item_slug) {
-      setActiveItem(undefined);
-      return;
-    }
-    // Update the active item if the item slug has changed
-    if (!activeItem || activeItem?.meta?.slug !== param?.item_slug) {
-      setActiveItem(
-        activeCollection?.children?.find(
-          (i: any) => i?.meta?.slug === param?.item_slug
-        )
-      );
-    }
-  }, [param?.item_slug, activeCollection]);
+  // useEffect(() => {
+  //   if (!param?.collection_slug) {
+  //     setActiveCollection(undefined);
+  //     return;
+  //   }
+  //   const updatedCollection = collections?.find(
+  //     (c) => c?.meta?.slug === param?.collection_slug
+  //   );
+  //   // Update the active collection if the collection slug has changed
+  //   if (
+  //     (updatedCollection &&
+  //       (!activeCollection ||
+  //         activeCollection?.meta?.slug !== param?.collection_slug)) ||
+  //     updatedCollection?.children !== activeCollection?.children
+  //   ) {
+  //     setActiveCollection(updatedCollection);
+  //   }
+  // }, [param?.collection_slug, collections]);
 
   // Update the active item in database
   async function UpdateActiveItem(item: Collection, parent: Collection) {
@@ -92,7 +66,7 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ item: item }),
-        }
+        },
       );
       const list = collections.map((c) => {
         if (c._id === parent._id) {
@@ -105,61 +79,17 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
         }
         return c;
       });
-      setActiveItem(response.item);
+      // setActiveItem(response.item);
 
       if (activeItemSlug && activeItemSlug !== response.item?.meta?.slug) {
         router.replace(
-          `/${teamSlug}/${workspaceSlug}/${collectionSlug}/${response?.item.meta.slug}`
+          `/${teamSlug}/${workspaceSlug}/${collectionSlug}/${response?.item.meta.slug}`,
         );
       }
 
-      mutate({ collections: list }, { revalidate: false });
+      mutate({ collections: list }, false);
     } catch (error) {
       console.error("error", error);
-    }
-  }
-
-  // Create a new Collection/Item
-  async function createCollection(collection: Collection) {
-    const teamSlug = param?.team_slug;
-    const workspaceSlug = param?.workspace_slug;
-
-    try {
-      const response = await fetcher(
-        `/api/teams/${teamSlug}/${workspaceSlug}/collections`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ collection: collection }),
-        }
-      );
-      toast({
-        title: "Success",
-        description: response?.message,
-      });
-      if (collection.object === "collection") {
-        const list = [...collections, response.collection];
-        setActiveCollection(response.collection);
-        mutate({ collections: list }, { revalidate: false });
-        console.log("Collection created");
-        router.push(
-          `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`
-        );
-      } else {
-        const list = collections.map((c) => {
-          if (c._id === collection.parent) {
-            c.children.push(response.collection);
-          }
-          return c;
-        });
-        console.log("Item created");
-        mutate({ collections: list }, { revalidate: false });
-      }
-    } catch (error) {
-      console.error("error", error);
-      throw error;
     }
   }
 
@@ -177,7 +107,7 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ collection: collection }),
-        }
+        },
       );
       const list = collections.map((c) => {
         if (c.meta.slug === collectionSlug) {
@@ -185,14 +115,10 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
         }
         return c;
       });
-      setActiveCollection(response.collection);
       // Change the url if the collection slug has changed
-      if (
-        collectionSlug === activeCollection?.meta.slug &&
-        collectionSlug != response.collection.meta.slug
-      ) {
+      if (collectionSlug != response.collection.meta.slug) {
         router.replace(
-          `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`
+          `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`,
         );
       }
       mutate({ collections: list }, { revalidate: false });
@@ -211,7 +137,7 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
       fetcher(`/api/teams/${teamSlug}/${workspaceSlug}/${collectionSlug}`, {
         method: "DELETE",
       }).then((data) => {
-        toast({
+        displayToast({
           title: "Collection deleted",
           description: "Collection has been deleted successfully",
         });
@@ -223,14 +149,17 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
         if (collectionSlug === activeCollectionSlug) {
           router.replace(`/${teamSlug}/${workspaceSlug}`);
         }
-        mutate({ collections: list }, { revalidate: false });
+        mutate(
+          { collections: list },
+          { revalidate: false, optimisticData: list },
+        );
       });
     } catch (error) {
       console.error("error", error);
-      toast({
+      displayToast({
         title: "Error",
         description: "Failed to delete collection",
-        variant: "destructive",
+        variant: "error",
       });
       throw error;
     }
@@ -246,16 +175,16 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
         `/api/teams/${teamSlug}/${workspaceSlug}/${collectionSlug}/${itemSlug}`,
         {
           method: "DELETE",
-        }
+        },
       ).then((data) => {
-        toast({
-          title: "Item deleted",
+        displayToast({
+          title: "Item deleted - 1",
           description: "Item has been deleted successfully",
         });
         const list = collections.map((c) => {
           if (c.meta.slug === collectionSlug) {
             c.children = c.children.filter(
-              (i: any) => i.meta.slug !== itemSlug
+              (i: any) => i.meta.slug !== itemSlug,
             );
           }
           return c;
@@ -263,33 +192,60 @@ function WorkspaceProvider({ children }: { children: ReactNode }) {
         if (itemSlug === activeItemSlug) {
           router.replace(`/${teamSlug}/${workspaceSlug}/${collectionSlug}`);
         }
-        mutate({ collections: list }, { revalidate: false });
+        mutate(
+          { collections: list },
+          {
+            revalidate: false,
+            optimisticData: list,
+          },
+        );
       });
     } catch (error) {
       console.error("error", error);
-      toast({
+      displayToast({
         title: "Error",
         description: "Failed to delete item",
-        variant: "destructive",
+        variant: "error",
       });
       throw error;
+    }
+  }
+
+  function displayToast({
+    title,
+    description,
+    variant = "success",
+  }: {
+    title: string;
+    description: string;
+    variant?: "success" | "error";
+  }) {
+    const ele = (
+      <div>
+        <h1 className="font-medium">{title}</h1>
+        <p>{description}</p>
+      </div>
+    );
+    switch (variant) {
+      case "success":
+        toast.success(ele);
+        break;
+      case "error":
+        toast.error(ele);
+      default:
+        break;
     }
   }
 
   return (
     <WorkspaceContext.Provider
       value={{
-        error,
-        loading,
-        collections: collections,
-        activeCollection,
-        activeItem,
         UpdateActiveItem,
-        createCollection,
         updateCollection,
         deleteCollection,
         deleteItem,
-      }}>
+      }}
+    >
       {children}
     </WorkspaceContext.Provider>
   );

@@ -8,12 +8,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
 import { MoreVerticalIcon, PlusIcon } from "lucide-react";
-import React, { useContext } from "react";
+import React from "react";
 
-import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
+// import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
 import { Spinner } from "@/components/atom/spinner";
 import { H5 } from "@/components/atom/typography";
 import { ListView } from "@/components/ui/listview";
+import useCollections from "@/lib/swr/use-collections";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import cx from "classnames";
@@ -22,26 +23,27 @@ import { useParams } from "next/navigation";
 import { NoCollectionView } from "./collection-board";
 
 interface Props {
-  collections: Array<Collection>;
-  isLoading?: boolean;
+  // collections: Array<Collection>;
+  // isLoading?: boolean;
 }
 /**
  * Display collections in list component
  */
 export default function CollectionList(prop: Props) {
+  const { error, loading, collections, mutate } = useCollections();
   return (
     <ListView
-      className="h-full overflow-y-auto flex flex-col gap-6 pb-28 px-4"
-      items={prop.collections}
-      loading={prop.isLoading}
+      className="flex h-full flex-col gap-6 overflow-y-auto px-4 pb-28"
+      items={collections}
+      loading={loading}
       renderItem={(collection, index) => (
-        <RenderCollection collection={collection} />
+        <RenderCollection key={index} collection={collection} />
       )}
       noItemsElement={<NoCollectionView />}
       placeholder={
         <>
           <div className="flex flex-col gap-2">
-            <div className="h-full w-full flex place-content-center items-center">
+            <div className="flex h-full w-full place-content-center items-center">
               <Spinner />
             </div>
           </div>
@@ -58,7 +60,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
   const [deleteStatus, setDeleteStatus] = React.useState<Status>("IDLE");
   const [createItemStatus, setCreateItemStatus] =
     React.useState<Status>("IDLE");
-  const { deleteCollection, createCollection } = useContext(WorkspaceContext);
+  const { createCollection, deleteCollection } = useCollections();
 
   const { team_slug, workspace_slug } = useParams() as {
     team_slug?: string;
@@ -80,6 +82,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
       parent: collection._id,
     } as Collection).finally(() => {
       setCreateItemStatus("IDLE");
+      console.log("Item created");
     });
   }
 
@@ -88,19 +91,20 @@ function RenderCollection({ collection }: RenderCollectionProps) {
       <div className="group relative">
         <Link
           href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}`}
-          className="w-full">
+          className="w-full"
+        >
           <H5 className="line-clamp-1 py-1 ">
             {hasValue(collection.name)
               ? collection.name
               : "Untitled collection"}
           </H5>
         </Link>
-        <div className="absolute -right-3  top-0 bottom-0 text-muted-foreground invisible group-hover:visible group-hover:bg-background">
-          <div className="flex items-center gap-2 h-full px-1">
-            <ToolTipWrapper onHover={<span>Create Item</span>}>
+        <div className="invisible absolute  -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background/40">
+          <div className="flex h-full items-center gap-2 px-1">
+            <ToolTipWrapper content={<span>Create Item</span>}>
               <button onClick={handleCreateItem}>
                 {createItemStatus === "LOADING" ? (
-                  <Spinner />
+                  <Spinner className="h-5" />
                 ) : (
                   <PlusIcon size={15} />
                 )}
@@ -111,7 +115,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
               <DropdownMenuTrigger className="flex items-center gap-2 ">
                 <button>
                   {deleteStatus === "LOADING" ? (
-                    <Spinner />
+                    <Spinner className="h-5" />
                   ) : (
                     <MoreVerticalIcon size={15} />
                   )}
@@ -121,8 +125,9 @@ function RenderCollection({ collection }: RenderCollectionProps) {
                 <DropdownMenuLabel>Options</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-destructive focus:bg-destructive focus:text-destructive-foreground cursor-pointer rounded-sm"
-                  onClick={HandleDeleteCollection}>
+                  className="cursor-pointer rounded-sm text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                  onClick={HandleDeleteCollection}
+                >
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -134,13 +139,13 @@ function RenderCollection({ collection }: RenderCollectionProps) {
       <ListView
         items={collection.children}
         className={cx(
-          "transition-all duration-150 ease-in-expo mx-1 flex flex-col gap-2  border-l border-border"
+          "mx-1 flex flex-col gap-2 border-l border-border transition-all  duration-150 ease-in-expo",
         )}
         renderItem={(item, index) => (
-          <RenderItem item={item} collection={collection} />
+          <RenderItem key={index} item={item} collection={collection} />
         )}
         noItemsElement={
-          <div className="py-1 flex items-center gap-2  pl-4 border-l  text-muted-foreground/70 -mx-px text-sm font-medium">
+          <div className="-mx-px flex items-center gap-2  border-l py-1  pl-4 text-sm font-medium text-muted-foreground/70">
             No items
           </div>
         }
@@ -161,7 +166,7 @@ function RenderItem({ item, collection }: RenderItemProps) {
     item_slug?: string;
   };
 
-  const { deleteItem } = useContext(WorkspaceContext);
+  const { deleteItem } = useCollections();
   function HandleDeleteItem() {
     setStatus("LOADING");
     deleteItem(item?.meta?.slug, collection?.meta?.slug).finally(() => {
@@ -175,24 +180,25 @@ function RenderItem({ item, collection }: RenderItemProps) {
       <Link
         href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}/${item.meta?.slug}/`}
         className={cx(
-          "group py-1 flex items-center gap-2  pl-4 border-l  text-muted-foreground -mx-px",
+          "group -mx-px flex items-center gap-2  border-l py-1  pl-4 text-muted-foreground",
           {
-            "text-primary border-primary": isActive,
-            "border-border hover:border-accent hover:text hover:border-secondary-foreground hover:text-secondary-foreground":
+            "border-primary text-primary": isActive,
+            "hover:text border-border hover:border-accent hover:border-secondary-foreground hover:text-secondary-foreground":
               !isActive,
-          }
-        )}>
+          },
+        )}
+      >
         <span className="text-sm font-medium ">
           {hasValue(item.name) ? item.name : "Untitled item"}
         </span>
       </Link>
-      <div className="absolute -right-3  top-0 bottom-0 text-muted-foreground invisible group-hover:visible group-hover:bg-background">
-        <div className="flex items-center gap-2 h-full px-1">
+      <div className="invisible absolute  -right-3 bottom-0 top-0 text-muted-foreground group-hover:visible group-hover:bg-background">
+        <div className="flex h-full items-center gap-2 px-1">
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2 ">
               <button>
                 {status === "LOADING" ? (
-                  <Spinner />
+                  <Spinner className="h-5" />
                 ) : (
                   <MoreVerticalIcon size={15} />
                 )}
@@ -202,8 +208,9 @@ function RenderItem({ item, collection }: RenderItemProps) {
               <DropdownMenuLabel>Options</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-destructive focus:bg-destructive focus:text-destructive-foreground cursor-pointer rounded-sm"
-                onClick={HandleDeleteItem}>
+                className="cursor-pointer rounded-sm text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                onClick={HandleDeleteItem}
+              >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -1,12 +1,10 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
 import slugify from "@sindresorhus/slugify";
-
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
-
 
 interface FoldProps<T, K> {
   value: T | null | undefined;
@@ -37,26 +35,26 @@ export const Fold = <T, K>({ value, ifPresent, ifAbsent }: FoldProps<T, K>) => {
 };
 
 /**
-   * Checks if the given object is not null, not undefined and not empty.
-   * @param obj The object to check.
-   * @returns True if the object is not null or undefined and not empty, false otherwise.
-   * @memberof Validator
-   * @example
-   * Validator.hasValue(null); // false
-   * Validator.hasValue(undefined); // false
-   * Validator.hasValue({}); // false
-   * Validator.hasValue({ a: 1 }); // true
-   * Validator.hasValue([]); // false
-   * Validator.hasValue([1]); // true
-   * Validator.hasValue(''); // false
-   * Validator.hasValue('a'); // true
-   * Validator.hasValue(0); // true
-   * Validator.hasValue(false); // true
-   * Validator.hasValue(true); // true
-   * Validator.hasValue(NaN); // true
-   * Validator.hasValue(Infinity); // true
-   * Validator.hasValue(-Infinity); // true
-   */
+ * Checks if the given object is not null, not undefined and not empty.
+ * @param obj The object to check.
+ * @returns True if the object is not null or undefined and not empty, false otherwise.
+ * @memberof Validator
+ * @example
+ * Validator.hasValue(null); // false
+ * Validator.hasValue(undefined); // false
+ * Validator.hasValue({}); // false
+ * Validator.hasValue({ a: 1 }); // true
+ * Validator.hasValue([]); // false
+ * Validator.hasValue([1]); // true
+ * Validator.hasValue(''); // false
+ * Validator.hasValue('a'); // true
+ * Validator.hasValue(0); // true
+ * Validator.hasValue(false); // true
+ * Validator.hasValue(true); // true
+ * Validator.hasValue(NaN); // true
+ * Validator.hasValue(Infinity); // true
+ * Validator.hasValue(-Infinity); // true
+ */
 export function hasValue(obj: any): boolean {
   if (obj === null || obj === undefined) {
     return false;
@@ -76,20 +74,22 @@ export function hasValue(obj: any): boolean {
 
 export type PrettiFy<T> = {
   [P in keyof T]: T[P] extends string
-  ? string
-  : T[P] extends number
-  ? number
-  : T[P] extends boolean
-  ? boolean
-  : T[P] extends object
-  ? PrettiFy<T[P]>
-  : T[P] extends Array<infer P>
-  ? Array<PrettiFy<P>>
-  : T[P];
+    ? string
+    : T[P] extends number
+      ? number
+      : T[P] extends boolean
+        ? boolean
+        : T[P] extends object
+          ? PrettiFy<T[P]>
+          : T[P] extends Array<infer P>
+            ? Array<PrettiFy<P>>
+            : T[P];
 } & {};
 
-
-export async function generateSlug({ title, didExist = async () => false }: {
+export async function generateSlug({
+  title,
+  didExist = async () => false,
+}: {
   title: string;
   didExist?: (val: string) => Promise<boolean>;
 }) {
@@ -114,34 +114,38 @@ export async function generateSlug({ title, didExist = async () => false }: {
 }
 
 /**
-   * Generate a uuid v4.
-   * @example
-   * const id = randomId();
-   * console.log(id); // 110ec58a-a0f2-4ac4-8393-c866d813b8d1
-   * @returns {string} A random id
-   */
+ * Generate a uuid v4.
+ * @example
+ * const id = randomId();
+ * console.log(id); // 110ec58a-a0f2-4ac4-8393-c866d813b8d1
+ * @returns {string} A random id
+ */
 function randomId(length: 4 | 6 | 16 | 36 = 36): string {
   let dt = new Date().getTime();
   let format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
   if (length === 4) {
     format = "xxxx";
-  }
-  else if (length === 6) {
+  } else if (length === 6) {
     format = "xxxxxx";
-  }
-  else if (length === 16) {
+  } else if (length === 16) {
     format = "xxxx-xxxx-xxxx-xxxx";
-  }
-  else if (length === 36) {
+  } else if (length === 36) {
     format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
   }
-  const uuid = format.replace(
-    /[xy]/g,
-    (c: string) => {
-      const r = (dt + Math.random() * 16) % 16 | 0;
-      dt = Math.floor(dt / 16);
-      return (c === "x" ? r : (r && 0x3) || 0x8).toString(16);
-    }
-  );
+  const uuid = format.replace(/[xy]/g, (c: string) => {
+    const r = (dt + Math.random() * 16) % 16 | 0;
+    dt = Math.floor(dt / 16);
+    return (c === "x" ? r : (r && 0x3) || 0x8).toString(16);
+  });
   return uuid;
+}
+
+/**
+ * Pluralize a word.
+ * @param word The word to pluralize
+ * @param count The count to check if the word should be pluralized
+ * @returns The pluralized word
+ */
+export function pluralize(word: string, count: number): string {
+  return count === 1 ? word : `${word}s`;
 }

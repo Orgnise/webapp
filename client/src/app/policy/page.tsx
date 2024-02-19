@@ -1,22 +1,24 @@
 import { BrandLabel, Logo } from "@/components/atom/logo";
 
-import Link from "next/link";
 import { NavbarLayout } from "@/components/layout/nav-layout";
+import Link from "next/link";
 import PrivacyPolicyPageClient from "./page-client";
 
 export default function PrivacyPolicyPage() {
-
   return (
-    <div className="flex flex-col bg-default" >
+    <div className="bg-default flex flex-col">
       <NavbarLayout>
-        <div className="flex items-center place-content-between w-full">
+        <div className="flex w-full place-content-between items-center">
           <Link href="/" className="Logo flex items-center gap-2">
             <Logo className="h-8" />
-            <BrandLabel className="h-4"/>
+            <BrandLabel className="h-4" />
           </Link>
         </div>
       </NavbarLayout>
-      <div className="flex-1 max-w-screen-lg mx-auto pointer-events-none" id='privacy-policy'>
+      <div
+        className="pointer-events-none mx-auto max-w-screen-lg flex-1"
+        id="privacy-policy"
+      >
         <PrivacyPolicyPageClient data={data} />
       </div>
     </div>

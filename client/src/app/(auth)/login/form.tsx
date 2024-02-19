@@ -1,12 +1,12 @@
 "use client";
 
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import Label from "@/components/atom/label";
-import Link from "next/link";
 import { TextField } from "@/components/molecule/text-field";
+import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 export function LoginForm() {
   const [errors, setError] = useState<{
@@ -32,8 +32,9 @@ export function LoginForm() {
 
   return (
     <form
-      className="flex flex-col items-center place-content-center  h-full  rounded-md"
-      onSubmit={handleSubmit}>
+      className="flex h-full flex-col place-content-center  items-center  rounded-md"
+      onSubmit={handleSubmit}
+    >
       <div className="flex flex-col items-center font-normal">
         <Label size="h1" variant="t2">
           Welcome back
@@ -68,19 +69,20 @@ export function LoginForm() {
       <div
         className="flex h-8 items-end space-x-1"
         aria-live="polite"
-        aria-atomic="true">
+        aria-atomic="true"
+      >
         {errors?.other && (
           <>
             <p className="text-sm text-red-500">{errors?.other}</p>
           </>
         )}
       </div>
-      <div className="flex items-center place-content-evenly text-center w-9/12 py-10">
-        <span className="border-t theme-border flex-1" />
+      <div className="flex w-9/12 place-content-evenly items-center py-10 text-center">
+        <span className="theme-border flex-1 border-t" />
         <span className="px-4 text-sm ">OR</span>
-        <span className="border-t theme-border flex-1" />
+        <span className="theme-border flex-1 border-t" />
       </div>
-      <div className="flex gap-4 mt-4">
+      <div className="mt-4 flex gap-4">
         {/* GOOGLE LOGIN */}
         <button
           onClick={async (e) => {
@@ -88,7 +90,8 @@ export function LoginForm() {
             // googleLogin();
             await signIn("google");
           }}
-          className=" bg-white shadow rounded-full p-2">
+          className=" rounded-full bg-white p-2 shadow"
+        >
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png"
             className="h-8 w-8"
@@ -100,7 +103,8 @@ export function LoginForm() {
             e.preventDefault();
             await signIn("github");
           }}
-          className="bg-white shadow rounded-full p-2">
+          className="rounded-full bg-white p-2 shadow"
+        >
           <img
             src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"
             className="h-8 w-8"
@@ -108,35 +112,36 @@ export function LoginForm() {
         </button>
         {/* Twitter Login */}
         <button
-          className=" bg-white shadow rounded-full p-2"
+          className=" rounded-full bg-white p-2 shadow"
           onClick={async (e) => {
             e.preventDefault();
             // googleLogin();
             await signIn("twitter");
-          }}>
+          }}
+        >
           <img
             src="https://abs.twimg.com/favicons/twitter.ico"
             className="h-8 w-8"
           />
         </button>
       </div>
-      <div className="flex items-center place-content-evenly text-center w-9/12 pt-10">
-        <span className="border-t theme-border flex-1" />
-        <span className="px-4 text-sm underline cursor-pointer">
+      <div className="flex w-9/12 place-content-evenly items-center pt-10 text-center">
+        <span className="theme-border flex-1 border-t" />
+        <span className="cursor-pointer px-4 text-sm underline">
           <Link href={"/signup"}>CREATE AN ACCOUNT</Link>
         </span>
-        <span className="border-t theme-border flex-1" />
+        <span className="theme-border flex-1 border-t" />
       </div>
 
       {/* Terms & Conditions and Privacy Policy */}
-      <div className="flex flex-col items-center place-content-center text-center w-9/12 pt-10">
+      <div className="flex w-9/12 flex-col place-content-center items-center pt-10 text-center">
         <span className="text-sm">
           By signing in, you agree to our{" "}
-          <span className="underline cursor-pointer">
+          <span className="cursor-pointer underline">
             <Link href="terms">Terms & Conditions</Link>
           </span>{" "}
           and{" "}
-          <span className="underline cursor-pointer">
+          <span className="cursor-pointer underline">
             <Link href="policy">Privacy Policy</Link>
           </span>
         </span>

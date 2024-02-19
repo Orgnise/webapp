@@ -1,13 +1,12 @@
-import { AuthOptions, } from "next-auth";
-import Credentials from 'next-auth/providers/credentials';
-import GitHub from "@auth/core/providers/github"
-import Google from "next-auth/providers/google"
-import { MongoDBAdapter } from "@auth/mongodb-adapter"
-import NextAuth from 'next-auth';
-import Twitter from "next-auth/providers/twitter"
-import mongoDb from '../mongodb';
-import { mongoUserResult } from '@/app/api/signup/route';
-import { z } from 'zod';
+import { mongoUserResult } from "@/app/api/signup/route";
+import GitHub from "@auth/core/providers/github";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import NextAuth, { AuthOptions } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
+import Twitter from "next-auth/providers/twitter";
+import { z } from "zod";
+import mongoDb from "../mongodb";
 
 const backendURL = process.env.NEXT_PUBLIC_URL;
 
@@ -23,7 +22,7 @@ export const NextAuthOptions = {
     Credentials({
       credentials: {
         email: { label: "email" },
-        password: { label: "password", type: "password" }
+        password: { label: "password", type: "password" },
       },
       name: "Credentials",
       async authorize(credentials, req) {
@@ -31,22 +30,19 @@ export const NextAuthOptions = {
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
         if (parsedCredentials.success) {
-          const authResponse = await fetch(`${backendURL}/api/login`,
-            {
-              method: "POST",
-              body: JSON.stringify(parsedCredentials.data),
-              headers: {
-                "Content-Type": "application/json",
-              },
-              cache: "no-cache" //! To be removed after done testing
-
-            })
+          const authResponse = await fetch(`${backendURL}/api/login`, {
+            method: "POST",
+            body: JSON.stringify(parsedCredentials.data),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            cache: "no-cache", //! To be removed after done testing
+          });
           if (!authResponse.ok) {
-            return null
+            return null;
           }
-          const res = await authResponse.json()
-          return res.user
-
+          const res = await authResponse.json();
+          return res.user;
         }
         return null;
       },
@@ -79,38 +75,47 @@ export const NextAuthOptions = {
 
   callbacks: {
     async signIn({ account, profile }: any) {
-      console.log("signIn begin", { account, profile })
+      console.log("signIn begin", { account, profile });
       if (["google", "github"].includes(account.provider)) {
         const client = await mongoDb;
-        const users = client.db('pulse-db').collection('users');
-        const userExists = await users
-          .findOne({ email: profile.email }) as unknown as mongoUserResult | null;
+        const users = client.db("pulse-db").collection("users");
+        const userExists = (await users.findOne({
+          email: profile.email,
+        })) as unknown as mongoUserResult | null;
 
         // If the user doesn't exist, create a new one
         if (!userExists) {
-          const image = profile.avatar_url ?? profile.picture ?? profile.profile_image_url ?? `https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`;
+          const image =
+            profile.avatar_url ??
+            profile.picture ??
+            profile.profile_image_url ??
+            `https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`;
           const newUser = {
             email: profile.email,
             name: profile.name,
             image: image,
             provider: account.provider,
             providerAccountId: account.id,
-            type: 'oauth',
+            type: "oauth",
             emailVerified: true,
-          }
+          };
           const insertResult = await users.insertOne(newUser);
           const customUser = {
             id: insertResult.insertedId.toString(), //required field!!
             email: newUser.email,
             name: newUser.name,
-            image: newUser.image
-          }
-          return customUser
+            image: newUser.image,
+          };
+          return customUser;
         }
         // Update the user's image if it doesn't exist
         else if (userExists && !userExists.image && profile.picture) {
-          const image = profile.avatar_url ?? profile.picture ?? profile.profile_image_url
-          await users.updateOne({ email: profile.email }, { $set: { image: image } })
+          const image =
+            profile.avatar_url ?? profile.picture ?? profile.profile_image_url;
+          await users.updateOne(
+            { email: profile.email },
+            { $set: { image: image } },
+          );
         }
       }
       return true; // Do different verification for other providers that don't have `email_verified`
@@ -121,20 +126,20 @@ export const NextAuthOptions = {
         token.userId = account.providerAccountId;
       }
       if (user) {
-        token.user = user
+        token.user = user;
       }
-      return token
+      return token;
     },
 
     authorized({ auth, request: { nextUrl } }: any) {
       // console.log("authorized begin", { auth, nextUrl })
       const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
       if (isOnDashboard) {
         if (isLoggedIn) return true;
         return false; // Redirect unauthenticated users to login page
       } else if (isLoggedIn) {
-        return Response.redirect(new URL('/dashboard', nextUrl));
+        return Response.redirect(new URL("/dashboard", nextUrl));
       }
       return true;
     },
@@ -142,41 +147,47 @@ export const NextAuthOptions = {
       // console.log("session begin", { session, token, user })
       session.user = {
         id: token.sub,
-        ...session.user
-      }
+        ...session.user,
+      };
       return session;
     },
-
   },
   events: {
     async signIn(message) {
       /* on successful sign in */
       // console.log("signIn event", message)
     },
-    async signOut(message) { /* on signout */ },
+    async signOut(message) {
+      /* on signout */
+    },
     async createUser(message) {
       /* user created */
-      console.log("createUser event", message)
+      console.log("createUser event", message);
     },
-    async linkAccount(message) { /* account linked to a user */ },
-    async session(message) { /* session is active */ },
-    async error() { /* error in authentication flow */ }
+    async linkAccount(message) {
+      /* account linked to a user */
+    },
+    async session(message) {
+      /* session is active */
+    },
+    async error() {
+      /* error in authentication flow */
+    },
   },
   secret: process.env.AUTH_SECRET,
   logger: {
     error(code, ...message) {
-      console.error(code, message)
+      console.error(code, message);
     },
     warn(code, ...message) {
-      console.warn(code, message)
+      console.warn(code, message);
     },
     debug(code, ...message) {
       // console.debug(code, message)
-    }
-  }
+    },
+  },
 } as AuthOptions;
 
 export const { auth, signIn, signOut } = NextAuth({
   ...NextAuthOptions,
 });
-

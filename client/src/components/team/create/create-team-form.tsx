@@ -11,22 +11,14 @@ type Status = "idle" | "loading" | "error" | "success";
 const AddTeam = () => {
   const { toast } = useToast();
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [error, setError] = useState<{
-    name?: string;
-    description?: string;
-  }>({});
-
   const router = useRouter();
 
   const [status, setStatus] = useState<Status>("idle");
-  // const createTeam = SocketEvent.team.create;
-  // const socket = useSocket();
 
   const handleCreateTeam = async (e: any) => {
     e.preventDefault();
-
+    const name = e.target.name.value;
+    const description = e.target.description.value;
     setStatus("loading");
 
     const payload = {
@@ -61,33 +53,33 @@ const AddTeam = () => {
   };
 
   return (
-    <div className="max-w-lg min-w-full flex flex-col">
-      <form className="flex flex-col gap-6" onSubmit={handleCreateTeam}>
-        <div className="flex flex-col">
-          <TextField
-            label="Team Name"
-            error={error.name}
-            placeholder="Enter team name"
-            required
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-          />
-          <TextField
-            label="Team Description"
-            error={error.name}
-            placeholder="Enter team description"
-            required
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
-          />
-        </div>
-      </form>
-      <Button disabled={name.length === 0} onClick={handleCreateTeam}>
+    <form
+      onSubmit={handleCreateTeam}
+      className="flex min-w-full max-w-lg flex-col"
+    >
+      <div className="flex flex-col">
+        <TextField
+          min={3}
+          max={30}
+          name="name"
+          label="Team Name"
+          placeholder="Enter team name"
+          required={true}
+        />
+        <TextField
+          min={3}
+          max={120}
+          name="description"
+          label="Team Description"
+          placeholder="Enter team description"
+          required={true}
+        />
+      </div>
+
+      <Button type="submit">
         {status === "loading" ? <Spinner /> : "Create"}
       </Button>
-    </div>
+    </form>
   );
 };
 

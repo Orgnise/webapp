@@ -1,8 +1,5 @@
 "use client";
 
-import { NavbarLayout } from "@/components/layout/nav-layout";
-import React from "react";
-
 /**
  * Terms and conditions page
  */
@@ -12,10 +9,10 @@ export default function TermsAndConditionPage({
   params: { slug: string };
 }) {
   return (
-    <div className="flex flex-col h-screen bg-default">
-      <div className="flex-1 flex items-center ">
-        <div className="max-w-xl mx-auto py-24 px-3">
-          <div className="flex flex-col space-y-3 items-center place-content-center text-sm">
+    <div className="bg-default flex h-screen flex-col">
+      <div className="flex flex-1 items-center ">
+        <div className="mx-auto max-w-xl px-3 py-24">
+          <div className="flex flex-col place-content-center items-center space-y-3 text-sm">
             {/* <CreateTeam /> */}
             {params.slug}
           </div>

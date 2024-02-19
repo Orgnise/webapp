@@ -1,26 +1,19 @@
 "use client";
 
-import { Editor } from "novel";
+import NovelEditor from "@/components/ui/editor/editor";
 import { useEffect } from "react";
 
 export default function TermsAndConditionPageClient({ data }: { data: any }) {
-    useEffect(() => {
-        document.title = "Terms and Conditions - Pulse";
-        setTimeout(() => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 200);
-
-    }, []);
-    return (
-        <Editor
-            key={"terms-and-conditions"}
-            className="shadow-none p-0 m-0"
-            defaultValue={data}
-            disableLocalStorage={true}
-            editorProps={{
-                editable: (state) => false,
-            }}
-        />
-
-    );
+  useEffect(() => {
+    document.title = "Terms and Conditions - Pulse";
+  }, []);
+  return (
+    <NovelEditor
+      content={data}
+      editable={false}
+      storageKey={"privacy-policy"}
+      editorClassName="border-none"
+      autofocus={false}
+    />
+  );
 }

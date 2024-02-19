@@ -1,23 +1,23 @@
 "use client";
 
-import { H3, P } from "@/components/atom/typography";
+import { H3 } from "@/components/atom/typography";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { LockIcon, Shapes } from "lucide-react";
+import { LockIcon } from "lucide-react";
 import { useContext, useState } from "react";
 
 import Label from "@/components/atom/label";
 import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
+import { TextField } from "@/components/molecule/text-field";
+import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ListView } from "@/components/ui/listview";
 import { Visibility } from "@/lib/models/workspace.model";
 import { Workspace } from "@/lib/types/types";
@@ -30,7 +30,7 @@ export default async function TeamsPageClient() {
   const { teamData, workspacesData } = useContext(TeamContext);
   if (teamData.loading) {
     return (
-      <div className="h-full w-full flex place-content-center items-center">
+      <div className="flex h-full w-full place-content-center items-center">
         <Spinner />
       </div>
     );
@@ -51,12 +51,13 @@ export default async function TeamsPageClient() {
       <ListView
         items={workspacesData?.workspaces}
         loading={workspacesData.loading}
-        className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid max-w-screen-xl mx-auto py-10 lg:px-20 px-2.5"
+        className="mx-auto grid max-w-screen-xl grid-cols-1   gap-5 px-2.5 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-20"
         renderItem={(item: Workspace, index: number) => (
           <Link
             key={index}
             href={`${team_slug}/${item.meta.slug}`}
-            className="flex place-content-between items-start border w-full h-32 rounded p-6 border-border cursor-pointer bg-card hover:bg-accent/20  hover:text-accent-foreground">
+            className="flex h-32 w-full cursor-pointer place-content-between items-start rounded border border-border bg-card p-6 hover:text-accent-foreground  hover:shadow"
+          >
             <div className="flex items-center gap-4">
               <Logo className="h-6" />
               <div>
@@ -72,17 +73,9 @@ export default async function TeamsPageClient() {
             </span>
           </Link>
         )}
-        noItemsElement={
-          <div className="h-full py-20 w-full flex flex-col place-content-center items-center text-center">
-            <Shapes className="text-accent" size={60} />
-            <P className="mt-6">No workspace available</P>
-            <P className="text-sm text-muted-foreground">
-              Create a workspace to start managing your collections.
-            </P>
-          </div>
-        }
+        noItemsElement={<EmptyWorkspaceView />}
         placeholder={
-          <div className="h-full w-full flex place-content-center items-center">
+          <div className="flex h-full w-full place-content-center items-center">
             <Spinner />
           </div>
         }
@@ -115,36 +108,32 @@ export function CerateWorkspaceModel({ children }: CerateWorkspaceModelProps) {
   return (
     <Dialog modal={true}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="p-6">
         <DialogHeader>
-          <DialogTitle>Create workspace</DialogTitle>
+          <Label size="h2" variant="t2">
+            Create workspace
+          </Label>
           <DialogDescription>
             Create a new workspace to start managing your collections.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleCreateWorkspace}>
-          <div className="flex flex-col gap-6 py-4">
-            <div className="flex flex-col gap-1">
-              <Label>Name</Label>
-              <Input
-                maxLength={30}
-                minLength={3}
-                name="name"
-                required
-                placeholder="Workspace name"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <Label className="">
-                Description <small>(optional)</small>
-              </Label>
-              <Input
-                maxLength={60}
-                name="description"
-                placeholder="Workspace description"
-              />
-            </div>
-          </div>
+        <form onSubmit={handleCreateWorkspace} className="flex flex-col pt-3">
+          <TextField
+            maxLength={30}
+            minLength={3}
+            name="name"
+            label="Workspace name"
+            required
+            placeholder="Workspace name"
+          />
+
+          <TextField
+            maxLength={60}
+            name="description"
+            label="Workspace description"
+            placeholder="Workspace description"
+          />
+
           <div className="flex justify-end">
             <DialogClose className="hidden" id="CreateWorkspaceCloseButton">
               Cancel
@@ -169,7 +158,7 @@ export function CerateWorkspaceModel({ children }: CerateWorkspaceModelProps) {
 export function SuggestOpenWorkspace({ setActive }: any) {
   return (
     <div className="h-full">
-      <div className="h-full flex flex-col gap-4 w-full items-center place-content-center max-w-xl mx-auto text-center">
+      <div className="mx-auto flex h-full w-full max-w-xl flex-col place-content-center items-center gap-4 text-center">
         <Label size="h1">Open work</Label>
         <Label size="body1">
           Open a workspace to start working on your tasks.
@@ -180,7 +169,8 @@ export function SuggestOpenWorkspace({ setActive }: any) {
           className="rounded-full"
           onClick={() => {
             setActive(true);
-          }}>
+          }}
+        >
           "Open Workspace"
         </Button>
 

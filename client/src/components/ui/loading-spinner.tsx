@@ -9,7 +9,8 @@ export function LoadingSpinner({ className }: { className?: string }) {
           top: "50%",
           left: "50%",
         }}
-        className={cn("loading-spinner", "h-5 w-5", className)}>
+        className={cn("loading-spinner", "h-5 w-5", className)}
+      >
         {[...Array(12)].map((_, i) => (
           <div
             key={i}

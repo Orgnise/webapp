@@ -1,10 +1,12 @@
-import "../styles/global.css";
+import "@/styles/global.css";
+import "@/styles/prosemirror.css";
 
-import { Inter as FontSans } from "next/font/google";
-import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
+import type { Metadata } from "next";
+import { Inter as FontSans } from "next/font/google";
+// import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -37,7 +39,8 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange>
+          disableTransitionOnChange
+        >
           {children}
         </ThemeProvider>
 

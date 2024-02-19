@@ -1,5 +1,5 @@
-import React from "react";
 import cx from "classnames";
+import React from "react";
 interface Props {
   tab: string;
   selected: Boolean;
@@ -14,16 +14,17 @@ function Tab({ tab, selected, onClick, className, disabled = false }: Props) {
       <div
         key={tab}
         className={cx(
-          "tab rounded-t px-4 py-1  hover:bg-muted dark:hover:bg-transparent cursor-pointer hover:border-primary  select-none transition duration-500 ease-in-out" +
+          "tab cursor-pointer select-none rounded-t  px-4 py-1 transition duration-500  ease-in-out hover:border-primary hover:bg-muted dark:hover:bg-transparent" +
             className,
           {
             "border-b-[3px] border-primary": selected,
           },
           {
             "pointer-events-none": disabled,
-          }
+          },
         )}
-        onClick={onClick}>
+        onClick={onClick}
+      >
         {tab}
       </div>
     </div>

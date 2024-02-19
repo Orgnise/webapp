@@ -1,7 +1,5 @@
 import * as React from "react";
 
-import exp from "constants";
-
 interface Prop {}
 
 interface H1Props extends React.HTMLAttributes<HTMLHeadingElement>, Prop {}
@@ -11,10 +9,10 @@ const H1 = React.forwardRef<HTMLHeadingElement, H1Props>(
       <h1
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-2xl font-bold tracking-tight lg:text-3xl ${className}`}
+        className={`scroll-m-20 text-2xl font-normal tracking-tight lg:text-3xl ${className}`}
       />
     );
-  }
+  },
 );
 H1.displayName = "H1";
 
@@ -25,10 +23,10 @@ const H2 = React.forwardRef<HTMLHeadingElement, H2Props>(
       <h2
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-xl font-bold tracking-tight lg:text-2xl ${className}`}
+        className={`scroll-m-20 text-xl font-normal tracking-tight lg:text-2xl ${className}`}
       />
     );
-  }
+  },
 );
 H2.displayName = "H2";
 
@@ -39,10 +37,10 @@ const H3 = React.forwardRef<HTMLHeadingElement, H3Props>(
       <h3
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-lg font-semibold tracking-tight ${className}`}
+        className={`scroll-m-20 text-lg font-normal tracking-tight ${className}`}
       />
     );
-  }
+  },
 );
 H3.displayName = "H3";
 
@@ -53,10 +51,10 @@ const H4 = React.forwardRef<HTMLHeadingElement, H4Props>(
       <h4
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-base font-semibold tracking-tight ${className}`}
+        className={`scroll-m-20 text-base font-normal tracking-tight ${className}`}
       />
     );
-  }
+  },
 );
 H4.displayName = "H4";
 
@@ -67,10 +65,10 @@ const H5 = React.forwardRef<HTMLHeadingElement, H5Props>(
       <h5
         {...props}
         ref={ref}
-        className={`scroll-m-20 text-sm font-semibold tracking-tight ${className}`}
+        className={`scroll-m-20 text-sm font-normal tracking-tight ${className}`}
       />
     );
-  }
+  },
 );
 H5.displayName = "H5";
 
@@ -84,7 +82,7 @@ const P = React.forwardRef<HTMLParagraphElement, PProps>(
         className={`scroll-m-20 text-sm font-normal tracking-tight ${className}`}
       />
     );
-  }
+  },
 );
 P.displayName = "P";
 
@@ -95,10 +93,10 @@ const LargeLabel = React.forwardRef<HTMLDivElement, LargeProps>(
       <div
         {...props}
         ref={ref}
-        className={`text-lg font-semibold ${className}`}
+        className={`text-lg font-normal ${className}`}
       />
     );
-  }
+  },
 );
 LargeLabel.displayName = "LargeLabel";
 
@@ -112,7 +110,7 @@ const SmallLabel = React.forwardRef<HTMLElement, SmallProps>(
         className={`text-sm font-medium leading-none ${className}`}
       />
     );
-  }
+  },
 );
 SmallLabel.displayName = "SmallLabel";
 
@@ -126,8 +124,8 @@ const MutedLabel = React.forwardRef<HTMLParagraphElement, MutedProps>(
         className={`text-sm text-muted-foreground ${className}`}
       />
     );
-  }
+  },
 );
 MutedLabel.displayName = "MutedLabel";
 
-export { H1, H2, H3, H4, H5, P, LargeLabel, SmallLabel, MutedLabel };
+export { H1, H2, H3, H4, H5, LargeLabel, MutedLabel, P, SmallLabel };

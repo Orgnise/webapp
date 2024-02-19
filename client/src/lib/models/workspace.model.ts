@@ -1,22 +1,22 @@
-import { Meta, Role } from "./team.modal"
+import { Meta, Role } from "./team.modal";
 
-import { ObjectId } from "mongodb"
+import { ObjectId } from "mongodb";
 
 export interface Workspace {
-  _id: string
-  team: ObjectId
-  name: string
-  description: string
+  _id: string;
+  team: ObjectId;
+  name: string;
+  description: string;
   members: {
-    user: ObjectId,
-    role: keyof typeof Role
-  }[],
-  visibility: keyof typeof Visibility
-  meta: Meta
-  createdAt: string
-  updatedAt: string
-  createdBy: ObjectId
-  updatedBy?: ObjectId
+    user: ObjectId;
+    role: keyof typeof Role;
+  }[];
+  visibility: keyof typeof Visibility;
+  meta: Meta;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: ObjectId;
+  updatedBy?: ObjectId;
 }
 
 export const Visibility = {

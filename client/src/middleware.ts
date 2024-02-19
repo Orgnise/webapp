@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getToken } from "next-auth/jwt"
+import { getToken } from "next-auth/jwt";
 
 export const config = {
   matcher: [
@@ -26,19 +26,23 @@ export const middleware = async (req: NextRequest) => {
   const loggedIn = session?.user ? true : false;
   const path = req.nextUrl.pathname;
 
-  if (['/terms','/policy'].includes(path)) {
+  if (["/terms", "/policy"].includes(path)) {
     return NextResponse.next();
-  } 
+  }
   // Redirect to login if not logged in
-  else if (!['/login','/signup','terms','policy'].includes(path) && !loggedIn) {
-    return NextResponse.redirect(new URL('/login', process.env.NEXT_PUBLIC_URL));
-  } 
-  
-  // Redirect to home if logged in and trying to access login or signup
-  else if (loggedIn &&(path === "/login" || path === "/signup")) {
-    return NextResponse.redirect(new URL("/", req.url));
+  else if (
+    !["/login", "/signup", "terms", "policy"].includes(path) &&
+    !loggedIn
+  ) {
+    return NextResponse.redirect(
+      new URL("/login", process.env.NEXT_PUBLIC_URL),
+    );
   }
-  else {
+
+  // Redirect to home if logged in and trying to access login or signup
+  else if (loggedIn && (path === "/login" || path === "/signup")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  } else {
     return NextResponse.next();
   }
-}
+};

@@ -7,8 +7,9 @@ import NotFoundView from "@/components/team/team-not-found";
 import { TeamContext } from "./providers";
 
 export default function TeamAuth({ children }: { children: ReactNode }) {
-  let { teamData: { loading, error } } = useContext(TeamContext);
-
+  let {
+    teamData: { loading, error },
+  } = useContext(TeamContext);
 
   if (loading) {
     return <LayoutLoader />;
@@ -17,8 +18,8 @@ export default function TeamAuth({ children }: { children: ReactNode }) {
   if (error) {
     return (
       <div className="bg-background">
-        <div className="max-w-3xl mx-auto">
-          <NotFoundView item="Team"/>
+        <div className="mx-auto max-w-3xl">
+          <NotFoundView item="Team" />
         </div>
       </div>
     );
