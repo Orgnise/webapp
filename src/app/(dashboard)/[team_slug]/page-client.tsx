@@ -171,7 +171,7 @@ export function SuggestOpenWorkspace({ setActive }: any) {
             setActive(true);
           }}
         >
-          "Open Workspace"
+          Open Workspace
         </Button>
 
         <Label size="body" variant="cap">

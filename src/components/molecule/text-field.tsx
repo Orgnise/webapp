@@ -1,20 +1,13 @@
-import React from "react";
 import cx from "classnames";
-import Label from "../typography";
+import React from "react";
+import Label from "../atom/label";
+import { Input } from "../ui/input";
 
-interface Props {
-  name?: string;
-  label?: string;
-  value?: string;
-  required?: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
-  disabled?: boolean;
-  error?: string;
-  placeholder?: string;
-  type?: "text" | "password" | "email" | "number" | "tel" | "url";
-  autoComplete?: string;
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   wrapperClassName?: string;
+  label?: string;
+  error?: string;
 }
 
 /**
@@ -24,42 +17,34 @@ interface Props {
  * @example
  * <TextField name="name" label="Name" value={name} onChange={e => setName(e.target.value)} />
  */
-export function TextField({
-  label,
-  type = "text",
-  name,
-  required,
-  placeholder,
-  value,
-  onChange,
-  error,
-  autoComplete,
-  wrapperClassName,
-}: Props) {
-  return (
-    <div className={cx("flex flex-col gap-2", wrapperClassName)}>
-      <Label variant="t2"> {label}</Label>
-      <div className={cx("flex flex-col mb-5 gap-1")}>
-        <input
-          type={type}
-          name={name}
-          placeholder={placeholder || `Enter ${label}`}
-          className={cx("theme-input   ", {
-            "border-red-500 ": error,
-          })}
-          required={required}
-          onChange={onChange}
-          value={value}
-          autoComplete={autoComplete}
-        />
-        <label
-          className={cx("text-red-500 text-xs", {
-            "inline-block  scale-100": error !== "" && error !== undefined,
-            "h-0": !error,
-          })}>
-          {error}
-        </label>
+const TextField = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, wrapperClassName, label, error, ...props }, ref) => {
+    return (
+      <div className={cx("flex flex-col gap-2", wrapperClassName)}>
+        <Label variant="t2"> {label}</Label>
+        <div className={cx("mb-5 flex flex-col gap-1")}>
+          <Input
+            placeholder={props.placeholder || `Enter ${label}`}
+            className={cx("theme-input   ", {
+              "border-red-500 ": error,
+            })}
+            // type={props.type}
+            {...props}
+          />
+          <label
+            className={cx("text-xs text-red-500", {
+              "inline-block  scale-100": error !== "" && error !== undefined,
+              "h-0": !error,
+            })}
+          >
+            {error}
+          </label>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  },
+);
+
+TextField.displayName = "TextField";
+
+export { TextField };
