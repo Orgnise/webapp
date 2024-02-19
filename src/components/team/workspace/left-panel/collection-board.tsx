@@ -180,6 +180,12 @@ function CollectionColumn({
   relativePath: any;
   setLeftPanelSize: any;
 }) {
+  const { team_slug, workspace_slug, item_slug } = useParams() as {
+    team_slug?: string;
+    workspace_slug?: string;
+    collection_slug?: string;
+    item_slug?: string;
+  };
   return (
     <Droppable droppableId={collection._id}>
       {(provided) => (
@@ -200,14 +206,6 @@ function CollectionColumn({
             renderItem={(item, index) => (
               <Draggable draggableId={item._id} index={index}>
                 {(provided) => {
-                  const { team_slug, workspace_slug, item_slug } =
-                    useParams() as {
-                      team_slug?: string;
-                      workspace_slug?: string;
-                      collection_slug?: string;
-                      item_slug?: string;
-                    };
-
                   const isActive = item_slug === item.meta?.slug;
                   return (
                     <div

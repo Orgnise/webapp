@@ -25,7 +25,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { TeamContext } from "./providers";
 
-export default async function TeamsPageClient() {
+export default function TeamsPageClient() {
   const { team_slug } = useParams() as { team_slug?: string };
   const { teamData, workspacesData } = useContext(TeamContext);
   if (teamData.loading) {

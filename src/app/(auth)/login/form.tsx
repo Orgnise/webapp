@@ -6,6 +6,7 @@ import Label from "@/components/atom/label";
 import { TextField } from "@/components/molecule/text-field";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 
 export function LoginForm() {
@@ -92,9 +93,13 @@ export function LoginForm() {
           }}
           className=" rounded-full bg-white p-2 shadow"
         >
-          <img
+          <Image
+            unoptimized={true}
+            height={32}
+            width={32}
             src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png"
             className="h-8 w-8"
+            alt={"Google"}
           />
         </button>
         {/* Github Login */}
@@ -105,9 +110,13 @@ export function LoginForm() {
           }}
           className="rounded-full bg-white p-2 shadow"
         >
-          <img
+          <Image
+            unoptimized={true}
             src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"
             className="h-8 w-8"
+            height={32}
+            width={32}
+            alt="Github"
           />
         </button>
         {/* Twitter Login */}
@@ -119,9 +128,13 @@ export function LoginForm() {
             await signIn("twitter");
           }}
         >
-          <img
+          <Image
+            unoptimized={true}
+            height={32}
+            width={32}
             src="https://abs.twimg.com/favicons/twitter.ico"
             className="h-8 w-8"
+            alt="Twitter"
           />
         </button>
       </div>

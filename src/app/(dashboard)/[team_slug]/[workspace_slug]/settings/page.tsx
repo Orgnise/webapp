@@ -163,7 +163,7 @@ function WorkspaceSlug() {
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Workspace Slug</h2>
           <p className="text-sm text-muted-foreground">
-            This is your workspace's unique slug on Pulse
+            This is your workspace&apos;s unique slug on Pulse
           </p>
         </div>
         <Input

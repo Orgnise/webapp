@@ -33,7 +33,7 @@ export default function WorkspaceView({
     if (activeWorkspace) {
       setLeftPanelSize(LeftPanelSize.default);
     }
-  }, [activeWorkspace?._id]);
+  }, [activeWorkspace]);
 
   if (loading) {
     return (

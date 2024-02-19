@@ -33,10 +33,6 @@ export default function CollectionTable({
   const [sortCollectionBy, setSortCollectionBy] = React.useState<SortBy>("asc");
   const { error, loading, collections, mutate } = useCollections();
 
-  if (!hasValue(collections)) {
-    return <NoCollectionView />;
-  }
-
   const { team_slug, workspace_slug, collection_slug, item_slug } =
     useParams() as {
       team_slug?: string;
@@ -44,38 +40,39 @@ export default function CollectionTable({
       collection_slug?: string;
       item_slug: string;
     };
-  const allItems =
-    collections &&
-    useMemo(
-      () =>
-        collections
-          .sort((a: Collection, b: Collection) => {
-            if (sortCollectionBy == "asc") {
-              return a.name.localeCompare(b.name);
-            } else {
-              return b.name.localeCompare(a.name);
-            }
-          })
-          .reduce((acc: any, collection: Collection) => {
-            return [
-              ...acc,
-              ...collection.children.map((item: Collection) => ({
-                ...item,
-                collection,
-              })),
-            ];
-          }, [])
-          .sort((a: Collection, b: Collection) => {
-            if (sortBy == "asc") {
-              return a.name.localeCompare(b.name);
-            } else {
-              return b.name.localeCompare(a.name);
-            }
-          }),
-      [collections, sortBy, sortCollectionBy],
-    );
+  const allItems = useMemo(
+    () =>
+      collections
+        ?.sort?.((a: Collection, b: Collection) => {
+          if (sortCollectionBy == "asc") {
+            return a.name.localeCompare(b.name);
+          } else {
+            return b.name.localeCompare(a.name);
+          }
+        })
+        .reduce((acc: any, collection: Collection) => {
+          return [
+            ...acc,
+            ...collection.children.map((item: Collection) => ({
+              ...item,
+              collection,
+            })),
+          ];
+        }, [])
+        .sort((a: Collection, b: Collection) => {
+          if (sortBy == "asc") {
+            return a.name.localeCompare(b.name);
+          } else {
+            return b.name.localeCompare(a.name);
+          }
+        }),
+    [collections, sortBy, sortCollectionBy],
+  );
 
   if (!hasValue(allItems)) {
+    return <NoCollectionView />;
+  }
+  if (!hasValue(collections)) {
     return <NoCollectionView />;
   }
 

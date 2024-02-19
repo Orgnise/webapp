@@ -16,6 +16,7 @@ import useTeams from "@/lib/swr/use-teams";
 import { Team } from "@/lib/types/types";
 import cx from "classnames";
 import { ChevronsUpDown } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useContext } from "react";
 import { Logo } from "../atom/logo";
@@ -43,7 +44,10 @@ const Nav = ({}) => {
               <DropdownMenuTrigger>
                 <div className="bg-primary-200 flex h-10 w-10 place-content-center items-center rounded-full text-lg font-bold hover:text-teal-700">
                   {user.image && (
-                    <img
+                    <Image
+                      unoptimized={true}
+                      height={32}
+                      width={32}
                       src={user.image}
                       alt="user"
                       className="h-8 w-8 rounded-full"

@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Logo } from "../atom/logo";
 import { H2, P } from "../atom/typography";
 
-export default async function TeamsList() {
+export default function TeamsList() {
   const data = useTeams();
   const { loading, teams } = useTeams();
 
