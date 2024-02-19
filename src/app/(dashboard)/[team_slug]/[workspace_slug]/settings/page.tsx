@@ -224,7 +224,7 @@ interface CerateWorkspaceModelProps {
   children: React.ReactNode;
 }
 
-export function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
+function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const {
     workspacesData: { activeWorkspace, error, loading },
