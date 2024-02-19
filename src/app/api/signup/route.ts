@@ -1,4 +1,4 @@
-import mongoDb from "@/lib/mongodb";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    const users = client.db("pulse-db").collection("users");
+    const users = client.db(databaseName).collection("users");
     const mongoResult: mongoUserResult | null = (await users.findOne({
       email: parsedCredentials.data.email,
     })) as unknown as mongoUserResult | null;

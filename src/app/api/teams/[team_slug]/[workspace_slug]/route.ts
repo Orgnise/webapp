@@ -1,6 +1,6 @@
 import { withAuth } from "@/lib/auth";
 import { Workspace } from "@/lib/models/workspace.model";
-import mongoDb from "@/lib/mongodb";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
@@ -24,7 +24,7 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
       );
     }
 
-    const workspaceDb = client.db("pulse-db").collection("workspaces");
+    const workspaceDb = client.db(databaseName).collection("workspaces");
     const query = { _id: new ObjectId(reqWorkspace._id) };
     const workspaceInDb = (await workspaceDb.findOne(
       query,
@@ -112,7 +112,7 @@ export const DELETE = withAuth(async ({ params }) => {
     const client = await mongoDb;
     const { workspace_slug } = params as { workspace_slug: string };
 
-    const workspaceDb = client.db("pulse-db").collection("workspaces");
+    const workspaceDb = client.db(databaseName).collection("workspaces");
     const query = { "meta.slug": workspace_slug };
     const workspaceInDb = (await workspaceDb.findOne(
       query,

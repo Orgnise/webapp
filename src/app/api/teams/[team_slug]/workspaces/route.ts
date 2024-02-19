@@ -1,6 +1,6 @@
 import { withAuth } from "@/lib/auth";
 import { Workspace } from "@/lib/models/workspace.model";
-import mongoDb from "@/lib/mongodb";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
@@ -10,7 +10,7 @@ export const GET = withAuth(async ({ team, headers, session, params }) => {
   try {
     const userId = session?.user?.id;
     const workspaces = client
-      .db("pulse-db")
+      .db(databaseName)
       .collection<Workspace>("workspaces");
     const query = {
       team: new ObjectId(team._id),
@@ -38,7 +38,7 @@ export const POST = withAuth(async ({ team, session, req }) => {
     }
     const userId = session?.user?.id;
     const workspaces = client
-      .db("pulse-db")
+      .db(databaseName)
       .collection<Workspace>("workspaces");
     const slug = await generateSlug({
       title: body.name,

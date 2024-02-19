@@ -1,6 +1,6 @@
 import { NextAuthOptions } from "@/lib/auth/auth";
 import { Role, Teams } from "@/lib/models/team.modal";
-import mongoDb from "@/lib/mongodb";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const teams = client.db("pulse-db").collection<Teams>("teams");
+    const teams = client.db(databaseName).collection<Teams>("teams");
     // Check if team already exists
     const team = await teams.findOne({ name: parsedBody.data.name });
     if (team) {

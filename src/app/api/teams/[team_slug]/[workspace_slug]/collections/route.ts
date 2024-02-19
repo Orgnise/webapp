@@ -1,7 +1,7 @@
 import { withAuth } from "@/lib/auth";
 import { CollectionDTO } from "@/lib/models/collection.model";
 import { Workspace } from "@/lib/models/workspace.model";
-import mongoDb from "@/lib/mongodb";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -13,11 +13,11 @@ export const GET = withAuth(async ({ team, params }) => {
   try {
     const { workspace_slug, team_slug } = params ?? {};
     const collections = client
-      .db("pulse-db")
+      .db(databaseName)
       .collection<Collection>("collections");
 
     const workspaces = client
-      .db("pulse-db")
+      .db(databaseName)
       .collection<Workspace>("workspaces");
     const workspaceDate = (await workspaces.findOne({
       "meta.slug": workspace_slug,
@@ -158,7 +158,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
       );
     }
     const workspaceDb = client
-      .db("pulse-db")
+      .db(databaseName)
       .collection<CollectionDTO>("workspaces");
     const workspace = await workspaceDb.findOne({
       "meta.slug": workspace_slug,
@@ -178,7 +178,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
     }
 
     const collectionsDb = client
-      .db("pulse-db")
+      .db(databaseName)
       .collection<CollectionDTO>("collections");
     const slug = await generateSlug({
       title: collectionToCreate?.name,

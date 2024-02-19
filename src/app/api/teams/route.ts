@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { NextAuthOptions } from "@/lib/auth/auth";
 import { Teams } from "@/lib/models/team.modal";
-import mongoDb from "@/lib/mongodb";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
 
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         { status: 400 },
       );
     }
-    const teams = client.db("pulse-db").collection<Teams>("teams");
+    const teams = client.db(databaseName).collection<Teams>("teams");
     const query = { createdBy: new ObjectId(session?.user?.id) };
     const dbResult = await teams.aggregate([{ $match: query }]).toArray();
     return NextResponse.json({ teams: dbResult });

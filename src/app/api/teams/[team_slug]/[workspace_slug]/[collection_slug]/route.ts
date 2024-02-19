@@ -1,7 +1,7 @@
 import { withAuth } from "@/lib/auth";
 import { CollectionDTO } from "@/lib/models/collection.model";
 import { Workspace } from "@/lib/models/workspace.model";
-import mongoDb from "@/lib/mongodb";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { generateSlug, hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -24,7 +24,7 @@ export const PATCH = withAuth(async ({ req, session }) => {
       );
     }
 
-    const collectionsDb = client.db("pulse-db").collection("collections");
+    const collectionsDb = client.db(databaseName).collection("collections");
     const query = { _id: new ObjectId(collection._id), object: "collection" };
     const collectionInDb = (await collectionsDb.findOne(
       query,
@@ -119,7 +119,7 @@ export const DELETE = withAuth(async ({ params, team }) => {
       workspace_slug: string;
     };
 
-    const workspaceDb = client.db("pulse-db").collection("workspaces");
+    const workspaceDb = client.db(databaseName).collection("workspaces");
     const workspace = (await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
@@ -135,7 +135,7 @@ export const DELETE = withAuth(async ({ params, team }) => {
       );
     }
 
-    const collectionsDb = client.db("pulse-db").collection("collections");
+    const collectionsDb = client.db(databaseName).collection("collections");
     const query = {
       "meta.slug": collection_slug,
       workspace: new ObjectId(workspace._id),

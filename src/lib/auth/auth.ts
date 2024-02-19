@@ -6,7 +6,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Twitter from "next-auth/providers/twitter";
 import { z } from "zod";
-import mongoDb from "../mongodb";
+import mongoDb, { databaseName } from "../mongodb";
 
 const backendURL = process.env.NEXT_PUBLIC_URL;
 
@@ -78,7 +78,7 @@ export const NextAuthOptions = {
       console.log("signIn begin", { account, profile });
       if (["google", "github"].includes(account.provider)) {
         const client = await mongoDb;
-        const users = client.db("pulse-db").collection("users");
+        const users = client.db(databaseName).collection("users");
         const userExists = (await users.findOne({
           email: profile.email,
         })) as unknown as mongoUserResult | null;

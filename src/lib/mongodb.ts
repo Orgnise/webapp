@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 
+export const databaseName = process.env.DATABASE_NAME ?? "pulse-db";
 const uri = process.env.MONGODB_URI as string; // your mongodb connection string
 const options = {};
 
