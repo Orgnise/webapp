@@ -10,7 +10,7 @@ import { ChevronsUpDown, Circle } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 
 import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
-import { DashBoardContext } from "@/app/(dashboard)/providers";
+import useTeams from "@/lib/swr/use-teams";
 import { Team } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
 import cx from "classnames";
@@ -26,7 +26,7 @@ import { SheetClose } from "./sheet";
 export default function TeamToggleDropDown() {
   const data = useContext(TeamContext);
   console.log({ data });
-  const { teams, error, loading } = useContext(DashBoardContext);
+  const { teams, error, loading } = useTeams();
   const { workspace_slug } = (useParams() as { workspace_slug?: string }) ?? {};
 
   if (!teams || loading) {
@@ -34,7 +34,7 @@ export default function TeamToggleDropDown() {
   }
 
   const activeTeam =
-    teams?.find((w) => w?.meta?.slug === workspace_slug) ?? teams?.[0];
+    teams?.find((w: any) => w?.meta?.slug === workspace_slug) ?? teams?.[0];
 
   return (
     <div className="ml-4 flex items-center gap-2 bg-background">
@@ -49,7 +49,7 @@ export default function TeamToggleDropDown() {
         <DropdownMenuContent className="border bg-background shadow">
           <DropdownMenuLabel>My Teams</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {teams.map((team: any, index) => (
+          {teams.map((team: any, index: number) => (
             <DropdownMenuItem key={index} id={`${index}`}>
               <TeamRow team={team} />
             </DropdownMenuItem>
