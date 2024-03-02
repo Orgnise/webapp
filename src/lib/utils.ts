@@ -1,6 +1,7 @@
 import slugify from "@sindresorhus/slugify";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { nanoid } from 'nanoid'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -56,7 +57,7 @@ export const Fold = <T, K>({ value, ifPresent, ifAbsent }: FoldProps<T, K>) => {
  * Validator.hasValue(-Infinity); // true
  */
 export function hasValue(obj: any): boolean {
-  if (obj === null || obj === undefined) {
+  if (!obj || obj === null || obj === undefined) {
     return false;
   }
   if (typeof obj === "object") {
@@ -74,24 +75,26 @@ export function hasValue(obj: any): boolean {
 
 export type PrettiFy<T> = {
   [P in keyof T]: T[P] extends string
-    ? string
-    : T[P] extends number
-      ? number
-      : T[P] extends boolean
-        ? boolean
-        : T[P] extends object
-          ? PrettiFy<T[P]>
-          : T[P] extends Array<infer P>
-            ? Array<PrettiFy<P>>
-            : T[P];
+  ? string
+  : T[P] extends number
+  ? number
+  : T[P] extends boolean
+  ? boolean
+  : T[P] extends object
+  ? PrettiFy<T[P]>
+  : T[P] extends Array<infer P>
+  ? Array<PrettiFy<P>>
+  : T[P];
 } & {};
 
 export async function generateSlug({
   title,
   didExist = async () => false,
+  suffixLength,
 }: {
   title: string;
   didExist?: (val: string) => Promise<boolean>;
+  suffixLength?: number
 }) {
   if (!hasValue(title)) {
     title = randomId();
@@ -99,6 +102,9 @@ export async function generateSlug({
   }
   const normalizedName = slugify(title, { separator: "-" });
   let slug = normalizedName;
+  if (suffixLength) {
+    slug = `${slug}-${randomId(suffixLength)}`;
+  }
   let exists = await didExist(slug);
   if (exists) {
     while (exists) {
@@ -120,24 +126,25 @@ export async function generateSlug({
  * console.log(id); // 110ec58a-a0f2-4ac4-8393-c866d813b8d1
  * @returns {string} A random id
  */
-function randomId(length: 4 | 6 | 16 | 36 = 36): string {
-  let dt = new Date().getTime();
-  let format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-  if (length === 4) {
-    format = "xxxx";
-  } else if (length === 6) {
-    format = "xxxxxx";
-  } else if (length === 16) {
-    format = "xxxx-xxxx-xxxx-xxxx";
-  } else if (length === 36) {
-    format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-  }
-  const uuid = format.replace(/[xy]/g, (c: string) => {
-    const r = (dt + Math.random() * 16) % 16 | 0;
-    dt = Math.floor(dt / 16);
-    return (c === "x" ? r : (r && 0x3) || 0x8).toString(16);
-  });
-  return uuid;
+export function randomId(length: number = 21): string {
+  return nanoid(length);
+  // let dt = new Date().getTime();
+  // let format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+  // if (length === 4) {
+  //   format = "xxxx";
+  // } else if (length === 6) {
+  //   format = "xxxxxx";
+  // } else if (length === 16) {
+  //   format = "xxxx-xxxx-xxxx-xxxx";
+  // } else if (length === 36) {
+  //   format = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
+  // }
+  // const uuid = format.replace(/[xy]/g, (c: string) => {
+  //   const r = (dt + Math.random() * 16) % 16 | 0;
+  //   dt = Math.floor(dt / 16);
+  //   return (c === "x" ? r : (r && 0x3) || 0x8).toString(16);
+  // });
+  // return uuid;
 }
 
 /**

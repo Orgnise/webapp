@@ -2,16 +2,14 @@
 import { Spinner } from "@/components/atom/spinner";
 import { TextField } from "@/components/molecule/text-field";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
+import useTeams from "@/lib/swr/use-teams";
+import { Team } from "@/lib/types/types";
 import { useState } from "react";
 
 type Status = "idle" | "loading" | "error" | "success";
 
 const AddTeam = () => {
-  const { toast } = useToast();
-
-  const router = useRouter();
+  const { createTeamAsync } = useTeams();
 
   const [status, setStatus] = useState<Status>("idle");
 
@@ -24,32 +22,10 @@ const AddTeam = () => {
     const payload = {
       name: name,
       description: description,
-    };
-    const res = await fetch("/api/teams/create", {
-      method: "POST",
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    if (res.status === 200) {
+    } as Team;
+    createTeamAsync(payload).finally(() => {
       setStatus("success");
-      toast({
-        title: "Team created",
-        description: "Team has been created",
-        variant: "default",
-      });
-      setTimeout(() => {
-        router.push(`./${data?.team?.meta?.slug}/add-example`);
-      }, 1000);
-    } else {
-      setStatus("error");
-      let err = data?.error ?? "something went wrong";
-      toast({
-        title: "Error",
-        description: err,
-        variant: "destructive",
-      });
-    }
+    });
   };
 
   return (

@@ -1,18 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-
 import { SmallLabel } from "@/components/atom/typography";
 import NotFoundView from "@/components/team/team-not-found";
 import ItemContent from "@/components/team/workspace/collection/content/content";
 import { Input } from "@/components/ui/input";
 import useCollections from "@/lib/swr/use-collections";
 import { hasValue } from "@/lib/utils";
+import { PrinterIcon } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect, useMemo, useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import Loading from "./loading";
 
-export default async function ItemPageClient() {
+export default function ItemPageClient() {
+  const componentRef = useRef<HTMLDivElement>(null);
+
   const {
     collections,
     UpdateItem: UpdateActiveItem,
@@ -52,11 +55,17 @@ export default async function ItemPageClient() {
     }
   };
 
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+    documentTitle: activeItem?.name ?? "Document",
+  });
+
   useEffect(() => {
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content, activeItem?._id]);
 
   if (loading) {
@@ -82,19 +91,30 @@ export default async function ItemPageClient() {
           >
             <SmallLabel className="">{activeCollection?.name}</SmallLabel>
           </Link>
-
-          <CollectionNameField
-            name={activeItem?.name}
-            onUpdateName={(name: string) => {
-              console.log("name", name);
-              UpdateActiveItem(
-                { ...activeItem!, name: name },
-                activeCollection!,
-              );
-            }}
-          />
+          <div className="flex place-content-between items-center gap-2">
+            <CollectionNameField
+              name={activeItem?.name}
+              onUpdateName={(name: string) => {
+                console.log("name", name);
+                UpdateActiveItem(
+                  { ...activeItem!, name: name },
+                  activeCollection!,
+                );
+              }}
+            />
+            <button
+              onClick={handlePrint}
+              className="flex flex-shrink-0 items-center gap-2 text-sm text-muted-foreground"
+            >
+              <PrinterIcon size={18} />
+              Print
+            </button>
+          </div>
         </div>
-        <div className="z-0 flex h-full flex-grow flex-col overflow-y-auto">
+        <div
+          ref={componentRef}
+          className="z-0 flex h-full flex-grow flex-col overflow-y-auto"
+        >
           <ItemContent
             activeItem={activeItem}
             isEditing={true}
@@ -119,6 +139,7 @@ function CollectionNameField({
 }) {
   return (
     <form
+      className="flex-grow"
       onSubmit={(e: any) => {
         e.preventDefault();
         const value = e.target.name.value;
@@ -130,7 +151,7 @@ function CollectionNameField({
       <Input
         type="text"
         autoFocus
-        className="border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
+        className=" border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
         maxLength={30}
         defaultValue={name}
         required

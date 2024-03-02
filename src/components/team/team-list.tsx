@@ -82,7 +82,7 @@ function TeamCard({ team, index }: any) {
         <UserCircle2Icon className="" size={16} />
         {team?.members?.length}
         <span className="pl-px">
-          {pluralize("member", team.members.length)}
+          {pluralize("member", team?.members?.length)}
         </span>
       </span>
     </Link>

@@ -1,5 +1,6 @@
 // import Mongoose from "mongoose";
 import { ObjectId } from "mongodb";
+import { Plan } from "../types/types";
 // const Schema = Mongoose.Schema;
 
 export const Role = {
@@ -8,10 +9,11 @@ export const Role = {
   Moderator: "Moderator",
 };
 export interface Teams {
-  _id: string;
+  _id: ObjectId;
   name: string;
   description?: string;
   createdBy: ObjectId;
+  plan: Plan;
   members: {
     user: ObjectId;
     role: keyof typeof Role;
@@ -19,6 +21,8 @@ export interface Teams {
   meta: Meta;
   createdAt: Date;
   membersCount: number;
+  billingCycleStart: number;
+  inviteCode: string;
 }
 
 export interface Meta {

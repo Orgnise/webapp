@@ -1,7 +1,7 @@
 import { withAuth } from "@/lib/auth";
 import { Workspace } from "@/lib/models/workspace.model";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { hasValue } from "@/lib/utils";
+import { generateSlug, hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
@@ -70,9 +70,18 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
         );
       }
     } else {
-      slug = workspaceInDb.meta.slug;
+      slug = await generateSlug({
+        title: workspaceInDb.meta.slug,
+        didExist: async (val: string) => {
+          const work = await workspaceDb.findOne({
+            "meta.slug": val,
+            team: new ObjectId(team._id),
+          });
+          return work ? true : false;
+        },
+        suffixLength: 4
+      });
     }
-
     const update = await workspaceDb.updateOne(query, {
       $set: {
         ...data,
@@ -84,7 +93,6 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
         updatedBy: new ObjectId(session.user.id),
       },
     });
-
     return NextResponse.json(
       {
         success: true,

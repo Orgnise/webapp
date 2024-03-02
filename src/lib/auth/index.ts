@@ -1,4 +1,4 @@
-import { PlanProps, Team } from "../types/types";
+import { Plan, Team } from "../types/types";
 
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { getServerSession } from "next-auth/next";
@@ -44,7 +44,7 @@ export const withAuth =
       requiredPlan = ["free", "pro", "business", "enterprise"], // if the action needs a specific plan
       requiredRole = ["admin", "member"],
     }: {
-      requiredPlan?: Array<PlanProps>;
+      requiredPlan?: Array<Plan>;
       requiredRole?: Array<"admin" | "member">;
     } = {},
   ) =>

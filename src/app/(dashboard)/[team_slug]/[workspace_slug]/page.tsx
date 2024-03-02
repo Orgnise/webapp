@@ -7,7 +7,7 @@ import { Fold } from "@/lib/utils";
 import { LightbulbIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 
-export default async function WorkspacePage() {
+export default function WorkspacePage() {
   const [status, setStatus] = useState<"IDLE" | "LOADING">("IDLE");
   const { createCollection, collections, loading } = useCollections();
 

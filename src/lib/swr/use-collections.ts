@@ -62,24 +62,20 @@ export default function useCollections(): IWorkspaces {
       if (collection.object === "collection") {
         const list = [...collections, response.collection];
         // setActiveCollection(response.collection);
-        mutate({ collections: list }, { revalidate: false });
+        mutate({ collections: list }, { revalidate: false, optimisticData: list });
         console.log("Collection created[");
         router.push(
           `/${team_slug}/${workspace_slug}/${response.collection.meta.slug}`,
         );
       } else {
+        console.log("Item created");
         const list = collections.map((c: any) => {
           if (c._id === collection.parent) {
             c.children.push(response.collection);
           }
           return c;
         });
-        mutate(
-          { collections: list },
-          {
-            optimisticData: list,
-          },
-        );
+        mutate({ collections: list }, { revalidate: false, optimisticData: list });
       }
     } catch (error) {
       console.error("error", error);
@@ -164,7 +160,7 @@ export default function useCollections(): IWorkspaces {
           `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`,
         );
       }
-      mutate({ collections: list }, { revalidate: false });
+      mutate({ collections: list }, { revalidate: false, optimisticData: list });
     } catch (error) {
       console.error("error", error);
       throw error;
@@ -179,7 +175,7 @@ export default function useCollections(): IWorkspaces {
     try {
       fetcher(`/api/teams/${teamSlug}/${workspaceSlug}/${collectionSlug}`, {
         method: "DELETE",
-      }).then((data) => {
+      }).then((res) => {
         displayToast({
           title: "Collection deleted",
           description: "Collection has been deleted successfully",
@@ -194,10 +190,7 @@ export default function useCollections(): IWorkspaces {
         if (collectionSlug === activeCollectionSlug) {
           router.replace(`/${teamSlug}/${workspaceSlug}`);
         }
-        mutate(
-          { collections: list },
-          { revalidate: false, optimisticData: list },
-        );
+        mutate({ collections: list }, { revalidate: false, optimisticData: list });
       });
     } catch (error) {
       console.error("error", error);
@@ -270,7 +263,7 @@ export default function useCollections(): IWorkspaces {
   };
 }
 
-function displayToast({
+export function displayToast({
   title,
   description,
   variant = "success",

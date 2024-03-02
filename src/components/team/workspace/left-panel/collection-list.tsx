@@ -145,7 +145,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
           <RenderItem key={index} item={item} collection={collection} />
         )}
         noItemsElement={
-          <div className="-mx-px flex items-center gap-2  border-l py-1  pl-4 text-sm font-medium text-muted-foreground/70">
+          <div className="-mx-px flex items-center gap-2  border-l border-border py-1  pl-4 text-sm font-medium text-muted-foreground/70">
             No items
           </div>
         }

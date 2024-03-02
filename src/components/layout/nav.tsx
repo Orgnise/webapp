@@ -18,7 +18,7 @@ import cx from "classnames";
 import { ChevronsUpDown } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { Logo } from "../atom/logo";
 import { Button } from "../ui/button";
 import { ModeToggle } from "../ui/toggle-theme";
@@ -29,7 +29,7 @@ const Nav = ({}) => {
   const user = session?.user;
 
   return (
-    <div className="flex w-full place-content-between items-center">
+    <div className="flex h-16 w-full place-content-between items-center">
       <div className="flex items-center gap-2">
         <Link href="/" className="Logo flex items-center gap-2">
           <Logo className="h-8" />
@@ -84,11 +84,14 @@ export function TeamToggleDropDown() {
   const { error, loading, teams } = useTeams();
   const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
 
+  const activeTeam = useMemo(
+    () => teams?.find((w) => w?.meta?.slug === team_slug),
+    [teams, team_slug],
+  );
+
   if (!teams || loading) {
     return <TeamToggleDropdownPlaceholder />;
   }
-
-  const activeTeam = teams?.find((w) => w?.meta?.slug === team_slug);
 
   return (
     <div className="ml-4 flex items-center gap-2 bg-background">
@@ -101,7 +104,9 @@ export function TeamToggleDropDown() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="border-border">
-          <DropdownMenuLabel>My Teams</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            <Link href="./">My Teams</Link>
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <div className="flex min-w-[224px] flex-col gap-2.5 rounded p-3">
             {teams.map((team: any, index) => (

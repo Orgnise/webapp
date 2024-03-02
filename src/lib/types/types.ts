@@ -5,7 +5,7 @@ export interface Team {
   name: string;
   description: string;
   members: Member[];
-  plan: PlanProps;
+  plan: Plan;
   meta: Meta;
   createdAt: string;
   createdBy: string;
@@ -24,7 +24,7 @@ export interface Meta {
   slug: string;
 }
 
-export type PlanProps = "free" | "pro" | "business" | "enterprise";
+export type Plan = "free" | "pro" | "business" | "enterprise";
 
 export interface Workspace {
   _id: string;

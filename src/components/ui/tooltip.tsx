@@ -4,6 +4,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const TooltipProvider = TooltipPrimitive.Provider;
 
@@ -41,6 +42,43 @@ function ToolTipWrapper({
         <TooltipContent className="border-border">{content}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+export function CustomTooltipContent({
+  title,
+  cta,
+  href,
+  target,
+  onClick,
+}: {
+  title: string;
+  cta?: string;
+  href?: string;
+  target?: string;
+  onClick?: () => void;
+}) {
+  return (
+    <div className="flex max-w-xs flex-col items-center space-y-3 p-4 text-center">
+      <p className="text-sm ">{title}</p>
+      {cta &&
+        (href ? (
+          <Link
+            href={href}
+            {...(target ? { target } : {})}
+            className="mt-4 w-full rounded-md border border-[#6a7689] bg-gradient-to-b from-[#455062] to-primary  px-3 py-1.5 text-center text-sm text-primary-foreground transition-colors duration-100 hover:from-[#455062]/0 hover:to-primary/0 hover:text-secondary-foreground"
+          >
+            {cta}
+          </Link>
+        ) : onClick ? (
+          <button
+            type="button"
+            className="mt-4 w-full rounded-md border border-[#6a7689] bg-gradient-to-b from-[#455062] to-primary  px-3 py-1.5 text-center text-sm text-primary-foreground transition-colors duration-100 hover:from-[#455062]/0 hover:to-primary/0 hover:text-secondary-foreground"
+            onClick={onClick}
+          >
+            {cta}
+          </button>
+        ) : null)}
+    </div>
   );
 }
 

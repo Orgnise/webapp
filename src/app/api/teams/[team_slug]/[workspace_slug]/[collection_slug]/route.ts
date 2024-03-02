@@ -64,8 +64,9 @@ export const PATCH = withAuth(async ({ req, session }) => {
             "meta.slug": val,
             workspace: new ObjectId(collectionInDb.workspace),
           });
-          return !!work;
+          return work ? true : false;
         },
+        suffixLength: 6,
       });
 
       console.log("slug", slug);

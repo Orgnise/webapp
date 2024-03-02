@@ -13,47 +13,33 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ToolTipWrapper } from "@/components/ui/tooltip";
+import useTeams from "@/lib/swr/use-teams";
 import { hasValue } from "@/lib/utils";
-import { ChevronRightIcon } from "lucide-react";
-import Link from "next/link";
-import { useContext, useState } from "react";
-import { TeamContext } from "../../providers";
+import { useParams } from "next/navigation";
+import { useMemo, useState } from "react";
 
-export default function WorkspaceSettingsPage() {
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-    teamData: { team },
-  } = useContext(TeamContext);
+export default function TeamSettingsPage() {
+  const { teams, error, loading } = useTeams();
+  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
+  const activeTeam = useMemo(
+    () => teams?.find((w) => w?.meta?.slug === team_slug),
+    [teams, team_slug],
+  );
 
   if (loading) {
     return <div>Loading...</div>;
-  } else if (error || !activeWorkspace) {
+  } else if (error || !activeTeam) {
     return (
-      <div className="WorkspaceSettingsPage h-full w-full py-12">
-        <NotFoundView item="Workspace" />
+      <div className="TeamSettingsPage h-full w-full py-12">
+        <NotFoundView item="Team" />
       </div>
     );
   }
   return (
     <div className="WorkspaceSettings">
-      <div className="flex h-28 border-b border-border lg:h-36">
-        <div className="mx-auto flex w-full max-w-screen-xl items-center gap-4 px-2.5 lg:px-20 ">
-          <ToolTipWrapper content={<>Back to workspace</>}>
-            <Link href={`/${team?.meta?.slug}/${activeWorkspace?.meta?.slug}`}>
-              <span className="flex items-center gap-px">
-                <h1 className="text-xl font-medium text-secondary-foreground/80">
-                  {activeWorkspace?.name}
-                </h1>
-              </span>
-            </Link>
-          </ToolTipWrapper>
-          <ChevronRightIcon className="cursor-pointer" size={18} />
-          <span className="flex items-center gap-px">
-            <h1 className="text-xl font-medium text-secondary-foreground/80">
-              Settings
-            </h1>
-          </span>
+      <div className="flex h-28 border-b border-border bg-background lg:h-36">
+        <div className="mx-auto flex w-full max-w-screen-xl items-center gap-4 px-2.5 ">
+          <h1 className="prose-2xl">Settings</h1>
         </div>
       </div>
       <div className="mx-auto flex max-w-screen-md flex-col gap-8 px-4 py-10">
@@ -68,23 +54,28 @@ export default function WorkspaceSettingsPage() {
 function WorkspaceName() {
   const [enableSubmit, setEnableSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-    updateWorkspace,
-  } = useContext(TeamContext);
+  const { teams, error, loading, updateTeamAsync } = useTeams();
+  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
+  const activeTeam = useMemo(
+    () => teams?.find((w) => w?.meta?.slug === team_slug),
+    [teams, team_slug],
+  );
 
   function handleUpdateWorkspace(e: any) {
     e.preventDefault();
     const name = e.target.name.value;
-    if (name === activeWorkspace!.name) {
+    if (!activeTeam || name === activeTeam!.name) {
       return;
     }
-    console.log("name", name, activeWorkspace?.name);
+    console.log("name", name, activeTeam?.name);
     setIsLoading(true);
-    updateWorkspace({
-      ...activeWorkspace!,
-      name,
-    }).finally(() => {
+    updateTeamAsync(
+      {
+        ...activeTeam!,
+        name,
+      },
+      activeTeam.meta.slug,
+    ).finally(() => {
       setIsLoading(false);
     });
   }
@@ -96,22 +87,21 @@ function WorkspaceName() {
     >
       <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
         <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Workspace Name</h2>
+          <h2 className="text-xl font-medium">Team Name</h2>
           <p className="text-sm text-muted-foreground">
             This is the name of your project on Dub.co.
           </p>
         </div>
         <Input
-          placeholder="My workspace"
+          placeholder="My team"
           minLength={3}
           maxLength={32}
           name="name"
           required
-          defaultValue={activeWorkspace!.name}
+          defaultValue={activeTeam!.name}
           onChange={(e) => {
             setEnableSubmit(
-              hasValue(e.target.value) &&
-                e.target.value !== activeWorkspace!.name,
+              hasValue(e.target.value) && e.target.value !== activeTeam!.name,
             );
           }}
         />
@@ -131,26 +121,31 @@ function WorkspaceName() {
 function WorkspaceSlug() {
   const [enableSubmit, setEnableSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-    updateWorkspace,
-  } = useContext(TeamContext);
+  const { teams, error, loading, updateTeamAsync } = useTeams();
+  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
+  const activeTeam = useMemo(
+    () => teams?.find((w) => w?.meta?.slug === team_slug),
+    [teams, team_slug],
+  );
 
   function handleUpdateWorkspace(e: any) {
     e.preventDefault();
     const slug = e.target.slug.value;
-    if (slug === activeWorkspace?.meta?.slug) {
+    if (!activeTeam || slug === activeTeam?.meta?.slug) {
       return;
     }
-    console.log("slug", slug, activeWorkspace?.meta?.slug);
+    console.log("slug", slug, activeTeam?.meta?.slug);
     setIsLoading(true);
-    updateWorkspace({
-      ...activeWorkspace!,
-      meta: {
-        ...activeWorkspace!.meta,
-        slug,
+    updateTeamAsync(
+      {
+        ...activeTeam!,
+        meta: {
+          ...activeTeam!.meta,
+          slug,
+        },
       },
-    }).finally(() => {
+      activeTeam.meta.slug,
+    ).finally(() => {
       setIsLoading(false);
     });
   }
@@ -161,23 +156,22 @@ function WorkspaceSlug() {
     >
       <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
         <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Workspace Slug</h2>
+          <h2 className="text-xl font-medium">Team Slug</h2>
           <p className="text-sm text-muted-foreground">
-            This is your workspace&apos;s unique slug on Pulse
+            This is your team&apos;s unique slug on Pulse
           </p>
         </div>
         <Input
           name="slug"
-          placeholder="my-workspace-slug"
+          placeholder="my-team-slug"
           required
           type="text"
           min={3}
           maxLength={32}
-          defaultValue={activeWorkspace?.meta?.slug}
+          defaultValue={activeTeam?.meta?.slug}
           onChange={(e) => {
             setEnableSubmit(
-              hasValue(e.target.value) &&
-                e.target.value !== activeWorkspace!.name,
+              hasValue(e.target.value) && e.target.value !== activeTeam!.name,
             );
           }}
         />
@@ -201,18 +195,17 @@ function DeleteWorkspace() {
     <div className="rounded-lg border border-destructive bg-card">
       <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
         <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Delete workspace</h2>
+          <h2 className="text-xl font-medium">Delete team</h2>
           <P className="text-muted-foreground">
-            Permanently delete your workspace, and all associated collections +
-            their items. This action cannot be undone - please proceed with
-            caution.
+            Permanently delete your team, and all associated collections + their
+            items. This action cannot be undone - please proceed with caution.
           </P>
         </div>
       </div>
       <div className="flex items-center justify-end space-x-4 rounded-b-lg border-t border-destructive bg-accent/20 p-3 sm:px-10">
         <DeleteWorkspaceModel>
           <Button variant={"destructive"} type="button">
-            <p>Delete workspace</p>
+            <p>Delete team</p>
           </Button>
         </DeleteWorkspaceModel>
       </div>
@@ -226,51 +219,53 @@ interface CerateWorkspaceModelProps {
 
 function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-    deleteWorkspace,
-  } = useContext(TeamContext);
+  const { teams, error, loading, deleteTeamAsync } = useTeams();
+  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
+  const activeTeam = useMemo(
+    () => teams?.find((w) => w?.meta?.slug === team_slug),
+    [teams, team_slug],
+  );
 
-  function handleDeleteWorkspace(e: any) {
+  function handleDeleteTeam(e: any) {
     e.preventDefault();
 
     setIsDeleting(true);
-    deleteWorkspace(activeWorkspace?.meta?.slug!).finally(() => {
+    deleteTeamAsync(activeTeam?.meta?.slug!).finally(() => {
       setIsDeleting(false);
     });
   }
 
   return (
-    <form onSubmit={handleDeleteWorkspace}>
+    <form onSubmit={handleDeleteTeam}>
       <Dialog modal={true}>
         <DialogTrigger asChild>{children}</DialogTrigger>
         <DialogContent className="border-border p-0 sm:max-w-[425px]">
           <DialogHeader className="flex flex-col  gap-4 px-8 pb-4 pt-8">
             <Logo className="h-10" />
-            <DialogTitle className="text-center">Delete workspace</DialogTitle>
+            <DialogTitle className="text-center">Delete team</DialogTitle>
             <DialogDescription className="text-center">
               <P className="text-muted-foreground">
-                Permanently delete your workspace, and all associated
-                collections + their items.
+                Permanently delete your team, and all associated collections +
+                their items.
               </P>
             </DialogDescription>
           </DialogHeader>
           <form className="flex flex-col space-y-6 bg-secondary/60 px-4 py-8 text-left sm:px-8">
             <div>
               <label
-                htmlFor="workspace-slug"
+                htmlFor="team-slug"
                 className="block select-none text-sm font-medium text-muted-foreground"
               >
                 Enter the project slug
                 <span className="cursor-text select-text px-1 font-semibold text-secondary-foreground">
-                  {activeWorkspace?.meta?.slug}
+                  {activeTeam?.meta?.slug}
                 </span>
                 to continue:
               </label>
               <div className="relative mt-1 rounded-md ">
                 <Input
-                  id="workspace-slug"
-                  pattern={activeWorkspace?.meta?.slug}
+                  id="team-slug"
+                  pattern={activeTeam?.meta?.slug}
                   type="text"
                   required
                   autoComplete="off"
@@ -284,14 +279,14 @@ function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
               >
                 To verify, type{" "}
                 <span className="cursor-text select-text font-semibold text-secondary-foreground">
-                  confirm delete workspace
+                  confirm delete team
                 </span>{" "}
                 below
               </label>
               <div className="relative mt-1 rounded-md ">
                 <Input
                   id="verification"
-                  pattern="confirm delete workspace"
+                  pattern="confirm delete team"
                   type="text"
                   autoComplete="off"
                   required
@@ -302,7 +297,7 @@ function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
               type="submit"
               className="group flex h-10 w-full items-center justify-center space-x-2 rounded-md border border-destructive bg-destructive px-4 text-sm text-destructive-foreground transition-all hover:bg-destructive-foreground hover:text-destructive"
             >
-              {isDeleting ? <Spinner /> : <p>Confirm delete workspace</p>}
+              {isDeleting ? <Spinner /> : <p>Confirm delete team</p>}
             </button>
           </form>
         </DialogContent>

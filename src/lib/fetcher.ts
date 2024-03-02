@@ -8,7 +8,7 @@ export async function fetcher<JSON = any>(
   init?: RequestInit,
 ): Promise<JSON> {
   const res = await fetch(input, init);
-
+  const json = await res.json();
   try {
     if (!res.ok) {
       const error = await res.text();
@@ -21,12 +21,12 @@ export async function fetcher<JSON = any>(
     }
   } catch (error) {
     console.error("error[]", error);
-    if (res.body) {
-      const body = await res.json();
-      throw body;
+    if (json) {
+
+      throw json;
     }
     throw error;
   }
 
-  return res.json();
+  return json;
 }

@@ -7,7 +7,7 @@ import Providers from "./providers";
 export default function TeamLayout({ children }: { children: ReactNode }) {
   return (
     <Providers>
-      <TeamAuth>{children}</TeamAuth>;
+      <TeamAuth>{children}</TeamAuth>
     </Providers>
   );
 }

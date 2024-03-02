@@ -39,9 +39,9 @@ export default function TeamsPageClient() {
   return (
     <div className="">
       <div className="flex h-36 items-center border-b border-border bg-background">
-        <div className="mx-auto w-full max-w-screen-xl px-2.5 lg:px-20">
+        <div className="mx-auto w-full max-w-screen-xl px-2.5">
           <div className="flex items-center justify-between">
-            <h1 className="text-lg sm:text-2xl ">My Workspaces</h1>
+            <h1 className="prose-2xl">My Workspaces</h1>
             <CerateWorkspaceModel>
               <Button size={"sm"}>Create Workspace</Button>
             </CerateWorkspaceModel>
@@ -60,7 +60,7 @@ export default function TeamsPageClient() {
           >
             <div className="flex items-center gap-4">
               <Logo className="h-6" />
-              <div>
+              <div className="flex-grow">
                 <H3>{item.name}</H3>
                 {item?.description && (
                   <p className="text-sm ">{item.description}</p>
@@ -108,7 +108,7 @@ export function CerateWorkspaceModel({ children }: CerateWorkspaceModelProps) {
   return (
     <Dialog modal={true}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="p-6">
+      <DialogContent className="border-border p-6">
         <DialogHeader>
           <Label size="h2" variant="t2">
             Create workspace

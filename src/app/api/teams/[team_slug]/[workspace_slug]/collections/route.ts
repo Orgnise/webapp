@@ -181,7 +181,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
       .db(databaseName)
       .collection<CollectionDTO>("collections");
     const slug = await generateSlug({
-      title: collectionToCreate?.name,
+      title: collectionToCreate?.name ?? 'collection ',
       didExist: async (val: string) => {
         const work = await collectionsDb.findOne({
           "meta.slug": val,
@@ -189,6 +189,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
         });
         return !!work;
       },
+      suffixLength: 6
     });
     const collection = {
       team: new ObjectId(team._id),
