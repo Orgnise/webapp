@@ -1,14 +1,14 @@
 "use client";
 import { cn, hasValue } from "@/lib/utils";
 import { Editor as Editor$1 } from "@tiptap/core";
-import { EditorProviderProps } from "@tiptap/react";
+import { type EditorProviderProps } from "@tiptap/react";
 import {
-  Editor,
   EditorBubble,
   EditorCommand,
   EditorCommandEmpty,
   EditorCommandItem,
   EditorContent,
+  EditorInstance,
   EditorRoot,
   defaultEditorProps,
   type JSONContent,
@@ -47,12 +47,15 @@ const TailwindEditor = ({
   const [openColor, setOpenColor] = useState(false);
   const [openLink, setOpenLink] = useState(false);
 
-  const debouncedUpdates = useDebouncedCallback(async (editor: Editor) => {
-    onDebouncedUpdate?.(editor);
-    const json = editor.getJSON();
-    window.localStorage.setItem("novel-content", JSON.stringify(json));
-    setSaveStatus("Saved");
-  }, 500);
+  const debouncedUpdates = useDebouncedCallback(
+    async (editor: EditorInstance) => {
+      onDebouncedUpdate?.(editor);
+      const json = editor.getJSON();
+      window.localStorage.setItem("novel-content", JSON.stringify(json));
+      setSaveStatus("Saved");
+    },
+    500,
+  );
 
   useEffect(() => {
     console.log("Storage Key", storageKey);
@@ -103,7 +106,7 @@ const TailwindEditor = ({
               class: `prose-lg prose-stone dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full`,
             },
           }}
-          onUpdate={({ editor }) => {
+          onUpdate={({ editor }: any) => {
             debouncedUpdates(editor);
             setSaveStatus("Unsaved");
           }}
