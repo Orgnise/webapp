@@ -4,10 +4,12 @@ import { fetcher } from "../fetcher";
 import { Team } from "../types/types";
 import { displayToast } from "./use-collections";
 import { useParams, useRouter } from "next/navigation";
+import { useMemo } from "react";
 interface ITeam {
   error: any;
   loading: boolean;
   teams: Team[];
+  activeTeam?: Team;
   mutate: KeyedMutator<any>;
   exceedingFreeTeam: boolean;
   createTeamAsync: (team: Team) => Promise<void>;
@@ -134,15 +136,21 @@ export default function useTeams(): ITeam {
 
   const teams = data?.teams?.map((team: Team) => ({
     ...team,
-    isOwner: team?.members && team.members[0].role.toLowerCase() === "admin",
+    isOwner: team?.members && team?.members?.[0]?.role.toLowerCase() === "owner",
   }));
 
   const freeProjects = teams?.filter(
     (team: any) => (team.plan === "free" || !team.plan) && team.isOwner,
   );
 
+  const activeTeam = useMemo(
+    () => data?.teams?.find((w: any) => w?.meta?.slug === param.team_slug),
+    [teams, param.team_slug],
+  ) as Team | undefined;
+
 
   return {
+    activeTeam: activeTeam,
     teams: data?.teams,
     error,
     mutate,

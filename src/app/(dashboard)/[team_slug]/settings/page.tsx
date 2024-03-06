@@ -37,16 +37,12 @@ export default function TeamSettingsPage() {
   }
   return (
     <div className="WorkspaceSettings">
-      <div className="flex h-28 border-b border-border bg-background lg:h-36">
-        <div className="mx-auto flex w-full max-w-screen-xl items-center gap-4 px-2.5 ">
-          <h1 className="prose-2xl">Settings</h1>
-        </div>
-      </div>
-      <div className="mx-auto flex max-w-screen-md flex-col gap-8 px-4 py-10">
+      <div className="mx-auto  grid max-w-screen-md flex-col gap-8 px-4 ">
         <WorkspaceName />
         <WorkspaceSlug />
         <DeleteWorkspace />
       </div>
+      {/* </div> */}
     </div>
   );
 }
@@ -89,7 +85,7 @@ function WorkspaceName() {
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Team Name</h2>
           <p className="text-sm text-muted-foreground">
-            This is the name of your project on Dub.co.
+            This is the name of your project on Pulse
           </p>
         </div>
         <Input

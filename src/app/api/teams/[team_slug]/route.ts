@@ -5,7 +5,8 @@ import { ObjectId } from "mongodb";
 import { Teams } from "@/lib/models/team.modal";
 import { Team } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
-// GET /api/projects/[slug] – get a specific project
+
+// GET /api/team/[slug] – get a specific team
 export const GET = withAuth(async ({ team, headers }) => {
   return NextResponse.json(team, { headers });
 });

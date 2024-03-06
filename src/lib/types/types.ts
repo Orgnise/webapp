@@ -5,17 +5,37 @@ export interface Team {
   name: string;
   description: string;
   members: Member[];
+  projectUsers: ProjectUsers[];
   plan: Plan;
   meta: Meta;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
+  billingCycleStart: number;
+  inviteCode: string;
 }
 
 export interface Member {
   user: string;
   role: "admin" | "member";
   _id: string;
+}
+export interface ProjectUsers {
+  _id: string;
+  role: "admin" | "member";
+  user: User;
+  projectId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface UserProps {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  createdAt: Date;
+  role: "owner" | "member";
+  projects?: { projectId: string }[];
 }
 
 export interface Meta {

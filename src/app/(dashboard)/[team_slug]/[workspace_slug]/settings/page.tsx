@@ -98,7 +98,7 @@ function WorkspaceName() {
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Workspace Name</h2>
           <p className="text-sm text-muted-foreground">
-            This is the name of your project on Dub.co.
+            This is the name of your project on Pulse
           </p>
         </div>
         <Input

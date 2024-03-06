@@ -80,9 +80,62 @@ export const withAuth =
       }
       const client = await mongodb;
       const teamsCollection = client.db(databaseName).collection<Teams>("teams");
-      const team = (await teamsCollection.findOne({
-        "meta.slug": team_slug,
-      })) as unknown as Team;
+      // const team = (await teamsCollection.findOne({
+      //   "meta.slug": team_slug,
+      // })) as unknown as Team;
+      const teamList = await teamsCollection.aggregate([
+        {
+          $match: {
+            "meta.slug": team_slug,
+          },
+        },
+        {
+          $lookup: {
+            from: "teamUsers",
+            localField: "_id",
+            foreignField: "teamId",
+            as: "members",
+          },
+        },
+        {
+          $unwind: {
+            path: "$members",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "members.user",
+            foreignField: "_id",
+            as: "members.user",
+          },
+        },
+        {
+          $unwind: {
+            path: "$members.user",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        // {
+        //   $project: {
+        //     name: 1,
+        //     plan: 1,
+        //     members: {
+        //       $cond: {
+        //         if: { $eq: ["$members", null] },
+        //         then: [],
+        //         else: {
+        //           user: "$members.user._id",
+        //           // role: "$members.role",
+        //         },
+        //       },
+        //     },
+        //   },
+        // },
+      ]).toArray();
+
+      const team = teamList[0] as Team;
 
       if (!team || !team.members) {
         // project doesn't exist

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { NextAuthOptions } from "@/lib/auth/auth";
-import { Role, Teams } from "@/lib/models/team.modal";
+import { Role, TeamUsers, Teams } from "@/lib/models/team.modal";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
@@ -10,7 +10,7 @@ import { Team } from "@/lib/types/types";
 import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
 
 
-
+// GET /api/teams - get all teams for the current user
 export async function GET(request: NextRequest) {
   const client = await mongoDb;
   await client.connect();
@@ -28,9 +28,71 @@ export async function GET(request: NextRequest) {
       );
     }
     const teams = client.db(databaseName).collection<Teams>("teams");
-    const query = { createdBy: new ObjectId(session?.user?.id) };
-    const dbResult = await teams.aggregate([{ $match: query }]).toArray();
-    return NextResponse.json({ teams: dbResult });
+
+
+    // const temUsersResult = await teamUsersDb.aggregate([{ $match: query }]).toArray();
+    // const teamIds = temUsersResult.map((team) => team.teamId) as ObjectId[];
+
+    // const dbResult = await teams.find({ _id: { $in: teamIds } }).toArray();
+    const teamList = await teams.aggregate([
+
+      {
+        $lookup: {
+          from: "teamUsers",
+          localField: "_id",
+          foreignField: "teamId",
+          as: "members",
+        },
+      },
+      {
+        $unwind: {
+          path: "$members",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "members.user",
+          foreignField: "_id",
+          as: "members.user",
+        },
+      },
+      {
+        $unwind: {
+          path: "$members.user",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      // Search the session user from members and append with role in members
+      {
+        $project: {
+          name: 1,
+          plan: 1,
+          meta: 1,
+          description: 1,
+          inviteCode: 1,
+          members: 1
+          // {
+          //   $cond: {
+          //     if: { $eq: ["$members", null] },
+          //     then: [],
+          //     else: {
+          //       user: "$members.user._id",
+          //       role: "$members.users.role",
+          //     },
+          //   },
+          // },
+        },
+      },
+      {
+        $match: {
+          "members.users.user": new ObjectId(session.user.id),
+        },
+      },
+    ]).toArray() as Teams[];
+
+    return NextResponse.json({ teams: teamList });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, message: "Operation failed", error: err.toString() },
@@ -69,13 +131,14 @@ export async function POST(req: NextRequest) {
     }
 
     const teams = client.db(databaseName).collection<Teams>("teams");
+    const teamUsersDb = client.db(databaseName).collection<TeamUsers>("teamUsers");
 
     const freeTeams = await teams.find({
       $and: [
         { plan: "free" },
         {
           members: {
-            $elemMatch: { user: new ObjectId(session.user.id), role: Role.Admin },
+            $elemMatch: { user: new ObjectId(session.user.id), role: "owner" },
           },
         }
       ]
@@ -104,7 +167,7 @@ export async function POST(req: NextRequest) {
       name: team.name,
       description: team.description,
       createdBy: new ObjectId(session.user.id),
-      members: [{ user: new ObjectId(session.user.id), role: Role.Admin }],
+      // members: [{ user: new ObjectId(session.user.id), role: 'owner' }],
       plan: 'free',
       meta: {
         title: team.name,
@@ -115,11 +178,40 @@ export async function POST(req: NextRequest) {
       billingCycleStart: new Date().getDate(),
       inviteCode: randomId(16),
     } as Teams;
-    const insertResult = await teams.insertOne(freeTeam);
+
+    // Create team
+    const teamResult = await teams.insertOne(freeTeam);
+
+    // Add user to team
+    const teamUser = await teamUsersDb.insertOne(
+      {
+        teamId: teamResult.insertedId,
+        users: [
+          {
+            role: "owner",
+            user: new ObjectId(session.user.id),
+            teamId: teamResult.insertedId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+      },
+    )
+
+    // Update team with teamUsers
+    await teams.updateOne(
+      { _id: teamResult.insertedId },
+      {
+        $set: {
+          teamUsers: new ObjectId(teamUser.insertedId),
+          membersCount: 1,
+        },
+      },
+    );
 
     const customTeam = {
       ...freeTeam,
-      _id: insertResult.insertedId,
+      _id: teamResult.insertedId,
     } as Teams;
     return NextResponse.json({ team: customTeam });
   } catch (err: any) {
