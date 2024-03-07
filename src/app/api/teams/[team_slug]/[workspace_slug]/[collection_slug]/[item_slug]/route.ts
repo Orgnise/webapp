@@ -1,5 +1,5 @@
 import { withAuth } from "@/lib/auth";
-import { Workspace } from "@/lib/models/workspace.model";
+import { WorkspaceSchema } from "@/lib/models/workspace.model";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
@@ -54,9 +54,7 @@ export const PATCH = withAuth(async ({ req, session }) => {
         ...data,
         name: hasValue(item?.name)
           ? item?.name
-          : hasValue(itemInDb.title)
-            ? itemInDb.title
-            : itemInDb.name,
+          : itemInDb.name,
         updatedAt: new Date().toISOString(),
         updatedBy: new ObjectId(session.user.id),
       },
@@ -92,7 +90,7 @@ export const DELETE = withAuth(async ({ req, params, team }) => {
     const workspace = (await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as Workspace;
+    })) as unknown as WorkspaceSchema;
     if (!workspace) {
       return NextResponse.json(
         {

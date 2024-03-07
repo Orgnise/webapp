@@ -1,5 +1,5 @@
 import { withAuth } from "@/lib/auth";
-import { Workspace } from "@/lib/models/workspace.model";
+import { WorkspaceSchema } from "@/lib/models/workspace.model";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -11,7 +11,7 @@ export const GET = withAuth(async ({ team, headers, session, params }) => {
     const userId = session?.user?.id;
     const workspaces = client
       .db(databaseName)
-      .collection<Workspace>("workspaces");
+      .collection<WorkspaceSchema>("workspaces");
     const query = {
       team: new ObjectId(team._id),
       members: { $elemMatch: { user: new ObjectId(userId) } },
@@ -39,7 +39,7 @@ export const POST = withAuth(async ({ team, session, req }) => {
     const userId = session?.user?.id;
     const workspaces = client
       .db(databaseName)
-      .collection<Workspace>("workspaces");
+      .collection<WorkspaceSchema>("workspaces");
     const slug = await generateSlug({
       title: body.name,
       didExist: async (val: string) => {
@@ -52,7 +52,7 @@ export const POST = withAuth(async ({ team, session, req }) => {
       team: new ObjectId(team._id),
       members: [
         {
-          role: "Admin",
+          role: "owner",
           user: new ObjectId(userId),
         },
       ],
@@ -67,7 +67,7 @@ export const POST = withAuth(async ({ team, session, req }) => {
       createdAt: new Date().toISOString(),
       createdBy: new ObjectId(userId),
       updatedAt: new Date().toISOString(),
-    } as Workspace;
+    } as WorkspaceSchema;
 
     const dbResult = await workspaces.insertOne(workspace);
     return NextResponse.json({

@@ -2,14 +2,14 @@ import { withAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { TeamUsers, Teams } from "@/lib/models/team.modal";
+import { TeamUserSchema, TeamSchema } from "@/lib/models/team.modal";
 import { Team } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 
 export const GET = withAuth(async ({ team, headers }) => {
   const client = await mongoDb;
   // const teamsDb = client.db(databaseName).collection("teams");
-  const teamUsersDb = client.db(databaseName).collection<TeamUsers>("teamUsers");
+  const teamUsersDb = client.db(databaseName).collection<TeamUserSchema>("teamUsers");
   const query = { teamId: new ObjectId(team._id) };
   const teamData = await teamUsersDb.findOne(query);
   if (!hasValue(teamData)) {

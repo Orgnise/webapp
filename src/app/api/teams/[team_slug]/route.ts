@@ -2,7 +2,7 @@ import { withAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { Teams } from "@/lib/models/team.modal";
+import { TeamSchema } from "@/lib/models/team.modal";
 import { Team } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 
@@ -93,7 +93,7 @@ export const DELETE = withAuth(async ({ params, team }) => {
   try {
     const client = await mongoDb;
 
-    const teamsDb = client.db(databaseName).collection<Teams>("teams");
+    const teamsDb = client.db(databaseName).collection<TeamSchema>("teams");
     const collectionsDb = client.db(databaseName).collection("collections");
     const workspaceDb = client.db(databaseName).collection("workspaces");
     const deleteQuery = {

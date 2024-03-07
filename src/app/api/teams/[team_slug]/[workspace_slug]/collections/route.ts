@@ -1,6 +1,6 @@
 import { withAuth } from "@/lib/auth";
-import { CollectionDTO } from "@/lib/models/collection.model";
-import { Workspace } from "@/lib/models/workspace.model";
+import { CollectionSchema } from "@/lib/models/collection.model";
+import { WorkspaceSchema } from "@/lib/models/workspace.model";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { generateSlug } from "@/lib/utils";
@@ -18,11 +18,11 @@ export const GET = withAuth(async ({ team, params }) => {
 
     const workspaces = client
       .db(databaseName)
-      .collection<Workspace>("workspaces");
+      .collection<WorkspaceSchema>("workspaces");
     const workspaceDate = (await workspaces.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as Workspace;
+    })) as unknown as WorkspaceSchema;
 
     if (!workspaceDate) {
       return NextResponse.json(
@@ -159,7 +159,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
     }
     const workspaceDb = client
       .db(databaseName)
-      .collection<CollectionDTO>("workspaces");
+      .collection<CollectionSchema>("workspaces");
     const workspace = await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
@@ -179,7 +179,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
 
     const collectionsDb = client
       .db(databaseName)
-      .collection<CollectionDTO>("collections");
+      .collection<CollectionSchema>("collections");
     const slug = await generateSlug({
       title: collectionToCreate?.name ?? 'collection ',
       didExist: async (val: string) => {
@@ -216,7 +216,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: new ObjectId(session.user.id),
-    } as CollectionDTO;
+    } as CollectionSchema;
 
     const dbResult = await collectionsDb.insertOne(collection);
     return NextResponse.json({

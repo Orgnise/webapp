@@ -1,5 +1,5 @@
 import { withAuth } from "@/lib/auth";
-import { Workspace } from "@/lib/models/workspace.model";
+import { WorkspaceSchema } from "@/lib/models/workspace.model";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { generateSlug, hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -10,7 +10,7 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
   try {
     const client = await mongoDb;
     const { workspace: reqWorkspace } = (await req.json()) as {
-      workspace: Workspace;
+      workspace: WorkspaceSchema;
     };
 
     if (!reqWorkspace || !ObjectId.isValid(reqWorkspace!._id)) {
@@ -28,7 +28,7 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
     const query = { _id: new ObjectId(reqWorkspace._id) };
     const workspaceInDb = (await workspaceDb.findOne(
       query,
-    )) as unknown as Workspace;
+    )) as unknown as WorkspaceSchema;
 
     if (!workspaceInDb) {
       return NextResponse.json(
@@ -124,7 +124,7 @@ export const DELETE = withAuth(async ({ params }) => {
     const query = { "meta.slug": workspace_slug };
     const workspaceInDb = (await workspaceDb.findOne(
       query,
-    )) as unknown as Workspace;
+    )) as unknown as WorkspaceSchema;
 
     if (!workspaceInDb) {
       return NextResponse.json(

@@ -2,7 +2,7 @@ import { Plan, Team } from "../types/types";
 
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { getServerSession } from "next-auth/next";
-import { Teams } from "../models/team.modal";
+import { TeamSchema } from "../models/team.modal";
 import { getSearchParams } from "../url";
 import { NextAuthOptions } from "./auth";
 
@@ -79,7 +79,7 @@ export const withAuth =
         });
       }
       const client = await mongodb;
-      const teamsCollection = client.db(databaseName).collection<Teams>("teams");
+      const teamsCollection = client.db(databaseName).collection<TeamSchema>("teams");
       // const team = (await teamsCollection.findOne({
       //   "meta.slug": team_slug,
       // })) as unknown as Team;

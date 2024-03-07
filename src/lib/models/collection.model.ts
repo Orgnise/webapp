@@ -2,9 +2,9 @@
 // const Schema = Mongoose.Schema;
 
 import { ObjectId } from "mongodb";
-import { Meta } from "./team.modal";
+import { MetaSchema } from "./team.modal";
 
-export interface CollectionDTO {
+export interface CollectionSchema {
   _id: string;
   object: "item" | "collection";
   workspace: ObjectId;
@@ -18,7 +18,7 @@ export interface CollectionDTO {
   name: string;
   content: string;
   sortIndex: number;
-  meta: Meta;
+  meta: MetaSchema;
   createdAt: string;
   createdBy: ObjectId;
   updatedBy?: ObjectId;

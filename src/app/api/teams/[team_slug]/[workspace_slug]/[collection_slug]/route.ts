@@ -1,6 +1,6 @@
 import { withAuth } from "@/lib/auth";
-import { CollectionDTO } from "@/lib/models/collection.model";
-import { Workspace } from "@/lib/models/workspace.model";
+import { CollectionSchema } from "@/lib/models/collection.model";
+import { WorkspaceSchema } from "@/lib/models/workspace.model";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { generateSlug, hasValue } from "@/lib/utils";
@@ -28,7 +28,7 @@ export const PATCH = withAuth(async ({ req, session }) => {
     const query = { _id: new ObjectId(collection._id), object: "collection" };
     const collectionInDb = (await collectionsDb.findOne(
       query,
-    )) as unknown as CollectionDTO;
+    )) as unknown as CollectionSchema;
 
     if (!collectionInDb) {
       return NextResponse.json(
@@ -124,7 +124,7 @@ export const DELETE = withAuth(async ({ params, team }) => {
     const workspace = (await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as Workspace;
+    })) as unknown as WorkspaceSchema;
     if (!workspace) {
       return NextResponse.json(
         {

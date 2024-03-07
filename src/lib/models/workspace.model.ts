@@ -1,18 +1,18 @@
-import { Meta, Role } from "./team.modal";
+import { MetaSchema, Role } from "./team.modal";
 
 import { ObjectId } from "mongodb";
 
-export interface Workspace {
+export interface WorkspaceSchema {
   _id: string;
   team: ObjectId;
   name: string;
   description: string;
   members: {
     user: ObjectId;
-    role: keyof typeof Role;
+    role: Role;
   }[];
   visibility: keyof typeof Visibility;
-  meta: Meta;
+  meta: MetaSchema;
   createdAt: string;
   updatedAt: string;
   createdBy: ObjectId;

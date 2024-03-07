@@ -1,7 +1,7 @@
 import { Logo } from "@/components/atom/logo";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getSession } from "@/lib/auth";
-import { TeamUsers, Teams } from "@/lib/models/team.modal";
+import { TeamSchema, TeamUserSchema } from "@/lib/models/team.modal";
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
@@ -81,10 +81,10 @@ async function VerifyInvite({ code }: { code: string }) {
   const teamsDb = client.db(databaseName).collection("teams");
   const teamUsersDb = client
     .db(databaseName)
-    .collection<TeamUsers>("teamUsers");
+    .collection<TeamUserSchema>("teamUsers");
   const team = (await teamsDb.findOne({
     inviteCode: code,
-  })) as unknown as Teams;
+  })) as unknown as TeamSchema;
   const user = await teamUsersDb.findOne({
     teamId: new ObjectId(team._id),
     users: {

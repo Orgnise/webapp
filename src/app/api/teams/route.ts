@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { NextAuthOptions } from "@/lib/auth/auth";
-import { Role, TeamUsers, Teams } from "@/lib/models/team.modal";
+import { TeamUserSchema, TeamSchema } from "@/lib/models/team.modal";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         { status: 400 },
       );
     }
-    const teams = client.db(databaseName).collection<Teams>("teams");
+    const teams = client.db(databaseName).collection<TeamSchema>("teams");
 
 
     // const temUsersResult = await teamUsersDb.aggregate([{ $match: query }]).toArray();
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
           "members.users.user": new ObjectId(session.user.id),
         },
       },
-    ]).toArray() as Teams[];
+    ]).toArray() as TeamSchema[];
 
     return NextResponse.json({ teams: teamList });
   } catch (err: any) {
@@ -130,8 +130,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const teams = client.db(databaseName).collection<Teams>("teams");
-    const teamUsersDb = client.db(databaseName).collection<TeamUsers>("teamUsers");
+    const teams = client.db(databaseName).collection<TeamSchema>("teams");
+    const teamUsersDb = client.db(databaseName).collection<TeamUserSchema>("teamUsers");
 
     const freeTeams = await teams.find({
       $and: [
@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
 
       billingCycleStart: new Date().getDate(),
       inviteCode: randomId(16),
-    } as Teams;
+    } as TeamSchema;
 
     // Create team
     const teamResult = await teams.insertOne(freeTeam);
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
     const customTeam = {
       ...freeTeam,
       _id: teamResult.insertedId,
-    } as Teams;
+    } as TeamSchema;
     return NextResponse.json({ team: customTeam });
   } catch (err: any) {
     return NextResponse.json(

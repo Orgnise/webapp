@@ -71,10 +71,6 @@ export interface Collection {
   children: any;
   parent: any;
   team: Team;
-  /**
-   * @deprecated title is deprecated, use name instead
-   */
-  title: string;
   name: string;
   content: any;
   sortIndex: number;
