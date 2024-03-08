@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { NextAuthOptions } from "@/lib/auth/auth";
-import { TeamUserSchema, TeamSchema } from "@/lib/models/team.modal";
+import { TeamUserSchema, TeamSchema } from "@/lib/schema/team.schema";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
@@ -177,6 +177,8 @@ export async function POST(req: NextRequest) {
 
       billingCycleStart: new Date().getDate(),
       inviteCode: randomId(16),
+      membersLimit: 2,
+      workspaceLimit: 3,
     } as TeamSchema;
 
     // Create team

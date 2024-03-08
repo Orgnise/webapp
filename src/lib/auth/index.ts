@@ -2,7 +2,7 @@ import { Plan, Team } from "../types/types";
 
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { getServerSession } from "next-auth/next";
-import { TeamSchema } from "../models/team.modal";
+import { TeamSchema } from "../schema/team.schema";
 import { getSearchParams } from "../url";
 import { NextAuthOptions } from "./auth";
 

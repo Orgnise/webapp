@@ -1,34 +1,41 @@
 "use client";
 
-import { useState } from "react";
-
 import Label from "@/components/atom/label";
+import { Spinner } from "@/components/atom/spinner";
 import { TextField } from "@/components/molecule/text-field";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export function LoginForm() {
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setError] = useState<{
     email?: string;
     password?: string;
     other?: string;
   }>({});
 
+  const searchParams = useSearchParams();
+  const next = searchParams?.get("next");
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     setError({});
+    setIsLoading(true);
     const email = e.target?.email?.value;
     const password = e.target.password?.value;
     await signIn("credentials", {
       email: email,
       password: password,
-      callbackUrl: "/",
+      callbackUrl: next && next.length > 0 ? next : "/",
     }).catch((error) => {
       console.log(error);
     });
+    setIsLoading(false);
   };
 
   return (
@@ -65,7 +72,14 @@ export function LoginForm() {
         wrapperClassName="w-9/12"
       />
       <Button className="mt-4 w-9/12" type="submit">
-        Log in
+        {isLoading ? (
+          <span className="flex items-center gap-1">
+            <Spinner className="h-6" />
+            <span>Logging In</span>
+          </span>
+        ) : (
+          "Login"
+        )}
       </Button>
       <div
         className="flex h-8 items-end space-x-1"
@@ -121,7 +135,7 @@ export function LoginForm() {
         </button>
         {/* Twitter Login */}
         <button
-          className=" rounded-full bg-white p-2 shadow"
+          className=" rounded-full bg-card p-2 shadow"
           onClick={async (e) => {
             e.preventDefault();
             // googleLogin();

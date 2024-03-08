@@ -1,4 +1,4 @@
-import { Visibility } from "../models/workspace.model";
+import { Visibility } from "../schema/workspace.schema";
 
 export interface Team {
   _id: string;
@@ -13,6 +13,8 @@ export interface Team {
   updatedAt: string;
   billingCycleStart: number;
   inviteCode: string;
+  membersLimit: number;
+  workspaceLimit: number;
 }
 
 export interface Member {

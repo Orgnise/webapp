@@ -1,6 +1,6 @@
 import { withAuth } from "@/lib/auth";
-import { CollectionSchema } from "@/lib/models/collection.model";
-import { WorkspaceSchema } from "@/lib/models/workspace.model";
+import { CollectionSchema } from "@/lib/schema/collection.schema";
+import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { generateSlug } from "@/lib/utils";

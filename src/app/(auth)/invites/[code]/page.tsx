@@ -1,8 +1,8 @@
 import { Logo } from "@/components/atom/logo";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getSession } from "@/lib/auth";
-import { TeamSchema, TeamUserSchema } from "@/lib/models/team.modal";
 import mongodb, { databaseName } from "@/lib/mongodb";
+import { TeamSchema, TeamUserSchema } from "@/lib/schema/team.schema";
 import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -13,7 +13,7 @@ const PageCopy = ({ title, message }: { title: string; message: string }) => {
   return (
     <>
       <h1 className="font-display text-3xl font-bold sm:text-4xl">{title}</h1>
-      <p className="max-w-lg text-gray-600 [text-wrap:balance] sm:text-lg">
+      <p className="max-w-lg text-muted-foreground [text-wrap:balance] sm:text-lg">
         {message}
       </p>
     </>
@@ -51,46 +51,19 @@ async function VerifyInvite({ code }: { code: string }) {
   const session = await getSession();
 
   if (!session) {
+    console.log("no session");
     redirect("/login");
   }
 
-  // const project = await prisma.project.findUnique({
-  //   where: {
-  //     inviteCode: code,
-  //   },
-  //   select: {
-  //     id: true,
-  //     slug: true,
-  //     usersLimit: true,
-  //     users: {
-  //       where: {
-  //         userId: session.user.id,
-  //       },
-  //       select: {
-  //         role: true,
-  //       },
-  //     },
-  //     _count: {
-  //       select: {
-  //         users: true,
-  //       },
-  //     },
-  //   },
-  // });
   const client = await mongodb;
   const teamsDb = client.db(databaseName).collection("teams");
   const teamUsersDb = client
     .db(databaseName)
     .collection<TeamUserSchema>("teamUsers");
+
   const team = (await teamsDb.findOne({
     inviteCode: code,
   })) as unknown as TeamSchema;
-  const user = await teamUsersDb.findOne({
-    teamId: new ObjectId(team._id),
-    users: {
-      $elemMatch: { user: new ObjectId(session.user.id) },
-    },
-  });
 
   if (!team) {
     return (
@@ -103,27 +76,33 @@ async function VerifyInvite({ code }: { code: string }) {
     );
   }
 
+  const teamUsers = (await teamUsersDb.findOne({
+    teamId: new ObjectId(team._id),
+    // users: {
+    //   $elemMatch: { user: new ObjectId(session.user.id) },
+    // },
+  })) as unknown as TeamUserSchema;
+
   // check if user is already in the project
+  const user = teamUsers.users.find((u) =>
+    u.user.equals(new ObjectId(session.user.id)),
+  );
   if (user) {
     redirect(`/${team.meta.slug}`);
   }
 
-  // if (project._count.users >= project.usersLimit) {
-  //   return (
-  //     <PageCopy
-  //       title="User Limit Reached"
-  //       message="The project you are trying to join is currently full. Please contact the project owner for more information."
-  //     />
-  //   );
-  // }
+  // check if team is full
+  if (teamUsers.users.length >= team.membersLimit) {
+    return (
+      <PageCopy
+        title="User Limit Reached"
+        message="The team you are trying to join is currently full. Please contact the project owner for more information."
+      />
+    );
+  }
 
-  // await prisma.projectUsers.create({
-  //   data: {
-  //     userId: session.user.id,
-  //     projectId: project.id,
-  //   },
-  // });
-  const akg = await teamUsersDb.findOneAndUpdate(
+  // add user to team
+  await teamUsersDb.findOneAndUpdate(
     {
       teamId: new ObjectId(team._id),
     },
@@ -139,6 +118,5 @@ async function VerifyInvite({ code }: { code: string }) {
       },
     },
   );
-  console.log("akg", akg);
   redirect(`/${team.meta.slug}`);
 }

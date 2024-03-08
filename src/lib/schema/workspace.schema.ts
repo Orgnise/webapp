@@ -1,4 +1,4 @@
-import { MetaSchema, Role } from "./team.modal";
+import { MetaSchema, Role } from "./team.schema";
 
 import { ObjectId } from "mongodb";
 

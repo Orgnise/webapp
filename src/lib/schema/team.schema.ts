@@ -20,6 +20,8 @@ export interface TeamSchema {
   membersCount: number;
   billingCycleStart: number;
   inviteCode: string;
+  membersLimit: number;
+  workspaceLimit: number;
 }
 
 export interface MetaSchema {

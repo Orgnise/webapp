@@ -2,7 +2,7 @@
 // const Schema = Mongoose.Schema;
 
 import { ObjectId } from "mongodb";
-import { MetaSchema } from "./team.modal";
+import { MetaSchema } from "./team.schema";
 
 export interface CollectionSchema {
   _id: string;

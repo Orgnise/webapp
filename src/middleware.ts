@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getToken } from "next-auth/jwt";
+import { parse } from "./lib/utils";
 
 export const config = {
   matcher: [
@@ -25,7 +26,7 @@ export const middleware = async (req: NextRequest) => {
   });
 
   const loggedIn = session?.user ? true : false;
-  const path = req.nextUrl.pathname;
+  const { path, fullPath } = parse(req);
 
   if (["/terms", "/policy"].includes(path)) {
     return NextResponse.next();
@@ -35,8 +36,9 @@ export const middleware = async (req: NextRequest) => {
     !["/login", "/signup", "terms", "policy"].includes(path) &&
     !loggedIn
   ) {
+    console.log("redirecting to login", path);
     return NextResponse.redirect(
-      new URL("/login", req.nextUrl.origin),
+      new URL(`/login${path === "/" ? "" : `?next=${encodeURIComponent(fullPath)}`}`, req.url),
     );
   }
 

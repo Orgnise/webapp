@@ -1,5 +1,5 @@
 import { withAuth } from "@/lib/auth";
-import { WorkspaceSchema } from "@/lib/models/workspace.model";
+import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";

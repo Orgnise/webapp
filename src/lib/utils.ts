@@ -2,6 +2,7 @@ import slugify from "@sindresorhus/slugify";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { nanoid } from 'nanoid'
+import { NextRequest } from "next/server";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -156,3 +157,14 @@ export function randomId(length: number = 21): string {
 export function pluralize(word: string, count: number): string {
   return count === 1 ? word : `${word}s`;
 }
+
+export const parse = (req: NextRequest) => {
+  // path is the path of the URL (e.g. pulse.com/home/settings -> /home/settings)
+  let path = req.nextUrl.pathname;
+
+  // fullPath is the full URL path (along with search params)
+  const searchParams = req.nextUrl.searchParams.toString();
+  const fullPath = `${path}${searchParams.length > 0 ? `?${searchParams}` : ""}`;
+
+  return { path, fullPath };
+};

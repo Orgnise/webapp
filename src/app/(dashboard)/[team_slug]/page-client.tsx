@@ -19,7 +19,7 @@ import { TextField } from "@/components/molecule/text-field";
 import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view";
 import { Button } from "@/components/ui/button";
 import { ListView } from "@/components/ui/listview";
-import { Visibility } from "@/lib/models/workspace.model";
+import { Visibility } from "@/lib/schema/workspace.schema";
 import { Workspace } from "@/lib/types/types";
 import Link from "next/link";
 import { useParams } from "next/navigation";

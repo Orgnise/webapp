@@ -2,7 +2,7 @@ import { withAuth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
-import { TeamSchema } from "@/lib/models/team.modal";
+import { TeamSchema } from "@/lib/schema/team.schema";
 import { Team } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 
