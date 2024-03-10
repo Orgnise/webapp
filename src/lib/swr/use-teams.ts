@@ -136,8 +136,6 @@ export default function useTeams(): ITeam {
 
   const teams = data?.teams?.map((team: Team) => ({
     ...team,
-    // isOwner: team?.members && team?.members?.[0]?.role.toLowerCase() === "owner",
-    // @ts-ignore
     isOwner: team.role === "owner",
   }));
 
@@ -147,7 +145,7 @@ export default function useTeams(): ITeam {
 
   const activeTeam = useMemo(
     () => data?.teams?.find((w: any) => w?.meta?.slug === param.team_slug),
-    [teams, param.team_slug],
+    [data?.teams, param.team_slug],
   ) as Team | undefined;
 
 

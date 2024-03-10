@@ -5,8 +5,8 @@ export interface Team {
   _id: string;
   name: string;
   description: string;
-  // members: Member[];
   teamMembers: ProjectUsers[];
+  role: Role;
   plan: Plan;
   meta: Meta;
   createdAt: string;

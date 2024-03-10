@@ -16,8 +16,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="min-h-screen w-full bg-accent/30">
         <NavbarLayout>
           <Nav />
-          {/* @ts-ignore */}
-          {activeTeam && activeTeam.isOwner && (
+          {activeTeam && activeTeam.role === "owner" && (
             <Suspense fallback={<div className="h-12 w-full" />}>
               <NavTabs />
             </Suspense>

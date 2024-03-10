@@ -51,19 +51,19 @@ export default function TeamsPageClient() {
       <ListView
         items={workspacesData?.workspaces}
         loading={workspacesData.loading}
-        className="mx-auto grid max-w-screen-xl grid-cols-1   gap-5 px-2.5 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-20"
+        className="mx-auto grid max-w-screen-xl grid-cols-1 gap-5 px-2.5 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-20"
         renderItem={(item: Workspace, index: number) => (
           <Link
             key={index}
             href={`${team_slug}/${item.meta.slug}`}
-            className="flex h-32 w-full cursor-pointer place-content-between items-start rounded border border-border bg-card p-6 hover:text-accent-foreground  hover:shadow"
+            className=" flex h-32 w-full cursor-pointer place-content-between items-start rounded border border-border bg-card p-6 hover:text-accent-foreground  hover:shadow"
           >
-            <div className="flex items-center gap-4">
-              <Logo className="h-6" />
+            <div className="flex items-start gap-4">
+              <Logo className="mt-1 h-7 min-h-6 w-6 min-w-6" />
               <div className="flex-grow">
                 <H3>{item.name}</H3>
                 {item?.description && (
-                  <p className="text-sm ">{item.description}</p>
+                  <p className="line-clamp-2 text-sm">{item.description}</p>
                 )}
               </div>
             </div>

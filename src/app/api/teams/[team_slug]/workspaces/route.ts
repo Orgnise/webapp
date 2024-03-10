@@ -14,10 +14,10 @@ export const GET = withAuth(async ({ team, session }) => {
       .collection<WorkspaceSchema>("workspaces");
     const query = {
       team: new ObjectId(team._id),
-      members: { $elemMatch: { user: new ObjectId(userId) } },
+      // members: { $elemMatch: { user: new ObjectId(userId) } },
     };
-    const dbResult = await workspaces.aggregate([{ $match: query }]).toArray();
-    return NextResponse.json({ workspaces: dbResult, team });
+    const list = await workspaces.aggregate([{ $match: query }]).toArray();
+    return NextResponse.json({ workspaces: list });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, message: "Operation failed", error: err.toString() },
