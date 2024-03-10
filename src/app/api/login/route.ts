@@ -25,40 +25,47 @@ export async function POST(request: Request) {
       }
     }
     const users = client.db(databaseName).collection("users");
-    const mongoResult: mongoUserResult | null = (await users.findOne({
+    const existingUser: mongoUserResult | null = (await users.findOne({
       email: parsedCredentials.data.email,
     })) as unknown as mongoUserResult | null;
 
-    if (mongoResult) {
-      //Verify password
-      const passwordIsCorrect = await bcrypt.compare(
-        credentials.password,
-        mongoResult.password,
-      );
+    if (!existingUser) {
+      return NextResponse.json({
+        success: false,
+        message: "email or password is incorrect",
+        error: "authentication failed",
 
-      if (passwordIsCorrect) {
-        const customUser: User = {
-          id: mongoResult._id.toString(), //required field!!
-          email: mongoResult.email,
-          name: mongoResult.name,
-          image:
-            mongoResult.image ??
-            `https://api.dicebear.com/7.x/initials/svg?seed=${mongoResult.name}`,
-        };
-
-        return NextResponse.json({ user: customUser });
-      } else {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "email or password is incorrect",
-            error: "authentication failed",
-          },
-          { status: 401 },
-        );
-      }
+      }, { status: 401 });
     }
-    return NextResponse.json(null);
+    //Verify password
+    const passwordIsCorrect = await bcrypt.compare(
+      credentials.password,
+      existingUser.password,
+    );
+
+    if (!passwordIsCorrect) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "email or password is incorrect",
+          error: "authentication failed",
+        },
+        { status: 401 },
+      );
+    }
+    const user: User = {
+      id: existingUser._id.toString(), //required field!!
+      email: existingUser.email,
+      name: existingUser.name,
+      image:
+        existingUser.image ??
+        `https://api.dicebear.com/7.x/initials/svg?seed=${existingUser.name}`,
+    };
+
+    return NextResponse.json({ user }, { status: 200 });
+
+
+
   } catch (err: any) {
     return NextResponse.json(
       {

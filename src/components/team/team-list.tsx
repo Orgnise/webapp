@@ -7,7 +7,8 @@ import { pluralize } from "@/lib/utils";
 import { Shapes, UserCircle2Icon } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "../atom/logo";
-import { H2, P } from "../atom/typography";
+import { P } from "../atom/typography";
+import { Badge } from "../ui/badge";
 
 export default function TeamsList() {
   const data = useTeams();
@@ -33,7 +34,7 @@ export default function TeamsList() {
           </div>
         }
         placeholder={
-          <div className="mx-auto grid max-w-screen-md animate-pulse  grid-cols-1 gap-5 px-2.5 py-10 lg:px-20">
+          <div className="mx-auto grid max-w-screen-xl grid-cols-1 gap-5 px-2.5 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-20">
             {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
@@ -65,21 +66,27 @@ function TeamCard({ team, index }: any) {
     <Link
       key={index}
       href={`/${team.meta.slug}`}
-      className="flex w-full cursor-pointer flex-col place-content-between items-start rounded border border-border bg-card p-6   hover:text-accent-foreground hover:shadow"
+      className="prose-base flex w-full cursor-pointer flex-col place-content-between items-start rounded border border-border bg-card p-4   hover:text-accent-foreground hover:shadow"
     >
-      <div className="flex items-center gap-4">
-        <Logo className="h-10" />
-        <div>
-          <div className="flex w-full place-content-between items-center">
-            <H2 className="max-w-[200px] truncate">{team.name}</H2>
+      <div className=" flex w-full items-center gap-4">
+        <Logo className="h-10 flex-none" />
+        <div className="flex flex-grow place-content-between items-start">
+          <div className="flex-grow flex-col items-center">
+            <div className="flex w-full place-content-between items-center">
+              <h3 className="m-0 max-w-[200px] truncate p-0">{team.name}</h3>
+            </div>
+            {team?.description && (
+              <p className="m-0 text-sm text-muted-foreground">
+                {team.description}
+              </p>
+            )}
           </div>
-          {team?.description && (
-            <p className="text-sm text-muted-foreground ">{team.description}</p>
-          )}
+          <Badge className="mt-1">{team.plan ?? "Free"}</Badge>
         </div>
       </div>
       <span className="flex items-center gap-1 pt-6 text-sm text-muted-foreground">
         <UserCircle2Icon className="" size={16} />
+        {/* TODO: Fetch and display members/workspaces count */}
         {team?.members?.length}
         <span className="pl-px">
           {pluralize("member", team?.members?.length)}

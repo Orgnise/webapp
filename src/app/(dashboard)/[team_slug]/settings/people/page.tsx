@@ -1,6 +1,7 @@
 "use client";
 
 import { Logo } from "@/components/atom/logo";
+import Tab from "@/components/atom/tab";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,20 +56,13 @@ export default function ProjectPeopleClient() {
           </div>
         </div>
         <div className="flex space-x-3 border-b border-border px-3 sm:px-7">
-          {tabs.map((tab) => (
-            <div
-              key={tab}
-              className={`${
-                tab === currentTab ? "border-black" : "border-transparent"
-              } border-b py-1`}
-            >
-              <button
-                onClick={() => setCurrentTab(tab)}
-                className="rounded-md px-3 py-1.5 text-sm transition-all duration-75 hover:bg-gray-100 active:bg-gray-200"
-              >
-                {tab}
-              </button>
-            </div>
+          {tabs.map((tab, index) => (
+            <Tab
+              key={index}
+              tab={tab}
+              selected={tab === currentTab}
+              onClick={() => setCurrentTab(tab)}
+            />
           ))}
         </div>
         <div className="grid divide-y divide-border">
@@ -210,7 +204,7 @@ function InviteTeammateModal({ inviteCode }: { inviteCode: string }) {
       <div className="flex flex-col items-center justify-center space-y-3 border-b border-border px-4 py-4 pt-8 sm:px-16">
         <Logo className="h-10" />
         <h3 className="text-lg font-medium">Invite Link</h3>
-        <p className="text-center text-sm text-gray-500">
+        <p className="text-center text-sm text-muted-foreground/90">
           Allow other people to join your Team through the link below.
         </p>
       </div>

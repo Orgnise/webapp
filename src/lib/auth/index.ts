@@ -2,9 +2,10 @@ import { Plan, Team } from "../types/types";
 
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { getServerSession } from "next-auth/next";
-import { TeamSchema } from "../schema/team.schema";
+import { Role, TeamMemberSchema, TeamSchema } from "../schema/team.schema";
 import { getSearchParams } from "../url";
 import { NextAuthOptions } from "./auth";
+import { ObjectId } from "mongodb";
 
 export interface Session {
   user: {
@@ -33,7 +34,7 @@ interface WithAuthHandler {
     searchParams: Record<string, string>;
     headers?: Record<string, string>;
     session: Session;
-    team: Team;
+    team: TeamSchema;
   }): Promise<Response>;
 }
 
@@ -42,10 +43,10 @@ export const withAuth =
     handler: WithAuthHandler,
     {
       requiredPlan = ["free", "pro", "business", "enterprise"], // if the action needs a specific plan
-      requiredRole = ["admin", "member"],
+      requiredRole = ["owner", "member"],
     }: {
       requiredPlan?: Array<Plan>;
-      requiredRole?: Array<"admin" | "member">;
+      requiredRole?: Array<Role>;
     } = {},
   ) =>
     async (
@@ -59,7 +60,6 @@ export const withAuth =
       const key = searchParams.key;
 
       let session: Session | undefined;
-      let headers = {};
 
       // if there's no projectSlug defined
       if (!team_slug) {
@@ -75,78 +75,78 @@ export const withAuth =
       if (!session?.user?.id) {
         return new Response("Unauthorized: Login required.", {
           status: 401,
-          headers,
         });
       }
       const client = await mongodb;
       const teamsCollection = client.db(databaseName).collection<TeamSchema>("teams");
-      // const team = (await teamsCollection.findOne({
-      //   "meta.slug": team_slug,
-      // })) as unknown as Team;
-      const teamList = await teamsCollection.aggregate([
+      const teamsMembers = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
+      const teamInDb = await teamsCollection.aggregate([
         {
           $match: {
             "meta.slug": team_slug,
           },
         },
-        {
-          $lookup: {
-            from: "teamUsers",
-            localField: "_id",
-            foreignField: "teamId",
-            as: "members",
-          },
-        },
-        {
-          $unwind: {
-            path: "$members",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "members.user",
-            foreignField: "_id",
-            as: "members.user",
-          },
-        },
-        {
-          $unwind: {
-            path: "$members.user",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        // {
-        //   $project: {
-        //     name: 1,
-        //     plan: 1,
-        //     members: {
-        //       $cond: {
-        //         if: { $eq: ["$members", null] },
-        //         then: [],
-        //         else: {
-        //           user: "$members.user._id",
-        //           // role: "$members.role",
-        //         },
-        //       },
-        //     },
-        //   },
-        // },
-      ]).toArray();
+      ]).toArray() as TeamSchema[];
 
-      const team = teamList[0] as Team;
+      const teamList = await teamsMembers.aggregate([
+        {
+          '$match': {
+            'user': new ObjectId(session.user.id),
+            'teamId': new ObjectId(teamInDb[0]._id)
+          }
+        },
+        {
+          '$lookup': {
+            'from': 'teams',
+            'localField': 'teamId',
+            'foreignField': '_id',
+            'as': 'team'
+          },
+        },
 
-      if (!team || !team.members) {
+        {
+          '$unwind': {
+            'path': '$team',
+            'preserveNullAndEmptyArrays': true
+          }
+        },
+        // Append team object in root object and make team_id and root id.
+        {
+          '$addFields': {
+            '_id': '$team._id',
+            'name': '$team.name',
+            'description': '$team.description',
+            'createdBy': '$team.createdBy',
+            'plan': '$team.plan',
+            'members': '$team.members',
+            'meta': '$team.meta',
+            'createdAt': '$team.createdAt',
+            'membersCount': '$team.membersCount',
+            'billingCycleStart': '$team.billingCycleStart',
+            'inviteCode': '$team.inviteCode',
+            'membersLimit': '$team.membersLimit',
+            'workspaceLimit': '$team.workspaceLimit'
+          }
+        },
+        // Remove team object from root object
+        {
+          '$project': {
+            'team': 0,
+            'teamId:': 0,
+          }
+        }
+      ]).toArray() as TeamSchema[];
+
+      const team = teamList[0] as any;
+      if (!team) {
         // project doesn't exist
         return new Response("Team not found.", {
           status: 404,
-          headers,
         });
       }
 
       // team exists but user is not part of it
-      if (team.members.length === 0) {
+      if (!team.role) {
         // Todo: check if the user is part of the team
         const pendingInvites = {
           expires: new Date(),
@@ -154,17 +154,14 @@ export const withAuth =
         if (!pendingInvites) {
           return new Response("Team not found.", {
             status: 404,
-            headers,
           });
         } else if (pendingInvites.expires < new Date()) {
           return new Response("Team invite expired.", {
             status: 410,
-            headers,
           });
         } else {
           return new Response("Team invite pending.", {
             status: 409,
-            headers,
           });
         }
       }
@@ -178,7 +175,6 @@ export const withAuth =
       ) {
         return new Response("Unauthorized: Insufficient permissions.", {
           status: 403,
-          headers,
         });
       }
 
@@ -186,7 +182,6 @@ export const withAuth =
       if (team.plan && !requiredPlan.includes(team.plan)) {
         return new Response("Unauthorized: Need higher plan.", {
           status: 403,
-          headers,
         });
       }
 
@@ -194,7 +189,6 @@ export const withAuth =
         req,
         params: params || {},
         searchParams,
-        headers,
         session,
         team,
       });

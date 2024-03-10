@@ -9,12 +9,12 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
       segment: null,
     },
     {
-      name: "Billing",
-      segment: "billing",
-    },
-    {
       name: "People",
       segment: "people",
+    },
+    {
+      name: "Billing",
+      segment: "billing",
     },
   ];
   return (

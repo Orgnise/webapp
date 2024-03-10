@@ -41,3 +41,12 @@ export interface TeamUserSchema {
     updatedAt: Date;
   }[]
 }
+
+export interface TeamMemberSchema {
+  _id?: string;
+  role: Role;
+  user: ObjectId;
+  teamId: ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}

@@ -7,8 +7,8 @@ import { Team } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 
 // GET /api/team/[slug] – get a specific team
-export const GET = withAuth(async ({ team, headers }) => {
-  return NextResponse.json(team, { headers });
+export const GET = withAuth(async ({ team }) => {
+  return NextResponse.json(team);
 });
 
 
@@ -119,4 +119,4 @@ export const DELETE = withAuth(async ({ params, team }) => {
       { status: 500 },
     );
   }
-}, { requiredRole: ["admin"] });
+}, { requiredRole: ["owner"] });

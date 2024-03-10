@@ -36,13 +36,14 @@ export default function TeamBillingPage() {
       <div className="flex flex-col items-start space-y-4 p-10 xl:flex-row xl:space-y-0">
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Plan &amp; Usage</h2>
-          <p className="text-sm text-gray-500">
-            You are currently on the <Badge>{plan ?? "free"}</Badge> plan.
+          <p className="text-sm text-muted-foreground/90">
+            You are currently on the &nbsp;<Badge>{plan ?? "free"}</Badge>&nbsp;
+            plan.
             {billingStart && billingEnd && (
               <>
                 {" "}
                 Current billing cycle:{" "}
-                <span className="font-medium text-black">
+                <span className="font-medium text-secondary-foreground">
                   {billingStart} - {billingEnd}
                 </span>
                 .

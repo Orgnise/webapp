@@ -1,11 +1,12 @@
+import { Role } from "../schema/team.schema";
 import { Visibility } from "../schema/workspace.schema";
 
 export interface Team {
   _id: string;
   name: string;
   description: string;
-  members: Member[];
-  projectUsers: ProjectUsers[];
+  // members: Member[];
+  teamMembers: ProjectUsers[];
   plan: Plan;
   meta: Meta;
   createdAt: string;
@@ -19,12 +20,12 @@ export interface Team {
 
 export interface Member {
   user: string;
-  role: "admin" | "member";
+  role: Role;
   _id: string;
 }
 export interface ProjectUsers {
   _id: string;
-  role: "admin" | "member";
+  role: Role;
   user: User;
   projectId: string;
   createdAt: string;
@@ -36,7 +37,7 @@ export interface UserProps {
   email: string;
   image?: string;
   createdAt: Date;
-  role: "owner" | "member";
+  role: Role;
   projects?: { projectId: string }[];
 }
 

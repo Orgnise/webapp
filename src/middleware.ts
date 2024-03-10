@@ -36,7 +36,6 @@ export const middleware = async (req: NextRequest) => {
     !["/login", "/signup", "terms", "policy"].includes(path) &&
     !loggedIn
   ) {
-    console.log("redirecting to login", path);
     return NextResponse.redirect(
       new URL(`/login${path === "/" ? "" : `?next=${encodeURIComponent(fullPath)}`}`, req.url),
     );

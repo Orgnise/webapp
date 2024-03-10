@@ -19,38 +19,6 @@ export const NextAuthOptions = {
     strategy: "jwt",
   },
   providers: [
-    Credentials({
-      credentials: {
-        email: { label: "email" },
-        password: { label: "password", type: "password" },
-      },
-      name: "Credentials",
-      async authorize(credentials, req) {
-        const feUrl = req?.headers?.origin;
-        const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
-          .safeParse(credentials);
-        if (parsedCredentials.success) {
-          const authResponse = await fetch(`${feUrl}/api/login`, {
-            method: "POST",
-            body: JSON.stringify(parsedCredentials.data),
-            headers: {
-              "Content-Type": "application/json",
-            },
-            cache: "no-cache", //! To be removed after done testing
-          });
-          const res = await authResponse.json();
-          if (!authResponse.ok) {
-            console.log("authResponse [failure]", res);
-            return null;
-          }
-          console.log("authResponse [Success]", res);
-          return res.user;
-        }
-        return null;
-      },
-    }),
-
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
       clientSecret: process.env.AUTH_GITHUB_SECRET,
@@ -74,13 +42,45 @@ export const NextAuthOptions = {
       allowDangerousEmailAccountLinking: true,
       // version: "2",
     }),
+    Credentials({
+      credentials: {
+        email: { label: "email" },
+        password: { label: "password", type: "password" },
+      },
+      name: "Credentials",
+      async authorize(credentials, req) {
+        const feUrl = req?.headers?.origin;
+        const parsedCredentials = z
+          .object({ email: z.string().email(), password: z.string().min(6) })
+          .safeParse(credentials);
+        if (parsedCredentials.success) {
+          const authResponse = await fetch(`${feUrl}/api/login`, {
+            method: "POST",
+            body: JSON.stringify(parsedCredentials.data),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            cache: "no-cache", //! To be removed after done testing
+          });
+          const res = await authResponse.json();
+          if (authResponse.status != 200 || !authResponse.ok) {
+            console.log("authResponse [failure]", res);
+            return null;
+          }
+          console.log("authResponse [Success]", res);
+          return res.user;
+        }
+        return null;
+      },
+    }),
   ],
 
   callbacks: {
     async signIn({ account, profile, user }: any) {
-      console.log("Mongo URI", process.env.MONGODB_URI);
-      console.log("Mongo db", process.env.DATABASE_NAME);
-      console.log("signIn begin", { account, profile, user });
+      // console.log("signIn begin", { account, profile, user });
+      if (!user?.email) {
+        return false;
+      }
 
       if (["google", "github"].includes(account.provider)) {
         const client = await mongoDb;
@@ -128,6 +128,10 @@ export const NextAuthOptions = {
     },
     async jwt({ token, user, account, profile }) {
       // console.log("jwt begin", { token, user, account, profile })
+      if (!token.email) {
+        return {};
+      }
+
       if (account && account.type === "credentials") {
         token.userId = account.providerAccountId;
       }
@@ -160,6 +164,10 @@ export const NextAuthOptions = {
   },
   events: {
     async signIn(message) {
+      /* on new user */
+      if (message.isNewUser) {
+        // To be used for sending welcome emails
+      }
       /* on successful sign in */
       // console.log("signIn event", message)
     },

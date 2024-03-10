@@ -2,7 +2,7 @@ import { Logo } from "@/components/atom/logo";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getSession } from "@/lib/auth";
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { TeamSchema, TeamUserSchema } from "@/lib/schema/team.schema";
+import { TeamMemberSchema, TeamSchema } from "@/lib/schema/team.schema";
 import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -57,9 +57,10 @@ async function VerifyInvite({ code }: { code: string }) {
 
   const client = await mongodb;
   const teamsDb = client.db(databaseName).collection("teams");
+
   const teamUsersDb = client
     .db(databaseName)
-    .collection<TeamUserSchema>("teamUsers");
+    .collection<TeamMemberSchema>("teamUsers");
 
   const team = (await teamsDb.findOne({
     inviteCode: code,
@@ -76,47 +77,32 @@ async function VerifyInvite({ code }: { code: string }) {
     );
   }
 
-  const teamUsers = (await teamUsersDb.findOne({
+  const member = (await teamUsersDb.findOne({
     teamId: new ObjectId(team._id),
-    // users: {
-    //   $elemMatch: { user: new ObjectId(session.user.id) },
-    // },
-  })) as unknown as TeamUserSchema;
+    user: new ObjectId(session.user.id),
+  })) as unknown as TeamMemberSchema;
 
   // check if user is already in the project
-  const user = teamUsers.users.find((u) =>
-    u.user.equals(new ObjectId(session.user.id)),
-  );
-  if (user) {
+  if (member) {
     redirect(`/${team.meta.slug}`);
   }
 
-  // check if team is full
-  if (teamUsers.users.length >= team.membersLimit) {
-    return (
-      <PageCopy
-        title="User Limit Reached"
-        message="The team you are trying to join is currently full. Please contact the project owner for more information."
-      />
-    );
-  }
+  // TODO: check if team is full
+  // if (teamUsers.users.length >= team.membersLimit) {
+  //   return (
+  //     <PageCopy
+  //       title="User Limit Reached"
+  //       message="The team you are trying to join is currently full. Please contact the project owner for more information."
+  //     />
+  //   );
+  // }
 
-  // add user to team
-  await teamUsersDb.findOneAndUpdate(
-    {
-      teamId: new ObjectId(team._id),
-    },
-    {
-      $push: {
-        users: {
-          user: new ObjectId(session.user.id),
-          role: "member",
-          teamId: new ObjectId(team._id),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      },
-    },
-  );
+  teamUsersDb.insertOne({
+    teamId: new ObjectId(team._id),
+    user: new ObjectId(session.user.id),
+    role: "member",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
   redirect(`/${team.meta.slug}`);
 }

@@ -33,9 +33,15 @@ export function CopyButton({
     >
       <span className="sr-only">Copy</span>
       {copied ? (
-        <CheckIcon className="text-secondary-foreground transition-all group-hover:text-blue-800" />
+        <CheckIcon
+          className="text-secondary-foreground transition-all group-hover:text-blue-800"
+          size={18}
+        />
       ) : (
-        <Comp className="text-secondary-foreground transition-all group-hover:text-blue-800" />
+        <Comp
+          className="text-secondary-foreground transition-all group-hover:text-blue-800"
+          size={18}
+        />
       )}
     </button>
   );

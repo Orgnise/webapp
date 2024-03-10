@@ -136,7 +136,9 @@ export default function useTeams(): ITeam {
 
   const teams = data?.teams?.map((team: Team) => ({
     ...team,
-    isOwner: team?.members && team?.members?.[0]?.role.toLowerCase() === "owner",
+    // isOwner: team?.members && team?.members?.[0]?.role.toLowerCase() === "owner",
+    // @ts-ignore
+    isOwner: team.role === "owner",
   }));
 
   const freeProjects = teams?.filter(

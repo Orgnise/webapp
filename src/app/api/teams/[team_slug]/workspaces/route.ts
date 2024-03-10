@@ -5,7 +5,7 @@ import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export const GET = withAuth(async ({ team, headers, session, params }) => {
+export const GET = withAuth(async ({ team, session }) => {
   const client = await mongoDb;
   try {
     const userId = session?.user?.id;
@@ -17,7 +17,7 @@ export const GET = withAuth(async ({ team, headers, session, params }) => {
       members: { $elemMatch: { user: new ObjectId(userId) } },
     };
     const dbResult = await workspaces.aggregate([{ $match: query }]).toArray();
-    return NextResponse.json({ workspaces: dbResult, team, query });
+    return NextResponse.json({ workspaces: dbResult, team });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, message: "Operation failed", error: err.toString() },

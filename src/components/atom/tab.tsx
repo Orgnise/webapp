@@ -10,7 +10,6 @@ interface Props {
 }
 
 function Tab({ tab, selected, onClick, className, disabled = false }: Props) {
-  console.log("tab", { tab, selected });
   return (
     <div
       className={cx("flex flex-col gap-0.5", {
