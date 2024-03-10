@@ -19,5 +19,6 @@ export default function useUsers({ invites }: { invites?: boolean } = {}) {
   return {
     users: res?.users,
     loading: !error && !res?.users,
+    error,
   };
 }

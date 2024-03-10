@@ -22,7 +22,6 @@ export async function fetcher<JSON = any>(
   } catch (error) {
     console.error("error[]", error);
     if (json) {
-
       throw json;
     }
     throw error;

@@ -6,6 +6,7 @@ import { Role, TeamMemberSchema, TeamSchema } from "../schema/team.schema";
 import { getSearchParams } from "../url";
 import { NextAuthOptions } from "./auth";
 import { ObjectId } from "mongodb";
+import { NextResponse } from "next/server";
 
 export interface Session {
   user: {
@@ -34,7 +35,7 @@ interface WithAuthHandler {
     searchParams: Record<string, string>;
     headers?: Record<string, string>;
     session: Session;
-    team: TeamSchema;
+    team: Team;
   }): Promise<Response>;
 }
 
@@ -54,17 +55,17 @@ export const withAuth =
       { params }: { params: Record<string, string> | undefined },
     ) => {
       const searchParams = getSearchParams(req.url);
-      const team_slug = params?.team_slug || searchParams.projectSlug;
+      const team_slug = params?.team_slug;
 
       const domain = params?.domain || searchParams.domain;
       const key = searchParams.key;
 
       let session: Session | undefined;
 
-      // if there's no projectSlug defined
+      // if there's no team defined
       if (!team_slug) {
         return new Response(
-          "Team slug not found. Did you forget to include a `projectSlug` query parameter?",
+          "Team slug not found. Did you forget to include a `team_slug` query parameter?",
           {
             status: 400,
           },
@@ -73,9 +74,14 @@ export const withAuth =
 
       session = await getSession();
       if (!session?.user?.id) {
-        return new Response("Unauthorized: Login required.", {
-          status: 401,
-        });
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Unauthorized: Login required.',
+            error: 'Operation failed'
+          },
+          { status: 401 }
+        );
       }
       const client = await mongodb;
       const teamsCollection = client.db(databaseName).collection<TeamSchema>("teams");
@@ -137,12 +143,18 @@ export const withAuth =
         }
       ]).toArray() as TeamSchema[];
 
-      const team = teamList[0] as any;
+      const team = teamList[0] as unknown as Team;
       if (!team) {
-        // project doesn't exist
-        return new Response("Team not found.", {
-          status: 404,
-        });
+        // Team doesn't exist
+
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Team not found',
+            error: 'Operation failed'
+          },
+          { status: 404 }
+        );
       }
 
       // team exists but user is not part of it
@@ -166,23 +178,33 @@ export const withAuth =
         }
       }
 
-      // project role checks (enterprise only)
+      // team role checks (enterprise only)
       if (
         requiredRole &&
-        team.plan === "enterprise" &&
-        !requiredRole.includes(team.members[0].role) &&
-        !(searchParams.userId === session.user.id)
+        !requiredRole.includes(team.role) ||
+        requiredPlan.includes(team.plan) &&
+        !requiredRole.includes(team.role)
       ) {
-        return new Response("Unauthorized: Insufficient permissions.", {
-          status: 403,
-        });
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Unauthorized: Insufficient permissions',
+            error: 'Operation failed'
+          },
+          { status: 403 }
+        );
       }
 
       // plan checks
-      if (team.plan && !requiredPlan.includes(team.plan)) {
-        return new Response("Unauthorized: Need higher plan.", {
-          status: 403,
-        });
+      if (!requiredPlan.includes(team.plan)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Unauthorized: Need higher plan.',
+            error: 'Operation failed'
+          },
+          { status: 403 }
+        );
       }
 
       return handler({

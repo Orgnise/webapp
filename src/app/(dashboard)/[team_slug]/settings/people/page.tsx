@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ListView } from "@/components/ui/listview";
 import { APP_DOMAIN } from "@/lib/constants";
 import useTeams from "@/lib/swr/use-teams";
 import useUsers from "@/lib/swr/use-users";
@@ -29,7 +30,9 @@ export default function ProjectPeopleClient() {
     "Members",
   );
   // const users = [] as any;
-  const { users } = useUsers({ invites: currentTab === "Invitations" });
+  const { users, loading, error } = useUsers({
+    invites: currentTab === "Invitations",
+  });
   const { activeTeam } = useTeams();
   const { data: session } = useSession();
   const authUser = session?.user;
@@ -66,30 +69,33 @@ export default function ProjectPeopleClient() {
           ))}
         </div>
         <div className="grid divide-y divide-border">
-          {users ? (
-            users.length > 0 ? (
-              users.map((user: any) => (
-                <UserCard
-                  key={user.email}
-                  user={user}
-                  currentTab={currentTab}
-                  isOwner={
-                    users.find((u: UserProps) => u.role === "owner")?.email ===
-                    authUser?.email
-                  }
-                />
-              ))
-            ) : (
+          <ListView
+            items={users}
+            loading={loading}
+            renderItem={(user: UserProps) => (
+              <UserCard
+                key={user.email}
+                user={user}
+                currentTab={currentTab}
+                isOwner={
+                  users?.find((u: UserProps) => u.role === "owner")?.email ===
+                  authUser?.email
+                }
+              />
+            )}
+            noItemsElement={
               <div className="flex flex-col items-center justify-center py-10">
-                {/* TODO: Display placeholder image */}
                 <p className="text-sm text-muted-foreground">
-                  No invitations sent
+                  {currentTab === "Invitations"
+                    ? " No invitations sent yet."
+                    : "No members in this team."}
                 </p>
               </div>
-            )
-          ) : (
-            Array.from({ length: 5 }).map((_, i) => <UserPlaceholder key={i} />)
-          )}
+            }
+            placeholder={Array.from({ length: 5 }).map((_, i) => (
+              <UserPlaceholder key={i} />
+            ))}
+          />
         </div>
       </div>
     </>

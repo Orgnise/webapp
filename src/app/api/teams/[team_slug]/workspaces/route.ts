@@ -24,6 +24,8 @@ export const GET = withAuth(async ({ team, session }) => {
       { status: 500 },
     );
   }
+}, {
+  requiredRole: ['owner', "member"]
 });
 
 export const POST = withAuth(async ({ team, session, req }) => {

@@ -85,11 +85,11 @@ export default function useTeams(): ITeam {
 
         mutate({ teams: list }, { revalidate: false, optimisticData: list });
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("error", error);
       displayToast({
         title: "Error",
-        description: "Failed to delete team",
+        description: error?.message ?? "Failed to delete team",
         variant: "error",
       });
       throw error;

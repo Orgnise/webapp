@@ -86,6 +86,8 @@ export const PATCH = withAuth(async ({ team, req, session }) => {
     );
 
   }
+}, {
+  requiredRole: ["owner"],
 });
 
 // Delete a team
