@@ -41,7 +41,7 @@ export const GET = withAuth(async ({ team, params }) => {
     const query = {
       workspace: new ObjectId(workspaceDate?._id),
     };
-    const dbResult = await collections.find(query).toArray();
+    const dbResult = await collections.find({ query }).toArray();
 
     // create a tree structure from this
     const tree = createTreeFromCollection(dbResult);
