@@ -1,11 +1,11 @@
-import {Collection } from "@/lib/types/types";
+import { Collection } from "@/lib/types/types";
 
 interface TreeNode<Collection> {
     _id: string | null;
     parent: string | null;
     children: TreeNode<Collection>[];
     // Dynamic properties
-    [key: string]: T;
+    [key: string]: any;
 }
 
 export function createTreeFromCollection(arr: Collection[]): TreeNode<Collection>[] {
