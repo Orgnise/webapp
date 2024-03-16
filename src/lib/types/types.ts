@@ -71,7 +71,7 @@ export interface User {
 
 export interface Collection {
   _id: string;
-  children: any;
+  children: Array<Collection>;
   parent: any;
   team: Team;
   name: string;

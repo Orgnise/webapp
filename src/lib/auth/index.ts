@@ -196,7 +196,7 @@ export const withAuth =
       }
 
       // plan checks
-      if (!requiredPlan.includes(team.plan)) {
+      if (!requiredPlan.includes(team.plan ?? "free")) {
         return NextResponse.json(
           {
             success: false,

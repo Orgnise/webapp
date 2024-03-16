@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../fetcher";
 import { Collection } from "../types/types";
+import { addInCollectionTree, removeFromCollectionTree, updateInCollectionTree } from "../utility/collection-tree-structure";
 
 interface IWorkspaces {
   error: any;
@@ -14,11 +15,11 @@ interface IWorkspaces {
    * Create a new collection / Item
    * To create item, pass the parent collection slug
    */
-  createCollection(collection: Collection): Promise<void>;
+  createCollection(collection: Collection, grandParentCollection: string): Promise<void>;
   updateCollection: (collection: Collection) => void;
   UpdateItem: (item: Collection, parent: Collection) => Promise<void>;
-  deleteCollection(collectionSlug: string): Promise<void>;
-  deleteItem(itemSlug: string, collectionSlug: string): Promise<void>;
+  deleteCollection(id: string, collectionSlug: string,): Promise<void>;
+  deleteItem(id: string, itemSlug: string, collectionSlug: string): Promise<void>;
 }
 export default function useCollections(): IWorkspaces {
   const param = useParams() as {
@@ -34,7 +35,7 @@ export default function useCollections(): IWorkspaces {
     error,
     mutate,
   } = useSWR<any>(
-    `/api/teams/${team_slug}/${workspace_slug}/collections`,
+    `/api/teams/${team_slug}/${workspace_slug}/collections-v2`,
     fetcher,
     {
       dedupingInterval: 30000,
@@ -42,7 +43,7 @@ export default function useCollections(): IWorkspaces {
   );
 
   // Create a new Collection/Item
-  async function createCollection(collection: Collection) {
+  async function createCollection(collection: Collection, grandParentCollection: string) {
     try {
       const response = await fetcher(
         `/api/teams/${team_slug}/${workspace_slug}/collections`,
@@ -54,29 +55,27 @@ export default function useCollections(): IWorkspaces {
           body: JSON.stringify({ collection: collection }),
         },
       );
+
+      const collections = data?.collections;
+      let list;
+
+      //  If created item is a collection type then
+      if (collection.object === "collection") {
+        list = addInCollectionTree(collections, collection.parent, response.collection);
+        mutate({ collections: list }, { revalidate: false, optimisticData: list });
+        router.push(
+          `/${team_slug}/${workspace_slug}/${response.collection.meta.slug}`,
+        );
+      }
+      // If created item is an item type
+      else {
+        list = addInCollectionTree(collections, collection.parent, response.collection);
+        mutate({ collections: list }, { revalidate: false, optimisticData: list });
+      }
       displayToast({
         title: "Success",
         description: response?.message,
       });
-      const collections = data?.collections;
-      if (collection.object === "collection") {
-        const list = [...collections, response.collection];
-        // setActiveCollection(response.collection);
-        mutate({ collections: list }, { revalidate: false, optimisticData: list });
-        console.log("Collection created[");
-        router.push(
-          `/${team_slug}/${workspace_slug}/${response.collection.meta.slug}`,
-        );
-      } else {
-        console.log("Item created");
-        const list = collections.map((c: any) => {
-          if (c._id === collection.parent) {
-            c.children.push(response.collection);
-          }
-          return c;
-        });
-        mutate({ collections: list }, { revalidate: false, optimisticData: list });
-      }
     } catch (error) {
       console.error("error", error);
       throw error;
@@ -101,30 +100,19 @@ export default function useCollections(): IWorkspaces {
           body: JSON.stringify({ item: item }),
         },
       );
-      const list = data.collections.map((c: any) => {
-        if (c._id === parent._id) {
-          c.children = c.children.map((i: any) => {
-            if (i._id === item._id) {
-              return response.item;
-            }
-            return i;
-          });
-        }
-        return c;
-      });
-      // setActiveItem(response.item);
+      const collectionTree = updateInCollectionTree(data?.collections, item._id, response.item);
 
       if (activeItemSlug && activeItemSlug !== response.item?.meta?.slug) {
         router.replace(
           `/${teamSlug}/${workspaceSlug}/${collectionSlug}/${response?.item.meta.slug}`,
         );
       }
-      console.log("Active item updated", list);
+      console.log("Active item updated", collectionTree);
       mutate(
-        { collections: list },
+        { collections: collectionTree },
         {
           revalidate: false,
-          optimisticData: list,
+          optimisticData: collectionTree,
         },
       );
     } catch (error) {
@@ -148,19 +136,15 @@ export default function useCollections(): IWorkspaces {
           body: JSON.stringify({ collection: collection }),
         },
       );
-      const list = data.collections.map((c: any) => {
-        if (c.meta.slug === collectionSlug) {
-          return response.collection;
-        }
-        return c;
-      });
+
+      const collectionTree = updateInCollectionTree(data?.collections, collection._id, response.collection);
       // Change the url if the collection slug has changed
       if (collectionSlug != response.collection.meta.slug) {
         router.replace(
           `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`,
         );
       }
-      mutate({ collections: list }, { revalidate: false, optimisticData: list });
+      mutate({ collections: collectionTree }, { revalidate: false, optimisticData: collectionTree });
     } catch (error) {
       console.error("error", error);
       throw error;
@@ -168,7 +152,7 @@ export default function useCollections(): IWorkspaces {
   }
 
   // Delete collection
-  async function deleteCollection(collectionSlug: string) {
+  async function deleteCollection(id: string, collectionSlug: string) {
     const teamSlug = param?.team_slug;
     const workspaceSlug = param?.workspace_slug;
     const activeCollectionSlug = param?.collection_slug;
@@ -180,9 +164,7 @@ export default function useCollections(): IWorkspaces {
           title: "Collection deleted",
           description: "Collection has been deleted successfully",
         });
-        const list = data?.collections?.filter(
-          (c: any) => c.meta?.slug !== collectionSlug,
-        );
+        const list = removeFromCollectionTree(data?.collections, id);
         if (activeCollectionSlug === collectionSlug) {
           window.history.pushState({}, "", `./`);
           console.log("Closing the collection");
@@ -204,7 +186,7 @@ export default function useCollections(): IWorkspaces {
   }
 
   // Delete item
-  async function deleteItem(itemSlug: string, collectionSlug: string) {
+  async function deleteItem(itemId: string, itemSlug: string, collectionSlug: string) {
     const teamSlug = param?.team_slug;
     const workspaceSlug = param?.workspace_slug;
     const activeItemSlug = param?.item_slug;
@@ -220,22 +202,15 @@ export default function useCollections(): IWorkspaces {
           title: "Item deleted - 1",
           description: "Item has been deleted successfully",
         });
-        const list = data?.collections?.map((c: any) => {
-          if (c.meta.slug === collectionSlug) {
-            c.children = c.children.filter(
-              (i: any) => i.meta.slug !== itemSlug,
-            );
-          }
-          return c;
-        });
+        const collectionTree = removeFromCollectionTree(data?.collections, itemId);
         if (itemSlug === activeItemSlug) {
           router.replace(`/${teamSlug}/${workspaceSlug}/${collectionSlug}`);
         }
         mutate(
-          { collections: list },
+          { collections: collectionTree },
           {
             revalidate: false,
-            optimisticData: list,
+            optimisticData: collectionTree,
           },
         );
       })

@@ -15,7 +15,7 @@ export const GET = withAuth(async ({ team, params }) => {
     const { workspace_slug, team_slug } = params ?? {};
     const collections = client
       .db(databaseName)
-      .collection<Collection>("collections");
+      .collection<CollectionSchema>("collections");
 
     const workspaces = client
       .db(databaseName)
@@ -41,13 +41,13 @@ export const GET = withAuth(async ({ team, params }) => {
     const query = {
       workspace: new ObjectId(workspaceDate?._id),
     };
-    const dbResult = await collections.find({ query }).toArray();
+    const dbResult = await collections.find(query).toArray();
 
     // create a tree structure from this
     const tree = createTreeFromCollection(dbResult);
     return NextResponse.json({
       collections: tree,
-      itemCount: dbResult.length
+      itemCount: dbResult.length,
     });
   } catch (err: any) {
     return NextResponse.json(

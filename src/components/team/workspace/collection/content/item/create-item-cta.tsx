@@ -23,7 +23,7 @@ export function CreateItemCTA({ activeCollection, children }: CreateItemProps) {
     } as Collection;
 
     setIsLoading(true);
-    await createCollection(item);
+    await createCollection(item, activeCollection?.parent);
     setIsLoading(false);
   }
 

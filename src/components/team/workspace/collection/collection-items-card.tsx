@@ -1,8 +1,10 @@
 "use Client";
 // import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
 import { Spinner } from "@/components/atom/spinner";
+import { H5 } from "@/components/atom/typography";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ListView } from "@/components/ui/listview";
 import useCollections from "@/lib/swr/use-collections";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
@@ -51,7 +53,7 @@ export function CollectionItemCard({
       return;
     }
     setStatus("Deleting");
-    await deleteItem(item?.meta?.slug, collection?.meta?.slug!);
+    await deleteItem(item._id, item?.meta?.slug, collection?.meta?.slug!);
     setStatus("Idle");
   }
 
@@ -102,6 +104,9 @@ export function CollectionItemCard({
       </div>
     );
   }
+  if (item.object == "collection") {
+    return <CollectionCard collection={item} />;
+  }
   return (
     <div id={`Item-${index}`} className="group relative mb-1">
       <Link
@@ -114,6 +119,7 @@ export function CollectionItemCard({
         )}
       >
         <ChevronRight className="pr-1" size={20} />
+
         {hasValue(item.name) ? (
           <div className="font-sans ">{item.name}</div>
         ) : (
@@ -152,6 +158,52 @@ export function CollectionItemCard({
           </Button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function CollectionCard({ collection }: { collection: Collection }) {
+  const { team_slug, workspace_slug } = useParams() as {
+    team_slug?: string;
+    workspace_slug?: string;
+    collection_slug?: string;
+  };
+
+  return (
+    <div className="flex flex-col ">
+      <div className=" flex place-content-between items-center gap-1 pl-2 ">
+        <ChevronRight size={20} />
+        <Link
+          href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}`}
+          className="w-full"
+        >
+          <H5 className="line-clamp-1 py-1 ">
+            {hasValue(collection.name)
+              ? collection.name
+              : "Untitled collection"}
+          </H5>
+        </Link>
+      </div>
+      <ListView
+        items={collection!.children}
+        className="ml-4 flex  flex-col overflow-y-auto border-l border-border pl-4"
+        renderItem={(item, index) => (
+          <CollectionItemCard
+            key={index}
+            index={index}
+            item={item}
+            collection={collection}
+          />
+        )}
+        footerElement={<div className="w-full"></div>}
+        noItemsElement={
+          <div className="pl-4 text-muted-foreground/40">
+            <div className="flex items-center gap-1 border-l border-border pl-4 ">
+              <p className="line-clamp-1 py-0.5 ">No items</p>
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 }

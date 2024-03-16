@@ -5,6 +5,8 @@ import NotFoundView from "@/components/team/team-not-found";
 import ItemContent from "@/components/team/workspace/collection/content/content";
 import { Input } from "@/components/ui/input";
 import useCollections from "@/lib/swr/use-collections";
+import { Collection } from "@/lib/types/types";
+import { findInCollectionTree } from "@/lib/utility/collection-tree-structure";
 import { hasValue } from "@/lib/utils";
 import { PrinterIcon } from "lucide-react";
 import Link from "next/link";
@@ -31,10 +33,13 @@ export default function ItemPageClient() {
       collection_slug: string;
       item_slug: string;
     };
-  const activeCollection = useMemo(
-    () => collections?.find((c) => c?.meta?.slug === collection_slug),
-    [collections, collection_slug],
-  );
+  const activeCollection = useMemo(() => {
+    if (!collections) return null;
+    return findInCollectionTree(
+      collections,
+      (collection) => collection.meta.slug === collection_slug,
+    ) as Collection;
+  }, [collection_slug, collections]);
 
   const activeItem = useMemo(
     () =>
@@ -66,7 +71,7 @@ export default function ItemPageClient() {
       document.removeEventListener("keydown", onKeyDown);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, activeItem?._id]);
+  }, [content, activeItem]);
 
   if (loading) {
     return <Loading />;

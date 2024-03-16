@@ -8,19 +8,25 @@ import { Input } from "@/components/ui/input";
 import { ListView } from "@/components/ui/listview";
 import useCollections from "@/lib/swr/use-collections";
 import { Collection } from "@/lib/types/types";
-import { hasValue } from "@/lib/utils";
+import { findInCollectionTree } from "@/lib/utility/collection-tree-structure";
 import { LightbulbIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import Loading from "./loading";
 
-export default async function CollectionContentPageClient() {
+export default function CollectionContentPageClient() {
   const { collections, loading, error, updateCollection } = useCollections();
   const param = useParams();
-  const activeCollection = useMemo(
-    () => collections?.find((c) => c?.meta?.slug === param?.collection_slug),
-    [collections, param],
-  );
+  const activeCollectionSlug = param?.collection_slug;
+
+  // Get the active collection
+  const activeCollection = useMemo(() => {
+    if (!collections) return null;
+    return findInCollectionTree(
+      collections,
+      (collection) => collection.meta.slug === activeCollectionSlug,
+    ) as Collection;
+  }, [activeCollectionSlug, collections]);
 
   if (loading) {
     return <Loading />;
@@ -32,7 +38,7 @@ export default async function CollectionContentPageClient() {
       </div>
     );
   }
-  if (!hasValue(activeCollection)) {
+  if (!activeCollection) {
     return (
       <div className="CollectionContentPageClient h-full w-full py-12">
         <NotFoundView item="Collection" />
@@ -50,7 +56,7 @@ export default async function CollectionContentPageClient() {
               updateCollection({ ...activeCollection!, name });
             }}
           />
-          {activeCollection?.children?.length > 0 && (
+          {activeCollection!.children.length > 0 && (
             <Button
               variant={"default"}
               className="border-dotted  border-muted-foreground "
@@ -83,7 +89,7 @@ export default async function CollectionContentPageClient() {
 
 function NoItemsView({ activeCollection }: { activeCollection?: Collection }) {
   return (
-    <div className="WorkspacePage h-full w-full flex-grow bg-background">
+    <div className="NoItemsView h-full w-full flex-grow bg-background">
       <div className="mx-auto flex h-full max-w-xl flex-1 flex-col place-content-center items-center gap-10 pt-56 text-center">
         <LightbulbIcon size={64} className="text-accent" />
         <span className="font-normal">
@@ -139,39 +145,3 @@ function CollectionNameField({
     </form>
   );
 }
-
-interface CreateItemProps {
-  activeCollection?: Collection;
-  children: React.ReactNode;
-  status: "IDLE" | "LOADING";
-  onStatusUpdate: (status: "IDLE" | "LOADING") => void;
-}
-// function CreateItem({
-//   activeCollection,
-//   children,
-//   onStatusUpdate,
-//   status,
-// }: CreateItemProps) {
-//   // const { createCollection } = useContext(WorkspaceContext);
-
-//   async function handleCreateCollection() {
-//     onStatusUpdate("LOADING");
-//     // createCollection({
-//     //   object: "item",
-//     //   parent: activeCollection?._id,
-//     // } as Collection).finally(() => {
-//     //   onStatusUpdate("IDLE");
-//     // });
-//   }
-//   return (
-//     <div
-//       onClick={() => {
-//         if (!activeCollection) {
-//           return;
-//         }
-//         handleCreateCollection();
-//       }}>
-//       {children}
-//     </div>
-//   );
-// }

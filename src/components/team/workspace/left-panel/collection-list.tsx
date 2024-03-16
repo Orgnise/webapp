@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
-import { MoreVerticalIcon, PlusIcon } from "lucide-react";
+import { CopyPlus, MoreVerticalIcon, PlusIcon } from "lucide-react";
 import React from "react";
 
 // import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
@@ -52,7 +52,7 @@ export default function CollectionList(prop: Props) {
     />
   );
 }
-type Status = "IDLE" | "LOADING";
+type Status = "IDLE" | "CREATING-ITEM" | "CREATING-COLLECTION" | "DELETING";
 interface RenderCollectionProps {
   collection: Collection;
 }
@@ -69,20 +69,22 @@ function RenderCollection({ collection }: RenderCollectionProps) {
   };
 
   function HandleDeleteCollection() {
-    setDeleteStatus("LOADING");
-    deleteCollection(collection?.meta?.slug).finally(() => {
+    setDeleteStatus("DELETING");
+    deleteCollection(collection?._id, collection?.meta?.slug).finally(() => {
       setDeleteStatus("IDLE");
     });
   }
 
-  function handleCreateItem() {
-    setCreateItemStatus("LOADING");
-    createCollection({
-      object: "item",
-      parent: collection._id,
-    } as Collection).finally(() => {
+  function handleCreateItem(object = "item" as "item" | "collection") {
+    setCreateItemStatus(("CREATING-" + object.toUpperCase()) as Status);
+    createCollection(
+      {
+        object: object,
+        parent: collection._id,
+      } as Collection,
+      collection?.parent,
+    ).finally(() => {
       setCreateItemStatus("IDLE");
-      console.log("Item created");
     });
   }
 
@@ -99,14 +101,31 @@ function RenderCollection({ collection }: RenderCollectionProps) {
               : "Untitled collection"}
           </H5>
         </Link>
-        <div className="invisible absolute  -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background/40">
+        <div className="invisible absolute  -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background">
           <div className="flex h-full items-center gap-2 px-1">
             <ToolTipWrapper content={<span>Create Item</span>}>
-              <button onClick={handleCreateItem}>
-                {createItemStatus === "LOADING" ? (
+              <button
+                onClick={() => {
+                  handleCreateItem("item");
+                }}
+              >
+                {createItemStatus === "CREATING-ITEM" ? (
                   <Spinner className="h-5" />
                 ) : (
                   <PlusIcon size={15} />
+                )}
+              </button>
+            </ToolTipWrapper>
+            <ToolTipWrapper content={<span>Create Collection</span>}>
+              <button
+                onClick={() => {
+                  handleCreateItem("collection");
+                }}
+              >
+                {createItemStatus === "CREATING-COLLECTION" ? (
+                  <Spinner className="h-5" />
+                ) : (
+                  <CopyPlus size={15} />
                 )}
               </button>
             </ToolTipWrapper>
@@ -114,7 +133,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 ">
                 <button>
-                  {deleteStatus === "LOADING" ? (
+                  {deleteStatus === "DELETING" ? (
                     <Spinner className="h-5" />
                   ) : (
                     <MoreVerticalIcon size={15} />
@@ -141,9 +160,18 @@ function RenderCollection({ collection }: RenderCollectionProps) {
         className={cx(
           "mx-1 flex flex-col gap-2 border-l border-border transition-all  duration-150 ease-in-expo",
         )}
-        renderItem={(item, index) => (
-          <RenderItem key={index} item={item} collection={collection} />
-        )}
+        renderItem={(item, index) => {
+          if (item.object === "item") {
+            return (
+              <RenderItem key={index} item={item} collection={collection} />
+            );
+          }
+          return (
+            <div key={index} className="pl-4">
+              <RenderCollection collection={item} />
+            </div>
+          );
+        }}
         noItemsElement={
           <div className="-mx-px flex items-center gap-2  border-l border-border py-1  pl-4 text-sm font-medium text-muted-foreground/70">
             No items
@@ -168,10 +196,12 @@ function RenderItem({ item, collection }: RenderItemProps) {
 
   const { deleteItem } = useCollections();
   function HandleDeleteItem() {
-    setStatus("LOADING");
-    deleteItem(item?.meta?.slug, collection?.meta?.slug).finally(() => {
-      setStatus("IDLE");
-    });
+    setStatus("DELETING");
+    deleteItem(item._id, item?.meta?.slug, collection?.meta?.slug).finally(
+      () => {
+        setStatus("IDLE");
+      },
+    );
   }
 
   const isActive = item_slug === item?.meta?.slug;
@@ -183,7 +213,7 @@ function RenderItem({ item, collection }: RenderItemProps) {
           "group -mx-px flex items-center gap-2  border-l py-1  pl-4 text-muted-foreground",
           {
             "border-primary text-primary": isActive,
-            "hover:text border-border hover:border-accent hover:border-secondary-foreground hover:text-secondary-foreground":
+            "hover:text border-border hover:border-secondary-foreground hover:text-secondary-foreground":
               !isActive,
           },
         )}
@@ -197,7 +227,7 @@ function RenderItem({ item, collection }: RenderItemProps) {
           <DropdownMenu>
             <DropdownMenuTrigger className="flex items-center gap-2 ">
               <button>
-                {status === "LOADING" ? (
+                {status === "DELETING" ? (
                   <Spinner className="h-5" />
                 ) : (
                   <MoreVerticalIcon size={15} />
