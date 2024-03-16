@@ -77,13 +77,10 @@ function RenderCollection({ collection }: RenderCollectionProps) {
 
   function handleCreateItem(object = "item" as "item" | "collection") {
     setCreateItemStatus(("CREATING-" + object.toUpperCase()) as Status);
-    createCollection(
-      {
-        object: object,
-        parent: collection._id,
-      } as Collection,
-      collection?.parent,
-    ).finally(() => {
+    createCollection({
+      object: object,
+      parent: collection._id,
+    } as Collection).finally(() => {
       setCreateItemStatus("IDLE");
     });
   }
@@ -158,7 +155,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
       <ListView
         items={collection.children}
         className={cx(
-          "mx-1 flex flex-col gap-2 border-l border-border transition-all  duration-150 ease-in-expo",
+          "flex flex-col gap-2 border-l border-border transition-all  duration-150 ease-in-expo",
         )}
         renderItem={(item, index) => {
           if (item.object === "item") {

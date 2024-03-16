@@ -15,7 +15,7 @@ interface IWorkspaces {
    * Create a new collection / Item
    * To create item, pass the parent collection slug
    */
-  createCollection(collection: Collection, grandParentCollection: string): Promise<void>;
+  createCollection(collection: Collection): Promise<void>;
   updateCollection: (collection: Collection) => void;
   UpdateItem: (item: Collection, parent: Collection) => Promise<void>;
   deleteCollection(id: string, collectionSlug: string,): Promise<void>;
@@ -43,7 +43,7 @@ export default function useCollections(): IWorkspaces {
   );
 
   // Create a new Collection/Item
-  async function createCollection(collection: Collection, grandParentCollection: string) {
+  async function createCollection(collection: Collection) {
     try {
       const response = await fetcher(
         `/api/teams/${team_slug}/${workspace_slug}/collections`,
@@ -61,7 +61,7 @@ export default function useCollections(): IWorkspaces {
 
       //  If created item is a collection type then
       if (collection.object === "collection") {
-        list = addInCollectionTree(collections, collection.parent, response.collection);
+        list = collections.length < 1 ? [response.collection] : addInCollectionTree(collections, collection.parent, response.collection);
         mutate({ collections: list }, { revalidate: false, optimisticData: list });
         router.push(
           `/${team_slug}/${workspace_slug}/${response.collection.meta.slug}`,

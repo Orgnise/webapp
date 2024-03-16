@@ -14,8 +14,7 @@ export function createTreeFromCollection(arr: CollectionSchema[]): TreeNode<Coll
     arr.forEach(obj => {
         map.set(obj._id.toString(), { ...obj, children: [] } as unknown as TreeNode<CollectionSchema>);
     });
-    // console.log(map);
-    const root: TreeNode<CollectionSchema> = { _id: null as any, parent: null, children: [] } as unknown as TreeNode<CollectionSchema>;
+    const root: TreeNode<CollectionSchema> = { _id: null as any, parent: null, children: [] };
     arr.forEach(obj => {
         if (obj.parent) {
             const parent = map.get(obj.parent.toString());

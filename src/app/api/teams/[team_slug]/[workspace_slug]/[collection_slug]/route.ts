@@ -158,11 +158,10 @@ export const DELETE = withAuth(async ({ params, team }) => {
         { status: 404 },
       );
     }
-    // const query to delete collections and all collection having parent as the collection
     const deleteQuery = {
       $or: [
-        { "meta.slug": collection_slug },
         { parent: new ObjectId(collectionInDb._id) },
+        { _id: new ObjectId(collectionInDb._id) },
       ],
     };
 
