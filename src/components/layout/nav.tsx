@@ -43,20 +43,18 @@ const Nav = ({}) => {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="bg-primary-200 flex h-10 w-10 place-content-center items-center rounded-full text-lg font-bold hover:text-teal-700">
-                  {user.image && (
-                    <Image
-                      unoptimized={true}
-                      height={32}
-                      width={32}
-                      src={user.image}
-                      alt="user"
-                      className="h-8 w-8 rounded-full"
-                      onError={(e) => {
-                        (e.target as any).src =
-                          `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
-                      }}
-                    />
-                  )}
+                  <Image
+                    unoptimized={true}
+                    height={32}
+                    width={32}
+                    src={user.image ?? ""}
+                    alt="user"
+                    className="h-8 w-8 rounded-full"
+                    onError={(e) => {
+                      (e.target as any).src =
+                        `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+                    }}
+                  />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="border-border">

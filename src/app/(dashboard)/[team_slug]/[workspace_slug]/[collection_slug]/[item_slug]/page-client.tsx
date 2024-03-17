@@ -157,7 +157,7 @@ function CollectionNameField({
         type="text"
         autoFocus
         className=" border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
-        maxLength={30}
+        maxLength={70}
         defaultValue={name}
         required
         name="name"
