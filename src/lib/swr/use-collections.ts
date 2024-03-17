@@ -56,21 +56,21 @@ export default function useCollections(): IWorkspaces {
         },
       );
 
-      const collections = data?.collections;
-      let list;
+      const collections = (data?.collections ?? []) as Array<Collection>;
+      let collectionTree;
 
       //  If created item is a collection type then
       if (collection.object === "collection") {
-        list = collections.length < 1 ? [response.collection] : addInCollectionTree(collections, collection.parent, response.collection);
-        mutate({ collections: list }, { revalidate: false, optimisticData: list });
+        collectionTree = addInCollectionTree(collections, collection.parent, response.collection);
+        mutate({ collections: collectionTree }, { revalidate: false, optimisticData: collectionTree });
         router.push(
           `/${team_slug}/${workspace_slug}/${response.collection.meta.slug}`,
         );
       }
       // If created item is an item type
       else {
-        list = addInCollectionTree(collections, collection.parent, response.collection);
-        mutate({ collections: list }, { revalidate: false, optimisticData: list });
+        collectionTree = addInCollectionTree(collections, collection.parent, response.collection);
+        mutate({ collections: collectionTree }, { revalidate: false, optimisticData: collectionTree });
       }
       displayToast({
         title: "Success",

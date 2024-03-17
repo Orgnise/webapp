@@ -155,7 +155,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
       <ListView
         items={collection.children}
         className={cx(
-          "flex flex-col gap-2 border-l border-border transition-all  duration-150 ease-in-expo",
+          "ml-1 flex flex-col gap-2 border-l border-border transition-all  duration-150 ease-in-expo",
         )}
         renderItem={(item, index) => {
           if (item.object === "item") {

@@ -57,15 +57,22 @@ export function updateInCollectionTree(tree: TreeNode<Collection>[], id: string,
  * @returns
  */
 export function addInCollectionTree(tree: TreeNode<Collection>[], id: string, newNode: TreeNode<Collection>): TreeNode<Collection>[] {
-    return tree.map((node) => {
-        if (node._id === id) {
-            return { ...node, children: [...node.children, newNode] };
-        }
-        if (node.children.length > 0) {
-            return { ...node, children: addInCollectionTree(node.children, id, newNode) };
-        }
-        return node;
-    })
+    if (tree.length === 0) {
+        return [newNode];
+    } else if (!id || id == null) {
+        return [...tree, newNode];
+    }
+    else {
+        return tree.map((node) => {
+            if (node._id === id) {
+                return { ...node, children: [...node.children, newNode] };
+            }
+            if (node.children.length > 0) {
+                return { ...node, children: addInCollectionTree(node.children, id, newNode) };
+            }
+            return node;
+        })
+    }
 }
 
 /**
