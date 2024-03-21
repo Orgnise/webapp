@@ -109,7 +109,7 @@ export function SignupForm() {
       </div>
 
       {/* Terms & Conditions and Privacy Policy */}
-      <div className="mt-6 flex w-9/12 flex-col place-content-center items-center pt-3 text-center text-xs text-muted-foreground/90">
+      {/* <div className="mt-6 flex w-9/12 flex-col place-content-center items-center pt-3 text-center text-xs text-muted-foreground/90">
         <span className="">
           By continue, you agree to our{" "}
           <span className="cursor-pointer underline">
@@ -120,7 +120,7 @@ export function SignupForm() {
             <Link href="policy">Privacy Policy</Link>
           </span>
         </span>
-      </div>
+      </div> */}
     </div>
   );
 }

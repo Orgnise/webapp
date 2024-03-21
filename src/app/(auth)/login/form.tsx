@@ -218,7 +218,7 @@ export function LoginForm() {
       </div>
 
       {/* Terms & Conditions and Privacy Policy */}
-      <div className="flex w-9/12 flex-col place-content-center items-center pt-3 text-center text-xs text-muted-foreground/90">
+      {/* <div className="flex w-9/12 flex-col place-content-center items-center pt-3 text-center text-xs text-muted-foreground/90">
         <span className="">
           By signing in, you agree to our{" "}
           <span className="cursor-pointer underline">
@@ -229,7 +229,7 @@ export function LoginForm() {
             <Link href="policy">Privacy Policy</Link>
           </span>
         </span>
-      </div>
+      </div> */}
     </div>
   );
 }

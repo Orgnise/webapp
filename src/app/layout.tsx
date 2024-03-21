@@ -7,9 +7,7 @@ import { cn } from "@/lib/utils";
 import { inter, satoshi } from "@/styles/font";
 import { Toaster } from "sonner";
 
-export const metadata = constructMetadata({
-  title: `Sign in to ${process.env.NEXT_PUBLIC_APP_NAME}`,
-});
+export const metadata = constructMetadata({});
 
 export default function RootLayout({
   children,

@@ -7,7 +7,7 @@ export function Logo({ className }: { className?: string }) {
       x="0px"
       y="0px"
       viewBox="0 0 180 180"
-      enable-background="new 0 0 180 180"
+      enableBackground="new 0 0 180 180"
       xmlSpace="preserve"
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -18,7 +18,7 @@ export function Logo({ className }: { className?: string }) {
         cy="90"
         r="87"
         stroke="black"
-        stroke-width="0"
+        strokeWidth="0"
         fill="white"
       />
       <path

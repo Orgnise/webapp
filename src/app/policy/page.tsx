@@ -1,8 +1,13 @@
 import { Logo } from "@/components/atom/logo";
 
 import { NavbarLayout } from "@/components/layout/nav-layout";
+import { constructMetadata } from "@/lib/utility/construct-metadata";
 import Link from "next/link";
 import PrivacyPolicyPageClient from "./page-client";
+
+export const metadata = constructMetadata({
+  title: `Privacy and Policy - ${process.env.NEXT_PUBLIC_APP_NAME}`,
+});
 
 export default function PrivacyPolicyPage() {
   return (
