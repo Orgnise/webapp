@@ -26,7 +26,7 @@ export const NextAuthOptions = {
     EmailProvider({
       async sendVerificationRequest({ identifier, url }) {
         console.log("sendVerificationRequest", { identifier, url });
-        if (!process.env.EMAIL_SERVER || !process.env.EMAIL_FROM) {
+        if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) {
           console.log(`Login link: ${url}`);
           return;
         } else {
