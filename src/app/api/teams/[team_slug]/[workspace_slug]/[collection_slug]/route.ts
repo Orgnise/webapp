@@ -165,6 +165,10 @@ export const DELETE = withAuth(async ({ params, team }) => {
       ],
     };
 
+    // delete all children recursively
+    await deleteDocumentAndChildren(collectionsDb, new ObjectId(collectionInDb._id));
+
+    // delete the record itself
     const deleteResult = await collectionsDb.deleteMany(deleteQuery);
 
     return NextResponse.json(
@@ -182,3 +186,14 @@ export const DELETE = withAuth(async ({ params, team }) => {
     );
   }
 });
+
+/**
+ * Delete all the children (n-level) of a given documentId (MongoId) and a collection
+ */
+async function deleteDocumentAndChildren(collection: any, documentId: any) {
+  const children = await collection.find({ parent: documentId }).toArray();
+  for (const child of children) {
+    await deleteDocumentAndChildren(collection, child._id);
+    await collection.deleteOne({ _id: child._id });
+  }
+}
