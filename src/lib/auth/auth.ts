@@ -24,22 +24,18 @@ export const NextAuthOptions = {
   },
   providers: [
     EmailProvider({
-      sendVerificationRequest({ identifier, url }) {
+      async sendVerificationRequest({ identifier, url }) {
         console.log("sendVerificationRequest", { identifier, url });
-        if (process.env.NODE_ENV === "development") {
+        if (!process.env.EMAIL_SERVER || !process.env.EMAIL_FROM) {
           console.log(`Login link: ${url}`);
           return;
         } else {
-          sendEmailV2({
-            identifier,
-            provider: {
-              server: process.env.EMAIL_SERVER ?? "",
-              from: process.env.EMAIL_FROM ?? "",
-            },
-            subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
-            react: LoginLink({ url, email: identifier }),
-          });
         }
+        await sendEmailV2({
+          identifier,
+          subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
+          react: LoginLink({ url, email: identifier }),
+        });
 
       },
     }),

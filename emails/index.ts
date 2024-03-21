@@ -40,12 +40,8 @@ export const sendEmail = async ({
 
 
 
-export async function sendEmailV2({ identifier, provider, subject, text, react, }: {
+export async function sendEmailV2({ identifier, subject, text, react, }: {
   identifier: string;
-  provider: {
-    server: string;
-    from: string;
-  };
   subject: string;
   text?: string;
   react?: ReactElement<any, string | JSXElementConstructor<any>>;
@@ -80,13 +76,11 @@ export async function sendEmailV2({ identifier, provider, subject, text, react, 
     html: 'Hi',
     ...(react && { html: render(react) }),
     ...(text && { TextBody: text }),
-
-
   })
-  // console.log("--------RESULT----------")
-  // console.log(result)
-  // console.log("------------------")
-  const failed = result.rejected.concat(result.rejected).filter(Boolean)
+  console.log("--------EMAIL TO:----------")
+  console.log({ accepted: result.accepted, rejected: result.rejected })
+  console.log("------------------")
+  const failed = result.rejected.filter(Boolean)
   if (failed.length) {
     throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
   }

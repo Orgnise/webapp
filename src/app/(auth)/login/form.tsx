@@ -9,7 +9,7 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 export function LoginForm() {
@@ -23,7 +23,7 @@ export function LoginForm() {
   const next = searchParams?.get("next");
   const signupPath = "/signup"; //next ? `/signup${next}` : "/signup";
 
-  const [email, setEmail] = useState("");
+  const emailRef = useRef<HTMLInputElement | null>(null);
   const [showEmailOption, setShowEmailOption] = useState(false);
   const [noSuchAccount, setNoSuchAccount] = useState(false);
 
@@ -48,11 +48,13 @@ export function LoginForm() {
             ...(next && next.length > 0 ? { callbackUrl: next } : {}),
           }).then((res) => {
             if (res?.ok && !res?.error) {
-              setEmail("");
+              // Clear email value
+              if (emailRef.current) emailRef.current!.value = "";
               toast.success("Email sent - check your inbox!");
             } else {
               toast.error("Error sending email - try again?");
             }
+            setShowEmailOption(false);
           });
         } else {
           toast.error("No account found with that email address.");
@@ -133,6 +135,7 @@ export function LoginForm() {
           <div className="mt-4 flex w-full flex-col items-center">
             <div className="mx-auto my-6 h-[1px] w-10/12 border-t border-border dark:border-card" />
             <Input
+              ref={emailRef}
               name="email"
               required={true}
               autoComplete="email"
@@ -142,7 +145,6 @@ export function LoginForm() {
               className="mb-4 w-9/12 dark:border-card"
               onChange={(e) => {
                 setNoSuchAccount(false);
-                setEmail(e.target.value);
               }}
             />
           </div>
