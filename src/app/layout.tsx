@@ -3,15 +3,10 @@ import "@/styles/prosemirror.css";
 
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import type { Metadata } from "next";
-import { Inter as FontSans } from "next/font/google";
 // import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
+import { inter, satoshi } from "@/styles/font";
 import { Toaster } from "sonner";
-
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
 
 export const metadata: Metadata = {
   title: "Pulse",
@@ -34,10 +29,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body className={cn("h-screen font-sans antialiased", fontSans.variable)}>
+      <body
+        className={cn(
+          "h-screen font-sans antialiased",
+          satoshi.variable,
+          inter.variable,
+        )}
+      >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

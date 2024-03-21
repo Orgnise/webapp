@@ -87,6 +87,11 @@ const config = {
         "in-expo": "cubic-bezier(0.3, 1, .3, 1)",
         "out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
       },
+      fontFamily: {
+        display: ["var(--font-satoshi)", "system-ui", "sans-serif"],
+        default: ["var(--font-inter)", "system-ui", "sans-serif"],
+      },
+
     },
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],

@@ -1,7 +1,7 @@
 export function Background() {
   return (
     <div style={styles.backgroundMain}>
-      {/* <div style={styles.backgroundMainBefore} /> */}
+      <div style={styles.backgroundMainBefore} />
       <div style={styles.backgroundMainAfter} />
       <div style={styles.backgroundContent} />
     </div>
@@ -30,7 +30,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   backgroundMainAfter: {
     content: '""',
-    backgroundImage: "url(https://d2vwwcvoksz7ty.cloudfront.net/grid.svg)",
+    backgroundImage: "url(_static/grid.svg)",
     zIndex: 1,
     position: "absolute",
     width: "100%",
@@ -43,7 +43,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     zIndex: 3,
     width: "100%",
     maxWidth: "640px",
-    backgroundImage: `radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%), 
+    backgroundImage: `radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%),
                       radial-gradient(at 97% 21%, hsla(125, 98%, 72%, 1) 0px, transparent 50%),
                       radial-gradient(at 52% 99%, hsla(354, 98%, 61%, 1) 0px, transparent 50%),
                       radial-gradient(at 10% 29%, hsla(256, 96%, 67%, 1) 0px, transparent 50%),

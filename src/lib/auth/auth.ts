@@ -1,12 +1,15 @@
-import { mongoUserResult } from "@/app/api/signup/route";
+import { mongoUserResult } from "@/app/api/auth/signup/route";
 import GitHub from "@auth/core/providers/github";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import NextAuth, { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Twitter from "next-auth/providers/twitter";
+import EmailProvider from "next-auth/providers/email";
 import { z } from "zod";
 import mongoDb, { databaseName } from "../mongodb";
+import LoginLink from "../../../emails/login-link";
+import { sendEmail, sendEmailV2 } from "../../../emails";
 
 const backendURL = process.env.NEXT_PUBLIC_URL;
 
@@ -19,6 +22,20 @@ export const NextAuthOptions = {
     strategy: "jwt",
   },
   providers: [
+    EmailProvider({
+      sendVerificationRequest({ identifier, url }) {
+        console.log("sendVerificationRequest", { identifier, url });
+        sendEmailV2({
+          identifier,
+          provider: {
+            server: process.env.EMAIL_SERVER ?? "",
+            from: process.env.EMAIL_FROM ?? "",
+          },
+          subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
+          react: LoginLink({ url, email: identifier }),
+        });
+      },
+    }),
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
       clientSecret: process.env.AUTH_GITHUB_SECRET,
@@ -54,7 +71,7 @@ export const NextAuthOptions = {
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);
         if (parsedCredentials.success) {
-          const authResponse = await fetch(`${feUrl}/api/login`, {
+          const authResponse = await fetch(`${feUrl}/api/auth/login`, {
             method: "POST",
             body: JSON.stringify(parsedCredentials.data),
             headers: {

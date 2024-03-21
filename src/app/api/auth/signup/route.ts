@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { User } from "../../../../types/user.type";
+import { User } from "../../../../../types/user.type";
 
 export async function POST(request: NextRequest) {
   const client = await mongoDb;

@@ -1,158 +1,126 @@
 "use client";
-import Label from "@/components/atom/label";
-import { TextField } from "@/components/molecule/text-field";
-import { Button } from "@/components/ui/button";
-import { fetcher } from "@/lib/fetcher";
+
+import cx from "classnames";
 import { signIn } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
-import { ChangeEvent, useState } from "react";
-
-type SignupInput = {
-  password: string;
-  cPassword: string;
-};
-
-type State = "IDLE" | "LOADING" | "ERROR" | "SUCCESS";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 export function SignupForm() {
-  const [inputs, setInputs] = useState<SignupInput>({
-    password: "",
-    cPassword: "",
-  });
-
-  const [state, setState] = useState<State>("IDLE");
-
+  const [isLoading, setIsLoading] = useState(false);
   const [errors, setError] = useState<{
-    name?: string;
     email?: string;
     password?: string;
-    cPassword?: string;
+    other?: string;
   }>({});
-
-  const handleSignup = async (e: any) => {
-    e.preventDefault();
-    if (inputs.password !== inputs.cPassword) {
-      setError({
-        ...errors,
-        cPassword: "Password and confirm password should be same",
-      });
-      return;
-    }
-    setError({
-      email: "",
-      password: "",
-      cPassword: "",
-      name: "",
-    });
-
-    setState("LOADING");
-    const name = e.target.name.value;
-    const email = e.target.email.value;
-    const { password } = inputs;
-    try {
-      const response = await fetcher("/api/signup", {
-        method: "POST",
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      });
-      signIn("credentials", {
-        email: email,
-        password: password,
-        callbackUrl: "/",
-      });
-      setState("SUCCESS");
-    } catch (error: any) {
-      setState("ERROR");
-      setError({
-        ...errors,
-        email: error?.message,
-      });
-    }
-  };
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const name = event.target.name;
-    const value = event.target.value;
-    setInputs((values) => ({ ...values, [name]: value }));
-  };
+  const searchParams = useSearchParams();
+  const next = searchParams?.get("next");
 
   return (
-    <form
-      className="flex h-full flex-col place-content-center items-center  rounded-md py-10"
-      onSubmit={handleSignup}
-    >
-      <div className="flex flex-col items-center py-12 font-normal">
-        <h3 className="text-3xl font-bold ">Welcome back</h3>
-        <Label>
-          We are <strong className="theme-text-primary">happy</strong> to have
-          you
-        </Label>
+    <div className="flex h-full flex-col place-content-center items-center bg-secondary/60 py-6">
+      <div className="mt-4 flex w-9/12 flex-col place-content-evenly gap-2">
+        {/* GOOGLE LOGIN */}
+        <button
+          onClick={async (e) => {
+            e.preventDefault();
+            // googleLogin();
+            await signIn("google");
+          }}
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+        >
+          <Image
+            unoptimized={true}
+            height={32}
+            width={32}
+            src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png"
+            className="h-6 w-6"
+            alt={"Google"}
+          />
+          <span className="px-2 text-sm">Continue with Google</span>
+        </button>
+        {/* Github Login */}
+        <button
+          onClick={async (e) => {
+            e.preventDefault();
+            await signIn("github");
+          }}
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+        >
+          <Image
+            unoptimized={true}
+            src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"
+            className="h-6 w-6"
+            height={32}
+            width={32}
+            alt="Github"
+          />
+          <span className="px-2 text-sm">Continue with Github</span>
+        </button>
+        {/* Twitter Login */}
+        <button
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+          onClick={async (e) => {
+            e.preventDefault();
+            // googleLogin();
+            await signIn("twitter");
+          }}
+        >
+          <Image
+            unoptimized={true}
+            height={32}
+            width={32}
+            src="https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023.svg"
+            className="h-5 w-5"
+            alt="X"
+          />
+          <span className="px-2 text-sm">Continue with X</span>
+        </button>
       </div>
 
-      <TextField
-        label="Fullname"
-        name="name"
-        required={true}
-        onChange={handleChange}
-        autoComplete="name"
-        error={errors.name}
-        type="text"
-        wrapperClassName="w-9/12"
-        maxLength={30}
-      />
-      <TextField
-        label="Email"
-        name="email"
-        required={true}
-        onChange={handleChange}
-        autoComplete="email"
-        error={errors.email}
-        type="email"
-        wrapperClassName="w-9/12"
-      />
-      <TextField
-        label="Password"
-        name="password"
-        required={true}
-        onChange={handleChange}
-        value={inputs.password}
-        error={errors.password}
-        type="password"
-        minLength={6}
-        wrapperClassName="w-9/12"
-      />
-
-      <TextField
-        label="Confirm Password"
-        name="cPassword"
-        onChange={handleChange}
-        required={true}
-        value={inputs.cPassword}
-        error={errors.cPassword}
-        type="password"
-        minLength={6}
-        pattern={inputs.password}
-        wrapperClassName="w-9/12"
-      />
-      <Button disabled={state === "LOADING"} className=" w-9/12">
-        {state === "LOADING" ? (
-          <div className="flex h-8 items-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-white"></div>
-          </div>
-        ) : (
-          "Sign up"
+      <div
+        className="flex items-end space-x-1"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {errors?.other && (
+          <>
+            <p className="text-sm text-red-500">{errors?.other}</p>
+          </>
         )}
-      </Button>
-      <div className="flex w-9/12 place-content-evenly items-center pt-10 text-center">
-        <span className="theme-border flex-1 border-t" />
-        <span className="cursor-pointer px-4 text-sm hover:underline">
-          <Link href="login">DO YOU HAVE AN ACCOUNT?</Link>
-        </span>
-        <span className="theme-border flex-1 border-t" />
       </div>
-    </form>
+
+      <div
+        className={cx(
+          "mt-6 flex w-9/12 place-content-evenly items-center text-center text-sm text-muted-foreground",
+        )}
+      >
+        <span className="flex-1 " />
+        Already have an account?
+        <span
+          className={cx(
+            "cursor-pointer px-1 font-bold hover:text-secondary-foreground",
+            {},
+          )}
+        >
+          <Link href={"/login"}>Log in</Link>
+        </span>
+        <span className="flex-1 " />
+      </div>
+
+      {/* Terms & Conditions and Privacy Policy */}
+      <div className="mt-6 flex w-9/12 flex-col place-content-center items-center pt-3 text-center text-xs text-muted-foreground/90">
+        <span className="">
+          By continue, you agree to our{" "}
+          <span className="cursor-pointer underline">
+            <Link href="terms">Terms & Conditions</Link>
+          </span>{" "}
+          and{" "}
+          <span className="cursor-pointer underline">
+            <Link href="policy">Privacy Policy</Link>
+          </span>
+        </span>
+      </div>
+    </div>
   );
 }
