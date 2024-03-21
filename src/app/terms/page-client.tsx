@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 export default function TermsAndConditionPageClient({ data }: { data: any }) {
   useEffect(() => {
-    document.title = "Terms and Conditions - Pulse";
+    document.title = "Terms and Conditions - Orgnise";
   }, []);
   return (
     <NovelEditor

@@ -1,4 +1,4 @@
-import { BrandLabel, Logo } from "@/components/atom/logo";
+import { Logo } from "@/components/atom/logo";
 
 import { NavbarLayout } from "@/components/layout/nav-layout";
 import Link from "next/link";
@@ -12,9 +12,8 @@ export default function TermsAndConditionPage() {
     <div className="bg-default flex flex-col">
       <NavbarLayout>
         <div className="flex w-full place-content-between items-center">
-          <Link href="/" className="Logo flex items-center gap-2">
+          <Link href="/" className="Logo flex items-center gap-2 py-2">
             <Logo className="h-8" />
-            <BrandLabel className="h-4" />
           </Link>
         </div>
       </NavbarLayout>
@@ -90,7 +89,7 @@ const data = {
               },
             },
           ],
-          text: 'We are Pulse ("',
+          text: 'We are Orgnise ("',
         },
         {
           type: "text",
@@ -223,7 +222,7 @@ const data = {
             {
               type: "link",
               attrs: {
-                href: "https://pulsehq.vercel.app/",
+                href: "https://app.orgnise.in/",
                 target: "_blank",
                 rel: "noopener noreferrer nofollow",
                 class:
@@ -237,7 +236,7 @@ const data = {
               },
             },
           ],
-          text: "https://pulsehq.vercel.app",
+          text: "",
         },
         {
           type: "text",
@@ -350,7 +349,7 @@ const data = {
               },
             },
           ],
-          text: '"), and Pulse, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.',
+          text: '"), and Orgnise, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.',
         },
       ],
     },
@@ -2637,7 +2636,7 @@ const data = {
             {
               type: "link",
               attrs: {
-                href: "https://pulsehq.vercel.app/privacy-policy",
+                href: "https://app.orgnise.in/policy",
                 target: "_blank",
                 rel: "noopener noreferrer nofollow",
                 class:
@@ -2654,7 +2653,7 @@ const data = {
               },
             },
           ],
-          text: "https://pulsehq.vercel.app/privacy-policy",
+          text: "https://app.orgnise.in/policy",
         },
         {
           type: "text",
@@ -2890,7 +2889,7 @@ const data = {
               },
             },
           ],
-          text: "These Legal Terms shall be governed by and defined following the laws of India. Pulse and yourself irrevocably consent that the courts of India shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these Legal Terms.",
+          text: "These Legal Terms shall be governed by and defined following the laws of India. Orgnise and yourself irrevocably consent that the courts of India shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these Legal Terms.",
         },
       ],
     },

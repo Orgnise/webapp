@@ -1,4 +1,4 @@
-import { BrandLabel, Logo } from "@/components/atom/logo";
+import { Logo } from "@/components/atom/logo";
 
 import { NavbarLayout } from "@/components/layout/nav-layout";
 import Link from "next/link";
@@ -9,9 +9,9 @@ export default function PrivacyPolicyPage() {
     <div className="bg-default flex flex-col">
       <NavbarLayout>
         <div className="flex w-full place-content-between items-center">
-          <Link href="/" className="Logo flex items-center gap-2">
+          <Link href="/" className="Logo flex items-center gap-2 py-2">
             <Logo className="h-8" />
-            <BrandLabel className="h-4" />
+            {/* <BrandLabel className="h-4" /> */}
           </Link>
         </div>
       </NavbarLayout>
@@ -210,7 +210,7 @@ const data = {
                 },
                 {
                   type: "text",
-                  text: ' (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to Pulse.',
+                  text: ' (referred to as either "the Company", "We", "Us" or "Our" in this Agreement) refers to Orgnise.',
                 },
               ],
             },
@@ -371,7 +371,7 @@ const data = {
                 },
                 {
                   type: "text",
-                  text: " refers to Pulse, accessible from ",
+                  text: " refers to Orgnise, accessible from ",
                 },
                 {
                   type: "text",
@@ -379,7 +379,7 @@ const data = {
                     {
                       type: "link",
                       attrs: {
-                        href: "https://pulsehq.vercel.app/",
+                        href: "https://app.orgnise.in/",
                         target: "_blank",
                         rel: "external nofollow noopener",
                         class:
@@ -390,7 +390,7 @@ const data = {
                       type: "underline",
                     },
                   ],
-                  text: "https://pulsehq.vercel.app",
+                  text: "",
                 },
               ],
             },

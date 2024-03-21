@@ -164,7 +164,7 @@ export function LoginForm() {
           )}
           ifAbsent={() => (
             <Button
-              className="mt-4 w-9/12"
+              className="hover:text-primary-background dark:hover:text-primary-background mt-4 w-9/12 bg-background text-secondary-foreground hover:bg-primary-foreground dark:hover:bg-primary-foreground"
               type={"button"}
               onClick={(e) => {
                 e.preventDefault();

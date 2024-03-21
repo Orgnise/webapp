@@ -35,7 +35,7 @@ export default function InvitesPage({
           <>
             <PageCopy
               title="Verifying Invite"
-              message={`Pulse is verifying your invite link...`}
+              message={`Orgnise is verifying your invite link...`}
             />
             <LoadingSpinner className="h-7 w-7" />
           </>

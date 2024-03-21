@@ -85,7 +85,7 @@ function WorkspaceName() {
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Team Name</h2>
           <p className="text-sm text-muted-foreground">
-            This is the name of your project on Pulse
+            This is the name of your project on Orgnise
           </p>
         </div>
         <Input
@@ -154,7 +154,7 @@ function WorkspaceSlug() {
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Team Slug</h2>
           <p className="text-sm text-muted-foreground">
-            This is your team&apos;s unique slug on Pulse
+            This is your team&apos;s unique slug on Orgnise
           </p>
         </div>
         <Input

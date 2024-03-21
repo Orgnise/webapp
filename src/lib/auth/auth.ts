@@ -10,6 +10,7 @@ import { z } from "zod";
 import mongoDb, { databaseName } from "../mongodb";
 import LoginLink from "../../../emails/login-link";
 import { sendEmail, sendEmailV2 } from "../../../emails";
+import { APP_DOMAIN } from "../constants";
 
 const backendURL = process.env.NEXT_PUBLIC_URL;
 
@@ -25,15 +26,21 @@ export const NextAuthOptions = {
     EmailProvider({
       sendVerificationRequest({ identifier, url }) {
         console.log("sendVerificationRequest", { identifier, url });
-        sendEmailV2({
-          identifier,
-          provider: {
-            server: process.env.EMAIL_SERVER ?? "",
-            from: process.env.EMAIL_FROM ?? "",
-          },
-          subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
-          react: LoginLink({ url, email: identifier }),
-        });
+        if (process.env.NODE_ENV === "development") {
+          console.log(`Login link: ${url}`);
+          return;
+        } else {
+          sendEmailV2({
+            identifier,
+            provider: {
+              server: process.env.EMAIL_SERVER ?? "",
+              from: process.env.EMAIL_FROM ?? "",
+            },
+            subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
+            react: LoginLink({ url, email: identifier }),
+          });
+        }
+
       },
     }),
     GitHub({
@@ -66,7 +73,7 @@ export const NextAuthOptions = {
       },
       name: "Credentials",
       async authorize(credentials, req) {
-        const feUrl = req?.headers?.origin;
+        const feUrl = APP_DOMAIN;
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })
           .safeParse(credentials);

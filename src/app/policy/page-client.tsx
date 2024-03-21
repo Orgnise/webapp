@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export default function PrivacyPolicyPageClient({ data }: { data: any }) {
   useEffect(() => {
-    document.title = "Privacy Policy - Pulse";
+    document.title = "Privacy Policy - Orgnise";
   }, []);
   return (
     <NovelEditor

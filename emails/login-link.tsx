@@ -22,7 +22,7 @@ export default function LoginLink({
   return (
     <Html>
       <Head />
-      <Preview>Your Pulse Login Link</Preview>
+      <Preview>Your Orgnise Login Link</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[500px] rounded border border-solid border-gray-200 px-10 py-5">
@@ -31,7 +31,7 @@ export default function LoginLink({
                 src={""}
                 width="40"
                 height="40"
-                alt="Pulse"
+                alt="Orgnise"
                 className="mx-auto my-0"
               /> */}
             </Section>
@@ -39,7 +39,7 @@ export default function LoginLink({
               Your Login Link
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              Welcome to Pulse!
+              Welcome to Orgnise!
             </Text>
             <Text className="text-sm leading-6 text-black">
               Please click the magic link below to sign in to your account.

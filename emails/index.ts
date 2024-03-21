@@ -75,7 +75,7 @@ export async function sendEmailV2({ identifier, provider, subject, text, react, 
   )
   const result = await transport.sendMail({
     to: identifier,
-    from: 'noreply@pulse.com',
+    from: 'noreply@orgnise.in',
     subject: subject,
     html: 'Hi',
     ...(react && { html: render(react) }),
