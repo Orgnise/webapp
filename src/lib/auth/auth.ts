@@ -12,7 +12,7 @@ import LoginLink from "../../../emails/login-link";
 import { sendEmail, sendEmailV2 } from "../../../emails";
 import { APP_DOMAIN } from "../constants";
 
-const backendURL = process.env.NEXT_PUBLIC_URL;
+const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
 export const NextAuthOptions = {
   adapter: MongoDBAdapter(mongoDb),
@@ -22,11 +22,26 @@ export const NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  cookies: {
+    sessionToken: {
+      name: `${VERCEL_DEPLOYMENT ? "__Secure-" : ""}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        // When working on localhost, the cookie domain must be omitted entirely (https://stackoverflow.com/a/1188145)
+        domain: VERCEL_DEPLOYMENT
+          ? `.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
+          : undefined,
+        secure: VERCEL_DEPLOYMENT,
+      },
+    },
+  },
   providers: [
     EmailProvider({
       async sendVerificationRequest({ identifier, url }) {
         console.log("sendVerificationRequest", { identifier, url });
-        if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD) {
+        if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD || process.env.NODE_ENV === "development") {
           console.log(`Login link: ${url}`);
           return;
         } else {

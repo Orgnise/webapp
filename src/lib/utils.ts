@@ -159,7 +159,7 @@ export function pluralize(word: string, count: number): string {
 }
 
 export const parse = (req: NextRequest) => {
-  // path is the path of the URL (e.g. pulse.com/home/settings -> /home/settings)
+  // path is the path of the URL (e.g. orgnise.in/home/settings -> /home/settings)
   let path = req.nextUrl.pathname;
 
   // fullPath is the full URL path (along with search params)
