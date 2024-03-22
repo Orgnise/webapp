@@ -34,9 +34,11 @@ We love our contributors! Here's how you can contribute:
 - [Open an issue](https://github.com/orgnise/orgnise/issues) if you believe you've encountered a bug.
 - Make a [pull request](https://github.com/orgnise/orgnise/pull) to add new features/improvements/fix bugs.
 
+<!--- 
 <a href="https://github.com/Orgnise/orgnise/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Orgnise/orgnise" />
 </a>
+--->
 
 
 ## Repo Activity
