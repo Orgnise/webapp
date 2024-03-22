@@ -1,3 +1,16 @@
 {
-  "cSpell.words": ["alphanum", "gettask", "humburger", "Kanban", "SIGNUP"]
+  "cSpell.words": [
+    "alphanum",
+    "deduping",
+    "gettask",
+    "humburger",
+    "Kanban",
+    "lucide",
+    "NEXTAUTH",
+    "orgnise",
+    "SIGNUP"
+  ],
+  "tailwindCSS.experimental.classRegex": [
+    ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ]
 }
