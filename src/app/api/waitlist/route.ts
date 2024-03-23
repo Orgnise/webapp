@@ -1,10 +1,28 @@
+import { HOME_DOMAIN } from "@/lib/constants";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+const allowCors = (fn: any) => async (req: any, res: any) => {
+  res.setHeader('Access-Control-Allow-Credentials', true)
+  res.setHeader('Access-Control-Allow-Origin', HOME_DOMAIN)
+  // another common pattern
+  // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+  res.setHeader('Access-Control-Allow-Methods', 'POST')
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  )
+  if (req.method === 'OPTIONS') {
+    res.status(200).end()
+    return
+  }
+  return await fn(req, res)
+}
+
 
 // API to save waitlist email
-export async function POST(request: Request) {
+async function POST(request: Request) {
   const client = await mongoDb;
   try {
     const credentials: { email: string } = await request.json();
@@ -53,3 +71,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export default allowCors(POST);
