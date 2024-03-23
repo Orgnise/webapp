@@ -1,28 +1,20 @@
 import { HOME_DOMAIN } from "@/lib/constants";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-const allowCors = (fn: any) => async (req: any, res: any) => {
-  res.setHeader('Access-Control-Allow-Credentials', true)
-  res.setHeader('Access-Control-Allow-Origin', HOME_DOMAIN)
-  // another common pattern
-  // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-  res.setHeader('Access-Control-Allow-Methods', 'POST')
-  res.setHeader(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-  )
-  if (req.method === 'OPTIONS') {
-    res.status(200).end()
-    return
-  }
-  return await fn(req, res)
+export const corsHeaders = {
+  "Access-Control-Allow-Origin": `${HOME_DOMAIN}`,
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS(req: NextRequest) {
+  return NextResponse.json({}, { headers: corsHeaders });
 }
 
-
 // API to save waitlist email
-async function POST(request: Request) {
+export async function POST(request: Request) {
   const client = await mongoDb;
   try {
     const credentials: { email: string } = await request.json();
@@ -35,7 +27,8 @@ async function POST(request: Request) {
           message: "Invalid email address",
           error: parsedCredentials.error,
         },
-        { status: 401 },
+        { status: 401, headers: corsHeaders },
+
       );
     }
     const waitListCollection = client.db(databaseName).collection("waitlist");
@@ -49,14 +42,14 @@ async function POST(request: Request) {
         message: "email already exists in waitlist",
 
 
-      }, { status: 200 });
+      }, { status: 200, headers: corsHeaders });
     }
 
     const user = await waitListCollection.insertOne({
       email: parsedCredentials.data.email,
       createdAt: new Date(),
     });
-    return NextResponse.json({ user }, { status: 200 });
+    return NextResponse.json({ user }, { status: 200, headers: corsHeaders });
 
 
 
@@ -67,9 +60,7 @@ async function POST(request: Request) {
         message: "Internal Server Error",
         error: err.toString(),
       },
-      { status: 500 },
+      { status: 500, headers: corsHeaders },
     );
   }
 }
-
-export default allowCors(POST);
