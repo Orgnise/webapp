@@ -8,7 +8,8 @@
     "lucide",
     "NEXTAUTH",
     "orgnise",
-    "SIGNUP"
+    "SIGNUP",
+    "waitlist"
   ],
   "tailwindCSS.experimental.classRegex": [
     ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
