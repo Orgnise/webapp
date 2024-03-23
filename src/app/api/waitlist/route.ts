@@ -3,15 +3,20 @@ import mongoDb, { databaseName } from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-export const corsHeaders = {
-  "Access-Control-Allow-Origin": `${HOME_DOMAIN}`,
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
 
-export async function OPTIONS(req: NextRequest) {
-  return NextResponse.json({}, { headers: corsHeaders });
+// Add and setting up the OPTIONS method
+export async function OPTIONS(request: Request) {
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': `${HOME_DOMAIN}`,
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  }
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders
+  });
 }
+
 
 // API to save waitlist email
 export async function POST(request: Request) {
@@ -27,7 +32,7 @@ export async function POST(request: Request) {
           message: "Invalid email address",
           error: parsedCredentials.error,
         },
-        { status: 401, headers: corsHeaders },
+        { status: 401, },
 
       );
     }
@@ -42,14 +47,14 @@ export async function POST(request: Request) {
         message: "email already exists in waitlist",
 
 
-      }, { status: 200, headers: corsHeaders });
+      }, { status: 200, });
     }
 
     const user = await waitListCollection.insertOne({
       email: parsedCredentials.data.email,
       createdAt: new Date(),
     });
-    return NextResponse.json({ user }, { status: 200, headers: corsHeaders });
+    return NextResponse.json({ user }, { status: 200, });
 
 
 
@@ -60,7 +65,7 @@ export async function POST(request: Request) {
         message: "Internal Server Error",
         error: err.toString(),
       },
-      { status: 500, headers: corsHeaders },
+      { status: 500, },
     );
   }
 }
