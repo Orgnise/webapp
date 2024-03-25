@@ -1,13 +1,13 @@
-<p align="center">
-  <a href="https://orgnise.in">
-    <img width="640" alt="opengraph-image" src="https://github.com/Orgnise/webapp/assets/37103237/82a9dbe3-a283-4a9d-a910-6a97879b7c45">
+
+  <a href="https://orgnise.in" >
+    <img width="100%" alt="opengraph-image" src="https://github.com/Orgnise/webapp/assets/37103237/82a9dbe3-a283-4a9d-a910-6a97879b7c45">
    </a> 
-</p>
+
 <p align="center">
-  <img alt"counter" src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FTheAlphamerc%2Fpulse&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" >  
+  
 </p>
 
-## Orgnise 
+## Orgnise ![](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FTheAlphamerc%2Fpulse&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)
 A Platform to create a single source of truth for all important information, such as use-cases, wikis, tech documentation, company information, policies, guidelines, announcements, and more.
 <br/>
 
