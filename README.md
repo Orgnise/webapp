@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://orgnise.in">
-    <img alt="Orgnise" src="https://app.orgnise.in/_static/logo.png">
+    <img width="640" alt="opengraph-image" src="https://github.com/Orgnise/webapp/assets/37103237/82a9dbe3-a283-4a9d-a910-6a97879b7c45">
    </a> 
 </p>
 <p align="center">
