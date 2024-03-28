@@ -39,7 +39,7 @@ export const NextAuthOptions = {
     },
   },
   providers: [
-    Slack({ clientId: process.env.AUTH_SLACK_ID ?? '', clientSecret: process.env.AUTH_SLACK_SECRET ?? "" }),
+    Slack({ clientId: process.env.AUTH_SLACK_ID ?? '', clientSecret: process.env.AUTH_SLACK_SECRET ?? "", allowDangerousEmailAccountLinking: true }),
     EmailProvider({
       async sendVerificationRequest({ identifier, url }) {
         console.log("sendVerificationRequest", { identifier, url });
