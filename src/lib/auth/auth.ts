@@ -5,6 +5,7 @@ import NextAuth, { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Twitter from "next-auth/providers/twitter";
+import Slack from "next-auth/providers/slack";
 import EmailProvider from "next-auth/providers/email";
 import { z } from "zod";
 import mongoDb, { databaseName } from "../mongodb";
@@ -38,6 +39,7 @@ export const NextAuthOptions = {
     },
   },
   providers: [
+    Slack({ clientId: process.env.AUTH_SLACK_ID ?? '', clientSecret: process.env.AUTH_SLACK_SECRET ?? "" }),
     EmailProvider({
       async sendVerificationRequest({ identifier, url }) {
         console.log("sendVerificationRequest", { identifier, url });

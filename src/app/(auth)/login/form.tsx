@@ -108,7 +108,7 @@ export function LoginForm() {
           />
         </button>
         {/* X Login */}
-        <button
+        {/* <button
           className="flex w-1/3 place-content-center rounded-sm border border-border bg-white p-1.5"
           onClick={async (e) => {
             e.preventDefault();
@@ -123,6 +123,24 @@ export function LoginForm() {
             src="https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023.svg"
             className="h-6 w-6"
             alt="X"
+          />
+        </button> */}
+        {/** Slack */}
+        <button
+          className="flex w-1/3 place-content-center rounded-sm border border-border bg-white p-1.5"
+          onClick={async (e) => {
+            e.preventDefault();
+            // googleLogin();
+            await signIn("slack");
+          }}
+        >
+          <Image
+            unoptimized={true}
+            height={32}
+            width={32}
+            src="https://previews.us-east-1.widencdn.net/preview/48045879/assets/asset-view/0cece34e-cbb7-4c6f-be3e-d475baeb3a8d/thumbnail/eyJ3Ijo0ODAsImgiOjQ4MCwic2NvcGUiOiJhcHAifQ==?Expires=1711648800&Signature=RylY68r7Rqga~CLxYCyXsz52ywGbwK6BNAhvEln1prkGcdaj1jzhiF3Y8YgsOlTD2Bv-iF7qolm2YwuXI-RRwteXirEX6oXkErjPz-cogkVBZd~797r4caiF02v7vvSI30BESnihsPum6yRbomXGXaCamwGww-39ZNYSxxxeRZsh0QA3GU7PggM7Rfb8w~A8bDEYFEtAP4zuefO~iuD0q-Yc-0Ee7T1Y3pIaPI-dYSuEPjeGdRFzJD4fYQVFtK60bvakUSCsVk1Lq0z8~S5JWr6bQPMBAGeaH2pUu07iEkumNAF3EV3sh98uoyV6wARGlR6TAN7PNsHCDdvQr~7a-w__&Key-Pair-Id=APKAJM7FVRD2EPOYUXBQ"
+            className="h-5 w-5"
+            alt="Slack"
           />
         </button>
       </div>
