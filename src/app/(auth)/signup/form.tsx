@@ -58,7 +58,7 @@ export function SignupForm() {
           <span className="px-2 text-sm">Continue with Github</span>
         </button>
         {/* Twitter Login */}
-        <button
+        {/* <button
           className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
           onClick={async (e) => {
             e.preventDefault();
@@ -75,6 +75,24 @@ export function SignupForm() {
             alt="X"
           />
           <span className="px-2 text-sm">Continue with X</span>
+        </button> */}
+        <button
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+          onClick={async (e) => {
+            e.preventDefault();
+            // googleLogin();
+            await signIn("slack");
+          }}
+        >
+          <Image
+            unoptimized={true}
+            height={32}
+            width={32}
+            src="_static/slack-logo.svg"
+            className="h-6 w-6 scale-150"
+            alt="Slack"
+          />
+          <span className="px-2 text-sm">Continue with Slack</span>
         </button>
       </div>
 

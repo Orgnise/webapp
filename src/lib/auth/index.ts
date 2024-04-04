@@ -116,6 +116,17 @@ export const withAuth =
             'preserveNullAndEmptyArrays': true
           }
         },
+        {
+          '$lookup': {
+            'from': 'teamUsers',
+            'localField': 'team._id',
+            'foreignField': 'teamId',
+            'as': 'members'
+          }
+        },
+        {
+          $addFields: { membersCount: { $size: "$members" } },
+        },
         // Append team object in root object and make team_id and root id.
         {
           '$addFields': {
@@ -124,10 +135,8 @@ export const withAuth =
             'description': '$team.description',
             'createdBy': '$team.createdBy',
             'plan': '$team.plan',
-            'members': '$team.members',
             'meta': '$team.meta',
             'createdAt': '$team.createdAt',
-            'membersCount': '$team.membersCount',
             'billingCycleStart': '$team.billingCycleStart',
             'inviteCode': '$team.inviteCode',
             'membersLimit': '$team.membersLimit',
@@ -139,6 +148,7 @@ export const withAuth =
           '$project': {
             'team': 0,
             'teamId:': 0,
+            'members': 0
           }
         }
       ]).toArray() as TeamSchema[];

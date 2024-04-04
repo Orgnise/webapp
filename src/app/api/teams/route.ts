@@ -49,6 +49,17 @@ export async function GET(request: NextRequest) {
           'preserveNullAndEmptyArrays': true
         }
       },
+      {
+        '$lookup': {
+          'from': 'teamUsers',
+          'localField': 'team._id',
+          'foreignField': 'teamId',
+          'as': 'members'
+        }
+      },
+      {
+        $addFields: { membersCount: { $size: "$members" } },
+      },
       // Append team object in root object and make team_id and root id.
       {
         '$addFields': {
@@ -57,10 +68,8 @@ export async function GET(request: NextRequest) {
           'description': '$team.description',
           'createdBy': '$team.createdBy',
           'plan': '$team.plan',
-          'members': '$team.members',
           'meta': '$team.meta',
           'createdAt': '$team.createdAt',
-          'membersCount': '$team.membersCount',
           'billingCycleStart': '$team.billingCycleStart',
           'inviteCode': '$team.inviteCode',
           'membersLimit': '$team.membersLimit',
@@ -72,6 +81,7 @@ export async function GET(request: NextRequest) {
         '$project': {
           'team': 0,
           'teamId:': 0,
+          'members': 0
         }
       }
     ]).toArray() as TeamSchema[];

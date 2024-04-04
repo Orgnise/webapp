@@ -10,14 +10,9 @@ export interface TeamSchema {
   description?: string;
   createdBy: ObjectId;
   plan: Plan;
-  members: {
-    user: ObjectId;
-    role: Role;
-  }[];
   teamUsers: ObjectId;
   meta: MetaSchema;
   createdAt: Date;
-  membersCount: number;
   billingCycleStart: number;
   inviteCode: string;
   membersLimit: number;

@@ -14,6 +14,7 @@ export interface Team {
   updatedAt: string;
   billingCycleStart: number;
   inviteCode: string;
+  membersCount: number;
   membersLimit: number;
   workspaceLimit: number;
 }

@@ -87,7 +87,7 @@ function TeamCard({ team, index }: any) {
       <span className="flex items-center gap-1 pt-6 text-sm text-muted-foreground">
         <UserCircle2Icon className="" size={16} />
         {/* TODO: Fetch and display members/workspaces count */}
-        {team?.members?.length}
+        {team?.membersCount}
         <span className="pl-px">
           {pluralize("member", team?.members?.length)}
         </span>
