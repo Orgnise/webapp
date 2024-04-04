@@ -4,7 +4,7 @@ import mongoDb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { TeamSchema } from "@/lib/schema/team.schema";
 import { Team } from "@/lib/types/types";
-import { hasValue } from "@/lib/utils";
+import { hasValue, randomId } from "@/lib/utils";
 
 // GET /api/team/[slug] – get a specific team
 export const GET = withAuth(async ({ team }) => {
@@ -29,6 +29,7 @@ export const PATCH = withAuth(async ({ team, req, session }) => {
     let data = {
       name: reqTeam.name,
       description: reqTeam.description,
+      inviteCode: reqTeam.inviteCode,
       meta: {
         slug: reqTeam.meta.slug,
         title: reqTeam.name,
@@ -37,6 +38,8 @@ export const PATCH = withAuth(async ({ team, req, session }) => {
     };
 
     let slug = reqTeam?.meta?.slug;
+
+    // Update slug if it is changed
     if (hasValue(slug) && team?.meta?.slug !== slug) {
       const data = await teamsDb.findOne({
         "meta.slug": reqTeam?.meta?.slug,
@@ -51,6 +54,14 @@ export const PATCH = withAuth(async ({ team, req, session }) => {
           { status: 409 },
         );
       }
+    }
+
+    // Update invite code if it is changed
+    if (reqTeam?.inviteCode !== team.inviteCode) {
+      data = {
+        ...data,
+        inviteCode: randomId(16),
+      };
     }
 
     const update = await teamsDb.updateOne(query, {

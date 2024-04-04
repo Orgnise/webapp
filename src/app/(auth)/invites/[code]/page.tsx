@@ -2,7 +2,9 @@ import { Logo } from "@/components/atom/logo";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getSession } from "@/lib/auth";
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberSchema, TeamSchema } from "@/lib/schema/team.schema";
+import { TeamMemberSchema } from "@/lib/schema/team.schema";
+import { Team } from "@/lib/types/types";
+import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -56,17 +58,30 @@ async function VerifyInvite({ code }: { code: string }) {
   }
 
   const client = await mongodb;
-  const teamsDb = client.db(databaseName).collection("teams");
+  const teamsCollection = client.db(databaseName).collection("teams");
 
-  const teamUsersDb = client
-    .db(databaseName)
-    .collection<TeamMemberSchema>("teamUsers");
+  const teams = (await teamsCollection
+    .aggregate([
+      {
+        $match: {
+          inviteCode: code,
+        },
+      },
+      {
+        $lookup: {
+          from: "teamUsers",
+          localField: "_id",
+          foreignField: "teamId",
+          as: "members",
+        },
+      },
+      {
+        $addFields: { membersCount: { $size: "$members" } },
+      },
+    ])
+    .toArray()) as unknown as Team[];
 
-  const team = (await teamsDb.findOne({
-    inviteCode: code,
-  })) as unknown as TeamSchema;
-
-  if (!team) {
+  if (!hasValue(teams)) {
     return (
       <>
         <PageCopy
@@ -77,7 +92,23 @@ async function VerifyInvite({ code }: { code: string }) {
     );
   }
 
-  const member = (await teamUsersDb.findOne({
+  const team = teams[0];
+
+  // TODO: check if team is full
+  if (team.membersCount >= team.membersLimit) {
+    return (
+      <PageCopy
+        title="User Limit Reached"
+        message="The team you are trying to join is currently full. Please contact the project owner for more information."
+      />
+    );
+  }
+
+  const teamUserCollection = client
+    .db(databaseName)
+    .collection<TeamMemberSchema>("teamUsers");
+
+  const member = (await teamUserCollection.findOne({
     teamId: new ObjectId(team._id),
     user: new ObjectId(session.user.id),
   })) as unknown as TeamMemberSchema;
@@ -87,17 +118,7 @@ async function VerifyInvite({ code }: { code: string }) {
     redirect(`/${team.meta.slug}`);
   }
 
-  // TODO: check if team is full
-  // if (teamUsers.users.length >= team.membersLimit) {
-  //   return (
-  //     <PageCopy
-  //       title="User Limit Reached"
-  //       message="The team you are trying to join is currently full. Please contact the project owner for more information."
-  //     />
-  //   );
-  // }
-
-  teamUsersDb.insertOne({
+  teamUserCollection.insertOne({
     teamId: new ObjectId(team._id),
     user: new ObjectId(session.user.id),
     role: "member",

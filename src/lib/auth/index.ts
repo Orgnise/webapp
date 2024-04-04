@@ -7,6 +7,7 @@ import { getSearchParams } from "../url";
 import { NextAuthOptions } from "./auth";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
+import { hasValue } from "../utils";
 
 export interface Session {
   user: {
@@ -54,174 +55,201 @@ export const withAuth =
       req: Request,
       { params }: { params: Record<string, string> | undefined },
     ) => {
-      const searchParams = getSearchParams(req.url);
-      const team_slug = params?.team_slug;
+      try {
+        const searchParams = getSearchParams(req.url);
+        const team_slug = params?.team_slug;
 
-      const domain = params?.domain || searchParams.domain;
-      const key = searchParams.key;
+        const domain = params?.domain || searchParams.domain;
+        const key = searchParams.key;
 
-      let session: Session | undefined;
+        let session: Session | undefined;
 
-      // if there's no team defined
-      if (!team_slug) {
-        return new Response(
-          "Team slug not found. Did you forget to include a `team_slug` query parameter?",
+        // if there's no team defined
+        if (!team_slug) {
+          return new Response(
+            "Team slug not found. Did you forget to include a `team_slug` query parameter?",
+            {
+              status: 400,
+            },
+          );
+        }
+
+        session = await getSession();
+        if (!session?.user?.id) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Unauthorized: Login required.',
+              error: 'Operation failed'
+            },
+            { status: 401 }
+          );
+        }
+        const client = await mongodb;
+        const teamsCollection = client.db(databaseName).collection<TeamSchema>("teams");
+        const teamsMembers = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
+
+        const teamInDb = await teamsCollection.aggregate([
           {
-            status: 400,
+            $match: {
+              "meta.slug": team_slug,
+            },
           },
-        );
-      }
+        ]).toArray() as TeamSchema[];
 
-      session = await getSession();
-      if (!session?.user?.id) {
-        return NextResponse.json(
+        if (!hasValue(teamInDb)) {
+
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Team not found',
+              error: 'Operation failed'
+            },
+            { status: 404 }
+          );
+        }
+
+        const teamList = await teamsMembers.aggregate([
           {
-            success: false,
-            message: 'Unauthorized: Login required.',
-            error: 'Operation failed'
+            '$match': {
+              'user': new ObjectId(session.user.id),
+              'teamId': new ObjectId(teamInDb[0]._id)
+            }
           },
-          { status: 401 }
-        );
-      }
-      const client = await mongodb;
-      const teamsCollection = client.db(databaseName).collection<TeamSchema>("teams");
-      const teamsMembers = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
-      const teamInDb = await teamsCollection.aggregate([
-        {
-          $match: {
-            "meta.slug": team_slug,
+          {
+            '$lookup': {
+              'from': 'teams',
+              'localField': 'teamId',
+              'foreignField': '_id',
+              'as': 'team'
+            },
           },
-        },
-      ]).toArray() as TeamSchema[];
 
-      const teamList = await teamsMembers.aggregate([
-        {
-          '$match': {
-            'user': new ObjectId(session.user.id),
-            'teamId': new ObjectId(teamInDb[0]._id)
-          }
-        },
-        {
-          '$lookup': {
-            'from': 'teams',
-            'localField': 'teamId',
-            'foreignField': '_id',
-            'as': 'team'
+          {
+            '$unwind': {
+              'path': '$team',
+              'preserveNullAndEmptyArrays': true
+            }
           },
-        },
+          {
+            '$lookup': {
+              'from': 'teamUsers',
+              'localField': 'team._id',
+              'foreignField': 'teamId',
+              'as': 'members'
+            }
+          },
+          {
+            $addFields: { membersCount: { $size: "$members" } },
+          },
+          // Append team object in root object and make team_id and root id.
+          {
+            '$addFields': {
+              '_id': '$team._id',
+              'name': '$team.name',
+              'description': '$team.description',
+              'createdBy': '$team.createdBy',
+              'plan': '$team.plan',
+              'meta': '$team.meta',
+              'createdAt': '$team.createdAt',
+              'billingCycleStart': '$team.billingCycleStart',
+              'inviteCode': '$team.inviteCode',
+              'membersLimit': '$team.membersLimit',
+              'workspaceLimit': '$team.workspaceLimit'
+            }
+          },
+          // Remove team object from root object
+          {
+            '$project': {
+              'team': 0,
+              'teamId:': 0,
+              'members': 0
+            }
+          }
+        ]).toArray() as TeamSchema[];
 
-        {
-          '$unwind': {
-            'path': '$team',
-            'preserveNullAndEmptyArrays': true
-          }
-        },
-        {
-          '$lookup': {
-            'from': 'teamUsers',
-            'localField': 'team._id',
-            'foreignField': 'teamId',
-            'as': 'members'
-          }
-        },
-        {
-          $addFields: { membersCount: { $size: "$members" } },
-        },
-        // Append team object in root object and make team_id and root id.
-        {
-          '$addFields': {
-            '_id': '$team._id',
-            'name': '$team.name',
-            'description': '$team.description',
-            'createdBy': '$team.createdBy',
-            'plan': '$team.plan',
-            'meta': '$team.meta',
-            'createdAt': '$team.createdAt',
-            'billingCycleStart': '$team.billingCycleStart',
-            'inviteCode': '$team.inviteCode',
-            'membersLimit': '$team.membersLimit',
-            'workspaceLimit': '$team.workspaceLimit'
-          }
-        },
-        // Remove team object from root object
-        {
-          '$project': {
-            'team': 0,
-            'teamId:': 0,
-            'members': 0
+        console.log('teamList Fetched',);
+
+        const team = teamList[0] as unknown as Team;
+        if (!team) {
+          // Team doesn't exist
+
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Team not found',
+              error: 'Operation failed'
+            },
+            { status: 404 }
+          );
+        }
+
+        // team exists but user is not part of it
+        if (!team.role) {
+          // Todo: check if the user is part of the team
+          const pendingInvites = {
+            expires: new Date(),
+          };
+          if (!pendingInvites) {
+            return new Response("Team not found.", {
+              status: 404,
+            });
+          } else if (pendingInvites.expires < new Date()) {
+            return new Response("Team invite expired.", {
+              status: 410,
+            });
+          } else {
+            return new Response("Team invite pending.", {
+              status: 409,
+            });
           }
         }
-      ]).toArray() as TeamSchema[];
 
-      const team = teamList[0] as unknown as Team;
-      if (!team) {
-        // Team doesn't exist
-
-        return NextResponse.json(
-          {
-            success: false,
-            message: 'Team not found',
-            error: 'Operation failed'
-          },
-          { status: 404 }
-        );
-      }
-
-      // team exists but user is not part of it
-      if (!team.role) {
-        // Todo: check if the user is part of the team
-        const pendingInvites = {
-          expires: new Date(),
-        };
-        if (!pendingInvites) {
-          return new Response("Team not found.", {
-            status: 404,
-          });
-        } else if (pendingInvites.expires < new Date()) {
-          return new Response("Team invite expired.", {
-            status: 410,
-          });
-        } else {
-          return new Response("Team invite pending.", {
-            status: 409,
-          });
+        // team role checks (enterprise only)
+        if (
+          requiredRole &&
+          !requiredRole.includes(team.role) ||
+          requiredPlan.includes(team.plan) &&
+          !requiredRole.includes(team.role)
+        ) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Unauthorized: Insufficient permissions',
+              error: 'Operation failed'
+            },
+            { status: 403 }
+          );
         }
-      }
 
-      // team role checks (enterprise only)
-      if (
-        requiredRole &&
-        !requiredRole.includes(team.role) ||
-        requiredPlan.includes(team.plan) &&
-        !requiredRole.includes(team.role)
-      ) {
+        // plan checks
+        if (!requiredPlan.includes(team.plan ?? "free")) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: 'Unauthorized: Need higher plan.',
+              error: 'Operation failed'
+            },
+            { status: 403 }
+          );
+        }
+
+        return handler({
+          req,
+          params: params || {},
+          searchParams,
+          session,
+          team,
+        });
+      } catch (error) {
+        console.log(error);
         return NextResponse.json(
           {
             success: false,
-            message: 'Unauthorized: Insufficient permissions',
-            error: 'Operation failed'
+            message: 'Operation failed',
+            error: error?.toString()
           },
-          { status: 403 }
+          { status: 500 }
         );
       }
-
-      // plan checks
-      if (!requiredPlan.includes(team.plan ?? "free")) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: 'Unauthorized: Need higher plan.',
-            error: 'Operation failed'
-          },
-          { status: 403 }
-        );
-      }
-
-      return handler({
-        req,
-        params: params || {},
-        searchParams,
-        session,
-        team,
-      });
     };

@@ -1,6 +1,7 @@
 "use client";
 
 import { Logo } from "@/components/atom/logo";
+import { Spinner } from "@/components/atom/spinner";
 import Tab from "@/components/atom/tab";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -16,12 +17,13 @@ import { ListView } from "@/components/ui/listview";
 import { APP_DOMAIN } from "@/lib/constants";
 import useTeams from "@/lib/swr/use-teams";
 import useUsers from "@/lib/swr/use-users";
-import { UserProps } from "@/lib/types/types";
+import { Team, UserProps } from "@/lib/types/types";
 import { timeAgo } from "@/lib/utility/datetime";
 import { cn } from "@/lib/utils";
 import { LinkIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const tabs: Array<"Members" | "Invitations"> = ["Members", "Invitations"];
 
@@ -49,9 +51,7 @@ export default function ProjectPeopleClient() {
           </div>
           <div className="flex space-x-2">
             <Button className="h-9">Invite</Button>
-            <InviteToTeamCodeModel
-              inviteCode={activeTeam?.inviteCode ?? "none"}
-            >
+            <InviteToTeamCodeModel team={activeTeam}>
               <Button variant="secondary" className="h-9" size={"icon"}>
                 <LinkIcon className="h-4 w-4" />
               </Button>
@@ -182,17 +182,17 @@ const UserCard = ({
 
 function InviteToTeamCodeModel({
   children,
-  inviteCode,
+  team,
 }: {
   children: React.ReactNode;
-  inviteCode: string;
+  team?: Team;
 }) {
   return (
     <Dialog modal={true}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className=" rounded-lg border-border bg-card p-0">
+      <DialogContent className=" w-fit overflow-hidden rounded-lg border-border bg-card p-0">
         {/* <CreateTeam /> */}
-        <InviteTeammateModal inviteCode={inviteCode} />
+        <InviteTeammateModal team={team} />
         <DialogClose id="CreateTeamCloseDialogButton" className="hidden">
           Close
         </DialogClose>
@@ -201,12 +201,31 @@ function InviteToTeamCodeModel({
   );
 }
 
-function InviteTeammateModal({ inviteCode }: { inviteCode: string }) {
+function InviteTeammateModal({ team }: { team?: Team }) {
+  const [resetLinkStatus, setResetLinkStatus] = useState<
+    "IDLE" | "LOADING" | "SUCCESS"
+  >();
+
+  const { updateTeamAsync } = useTeams();
   const inviteLink = useMemo(() => {
-    return `${APP_DOMAIN}/invites/${inviteCode}`;
-  }, [inviteCode]);
+    return `${APP_DOMAIN}/invites/${team?.inviteCode}`;
+  }, [team?.inviteCode]);
+
+  function resetLink() {
+    setResetLinkStatus("LOADING");
+    updateTeamAsync({ ...team!, inviteCode: "" }, team?.meta?.slug ?? "")
+      .then((data) => {
+        toast.success("Invite link reset successfully.");
+        setResetLinkStatus("SUCCESS");
+      })
+      .catch((error) => {
+        toast.error("Failed to reset invite link.");
+        setResetLinkStatus("IDLE");
+      });
+  }
+
   return (
-    <div>
+    <div className="mx-auto max-w-md">
       <div className="flex flex-col items-center justify-center space-y-3 border-b border-border px-4 py-4 pt-8 sm:px-16">
         <Logo className="h-10" />
         <h3 className="text-lg font-medium">Invite Link</h3>
@@ -215,14 +234,20 @@ function InviteTeammateModal({ inviteCode }: { inviteCode: string }) {
         </p>
       </div>
 
-      <div className="flex flex-col space-y-3 bg-background px-4 py-8 text-left sm:px-8">
-        <div className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-1.5">
-          <p className="scrollbar-hide w-[88%] overflow-scroll font-mono text-xs text-muted-foreground">
+      <div className="flex w-full flex-col space-y-4 overflow-hidden bg-background px-4 py-8 text-left sm:px-8">
+        <div className="flex items-center justify-between gap-1.5 rounded-md border border-border bg-card px-3 py-1.5">
+          <p className="scrollbar-hide  line-clamp-1 overflow-scroll font-mono text-xs text-muted-foreground">
             {inviteLink}
           </p>
           <CopyButton value={inviteLink} className="rounded-md" />
         </div>
-        {/* TODO: Add reset invite button */}
+        <Button disabled={resetLinkStatus === "LOADING"} onClick={resetLink}>
+          {resetLinkStatus === "LOADING" ? (
+            <Spinner className="h-6" />
+          ) : (
+            "Reset Invite Link"
+          )}
+        </Button>
       </div>
     </div>
   );

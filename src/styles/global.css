@@ -75,3 +75,8 @@
   scroll-behavior: smooth;
   height: 100%;
 }
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
