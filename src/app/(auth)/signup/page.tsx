@@ -14,8 +14,7 @@ export default function SignupPage() {
           <Logo className="mb-4 h-12 w-12" />
           <h1 className="m-0 p-0 font-bold">Create your Orgnise account</h1>
           <p className="p-0 text-sm">
-            {/* Get started for free. No credit card required */}
-            Start creating short links with superpowers
+            Get started for free. No credit card required.
           </p>
         </div>
         <SignupForm />
