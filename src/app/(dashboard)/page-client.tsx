@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dialog";
 import { CustomTooltipContent, ToolTipWrapper } from "@/components/ui/tooltip";
 import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
+import useTeam from "@/lib/swr/use-team";
 
-import useTeams from "@/lib/swr/use-teams";
 import { Fold } from "@/lib/utils";
 
 interface CerateWorkspaceModelProps {
@@ -20,7 +20,7 @@ interface CerateWorkspaceModelProps {
 }
 
 export default function DashboardClient() {
-  const { exceedingFreeTeam } = useTeams();
+  const { exceedingFreeTeam } = useTeam();
   return (
     <div className="">
       <div className="flex h-36 items-center border-b border-border bg-background">

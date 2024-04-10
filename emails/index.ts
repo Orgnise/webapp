@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { createTransport } from "nodemailer"
 
 import { JSXElementConstructor, ReactElement } from "react";
+import { Address } from "nodemailer/lib/mailer";
 
 export const resend = new Resend('re_G3zUARz4_KR7HcGQBQLYxutSCaUToT8Fu');
 
@@ -41,7 +42,7 @@ export const sendEmail = async ({
 
 
 export async function sendEmailV2({ identifier, subject, text, react, }: {
-  identifier: string;
+  identifier: string | Address | Array<string | Address> | undefined;
   subject: string;
   text?: string;
   react?: ReactElement<any, string | JSXElementConstructor<any>>;
@@ -51,7 +52,7 @@ export async function sendEmailV2({ identifier, subject, text, react, }: {
     console.log(
       'EMAIL_SERVER_USER and EMAIL_SERVER_PASSWORD must be set in the environment to send emails.'
     );
-    return Promise.resolve();
+    return Promise.reject('EMAIL_SERVER_USER and EMAIL_SERVER_PASSWORD must be set in the environment to send emails.');
   }
 
 
@@ -84,4 +85,5 @@ export async function sendEmailV2({ identifier, subject, text, react, }: {
   if (failed.length) {
     throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`)
   }
+  return result;
 }

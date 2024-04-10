@@ -89,7 +89,7 @@ const data = {
               },
             },
           ],
-          text: 'We are Orgnise ("',
+          text: 'We are Orgnise"',
         },
         {
           type: "text",
@@ -222,7 +222,7 @@ const data = {
             {
               type: "link",
               attrs: {
-                href: "https://app.orgnise.in/",
+                href: "https://orgnise.in",
                 target: "_blank",
                 rel: "noopener noreferrer nofollow",
                 class:
@@ -236,7 +236,7 @@ const data = {
               },
             },
           ],
-          text: "",
+          text: "https://orgnise.in",
         },
         {
           type: "text",
@@ -305,7 +305,7 @@ const data = {
               },
             },
           ],
-          text: "You can contact us by email at sonu.sharma045@gmail.com ",
+          text: "You can contact us by email at orgnisehq@gmail.com ",
         },
       ],
     },
@@ -349,7 +349,7 @@ const data = {
               },
             },
           ],
-          text: '"), and Orgnise, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.',
+          text: '"), and Pulse, concerning your access to and use of the Services. You agree that by accessing the Services, you have read, understood, and agreed to be bound by all of these Legal Terms. IF YOU DO NOT AGREE WITH ALL OF THESE LEGAL TERMS, THEN YOU ARE EXPRESSLY PROHIBITED FROM USING THE SERVICES AND YOU MUST DISCONTINUE USE IMMEDIATELY.',
         },
       ],
     },
@@ -1137,7 +1137,7 @@ const data = {
               },
             },
           ],
-          text: "If you wish to make any use of the Services, Content, or Marks other than as set out in this section or elsewhere in our Legal Terms, please address your request to: sonu.sharma045@gmail.com. If we ever grant you the permission to post, reproduce, or publicly display any part of our Services or Content, you must identify us as the owners or licensors of the Services, Content, or Marks and ensure that any copyright or proprietary notice appears or is visible on posting, reproducing, or displaying our Content.",
+          text: "If you wish to make any use of the Services, Content, or Marks other than as set out in this section or elsewhere in our Legal Terms, please address your request to: orgnisehq@gmail.com. If we ever grant you the permission to post, reproduce, or publicly display any part of our Services or Content, you must identify us as the owners or licensors of the Services, Content, or Marks and ensure that any copyright or proprietary notice appears or is visible on posting, reproducing, or displaying our Content.",
         },
       ],
     },
@@ -1782,7 +1782,7 @@ const data = {
               },
             },
           ],
-          text: "If you are unsatisfied with our Services, please email us at sonu.sharma045@gmail.com.",
+          text: "If you are unsatisfied with our Services, please email us at orgnisehq@gmail.com.",
         },
       ],
     },
@@ -2636,7 +2636,7 @@ const data = {
             {
               type: "link",
               attrs: {
-                href: "https://app.orgnise.in/policy",
+                href: "https://pulsehq.vercel.app/privacy-policy",
                 target: "_blank",
                 rel: "noopener noreferrer nofollow",
                 class:
@@ -2653,7 +2653,7 @@ const data = {
               },
             },
           ],
-          text: "https://app.orgnise.in/policy",
+          text: "https://orgnise.in/policy",
         },
         {
           type: "text",
@@ -3457,7 +3457,7 @@ const data = {
               },
             },
           ],
-          text: "In order to resolve a complaint regarding the Services or to receive further information regarding use of the Services, please contact us at: sonu.sharma045@gmail.com",
+          text: "In order to resolve a complaint regarding the Services or to receive further information regarding use of the Services, please contact us at: orgnisehq@gmail.com",
         },
       ],
     },

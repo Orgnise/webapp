@@ -1,3 +1,4 @@
+import ms from "ms";
 
 export const getFirstAndLastDay = (day: number) => {
   const today = new Date();
@@ -31,7 +32,7 @@ export const getFirstAndLastDay = (day: number) => {
  * @example
  */
 export const timeAgo = (
-  timestamp: Date | null | undefined | string,
+  timestamp: Date | null,
   {
     withAgo,
   }: {
@@ -54,26 +55,5 @@ export const timeAgo = (
           : undefined,
     });
   }
-  const intervals = {
-    year: 31536000,
-    month: 2592000,
-    week: 604800,
-    day: 86400,
-    hour: 3600,
-    minute: 60,
-    second: 1,
-  } as const;
-  let counter;
-  for (const i in intervals) {
-    // @ts-ignore
-    counter = Math.floor(diff / intervals[i]);
-    if (counter > 0) {
-      if (counter === 1) {
-        return `${counter} ${i}${withAgo ? " ago" : ""}`;
-      } else {
-        return `${counter} ${i}s${withAgo ? " ago" : ""}`;
-      }
-    }
-  }
-  return "Just now";
-};
+  return `${ms(diff)}${withAgo ? " ago" : ""}`;
+}

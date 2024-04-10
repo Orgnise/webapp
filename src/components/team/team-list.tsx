@@ -11,14 +11,13 @@ import { P } from "../atom/typography";
 import { Badge } from "../ui/badge";
 
 export default function TeamsList() {
-  const data = useTeams();
   const { loading, teams } = useTeams();
 
   return (
     <>
       <ListView
         items={teams}
-        loading={data.loading}
+        loading={loading}
         className="mx-auto grid max-w-screen-xl grid-cols-1 gap-5 px-2.5 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-20"
         renderItem={(item: Team, index: number) => (
           <TeamCard key={index} team={item} index={index} />
@@ -62,6 +61,10 @@ export default function TeamsList() {
 }
 
 function TeamCard({ team, index }: any) {
+  if (!team || !team.meta) {
+    console.error("TeamCard team or team.meta is missing", team?.id);
+    return null;
+  }
   return (
     <Link
       key={index}

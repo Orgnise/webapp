@@ -9,12 +9,11 @@ interface ITeam {
   error: any;
   loading: boolean;
   teams: Team[];
-  activeTeam?: Team;
   mutate: KeyedMutator<any>;
   exceedingFreeTeam: boolean;
   createTeamAsync: (team: Team) => Promise<void>;
-  deleteTeamAsync: (teamSlug: string) => Promise<void>;
-  updateTeamAsync: (team: Team, teamSlug: string) => Promise<void>;
+  // deleteTeamAsync: (teamSlug: string) => Promise<void>;
+  // updateTeamAsync: (team: Team, teamSlug: string) => Promise<void>;
 }
 export default function useTeams(): ITeam {
   const param = useParams() as {
@@ -29,7 +28,7 @@ export default function useTeams(): ITeam {
     error,
     mutate,
   } = useSWR<any>(`/api/teams`, fetcher, {
-    dedupingInterval: 30000,
+    dedupingInterval: 120000,
   });
 
   // Create collection
@@ -143,21 +142,15 @@ export default function useTeams(): ITeam {
     (team: any) => (team.plan === "free" || !team.plan) && team.isOwner,
   );
 
-  const activeTeam = useMemo(
-    () => data?.teams?.find((w: any) => w?.meta?.slug === param.team_slug),
-    [data?.teams, param.team_slug],
-  ) as Team | undefined;
-
 
   return {
-    activeTeam: activeTeam,
-    teams: data?.teams,
+    teams: data?.teams ?? [],
     error,
     mutate,
     exceedingFreeTeam: freeProjects?.length >= 2 ? true : false,
     loading: !data?.teams && !error ? true : false,
     createTeamAsync,
-    deleteTeamAsync,
-    updateTeamAsync,
+    // deleteTeamAsync,
+    // updateTeamAsync,
   };
 }

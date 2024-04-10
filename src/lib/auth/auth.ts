@@ -10,10 +10,24 @@ import EmailProvider from "next-auth/providers/email";
 import { z } from "zod";
 import mongoDb, { databaseName } from "../mongodb";
 import LoginLink from "../../../emails/login-link";
-import { sendEmail, sendEmailV2 } from "../../../emails";
+import { sendEmailV2 } from "../../../emails";
 import { APP_DOMAIN } from "../constants";
+import { createHash } from "crypto";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
+
+export const hashToken = (
+  token: string,
+  {
+    noSecret = false,
+  }: {
+    noSecret?: boolean;
+  } = {},
+) => {
+  return createHash("sha256")
+    .update(`${token}${noSecret ? "" : process.env.AUTH_SECRET}`)
+    .digest("hex");
+};
 
 export const NextAuthOptions = {
   adapter: MongoDBAdapter(mongoDb),
@@ -226,17 +240,17 @@ export const NextAuthOptions = {
     },
   },
   secret: process.env.AUTH_SECRET,
-  logger: {
-    error(code, ...message) {
-      console.error(code, message);
-    },
-    warn(code, ...message) {
-      console.warn(code, message);
-    },
-    debug(code, ...message) {
-      console.debug(code, message)
-    },
-  },
+  // logger: {
+  //   error(code, ...message) {
+  //     console.error('[ERROR]', code, message);
+  //   },
+  //   warn(code, ...message) {
+  //     console.warn('[WARN]', code, message);
+  //   },
+  //   debug(code, ...message) {
+  //     console.debug('[DEBUG]', code, message);
+  //   },
+  // },
 } as AuthOptions;
 
 export const { auth, signIn, signOut } = NextAuth({

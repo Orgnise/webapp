@@ -384,7 +384,7 @@ const data = {
                     {
                       type: "link",
                       attrs: {
-                        href: "https://app.orgnise.in/",
+                        href: "https://orgnise.in",
                         target: "_blank",
                         rel: "external nofollow noopener",
                         class:
@@ -395,7 +395,7 @@ const data = {
                       type: "underline",
                     },
                   ],
-                  text: "",
+                  href: "https://orgnise.in",
                 },
               ],
             },
@@ -1712,7 +1712,7 @@ const data = {
                     {
                       type: "link",
                       attrs: {
-                        href: "mailto:sonu.sharma045@gmail.com",
+                        href: "mailto:orgnisehq@gmail.com",
                         target: "_blank",
                         rel: "noopener noreferrer nofollow",
                         class:
@@ -1720,7 +1720,7 @@ const data = {
                       },
                     },
                   ],
-                  text: "sonu.sharma045@gmail.com ",
+                  text: "orgnisehq@gmail.com ",
                 },
               ],
             },

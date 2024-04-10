@@ -26,16 +26,7 @@ export const PATCH = withAuth(async ({ team, req, session }) => {
 
     const teamsDb = client.db(databaseName).collection("teams");
     const query = { _id: new ObjectId(reqTeam._id) };
-    let data = {
-      name: reqTeam.name,
-      description: reqTeam.description,
-      inviteCode: reqTeam.inviteCode,
-      meta: {
-        slug: reqTeam.meta.slug,
-        title: reqTeam.name,
-        description: reqTeam.description,
-      }
-    };
+
 
     let slug = reqTeam?.meta?.slug;
 
@@ -56,23 +47,29 @@ export const PATCH = withAuth(async ({ team, req, session }) => {
       }
     }
 
+    let updatedTeam = {
+      name: reqTeam.name,
+      description: reqTeam.description,
+      inviteCode: reqTeam.inviteCode,
+      updatedAt: new Date().toISOString(),
+      updatedBy: new ObjectId(session.user.id),
+      meta: {
+        ...team.meta,
+        slug: slug,
+      },
+    } as any;
+
     // Update invite code if it is changed
     if (reqTeam?.inviteCode !== team.inviteCode) {
-      data = {
-        ...data,
+      updatedTeam = {
+        ...updatedTeam,
         inviteCode: randomId(16),
       };
     }
 
     const update = await teamsDb.updateOne(query, {
       $set: {
-        ...data,
-        meta: {
-          ...team.meta,
-          slug: slug,
-        },
-        updatedAt: new Date().toISOString(),
-        updatedBy: new ObjectId(session.user.id),
+        ...updatedTeam,
       },
     });
 
@@ -81,11 +78,9 @@ export const PATCH = withAuth(async ({ team, req, session }) => {
         success: true,
         message: "Team updated",
         team: {
-          ...data,
-          meta: {
-            ...team.meta,
-            slug: slug,
-          },
+          ...reqTeam,
+          ...updatedTeam,
+          _id: reqTeam._id
         },
       },
       { status: 200 },

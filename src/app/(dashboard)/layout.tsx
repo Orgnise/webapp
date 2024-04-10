@@ -3,14 +3,15 @@
 import Nav from "@/components/layout/nav";
 import { NavbarLayout } from "@/components/layout/nav-layout";
 import NavTabs from "@/components/layout/teams-nav-tabs";
-import useTeams from "@/lib/swr/use-teams";
+import { Toaster } from "@/components/ui/toaster";
+import useTeam from "@/lib/swr/use-team";
 import { ReactNode, Suspense } from "react";
 import Providers from "./providers";
 
 export const dynamic = "force-static";
 
 export default function Layout({ children }: { children: ReactNode }) {
-  const { activeTeam } = useTeams();
+  const { team: activeTeam } = useTeam();
   return (
     <Providers>
       <div className="min-h-screen w-full bg-accent/30">
@@ -23,6 +24,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           )}
         </NavbarLayout>
         {children}
+        <Toaster />
       </div>
     </Providers>
   );

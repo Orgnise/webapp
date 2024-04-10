@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
+import useTeam from "@/lib/swr/use-team";
 import { hasValue } from "@/lib/utils";
 import { ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
@@ -23,8 +24,8 @@ import { TeamContext } from "../../providers";
 export default function WorkspaceSettingsPage() {
   const {
     workspacesData: { activeWorkspace, error, loading },
-    teamData: { team },
   } = useContext(TeamContext);
+  const { team: activeTeam } = useTeam();
 
   if (loading) {
     return <div>Loading...</div>;
@@ -40,7 +41,9 @@ export default function WorkspaceSettingsPage() {
       <div className="flex h-28 border-b border-border lg:h-36">
         <div className="mx-auto flex w-full max-w-screen-xl items-center gap-4 px-2.5 lg:px-20 ">
           <ToolTipWrapper content={<>Back to workspace</>}>
-            <Link href={`/${team?.meta?.slug}/${activeWorkspace?.meta?.slug}`}>
+            <Link
+              href={`/${activeTeam?.meta?.slug}/${activeWorkspace?.meta?.slug}`}
+            >
               <span className="flex items-center gap-px">
                 <h1 className="text-xl font-medium text-secondary-foreground/80">
                   {activeWorkspace?.name}
@@ -98,7 +101,7 @@ function WorkspaceName() {
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Workspace Name</h2>
           <p className="text-sm text-muted-foreground">
-            This is the name of your project on Orgnise
+            This is the name of your workspace
           </p>
         </div>
         <Input
@@ -163,7 +166,7 @@ function WorkspaceSlug() {
         <div className="flex flex-col space-y-3">
           <h2 className="text-xl font-medium">Workspace Slug</h2>
           <p className="text-sm text-muted-foreground">
-            This is your workspace&apos;s unique slug on Orgnise
+            This is your workspace&apos;s unique slug
           </p>
         </div>
         <Input
@@ -261,7 +264,7 @@ function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
                 htmlFor="workspace-slug"
                 className="block select-none text-sm font-medium text-muted-foreground"
               >
-                Enter the project slug
+                Enter the workspace slug
                 <span className="cursor-text select-text px-1 font-semibold text-secondary-foreground">
                   {activeWorkspace?.meta?.slug}
                 </span>

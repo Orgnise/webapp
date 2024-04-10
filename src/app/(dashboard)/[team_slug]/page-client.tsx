@@ -20,15 +20,17 @@ import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view
 import { Button } from "@/components/ui/button";
 import { ListView } from "@/components/ui/listview";
 import { Visibility } from "@/lib/schema/workspace.schema";
+import useTeam from "@/lib/swr/use-team";
 import { Workspace } from "@/lib/types/types";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { TeamContext } from "./providers";
 
 export default function TeamsPageClient() {
+  const { team, loading } = useTeam();
   const { team_slug } = useParams() as { team_slug?: string };
-  const { teamData, workspacesData } = useContext(TeamContext);
-  if (teamData.loading) {
+  const { workspacesData } = useContext(TeamContext);
+  if (loading) {
     return (
       <div className="flex h-full w-full place-content-center items-center">
         <Spinner />
@@ -149,35 +151,5 @@ export function CerateWorkspaceModel({ children }: CerateWorkspaceModelProps) {
         </form>
       </DialogContent>
     </Dialog>
-  );
-}
-
-/**
- * Suggest to open workspace
- */
-export function SuggestOpenWorkspace({ setActive }: any) {
-  return (
-    <div className="h-full">
-      <div className="mx-auto flex h-full w-full max-w-xl flex-col place-content-center items-center gap-4 text-center">
-        <Label size="h1">Open work</Label>
-        <Label size="body1">
-          Open a workspace to start working on your tasks.
-        </Label>
-
-        <Button
-          variant={"outline"}
-          className="rounded-full"
-          onClick={() => {
-            setActive(true);
-          }}
-        >
-          Open Workspace
-        </Button>
-
-        <Label size="body" variant="cap">
-          You can also use humburger menu to open workspace.
-        </Label>
-      </div>
-    </div>
   );
 }

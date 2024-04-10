@@ -5,7 +5,7 @@ export interface Team {
   _id: string;
   name: string;
   description: string;
-  teamMembers: ProjectUsers[];
+  teamMembers: TeamUsers[];
   role: Role;
   plan: Plan;
   meta: Meta;
@@ -24,11 +24,11 @@ export interface Member {
   role: Role;
   _id: string;
 }
-export interface ProjectUsers {
+export interface TeamUsers {
   _id: string;
   role: Role;
   user: User;
-  projectId: string;
+  teamId: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -39,7 +39,6 @@ export interface UserProps {
   image?: string;
   createdAt: Date;
   role: Role;
-  projects?: { projectId: string }[];
 }
 
 export interface Meta {
@@ -84,4 +83,13 @@ export interface Collection {
   workspace: Workspace;
   meta: Meta;
   object?: "item" | "collection";
+}
+
+export interface Invite {
+  _id: string;
+  email: string;
+  expires: Date;
+  team: Team;
+  createdAt: Date;
+  role: Role;
 }

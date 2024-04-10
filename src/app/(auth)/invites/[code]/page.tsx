@@ -30,7 +30,7 @@ export default function InvitesPage({
   };
 }) {
   return (
-    <div className="flex h-screen flex-col items-center justify-center space-y-6 text-center">
+    <div className="flex h-screen w-full flex-col items-center justify-center space-y-6 bg-background/90 text-center ">
       <Logo className="h-12 w-12" />
       <Suspense
         fallback={
@@ -53,7 +53,6 @@ async function VerifyInvite({ code }: { code: string }) {
   const session = await getSession();
 
   if (!session) {
-    console.log("no session");
     redirect("/login");
   }
 
@@ -86,7 +85,7 @@ async function VerifyInvite({ code }: { code: string }) {
       <>
         <PageCopy
           title="Invalid Invite"
-          message="The invite link you are trying to use is invalid. Please contact the project owner for a new invite."
+          message="The invite link you are trying to use is invalid. Please contact the team owner for a new invite."
         />
       </>
     );
@@ -95,14 +94,14 @@ async function VerifyInvite({ code }: { code: string }) {
   const team = teams[0];
 
   // TODO: check if team is full
-  if (team.membersCount >= team.membersLimit) {
-    return (
-      <PageCopy
-        title="User Limit Reached"
-        message="The team you are trying to join is currently full. Please contact the project owner for more information."
-      />
-    );
-  }
+  // if (team.membersCount >= team.membersLimit) {
+  //   return (
+  //     <PageCopy
+  //       title="User Limit Reached"
+  //       message="The team you are trying to join is currently full. Please contact the team owner for more information."
+  //     />
+  //   );
+  // }
 
   const teamUserCollection = client
     .db(databaseName)
@@ -113,7 +112,7 @@ async function VerifyInvite({ code }: { code: string }) {
     user: new ObjectId(session.user.id),
   })) as unknown as TeamMemberSchema;
 
-  // check if user is already in the project
+  // check if user is already in the team
   if (member) {
     redirect(`/${team.meta.slug}`);
   }

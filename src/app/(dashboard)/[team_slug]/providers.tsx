@@ -1,13 +1,12 @@
 "use client";
 
-import { Team, Workspace } from "@/lib/types/types";
+import { Workspace } from "@/lib/types/types";
 import { ReactNode, createContext } from "react";
 
 // import { useToast } from "@/components/ui/use-toast";
 import { toast } from "sonner";
 
 import { fetcher } from "@/lib/fetcher";
-import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-wrorkspaces";
 import { useParams, useRouter } from "next/navigation";
 
@@ -16,11 +15,6 @@ export default function Providers({ children }: { children: ReactNode }) {
 }
 
 interface TeamProviderProps {
-  teamData: {
-    loading?: boolean;
-    error?: any;
-    team?: Team;
-  };
   workspacesData: {
     loading?: boolean;
     error?: any;
@@ -38,7 +32,6 @@ export const TeamContext = createContext(
 TeamContext.displayName = "TeamContext";
 
 function TeamProvider({ children }: { children: ReactNode }) {
-  const team = useTeam();
   const router = useRouter();
   const workspacesResponse = useWorkspaces();
 
@@ -178,7 +171,6 @@ function TeamProvider({ children }: { children: ReactNode }) {
   return (
     <TeamContext.Provider
       value={{
-        teamData: team,
         workspacesData: {
           activeWorkspace: workspace,
           error: workspacesResponse.error,

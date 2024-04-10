@@ -13,22 +13,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import useTeams from "@/lib/swr/use-teams";
+import { useToast } from "@/components/ui/use-toast";
+import useTeam from "@/lib/swr/use-team";
 import { hasValue } from "@/lib/utils";
-import { useParams } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { mutate } from "swr";
 
 export default function TeamSettingsPage() {
-  const { teams, error, loading } = useTeams();
-  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
-  const activeTeam = useMemo(
-    () => teams?.find((w) => w?.meta?.slug === team_slug),
-    [teams, team_slug],
-  );
+  const { team, loading, error } = useTeam();
 
   if (loading) {
     return <div>Loading...</div>;
-  } else if (error || !activeTeam) {
+  } else if (error || !team) {
     return (
       <div className="TeamSettingsPage h-full w-full py-12">
         <NotFoundView item="Team" />
@@ -38,47 +34,58 @@ export default function TeamSettingsPage() {
   return (
     <div className="WorkspaceSettings">
       <div className="mx-auto  grid max-w-screen-md flex-col gap-8 px-4 ">
-        <WorkspaceName />
-        <WorkspaceSlug />
-        <DeleteWorkspace />
+        <TeamName />
+        <TeamSlug />
+        <DeleteTeam />
       </div>
-      {/* </div> */}
     </div>
   );
 }
 
-function WorkspaceName() {
+function TeamName() {
   const [enableSubmit, setEnableSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { teams, error, loading, updateTeamAsync } = useTeams();
-  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
-  const activeTeam = useMemo(
-    () => teams?.find((w) => w?.meta?.slug === team_slug),
-    [teams, team_slug],
-  );
+  const { team, error, loading, updateTeamAsync } = useTeam();
+  const { toast } = useToast();
 
-  function handleUpdateWorkspace(e: any) {
+  function handleUpdateTeamName(e: any) {
     e.preventDefault();
     const name = e.target.name.value;
-    if (!activeTeam || name === activeTeam!.name) {
+    if (!team || name === team.name) {
       return;
     }
-    console.log("name", name, activeTeam?.name);
+    if (!team.meta?.slug) {
+      console.error("Team slug not present");
+      toast({
+        title: "Error!",
+        description:
+          "Unable to update team name. Try refreshing page and try again",
+      });
+      return;
+    }
     setIsLoading(true);
     updateTeamAsync(
       {
-        ...activeTeam!,
+        ...team!,
         name,
       },
-      activeTeam.meta.slug,
-    ).finally(() => {
-      setIsLoading(false);
-    });
+      team.meta.slug,
+    )
+      .then(() => {
+        toast({
+          title: "Success!",
+          description: "Team name updated successfully",
+        });
+        mutate(`/api/teams`);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   return (
     <form
-      onSubmit={handleUpdateWorkspace}
+      onSubmit={handleUpdateTeamName}
       className="rounded-lg border border-border bg-card"
     >
       <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
@@ -94,10 +101,10 @@ function WorkspaceName() {
           maxLength={32}
           name="name"
           required
-          defaultValue={activeTeam!.name}
+          defaultValue={team!.name}
           onChange={(e) => {
             setEnableSubmit(
-              hasValue(e.target.value) && e.target.value !== activeTeam!.name,
+              hasValue(e.target.value) && e.target.value !== team!.name,
             );
           }}
         />
@@ -114,40 +121,52 @@ function WorkspaceName() {
   );
 }
 
-function WorkspaceSlug() {
+function TeamSlug() {
   const [enableSubmit, setEnableSubmit] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { teams, error, loading, updateTeamAsync } = useTeams();
-  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
-  const activeTeam = useMemo(
-    () => teams?.find((w) => w?.meta?.slug === team_slug),
-    [teams, team_slug],
-  );
-
-  function handleUpdateWorkspace(e: any) {
+  const { team, error, loading, updateTeamAsync } = useTeam();
+  const { toast } = useToast();
+  function handleUpdateTeamSlug(e: any) {
     e.preventDefault();
     const slug = e.target.slug.value;
-    if (!activeTeam || slug === activeTeam?.meta?.slug) {
+    if (!team || slug === team?.meta?.slug) {
       return;
     }
-    console.log("slug", slug, activeTeam?.meta?.slug);
+    if (!team?.meta?.slug) {
+      console.error("Team slug not present");
+      toast({
+        title: "Error!",
+        description:
+          "Unable to update team slug. Try refreshing page and try again",
+        variant: "destructive",
+      });
+      return;
+    }
     setIsLoading(true);
     updateTeamAsync(
       {
-        ...activeTeam!,
+        ...team!,
         meta: {
-          ...activeTeam!.meta,
+          ...team!.meta,
           slug,
         },
       },
-      activeTeam.meta.slug,
-    ).finally(() => {
-      setIsLoading(false);
-    });
+      team?.meta.slug,
+    )
+      .then(() => {
+        toast({
+          title: "Success!",
+          description: "Team name updated successfully",
+        });
+        mutate(`/api/teams`);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
   return (
     <form
-      onSubmit={handleUpdateWorkspace}
+      onSubmit={handleUpdateTeamSlug}
       className="rounded-lg border border-border bg-card"
     >
       <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
@@ -164,10 +183,10 @@ function WorkspaceSlug() {
           type="text"
           min={3}
           maxLength={32}
-          defaultValue={activeTeam?.meta?.slug}
+          defaultValue={team?.meta?.slug}
           onChange={(e) => {
             setEnableSubmit(
-              hasValue(e.target.value) && e.target.value !== activeTeam!.name,
+              hasValue(e.target.value) && e.target.value !== team!.name,
             );
           }}
         />
@@ -186,7 +205,7 @@ function WorkspaceSlug() {
   );
 }
 
-function DeleteWorkspace() {
+function DeleteTeam() {
   return (
     <div className="rounded-lg border border-destructive bg-card">
       <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
@@ -215,18 +234,13 @@ interface CerateWorkspaceModelProps {
 
 function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { teams, error, loading, deleteTeamAsync } = useTeams();
-  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
-  const activeTeam = useMemo(
-    () => teams?.find((w) => w?.meta?.slug === team_slug),
-    [teams, team_slug],
-  );
+  const { team, error, loading, deleteTeamAsync } = useTeam();
 
   function handleDeleteTeam(e: any) {
     e.preventDefault();
 
     setIsDeleting(true);
-    deleteTeamAsync(activeTeam?.meta?.slug!).finally(() => {
+    deleteTeamAsync(team?.meta?.slug!).finally(() => {
       setIsDeleting(false);
     });
   }
@@ -252,16 +266,16 @@ function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
                 htmlFor="team-slug"
                 className="block select-none text-sm font-medium text-muted-foreground"
               >
-                Enter the project slug
+                Enter the team slug
                 <span className="cursor-text select-text px-1 font-semibold text-secondary-foreground">
-                  {activeTeam?.meta?.slug}
+                  {team?.meta?.slug}
                 </span>
                 to continue:
               </label>
               <div className="relative mt-1 rounded-md ">
                 <Input
                   id="team-slug"
-                  pattern={activeTeam?.meta?.slug}
+                  pattern={team?.meta?.slug}
                   type="text"
                   required
                   autoComplete="off"

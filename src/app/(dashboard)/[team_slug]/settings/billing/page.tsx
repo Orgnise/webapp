@@ -1,17 +1,11 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import useTeams from "@/lib/swr/use-teams";
+import useTeam from "@/lib/swr/use-team";
 import { getFirstAndLastDay } from "@/lib/utility/datetime";
-import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
 export default function TeamBillingPage() {
-  const { teams } = useTeams();
-  const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
-  const activeTeam = useMemo(
-    () => teams?.find((w) => w?.meta?.slug === team_slug),
-    [teams, team_slug],
-  );
+  const { team: activeTeam, loading } = useTeam();
   const plan = activeTeam?.plan ?? "free";
   const billingCycleStart = activeTeam?.billingCycleStart;
 

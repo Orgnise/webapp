@@ -19,7 +19,7 @@ export default function useWorkspaces(): IWorkspaces {
     error,
     mutate,
   } = useSWR<any>(`/api/teams/${team_slug}/workspaces`, fetcher, {
-    dedupingInterval: 30000,
+    dedupingInterval: 120000,
   });
 
   if (!team_slug) {

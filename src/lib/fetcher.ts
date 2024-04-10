@@ -9,6 +9,7 @@ export async function fetcher<JSON = any>(
 ): Promise<JSON> {
   const res = await fetch(input, init);
   const json = await res.json();
+  json.status = res.status;
   try {
     if (!res.ok) {
       const error = await res.text();
@@ -24,7 +25,7 @@ export async function fetcher<JSON = any>(
     if (json) {
       throw json;
     }
-    throw error;
+    throw error
   }
 
   return json;

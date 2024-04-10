@@ -38,7 +38,7 @@ export default function useCollections(): IWorkspaces {
     `/api/teams/${team_slug}/${workspace_slug}/collections-v2`,
     fetcher,
     {
-      dedupingInterval: 30000,
+      dedupingInterval: 120000,
     },
   );
 
