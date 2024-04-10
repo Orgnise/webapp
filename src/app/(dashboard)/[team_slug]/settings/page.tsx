@@ -18,12 +18,13 @@ import useTeam from "@/lib/swr/use-team";
 import { hasValue } from "@/lib/utils";
 import { useState } from "react";
 import { mutate } from "swr";
+import TeamSettingsLoading from "./loading";
 
 export default function TeamSettingsPage() {
   const { team, loading, error } = useTeam();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <TeamSettingsLoading />;
   } else if (error || !team) {
     return (
       <div className="TeamSettingsPage h-full w-full py-12">
@@ -32,7 +33,7 @@ export default function TeamSettingsPage() {
     );
   }
   return (
-    <div className="WorkspaceSettings">
+    <div className="TeamSettingsPage">
       <div className="mx-auto  grid max-w-screen-md flex-col gap-8 px-4 ">
         <TeamName />
         <TeamSlug />

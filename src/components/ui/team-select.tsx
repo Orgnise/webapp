@@ -21,9 +21,9 @@ import { Button } from "./button";
 
 export function TeamToggleDropDown() {
   const data = useContext(TeamContext);
-  const { error, loading, teams } = useTeams();
-  const { team: activeTeam } = useTeam();
-  if (!activeTeam && loading) {
+  const { error, loading: teamsLoading, teams } = useTeams();
+  const { team: activeTeam, loading: teamLoading } = useTeam();
+  if (!activeTeam && teamLoading) {
     return <TeamToggleDropdownPlaceholder />;
   }
 
@@ -42,23 +42,37 @@ export function TeamToggleDropDown() {
             <Link href="./">My Teams</Link>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <div className="flex min-w-[224px] flex-col gap-2.5 rounded p-3">
-            <Fold
-              value={teams}
-              ifPresent={(teams: Team[]) => {
-                teams.map((team: any, index) => (
-                  <TeamRow team={team} key={index} />
-                ));
-              }}
-              ifAbsent={() => (
-                <div>
-                  <span className="max-w-[220px] truncate text-sm">
-                    You are not part of any team
-                  </span>
-                </div>
-              )}
-            />
-          </div>
+          <Fold
+            value={teamsLoading}
+            ifPresent={(value) => (
+              <div className="flex min-w-[224px] flex-col  gap-2.5 rounded p-3">
+                <div className="h-8 w-full animate-pulse rounded bg-secondary" />
+                <div className="h-8 w-full animate-pulse rounded bg-secondary" />
+                <div className="h-8 w-full animate-pulse rounded bg-secondary" />
+              </div>
+            )}
+            ifAbsent={() => (
+              <div className="min-w-[224px] rounded p-3">
+                <Fold
+                  value={teams}
+                  ifPresent={(teams: Team[]) => (
+                    <div className="flex flex-col gap-1">
+                      {teams.map((team: any, index) => (
+                        <TeamRow team={team} key={index} />
+                      ))}
+                    </div>
+                  )}
+                  ifAbsent={() => (
+                    <div>
+                      <span className="max-w-[220px] truncate text-sm">
+                        You are not part of any team
+                      </span>
+                    </div>
+                  )}
+                />
+              </div>
+            )}
+          />
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -71,8 +85,9 @@ function TeamRow({ team }: { team: Team }) {
     <Link href={`/${team.meta.slug}`}>
       <div
         className={cx("flex w-full items-center  gap-2 rounded", {
-          "bg-primary text-primary-foreground":
-            pathname === `/${team.meta.slug}`,
+          "bg-primary text-primary-foreground": pathname?.startsWith(
+            `/${team.meta.slug}`,
+          ),
           "hover:bg-accent": pathname !== `/${team.meta.slug}`,
         })}
       >

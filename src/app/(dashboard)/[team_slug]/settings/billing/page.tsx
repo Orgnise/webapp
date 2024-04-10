@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import useTeam from "@/lib/swr/use-team";
 import { getFirstAndLastDay } from "@/lib/utility/datetime";
 import { useMemo } from "react";
+import TeamBillingSettingsLoading from "./loading";
 
 export default function TeamBillingPage() {
   const { team: activeTeam, loading } = useTeam();
@@ -24,6 +25,10 @@ export default function TeamBillingPage() {
     }
     return [];
   }, [billingCycleStart]);
+
+  if (loading) {
+    return <TeamBillingSettingsLoading />;
+  }
 
   return (
     <div className="rounded-lg border border-border bg-card">

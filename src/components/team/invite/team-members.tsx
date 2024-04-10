@@ -157,7 +157,7 @@ const UserCard = ({ user, isOwner }: { user: UserProps; isOwner: boolean }) => {
   );
 };
 
-const UserPlaceholder = () => (
+export const UserPlaceholder = () => (
   <div className="flex items-center justify-between space-x-3 px-4 py-3 sm:px-8">
     <div className="flex items-center space-x-3">
       <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />
