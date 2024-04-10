@@ -1,32 +1,35 @@
 import { withAuth } from "@/lib/auth";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import mongoDb, { databaseName } from "@/lib/mongodb";
+import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export const GET = withAuth(async ({ team, session }) => {
-  const client = await mongoDb;
-  try {
-    const userId = session?.user?.id;
-    const workspaces = client
-      .db(databaseName)
-      .collection<WorkspaceSchema>("workspaces");
-    const query = {
-      team: new ObjectId(team._id),
-      // members: { $elemMatch: { user: new ObjectId(userId) } },
-    };
-    const list = await workspaces.aggregate([{ $match: query }]).toArray();
-    return NextResponse.json({ workspaces: list });
-  } catch (err: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: err.toString() },
-      { status: 500 },
-    );
-  }
-}, {
-  requiredRole: ['owner', "member"]
-});
+export const GET = withAuth(
+  async ({ team, session }) => {
+    const client = await mongoDb;
+    try {
+      const userId = session?.user?.id;
+      const workspaces = client
+        .db(databaseName)
+        .collection<WorkspaceSchema>("workspaces");
+      const query = {
+        team: new ObjectId(team._id),
+        // members: { $elemMatch: { user: new ObjectId(userId) } },
+      };
+      const list = await workspaces.aggregate([{ $match: query }]).toArray();
+      return NextResponse.json({ workspaces: list });
+    } catch (err: any) {
+      return NextResponse.json(
+        { success: false, message: "Operation failed", error: err.toString() },
+        { status: 500 },
+      );
+    }
+  },
+  {
+    requiredRole: ["owner", "member"],
+  },
+);
 
 export const POST = withAuth(async ({ team, session, req }) => {
   const client = await mongoDb;

@@ -5,7 +5,7 @@ import { Plan } from "../types/types";
 
 export const roles = ["owner", "moderator", "guest", "member"] as const;
 
-export type Role = typeof roles[number];
+export type Role = (typeof roles)[number];
 export interface TeamSchema {
   _id: ObjectId;
   name: string;
@@ -26,7 +26,6 @@ export interface MetaSchema {
   description: string;
   slug: string;
 }
-
 
 export interface TeamMemberSchema {
   _id?: string;

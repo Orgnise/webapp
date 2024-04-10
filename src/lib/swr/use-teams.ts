@@ -1,10 +1,9 @@
 import useSWR, { KeyedMutator } from "swr";
 
+import { useParams, useRouter } from "next/navigation";
 import { fetcher } from "../fetcher";
 import { Team } from "../types/types";
 import { displayToast } from "./use-collections";
-import { useParams, useRouter } from "next/navigation";
-import { useMemo } from "react";
 interface ITeam {
   error: any;
   loading: boolean;
@@ -74,9 +73,7 @@ export default function useTeams(): ITeam {
           description: "Team has been deleted successfully",
         });
         console.log("Team deleted", { activeTeamSlug, teamSlug });
-        const list = data.teams?.filter(
-          (c: any) => c.meta?.slug !== teamSlug,
-        );
+        const list = data.teams?.filter((c: any) => c.meta?.slug !== teamSlug);
         if (activeTeamSlug === teamSlug) {
           router.replace("/");
           console.log("Closing the team page");
@@ -99,16 +96,13 @@ export default function useTeams(): ITeam {
   async function updateTeamAsync(team: Team, teamSlug: string) {
     // const teamSlug = team?.meta?.slug;
     try {
-      const response = await fetcher(
-        `/api/teams/${teamSlug}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ team: team }),
+      const response = await fetcher(`/api/teams/${teamSlug}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ team: team }),
+      });
       const list = data.teams.map((c: any) => {
         if (c.meta.slug === teamSlug) {
           return response.team;
@@ -117,9 +111,7 @@ export default function useTeams(): ITeam {
       });
       // Change the url if the collection slug has changed
       if (teamSlug != response.team.meta.slug) {
-        router.replace(
-          `/${response.team.meta.slug}/settings`,
-        );
+        router.replace(`/${response.team.meta.slug}/settings`);
       }
       mutate({ teams: list }, { revalidate: false, optimisticData: list });
     } catch (error: any) {
@@ -141,7 +133,6 @@ export default function useTeams(): ITeam {
   const freeProjects = teams?.filter(
     (team: any) => (team.plan === "free" || !team.plan) && team.isOwner,
   );
-
 
   return {
     teams: data?.teams ?? [],

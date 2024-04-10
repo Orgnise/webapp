@@ -30,12 +30,14 @@ export async function POST(request: Request) {
     })) as unknown as mongoUserResult | null;
 
     if (!existingUser) {
-      return NextResponse.json({
-        success: false,
-        message: "email or password is incorrect",
-        error: "authentication failed",
-
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "email or password is incorrect",
+          error: "authentication failed",
+        },
+        { status: 401 },
+      );
     }
     //Verify password
     const passwordIsCorrect = await bcrypt.compare(
@@ -63,9 +65,6 @@ export async function POST(request: Request) {
     };
 
     return NextResponse.json({ user }, { status: 200 });
-
-
-
   } catch (err: any) {
     return NextResponse.json(
       {

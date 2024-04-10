@@ -1,4 +1,3 @@
-
 import { Metadata } from "next";
 import { HOME_DOMAIN } from "../constants";
 

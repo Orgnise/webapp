@@ -19,77 +19,90 @@ const removeUserSchema = z.object({
   userId: z.string().min(1),
 });
 
-export const GET = withAuth(async ({ team, headers }) => {
-  const client = await mongoDb;
-  const teamUsersDb = client.db(databaseName).collection("teamUsers");
-  const query = { teamId: new ObjectId(team._id) };
-  const teamData = await teamUsersDb.findOne(query);
-  if (!hasValue(teamData)) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Team not found',
-        error: 'Operation failed'
-      },
-      { status: 404 }
-    );
-  }
-  const dbResults = await teamUsersDb.aggregate(
-    [{
-      '$match': {
-        'teamId': new ObjectId(team._id)
-      }
-    },
-    {
-      '$lookup': {
-        'from': 'users',
-        'localField': 'user',
-        'foreignField': '_id',
-        'as': 'user'
-      },
-    },
-    { "$unwind": "$user" },
-    {
-      '$project': {
-        'role': 1,
-        'name': '$user.name',
-        'email': '$user.email',
-        'image': '$user.image',
-      }
+export const GET = withAuth(
+  async ({ team, headers }) => {
+    const client = await mongoDb;
+    const teamUsersDb = client.db(databaseName).collection("teamUsers");
+    const query = { teamId: new ObjectId(team._id) };
+    const teamData = await teamUsersDb.findOne(query);
+    if (!hasValue(teamData)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Team not found",
+          error: "Operation failed",
+        },
+        { status: 404 },
+      );
     }
-    ]).toArray() as unknown as any[];
+    const dbResults = (await teamUsersDb
+      .aggregate([
+        {
+          $match: {
+            teamId: new ObjectId(team._id),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+          },
+        },
+        { $unwind: "$user" },
+        {
+          $project: {
+            role: 1,
+            name: "$user.name",
+            email: "$user.email",
+            image: "$user.image",
+          },
+        },
+      ])
+      .toArray()) as unknown as any[];
 
-  return NextResponse.json({ users: dbResults, query }, { status: 200 });
-}, {
-  requiredRole: ['owner']
-});
+    return NextResponse.json({ users: dbResults, query }, { status: 200 });
+  },
+  {
+    requiredRole: ["owner"],
+  },
+);
 
 // PUT /api/teams/[slug]/users – update a user's role for a specific team
 export const PUT = withAuth(
   async ({ req, team }) => {
     try {
-      const { userId: documentId, role } = updateRoleSchema.parse(await req.json());
-      const client = await mongoDb;
-      const teamUserCollection = client.db(databaseName).collection("teamUsers");
-      const query = { _id: new ObjectId(documentId), teamId: new ObjectId(team._id) };
-      const response = await teamUserCollection.updateOne(
-        query,
-        { $set: { role: role } },
+      const { userId: documentId, role } = updateRoleSchema.parse(
+        await req.json(),
       );
-
-      return NextResponse.json({
-        success: true,
-        message: "User role updated",
-      }, {
-        status: 200
+      const client = await mongoDb;
+      const teamUserCollection = client
+        .db(databaseName)
+        .collection("teamUsers");
+      const query = {
+        _id: new ObjectId(documentId),
+        teamId: new ObjectId(team._id),
+      };
+      const response = await teamUserCollection.updateOne(query, {
+        $set: { role: role },
       });
+
+      return NextResponse.json(
+        {
+          success: true,
+          message: "User role updated",
+        },
+        {
+          status: 200,
+        },
+      );
     } catch (error) {
       return handleAndReturnErrorResponse(error);
     }
-
   },
   {
-    requiredRole: ["owner", 'moderator'],
+    requiredRole: ["owner", "moderator"],
   },
 );
 
@@ -107,7 +120,7 @@ export const DELETE = withAuth(
       teamId: new ObjectId(team._id),
     };
     const result = await teamUserCollection.deleteOne(query);
-    return NextResponse.json({ message: "User removed from team", result, });
+    return NextResponse.json({ message: "User removed from team", result });
   },
   {
     requiredRole: ["owner"],

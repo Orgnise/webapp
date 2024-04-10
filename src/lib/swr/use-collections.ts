@@ -4,7 +4,11 @@ import { toast } from "sonner";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../fetcher";
 import { Collection } from "../types/types";
-import { addInCollectionTree, removeFromCollectionTree, updateInCollectionTree } from "../utility/collection-tree-structure";
+import {
+  addInCollectionTree,
+  removeFromCollectionTree,
+  updateInCollectionTree,
+} from "../utility/collection-tree-structure";
 
 interface IWorkspaces {
   error: any;
@@ -18,8 +22,12 @@ interface IWorkspaces {
   createCollection(collection: Collection): Promise<void>;
   updateCollection: (collection: Collection) => void;
   UpdateItem: (item: Collection, parent: Collection) => Promise<void>;
-  deleteCollection(id: string, collectionSlug: string,): Promise<void>;
-  deleteItem(id: string, itemSlug: string, collectionSlug: string): Promise<void>;
+  deleteCollection(id: string, collectionSlug: string): Promise<void>;
+  deleteItem(
+    id: string,
+    itemSlug: string,
+    collectionSlug: string,
+  ): Promise<void>;
 }
 export default function useCollections(): IWorkspaces {
   const param = useParams() as {
@@ -61,16 +69,30 @@ export default function useCollections(): IWorkspaces {
 
       //  If created item is a collection type then
       if (collection.object === "collection") {
-        collectionTree = addInCollectionTree(collections, collection.parent, response.collection);
-        mutate({ collections: collectionTree }, { revalidate: false, optimisticData: collectionTree });
+        collectionTree = addInCollectionTree(
+          collections,
+          collection.parent,
+          response.collection,
+        );
+        mutate(
+          { collections: collectionTree },
+          { revalidate: false, optimisticData: collectionTree },
+        );
         router.push(
           `/${team_slug}/${workspace_slug}/${response.collection.meta.slug}`,
         );
       }
       // If created item is an item type
       else {
-        collectionTree = addInCollectionTree(collections, collection.parent, response.collection);
-        mutate({ collections: collectionTree }, { revalidate: false, optimisticData: collectionTree });
+        collectionTree = addInCollectionTree(
+          collections,
+          collection.parent,
+          response.collection,
+        );
+        mutate(
+          { collections: collectionTree },
+          { revalidate: false, optimisticData: collectionTree },
+        );
       }
       displayToast({
         title: "Success",
@@ -100,7 +122,11 @@ export default function useCollections(): IWorkspaces {
           body: JSON.stringify({ item: item }),
         },
       );
-      const collectionTree = updateInCollectionTree(data?.collections, item._id, response.item);
+      const collectionTree = updateInCollectionTree(
+        data?.collections,
+        item._id,
+        response.item,
+      );
 
       if (activeItemSlug && activeItemSlug !== response.item?.meta?.slug) {
         router.replace(
@@ -137,14 +163,21 @@ export default function useCollections(): IWorkspaces {
         },
       );
 
-      const collectionTree = updateInCollectionTree(data?.collections, collection._id, response.collection);
+      const collectionTree = updateInCollectionTree(
+        data?.collections,
+        collection._id,
+        response.collection,
+      );
       // Change the url if the collection slug has changed
       if (collectionSlug != response.collection.meta.slug) {
         router.replace(
           `/${teamSlug}/${workspaceSlug}/${response.collection.meta.slug}`,
         );
       }
-      mutate({ collections: collectionTree }, { revalidate: false, optimisticData: collectionTree });
+      mutate(
+        { collections: collectionTree },
+        { revalidate: false, optimisticData: collectionTree },
+      );
     } catch (error) {
       console.error("error", error);
       throw error;
@@ -172,7 +205,10 @@ export default function useCollections(): IWorkspaces {
         if (collectionSlug === activeCollectionSlug) {
           router.replace(`/${teamSlug}/${workspaceSlug}`);
         }
-        mutate({ collections: list }, { revalidate: false, optimisticData: list });
+        mutate(
+          { collections: list },
+          { revalidate: false, optimisticData: list },
+        );
       });
     } catch (error) {
       console.error("error", error);
@@ -186,7 +222,11 @@ export default function useCollections(): IWorkspaces {
   }
 
   // Delete item
-  async function deleteItem(itemId: string, itemSlug: string, collectionSlug: string) {
+  async function deleteItem(
+    itemId: string,
+    itemSlug: string,
+    collectionSlug: string,
+  ) {
     const teamSlug = param?.team_slug;
     const workspaceSlug = param?.workspace_slug;
     const activeItemSlug = param?.item_slug;
@@ -202,7 +242,10 @@ export default function useCollections(): IWorkspaces {
           title: "Item deleted - 1",
           description: "Item has been deleted successfully",
         });
-        const collectionTree = removeFromCollectionTree(data?.collections, itemId);
+        const collectionTree = removeFromCollectionTree(
+          data?.collections,
+          itemId,
+        );
         if (itemSlug === activeItemSlug) {
           router.replace(`/${teamSlug}/${workspaceSlug}/${collectionSlug}`);
         }

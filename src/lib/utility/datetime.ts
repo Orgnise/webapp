@@ -56,4 +56,4 @@ export const timeAgo = (
     });
   }
   return `${ms(diff)}${withAgo ? " ago" : ""}`;
-}
+};

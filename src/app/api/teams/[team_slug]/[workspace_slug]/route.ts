@@ -1,6 +1,6 @@
 import { withAuth } from "@/lib/auth";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import mongoDb, { databaseName } from "@/lib/mongodb";
+import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import { generateSlug, hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
@@ -79,7 +79,7 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
           });
           return work ? true : false;
         },
-        suffixLength: 4
+        suffixLength: 4,
       });
     }
     const update = await workspaceDb.updateOne(query, {

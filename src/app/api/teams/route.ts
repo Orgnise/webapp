@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { NextAuthOptions } from "@/lib/auth/auth";
-import { TeamSchema, TeamMemberSchema } from "@/lib/schema/team.schema";
+import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
 import mongoDb, { databaseName } from "@/lib/mongodb";
+import { TeamMemberSchema, TeamSchema } from "@/lib/schema/team.schema";
+import { Team } from "@/lib/types/types";
+import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
-import { generateSlug, randomId } from "@/lib/utils";
-import { Team } from "@/lib/types/types";
-import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
-
 
 // GET /api/teams - get all teams for the current user
 export async function GET(request: NextRequest) {
@@ -28,63 +27,67 @@ export async function GET(request: NextRequest) {
       );
     }
     // const teams = client.db(databaseName).collection<TeamSchema>("teams");
-    const teamsMembers = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
-    const teamList = await teamsMembers.aggregate([
-      {
-        '$match': {
-          'user': new ObjectId(session.user.id)
-        }
-      },
-      {
-        '$lookup': {
-          'from': 'teams',
-          'localField': 'teamId',
-          'foreignField': '_id',
-          'as': 'team'
+    const teamsMembers = client
+      .db(databaseName)
+      .collection<TeamMemberSchema>("teamUsers");
+    const teamList = (await teamsMembers
+      .aggregate([
+        {
+          $match: {
+            user: new ObjectId(session.user.id),
+          },
         },
-      },
-      {
-        '$unwind': {
-          'path': '$team',
-          'preserveNullAndEmptyArrays': true
-        }
-      },
-      {
-        '$lookup': {
-          'from': 'teamUsers',
-          'localField': 'team._id',
-          'foreignField': 'teamId',
-          'as': 'members'
-        }
-      },
-      {
-        $addFields: { membersCount: { $size: "$members" } },
-      },
-      // Append team object in root object and make team_id and root id.
-      {
-        '$addFields': {
-          '_id': '$team._id',
-          'name': '$team.name',
-          'description': '$team.description',
-          'createdBy': '$team.createdBy',
-          'plan': '$team.plan',
-          'meta': '$team.meta',
-          'createdAt': '$team.createdAt',
-          'billingCycleStart': '$team.billingCycleStart',
-          'inviteCode': '$team.inviteCode',
-          'membersLimit': '$team.membersLimit',
-          'workspaceLimit': '$team.workspaceLimit'
-        }
-      },
-      // Remove team object from root object
-      {
-        '$project': {
-          'team': 0,
-          'teamId:': 0,
-          'members': 0
-        }
-      }
-    ]).toArray() as TeamSchema[];
+        {
+          $lookup: {
+            from: "teams",
+            localField: "teamId",
+            foreignField: "_id",
+            as: "team",
+          },
+        },
+        {
+          $unwind: {
+            path: "$team",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $lookup: {
+            from: "teamUsers",
+            localField: "team._id",
+            foreignField: "teamId",
+            as: "members",
+          },
+        },
+        {
+          $addFields: { membersCount: { $size: "$members" } },
+        },
+        // Append team object in root object and make team_id and root id.
+        {
+          $addFields: {
+            _id: "$team._id",
+            name: "$team.name",
+            description: "$team.description",
+            createdBy: "$team.createdBy",
+            plan: "$team.plan",
+            meta: "$team.meta",
+            createdAt: "$team.createdAt",
+            billingCycleStart: "$team.billingCycleStart",
+            inviteCode: "$team.inviteCode",
+            membersLimit: "$team.membersLimit",
+            workspaceLimit: "$team.workspaceLimit",
+          },
+        },
+        // Remove team object from root object
+        {
+          $project: {
+            team: 0,
+            "teamId:": 0,
+            members: 0,
+          },
+        },
+      ])
+      .toArray()) as TeamSchema[];
 
     // const teamList = await teams.aggregate([
 
@@ -177,18 +180,25 @@ export async function POST(req: NextRequest) {
     }
 
     const teams = client.db(databaseName).collection<TeamSchema>("teams");
-    const teamUsersDb = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
+    const teamUsersDb = client
+      .db(databaseName)
+      .collection<TeamMemberSchema>("teamUsers");
 
-    const freeTeams = await teams.find({
-      $and: [
-        { plan: "free" },
-        {
-          members: {
-            $elemMatch: { user: new ObjectId(session.user.id), role: "owner" },
+    const freeTeams = await teams
+      .find({
+        $and: [
+          { plan: "free" },
+          {
+            members: {
+              $elemMatch: {
+                user: new ObjectId(session.user.id),
+                role: "owner",
+              },
+            },
           },
-        }
-      ]
-    }).toArray();
+        ],
+      })
+      .toArray();
     if (freeTeams.length >= FREE_TEAMS_LIMIT) {
       return NextResponse.json(
         {
@@ -213,7 +223,7 @@ export async function POST(req: NextRequest) {
       name: team.name,
       description: team.description,
       createdBy: new ObjectId(session.user.id),
-      plan: 'free',
+      plan: "free",
       meta: {
         title: team.name,
         description: "",
@@ -229,16 +239,13 @@ export async function POST(req: NextRequest) {
     const teamResult = await teams.insertOne(freeTeam);
 
     // Add user to team
-    const teamUser = await teamUsersDb.insertOne(
-      {
-        teamId: teamResult.insertedId,
-        role: "owner",
-        user: new ObjectId(session.user.id),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    )
-
+    const teamUser = await teamUsersDb.insertOne({
+      teamId: teamResult.insertedId,
+      role: "owner",
+      user: new ObjectId(session.user.id),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
 
     const customTeam = {
       ...freeTeam,
@@ -252,4 +259,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-

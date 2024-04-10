@@ -1,7 +1,7 @@
 import { withAuth } from "@/lib/auth";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { CollectionSchema } from "@/lib/schema/collection.schema";
 import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
-import mongoDb, { databaseName } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
 import { generateSlug, hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -166,7 +166,10 @@ export const DELETE = withAuth(async ({ params, team }) => {
     };
 
     // delete all children recursively
-    await deleteDocumentAndChildren(collectionsDb, new ObjectId(collectionInDb._id));
+    await deleteDocumentAndChildren(
+      collectionsDb,
+      new ObjectId(collectionInDb._id),
+    );
 
     // delete the record itself
     const deleteResult = await collectionsDb.deleteMany(deleteQuery);

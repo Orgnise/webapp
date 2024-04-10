@@ -1,18 +1,18 @@
 import { mongoUserResult } from "@/app/api/auth/signup/route";
 import GitHub from "@auth/core/providers/github";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import { createHash } from "crypto";
 import NextAuth, { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import Twitter from "next-auth/providers/twitter";
-import Slack from "next-auth/providers/slack";
 import EmailProvider from "next-auth/providers/email";
+import Google from "next-auth/providers/google";
+import Slack from "next-auth/providers/slack";
+import Twitter from "next-auth/providers/twitter";
 import { z } from "zod";
-import mongoDb, { databaseName } from "../mongodb";
-import LoginLink from "../../../emails/login-link";
 import { sendEmailV2 } from "../../../emails";
+import LoginLink from "../../../emails/login-link";
 import { APP_DOMAIN } from "../constants";
-import { createHash } from "crypto";
+import mongoDb, { databaseName } from "../mongodb";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
@@ -53,11 +53,19 @@ export const NextAuthOptions = {
     },
   },
   providers: [
-    Slack({ clientId: process.env.AUTH_SLACK_ID ?? '', clientSecret: process.env.AUTH_SLACK_SECRET ?? "", allowDangerousEmailAccountLinking: true }),
+    Slack({
+      clientId: process.env.AUTH_SLACK_ID ?? "",
+      clientSecret: process.env.AUTH_SLACK_SECRET ?? "",
+      allowDangerousEmailAccountLinking: true,
+    }),
     EmailProvider({
       async sendVerificationRequest({ identifier, url }) {
         console.log("sendVerificationRequest", { identifier, url });
-        if (!process.env.EMAIL_SERVER_USER || !process.env.EMAIL_SERVER_PASSWORD || process.env.NODE_ENV === "development") {
+        if (
+          !process.env.EMAIL_SERVER_USER ||
+          !process.env.EMAIL_SERVER_PASSWORD ||
+          process.env.NODE_ENV === "development"
+        ) {
           console.log(`Login link: ${url}`);
           return;
         } else {
@@ -67,7 +75,6 @@ export const NextAuthOptions = {
           subject: `Your ${process.env.NEXT_PUBLIC_APP_NAME} Login Link`,
           react: LoginLink({ url, email: identifier }),
         });
-
       },
     }),
     GitHub({

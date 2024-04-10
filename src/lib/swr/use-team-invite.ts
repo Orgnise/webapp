@@ -8,8 +8,7 @@ export default function useTeamInvite() {
   };
 
   const { data: res, error } = useSWR<any>(
-    team_slug &&
-    `/api/teams/${team_slug}/invites`,
+    team_slug && `/api/teams/${team_slug}/invites`,
     fetcher,
   );
 

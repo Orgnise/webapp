@@ -1,8 +1,8 @@
 import slugify from "@sindresorhus/slugify";
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
-import { nanoid } from 'nanoid'
+import { nanoid } from "nanoid";
 import { NextRequest } from "next/server";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -76,16 +76,16 @@ export function hasValue(obj: any): boolean {
 
 export type PrettiFy<T> = {
   [P in keyof T]: T[P] extends string
-  ? string
-  : T[P] extends number
-  ? number
-  : T[P] extends boolean
-  ? boolean
-  : T[P] extends object
-  ? PrettiFy<T[P]>
-  : T[P] extends Array<infer P>
-  ? Array<PrettiFy<P>>
-  : T[P];
+    ? string
+    : T[P] extends number
+      ? number
+      : T[P] extends boolean
+        ? boolean
+        : T[P] extends object
+          ? PrettiFy<T[P]>
+          : T[P] extends Array<infer P>
+            ? Array<PrettiFy<P>>
+            : T[P];
 } & {};
 
 export async function generateSlug({
@@ -95,7 +95,7 @@ export async function generateSlug({
 }: {
   title: string;
   didExist?: (val: string) => Promise<boolean>;
-  suffixLength?: number
+  suffixLength?: number;
 }) {
   if (!hasValue(title)) {
     title = randomId();

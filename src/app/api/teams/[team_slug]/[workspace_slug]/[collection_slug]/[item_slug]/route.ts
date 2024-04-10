@@ -1,6 +1,6 @@
 import { withAuth } from "@/lib/auth";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import mongoDb, { databaseName } from "@/lib/mongodb";
+import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -52,9 +52,7 @@ export const PATCH = withAuth(async ({ req, session }) => {
     const update = await collectionsDb.updateOne(query, {
       $set: {
         ...data,
-        name: hasValue(item?.name)
-          ? item?.name
-          : itemInDb.name,
+        name: hasValue(item?.name) ? item?.name : itemInDb.name,
         updatedAt: new Date().toISOString(),
         updatedBy: new ObjectId(session.user.id),
       },

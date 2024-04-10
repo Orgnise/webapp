@@ -15,16 +15,15 @@ interface ITeam {
   updateTeamAsync: (team: Team, teamSlug: string) => Promise<void>;
 }
 export default function useTeam(): ITeam {
-
   const router = useRouter();
   const { team_slug } = useParams() as { team_slug?: string };
-  const {
-    data,
-    error,
-    mutate,
-  } = useSWR<any>(team_slug && `/api/teams/${team_slug}`, fetcher, {
-    dedupingInterval: 120000,
-  });
+  const { data, error, mutate } = useSWR<any>(
+    team_slug && `/api/teams/${team_slug}`,
+    fetcher,
+    {
+      dedupingInterval: 120000,
+    },
+  );
 
   // Delete collection
   async function deleteTeamAsync(teamSlug: string) {
@@ -45,7 +44,10 @@ export default function useTeam(): ITeam {
           console.log("Closing the team page");
         }
 
-        mutate({ team: undefined }, { revalidate: false, optimisticData: undefined });
+        mutate(
+          { team: undefined },
+          { revalidate: false, optimisticData: undefined },
+        );
       });
     } catch (error: any) {
       console.error("error", error);
@@ -61,24 +63,22 @@ export default function useTeam(): ITeam {
   // Update collection name
   async function updateTeamAsync(team: Team, teamSlug: string) {
     try {
-      const response = await fetcher(
-        `/api/teams/${teamSlug}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ team: team }),
+      const response = await fetcher(`/api/teams/${teamSlug}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ team: team }),
+      });
       // Change the url if the collection slug has changed
       if (teamSlug != response.team.meta.slug) {
-        router.replace(
-          `/${response.team.meta.slug}/settings`,
-        );
+        router.replace(`/${response.team.meta.slug}/settings`);
       }
-      console.log({ Team: response.team })
-      mutate({ ...response.team }, { revalidate: false, optimisticData: response.team });
+      console.log({ Team: response.team });
+      mutate(
+        { ...response.team },
+        { revalidate: false, optimisticData: response.team },
+      );
     } catch (error: any) {
       console.error("error", error);
       displayToast({

@@ -1,12 +1,11 @@
 import { withAuth } from "@/lib/auth";
+import mongoDb, { databaseName } from "@/lib/mongodb";
 import { CollectionSchema } from "@/lib/schema/collection.schema";
 import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
-import mongoDb, { databaseName } from "@/lib/mongodb";
-import { Collection } from "@/lib/types/types";
+import { createTreeFromCollection } from "@/lib/utility/collection-tree-structure";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
-import { createTreeFromCollection } from "@/lib/utility/collection-tree-structure";
 
 // Get list of collections
 export const GET = withAuth(async ({ team, params }) => {
@@ -101,7 +100,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
       .db(databaseName)
       .collection<CollectionSchema>("collections");
     const slug = await generateSlug({
-      title: collectionToCreate?.name ?? 'collection ',
+      title: collectionToCreate?.name ?? "collection ",
       didExist: async (val: string) => {
         const work = await collectionsDb.findOne({
           "meta.slug": val,
@@ -109,7 +108,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
         });
         return !!work;
       },
-      suffixLength: 6
+      suffixLength: 6,
     });
     const collection = {
       team: new ObjectId(team._id),

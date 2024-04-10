@@ -1,7 +1,7 @@
 import { inviteUser } from "@/lib/api/users";
 import { withAuth } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { Role, TeamMemberSchema } from "@/lib/schema/team.schema";
+import { Role } from "@/lib/schema/team.schema";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
@@ -11,21 +11,23 @@ const emailInviteSchema = z.object({
   email: z.string().email(),
 });
 
-
 export const GET = withAuth(async ({ team, headers }) => {
   const client = await mongoDb;
-  const teamUserCollection = client.db(databaseName).collection("teamInviteUsers");
+  const teamUserCollection = client
+    .db(databaseName)
+    .collection("teamInviteUsers");
   const query = { teamId: new ObjectId(team._id) };
   const teamData = await teamUserCollection.findOne(query);
   if (!hasValue(teamData)) {
     return NextResponse.json({ users: [] }, { status: 200 });
   }
-  const dbResults = await teamUserCollection.aggregate(
-    [{
-      '$match': {
-        'teamId': new ObjectId(team._id)
-      }
-    },
+  const dbResults = (await teamUserCollection
+    .aggregate([
+      {
+        $match: {
+          teamId: new ObjectId(team._id),
+        },
+      },
       // {
       //   '$lookup': {
       //     'from': 'users',
@@ -57,7 +59,8 @@ export const GET = withAuth(async ({ team, headers }) => {
       //     'email': 1
       //   }
       // }
-    ]).toArray() as unknown as any[];
+    ])
+    .toArray()) as unknown as any[];
 
   return NextResponse.json({ users: dbResults }, { status: 200 });
 });
@@ -65,7 +68,9 @@ export const GET = withAuth(async ({ team, headers }) => {
 // POST /api/team/[slug]/invites – invite a team member
 export const POST = withAuth(
   async ({ req, team, session }) => {
-    const { emails } = await req.json() as { emails: Array<EmailInvite> | undefined };
+    const { emails } = (await req.json()) as {
+      emails: Array<EmailInvite> | undefined;
+    };
     if (!hasValue(emails)) {
       return new Response("Emails are required", { status: 400 });
     }
@@ -114,14 +119,16 @@ export const POST = withAuth(
       });
       return NextResponse.json({ message: "Invitation sent" });
     } catch (error) {
-      return NextResponse.json({ message: "Failed to send invite", error }, { status: 500 });
+      return NextResponse.json(
+        { message: "Failed to send invite", error },
+        { status: 500 },
+      );
     }
   },
   {
     requiredRole: ["owner"],
   },
 );
-
 
 // DELETE /api/team/[slug]/invites – remove a team member invite
 export const DELETE = withAuth(
@@ -132,7 +139,9 @@ export const DELETE = withAuth(
       return new Response("Email is required", { status: 400 });
     }
     const client = await mongoDb;
-    const teamInviteUsersCollection = client.db(databaseName).collection("teamInviteUsers");
+    const teamInviteUsersCollection = client
+      .db(databaseName)
+      .collection("teamInviteUsers");
     const result = await teamInviteUsersCollection.deleteOne({
       email,
       teamId: new ObjectId(team._id),

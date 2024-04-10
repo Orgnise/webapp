@@ -4,4 +4,3 @@ import { extendZodWithOpenApi } from "zod-openapi";
 extendZodWithOpenApi(z);
 
 export default z;
-

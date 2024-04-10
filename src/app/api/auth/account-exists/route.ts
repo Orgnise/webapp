@@ -2,7 +2,6 @@ import mongoDb, { databaseName } from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-
   const client = await mongoDb;
   const { email } = (await req.json()) as { email: string };
   if (!process.env.MONGODB_URI) {
@@ -12,10 +11,9 @@ export async function POST(req: NextRequest) {
   }
 
   const userCollection = client.db(databaseName).collection("users");
-  const user = (await userCollection.findOne({
+  const user = await userCollection.findOne({
     email: email,
-  }));
-
+  });
 
   if (user) {
     return NextResponse.json({ exists: true });

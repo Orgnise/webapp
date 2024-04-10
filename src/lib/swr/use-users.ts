@@ -1,6 +1,5 @@
 import { useParams } from "next/navigation";
 import useSWR from "swr";
-import { UserProps } from "../types/types";
 import { fetcher } from "../fetcher";
 
 export default function useUsers() {

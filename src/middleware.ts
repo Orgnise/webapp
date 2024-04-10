@@ -22,7 +22,10 @@ export const middleware = async (req: NextRequest) => {
   const session = await getToken({
     req: req,
     secret: process.env.AUTH_SECRET,
-    cookieName: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token'
+    cookieName:
+      process.env.NODE_ENV === "production"
+        ? "__Secure-next-auth.session-token"
+        : "next-auth.session-token",
   });
 
   const loggedIn = session?.user ? true : false;
@@ -33,16 +36,22 @@ export const middleware = async (req: NextRequest) => {
   }
   // Redirect to login if not logged in
   else if (
-    !["/login", "/signup", "terms", "policy", '/credential'].includes(path) &&
+    !["/login", "/signup", "terms", "policy", "/credential"].includes(path) &&
     !loggedIn
   ) {
     return NextResponse.redirect(
-      new URL(`/login${path === "/" ? "" : `?next=${encodeURIComponent(fullPath)}`}`, req.url),
+      new URL(
+        `/login${path === "/" ? "" : `?next=${encodeURIComponent(fullPath)}`}`,
+        req.url,
+      ),
     );
   }
 
   // Redirect to home if logged in and trying to access login or signup
-  else if (loggedIn && (path === "/login" || path === "/signup" || path === "/credential")) {
+  else if (
+    loggedIn &&
+    (path === "/login" || path === "/signup" || path === "/credential")
+  ) {
     return NextResponse.redirect(new URL("/", req.url));
   } else {
     return NextResponse.next();

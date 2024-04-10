@@ -25,7 +25,7 @@ export async function fetcher<JSON = any>(
     if (json) {
       throw json;
     }
-    throw error
+    throw error;
   }
 
   return json;
