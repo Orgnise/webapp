@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
-import { Role } from "@/lib/schema/team.schema";
+import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
 import { UserProps } from "@/lib/types/types";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -19,7 +19,7 @@ export default function EditRoleModal({
   showEditRoleModal: boolean;
   setShowEditRoleModal: Dispatch<SetStateAction<boolean>>;
   user: UserProps;
-  role: Role;
+  role: TeamRole;
 }) {
   const [editing, setEditing] = useState(false);
   const { team } = useTeam();

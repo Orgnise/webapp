@@ -1,11 +1,12 @@
 import { Invite, Plan, Team } from "../types/types";
 
+import { TeamRole } from "@/lib/constants/team-role";
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "../api/errors";
-import { Role, TeamMemberSchema, TeamSchema } from "../schema/team.schema";
+import { TeamMemberSchema, TeamSchema } from "../schema/team.schema";
 import { getSearchParams } from "../url";
 import { hasValue } from "../utils";
 import { NextAuthOptions } from "./auth";
@@ -49,7 +50,7 @@ export const withAuth =
       requiredRole = ["owner", "member", "guest", "moderator"], // if the action needs a specific role
     }: {
       requiredPlan?: Array<Plan>;
-      requiredRole?: Array<Role>;
+      requiredRole?: Array<TeamRole>;
     } = {},
   ) =>
   async (
@@ -172,10 +173,10 @@ export const withAuth =
 
       const team = teamList[0] as unknown as Team;
       if (!team) {
-        const teamInviteUsersCollection = client
+        const teamInviteCollection = client
           .db(databaseName)
-          .collection("teamInviteUsers");
-        const invites = (await teamInviteUsersCollection
+          .collection("teamInvites");
+        const invites = (await teamInviteCollection
           .aggregate([
             {
               $match: {

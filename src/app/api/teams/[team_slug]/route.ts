@@ -100,7 +100,7 @@ export const PATCH = withAuth(
     }
   },
   {
-    requiredRole: ["owner"],
+    requiredRole: ["owner", "moderator"],
   },
 );
 
@@ -143,5 +143,7 @@ export const DELETE = withAuth(
       );
     }
   },
-  { requiredRole: ["owner"] },
+  {
+    requiredRole: ["owner", "moderator"],
+  },
 );

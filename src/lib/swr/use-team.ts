@@ -31,31 +31,35 @@ export default function useTeam(): ITeam {
     // const workspaceSlug = param?.workspace_slug;
     // const activeCollectionSlug = param?.collection_slug;
     try {
-      fetcher(`/api/teams/${teamSlug}`, {
+      fetch(`/api/teams/${teamSlug}`, {
         method: "DELETE",
-      }).then((res) => {
-        displayToast({
-          title: "Team deleted",
-          description: "Team has been deleted successfully",
-        });
-        console.log("Team deleted", { activeTeamSlug, teamSlug });
-        if (activeTeamSlug === teamSlug) {
-          router.replace("/");
-          console.log("Closing the team page");
-        }
+      }).then(async (res) => {
+        const json = await res.json();
+        if (res.ok) {
+          displayToast({
+            title: "Team deleted",
+            description: "Team has been deleted successfully",
+          });
+          console.log("Team deleted", { activeTeamSlug, teamSlug });
+          if (activeTeamSlug === teamSlug) {
+            router.replace("/");
+            console.log("Closing the team page");
+          }
 
-        mutate(
-          { team: undefined },
-          { revalidate: false, optimisticData: undefined },
-        );
+          mutate(
+            { team: undefined },
+            { revalidate: false, optimisticData: undefined },
+          );
+        } else {
+          displayToast({
+            title: "Error",
+            description: json?.message ?? "Failed to delete team",
+            variant: "error",
+          });
+        }
       });
     } catch (error: any) {
       console.error("error", error);
-      displayToast({
-        title: "Error",
-        description: error?.message ?? "Failed to delete team",
-        variant: "error",
-      });
       throw error;
     }
   }

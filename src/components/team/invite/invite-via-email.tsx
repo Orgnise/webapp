@@ -10,8 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { TeamRole } from "@/lib/constants/team-role";
 import { fetcher } from "@/lib/fetcher";
-import { Role } from "@/lib/schema/team.schema";
 import useTeam from "@/lib/swr/use-team";
 import { Team } from "@/lib/types/types";
 import clsx from "clsx";
@@ -21,7 +21,7 @@ import { mutate } from "swr";
 
 interface EmailInvite {
   email: string;
-  role: Role;
+  role: TeamRole;
 }
 
 export default function InviteViaEmail({ team }: { team?: Team }) {
@@ -107,7 +107,6 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
                           ? { ...email, email: e.target.value }
                           : email,
                       );
-                      console.log(updatedEmails);
                       setEmails(updatedEmails);
                     }}
                     placeholder="enter email address"
@@ -132,7 +131,9 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
                     onValueChange={(e) => {
                       setEmails(
                         emails.map((email, i) =>
-                          i === index ? { ...email, role: e as Role } : email,
+                          i === index
+                            ? { ...email, role: e as TeamRole }
+                            : email,
                         ),
                       );
                     }}

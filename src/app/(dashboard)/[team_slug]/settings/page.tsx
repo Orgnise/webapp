@@ -2,6 +2,7 @@
 import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
 import { P } from "@/components/atom/typography";
+import TeamPermission from "@/components/molecule/team-permisson-view";
 import NotFoundView from "@/components/team/team-not-found";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,40 +86,66 @@ function TeamName() {
   }
 
   return (
-    <form
-      onSubmit={handleUpdateTeamName}
-      className="rounded-lg border border-border bg-card"
+    <TeamPermission
+      permission={"UPDATE_TEAM_INFO"}
+      unAuthorized={
+        <div className="rounded-lg  border border-border bg-card ">
+          <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+            <div className="flex flex-col space-y-3">
+              <h2 className="text-xl font-medium">Team Name</h2>
+              <p className="text-sm text-muted-foreground">
+                This is the name of your project on Orgnise
+              </p>
+            </div>
+            <Input
+              name="name"
+              disabled
+              required
+              type="text"
+              min={3}
+              maxLength={32}
+              defaultValue={team!.name}
+              className="pointer-events-none"
+            />
+          </div>
+        </div>
+      }
     >
-      <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-        <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Team Name</h2>
-          <p className="text-sm text-muted-foreground">
-            This is the name of your project on Orgnise
-          </p>
+      <form
+        onSubmit={handleUpdateTeamName}
+        className="rounded-lg border border-border bg-card"
+      >
+        <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+          <div className="flex flex-col space-y-3">
+            <h2 className="text-xl font-medium">Team Name</h2>
+            <p className="text-sm text-muted-foreground">
+              This is the name of your project on Orgnise
+            </p>
+          </div>
+          <Input
+            placeholder="My team"
+            minLength={3}
+            maxLength={32}
+            name="name"
+            required
+            defaultValue={team!.name}
+            onChange={(e) => {
+              setEnableSubmit(
+                hasValue(e.target.value) && e.target.value !== team!.name,
+              );
+            }}
+          />
         </div>
-        <Input
-          placeholder="My team"
-          minLength={3}
-          maxLength={32}
-          name="name"
-          required
-          defaultValue={team!.name}
-          onChange={(e) => {
-            setEnableSubmit(
-              hasValue(e.target.value) && e.target.value !== team!.name,
-            );
-          }}
-        />
-      </div>
-      <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
-        <P className="text-sm text-muted-foreground">Max 32 characters.</P>
-        <div className="shrink-0">
-          <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
-            {isLoading ? <Spinner /> : <p>Save Changes</p>}
-          </Button>
+        <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
+          <P className="text-sm text-muted-foreground">Max 32 characters.</P>
+          <div className="shrink-0">
+            <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
+              {isLoading ? <Spinner /> : <p>Save Changes</p>}
+            </Button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </TeamPermission>
   );
 }
 
@@ -166,66 +193,117 @@ function TeamSlug() {
       });
   }
   return (
-    <form
-      onSubmit={handleUpdateTeamSlug}
-      className="rounded-lg border border-border bg-card"
+    <TeamPermission
+      permission={"UPDATE_TEAM_INFO"}
+      unAuthorized={
+        <div className="rounded-lg  border border-border bg-card ">
+          <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+            <div className="flex flex-col space-y-3">
+              <h2 className="text-xl font-medium">Team Slug</h2>
+              <p className="text-sm text-muted-foreground">
+                This is your team&apos;s unique slug on Orgnise
+              </p>
+            </div>
+            <Input
+              name="slug"
+              placeholder="my-team-slug"
+              disabled
+              required
+              type="text"
+              min={3}
+              maxLength={32}
+              defaultValue={team?.meta?.slug}
+              className="pointer-events-none"
+            />
+          </div>
+        </div>
+      }
     >
-      <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-        <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Team Slug</h2>
-          <p className="text-sm text-muted-foreground">
-            This is your team&apos;s unique slug on Orgnise
-          </p>
+      <form
+        onSubmit={handleUpdateTeamSlug}
+        className="rounded-lg border border-border bg-card"
+      >
+        <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+          <div className="flex flex-col space-y-3">
+            <h2 className="text-xl font-medium">Team Slug</h2>
+            <p className="text-sm text-muted-foreground">
+              This is your team&apos;s unique slug on Orgnise
+            </p>
+          </div>
+          <Input
+            name="slug"
+            placeholder="my-team-slug"
+            required
+            type="text"
+            min={3}
+            maxLength={32}
+            defaultValue={team?.meta?.slug}
+            onChange={(e) => {
+              setEnableSubmit(
+                hasValue(e.target.value) && e.target.value !== team!.name,
+              );
+            }}
+          />
         </div>
-        <Input
-          name="slug"
-          placeholder="my-team-slug"
-          required
-          type="text"
-          min={3}
-          maxLength={32}
-          defaultValue={team?.meta?.slug}
-          onChange={(e) => {
-            setEnableSubmit(
-              hasValue(e.target.value) && e.target.value !== team!.name,
-            );
-          }}
-        />
-      </div>
-      <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
-        <P className="text-muted-foreground">
-          Only lowercase letters, numbers, and dashes. Max 48 characters.
-        </P>
-        <div className="shrink-0">
-          <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
-            {isLoading ? <Spinner /> : <p>Save Changes</p>}
-          </Button>
+        <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
+          <P className="text-muted-foreground">
+            Only lowercase letters, numbers, and dashes. Max 48 characters.
+          </P>
+          <div className="shrink-0">
+            <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
+              {isLoading ? <Spinner /> : <p>Save Changes</p>}
+            </Button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </TeamPermission>
   );
 }
 
 function DeleteTeam() {
   return (
-    <div className="rounded-lg border border-destructive bg-card">
-      <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-        <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Delete team</h2>
-          <P className="text-muted-foreground">
-            Permanently delete your team, and all associated collections + their
-            items. This action cannot be undone - please proceed with caution.
-          </P>
+    <TeamPermission
+      permission={"DELETE_TEAM"}
+      unAuthorized={
+        <div className="rounded-lg  border border-info bg-card dark:border-border">
+          <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+            <div className="flex flex-col space-y-3">
+              <h2 className="text-xl font-medium">Delete team</h2>
+              <P className="text-muted-foreground">
+                Not authorized to delete this team
+              </P>
+            </div>
+          </div>
+          <div className="flex items-center  space-x-4 rounded-b-lg border-t border-info bg-info p-3 sm:px-10">
+            <p className="text-sm text-info-foreground">
+              You do not have permission to delete this team. Only the team
+              owner can delete the team.
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <div className="rounded-lg border border-destructive bg-card">
+        <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+          <div className="flex flex-col space-y-3">
+            <h2 className="text-xl font-medium">Delete team</h2>
+            <P className="text-muted-foreground">
+              Permanently delete your team, and all associated collections +
+              their items. This action cannot be undone - please proceed with
+              caution.
+            </P>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end space-x-4 rounded-b-lg border-t border-destructive bg-accent/20 p-3 sm:px-10">
+          <DeleteWorkspaceModel>
+            <Button variant={"destructive"} type="button">
+              <p>Delete team</p>
+            </Button>
+          </DeleteWorkspaceModel>
         </div>
       </div>
-      <div className="flex items-center justify-end space-x-4 rounded-b-lg border-t border-destructive bg-accent/20 p-3 sm:px-10">
-        <DeleteWorkspaceModel>
-          <Button variant={"destructive"} type="button">
-            <p>Delete team</p>
-          </Button>
-        </DeleteWorkspaceModel>
-      </div>
-    </div>
+    </TeamPermission>
   );
 }
 
@@ -257,7 +335,7 @@ function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
             <DialogDescription className="text-center">
               <P className="text-muted-foreground">
                 Permanently delete your team, and all associated collections +
-                their items.
+                their pages.
               </P>
             </DialogDescription>
           </DialogHeader>

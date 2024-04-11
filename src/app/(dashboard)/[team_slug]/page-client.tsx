@@ -15,6 +15,7 @@ import { useContext, useState } from "react";
 import Label from "@/components/atom/label";
 import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
+import TeamPermission from "@/components/molecule/team-permisson-view";
 import { TextField } from "@/components/molecule/text-field";
 import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,7 @@ import TeamPageLoading from "./loading";
 import { TeamContext } from "./providers";
 
 export default function TeamsPageClient() {
-  const { loading } = useTeam();
+  const { loading, team } = useTeam();
   const { team_slug } = useParams() as { team_slug?: string };
   const { workspacesData } = useContext(TeamContext);
   if (loading) {
@@ -41,9 +42,11 @@ export default function TeamsPageClient() {
         <div className="mx-auto w-full max-w-screen-xl px-2.5">
           <div className="flex items-center justify-between">
             <h1 className="prose-2xl">My Workspaces</h1>
-            <CerateWorkspaceModel>
-              <Button size={"sm"}>Create Workspace</Button>
-            </CerateWorkspaceModel>
+            <TeamPermission permission="CREATE_WORKSPACE">
+              <CerateWorkspaceModel>
+                <Button size={"sm"}>Create Workspace</Button>
+              </CerateWorkspaceModel>
+            </TeamPermission>
           </div>
         </div>
       </div>

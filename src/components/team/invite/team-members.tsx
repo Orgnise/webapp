@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Role } from "@/lib/schema/team.schema";
+import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
 import useUsers from "@/lib/swr/use-users";
 import { UserProps } from "@/lib/types/types";
@@ -55,7 +55,7 @@ const UserCard = ({ user, isOwner }: { user: UserProps; isOwner: boolean }) => {
 
   const { name, email, createdAt, role: currentRole } = user;
 
-  const [role, setRole] = useState<Role>(currentRole);
+  const [role, setRole] = useState<TeamRole>(currentRole);
 
   const { data: session } = useSession();
   const [showRemoveTeammateModal, setShowRemoveTeammateModal] = useState(false);

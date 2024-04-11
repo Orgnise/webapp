@@ -20,13 +20,14 @@ export default function NavTabs() {
     !team_slug ||
     error ||
     (workspace_slug && pathname !== `/${team_slug}/settings`)
-  )
+  ) {
     return null;
+  }
 
   return (
     <div className="flex h-12 items-end justify-start space-x-2 overflow-x-auto">
       {loading && !team ? (
-        <div className="h-12 w-full border"></div>
+        <div className="h-12 w-full"></div>
       ) : (
         tabs.map(({ name, href }) => (
           <Link key={href} href={href} className="relative">

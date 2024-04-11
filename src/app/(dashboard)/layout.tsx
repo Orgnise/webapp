@@ -17,11 +17,13 @@ export default function Layout({ children }: { children: ReactNode }) {
       <div className="min-h-screen w-full bg-accent/30">
         <NavbarLayout>
           <Nav />
-          {activeTeam && activeTeam.role === "owner" && (
-            <Suspense fallback={<div className="h-12 w-full" />}>
-              <NavTabs />
-            </Suspense>
-          )}
+          <Suspense
+            fallback={
+              <div className="flex h-12 items-end justify-start space-x-2 overflow-x-auto" />
+            }
+          >
+            <NavTabs />
+          </Suspense>
         </NavbarLayout>
         {children}
         <Toaster />

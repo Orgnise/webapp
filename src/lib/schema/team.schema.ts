@@ -1,11 +1,8 @@
 // import Mongoose from "mongoose";
+import { TeamRole } from "@/lib/constants/team-role";
 import { ObjectId } from "mongodb";
 import { Plan } from "../types/types";
-// const Schema = Mongoose.Schema;
 
-export const roles = ["owner", "moderator", "guest", "member"] as const;
-
-export type Role = (typeof roles)[number];
 export interface TeamSchema {
   _id: ObjectId;
   name: string;
@@ -29,7 +26,7 @@ export interface MetaSchema {
 
 export interface TeamMemberSchema {
   _id?: string;
-  role: Role;
+  role: TeamRole;
   user: ObjectId;
   teamId: ObjectId;
   createdAt: Date;

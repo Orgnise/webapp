@@ -20,9 +20,9 @@ export async function inviteUser({
   // same method of generating a token as next-auth
   const expires = new Date(Date.now() + TWO_WEEKS_IN_SECONDS * 1000);
   const client = await mongoDb;
-  const teamInviteUsersCollection = client
+  const teamInviteCollection = client
     .db(databaseName)
-    .collection("teamInviteUsers");
+    .collection("teamInvites");
 
   // create a team invite record and a verification request token that lasts for a week
   // TODO: add a check to see if the user is already in the team
@@ -43,7 +43,7 @@ export async function inviteUser({
         expires,
       });
     }
-    await teamInviteUsersCollection.insertMany(inviteList);
+    await teamInviteCollection.insertMany(inviteList);
     const verificationTokenCollection = client
       .db(databaseName)
       .collection("verification_tokens");
