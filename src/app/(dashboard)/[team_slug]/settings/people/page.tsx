@@ -1,6 +1,7 @@
 "use client";
 
 import Tab from "@/components/atom/tab";
+import TeamPermission from "@/components/molecule/team-permisson-view";
 import InviteViaEmail from "@/components/team/invite/invite-via-email";
 import InviteViaLink from "@/components/team/invite/invite-via-link";
 import InvitedMembers from "@/components/team/invite/invites-team-members";
@@ -37,20 +38,26 @@ export default function ProjectPeopleClient() {
               Teammates that have access to this team.
             </p>
           </div>
-          <div className="flex space-x-2">
+
+          <TeamPermission permission="INVITE_MANAGE_REMOVE_TEAM_MEMBER">
             <CopyInviteToTeamLinkCodeModel team={activeTeam}>
               <Button className="h-9">Invite</Button>
             </CopyInviteToTeamLinkCodeModel>
-          </div>
+          </TeamPermission>
         </div>
         <div className="flex space-x-3 border-b border-border px-3 sm:px-7">
           {tabs.map((tab, index) => (
-            <Tab
+            <TeamPermission
+              permission="INVITE_MANAGE_REMOVE_TEAM_MEMBER"
               key={index}
-              tab={tab}
-              selected={tab === currentTab}
-              onClick={() => setCurrentTab(tab)}
-            />
+            >
+              <Tab
+                key={index}
+                tab={tab}
+                selected={tab === currentTab}
+                onClick={() => setCurrentTab(tab)}
+              />
+            </TeamPermission>
           ))}
         </div>
         {currentTab === "Members" ? <TeamMembers /> : <InvitedMembers />}

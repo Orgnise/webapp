@@ -15,6 +15,7 @@ import { useContext, useState } from "react";
 import Label from "@/components/atom/label";
 import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
+import TeamPermission from "@/components/molecule/team-permisson-view";
 import { TextField } from "@/components/molecule/text-field";
 import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view";
 import { Button } from "@/components/ui/button";
@@ -24,18 +25,15 @@ import useTeam from "@/lib/swr/use-team";
 import { Workspace } from "@/lib/types/types";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import TeamPageLoading from "./loading";
 import { TeamContext } from "./providers";
 
 export default function TeamsPageClient() {
-  const { team, loading } = useTeam();
+  const { loading, team } = useTeam();
   const { team_slug } = useParams() as { team_slug?: string };
   const { workspacesData } = useContext(TeamContext);
   if (loading) {
-    return (
-      <div className="flex h-full w-full place-content-center items-center">
-        <Spinner />
-      </div>
-    );
+    return <TeamPageLoading />;
   }
 
   return (
@@ -44,9 +42,11 @@ export default function TeamsPageClient() {
         <div className="mx-auto w-full max-w-screen-xl px-2.5">
           <div className="flex items-center justify-between">
             <h1 className="prose-2xl">My Workspaces</h1>
-            <CerateWorkspaceModel>
-              <Button size={"sm"}>Create Workspace</Button>
-            </CerateWorkspaceModel>
+            <TeamPermission permission="CREATE_WORKSPACE">
+              <CerateWorkspaceModel>
+                <Button size={"sm"}>Create Workspace</Button>
+              </CerateWorkspaceModel>
+            </TeamPermission>
           </div>
         </div>
       </div>
@@ -76,11 +76,7 @@ export default function TeamsPageClient() {
           </Link>
         )}
         noItemsElement={<EmptyWorkspaceView />}
-        placeholder={
-          <div className="flex h-full w-full place-content-center items-center">
-            <Spinner />
-          </div>
-        }
+        placeholder={<WorkspacePlaceholder />}
       />
     </div>
   );
@@ -151,5 +147,27 @@ export function CerateWorkspaceModel({ children }: CerateWorkspaceModelProps) {
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+export function WorkspacePlaceholder() {
+  return (
+    <div className="mx-auto grid max-w-screen-xl grid-cols-1 gap-5 px-2.5 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-20">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div
+          key={i}
+          className="flex h-[146px] w-full cursor-pointer flex-col place-content-between items-start rounded border border-border bg-card p-6   hover:text-accent-foreground hover:shadow"
+        >
+          <div className="flex w-full items-center gap-2">
+            <div className="h-14 w-14 min-w-[56px] rounded-full bg-secondary "></div>
+            <div className="flex w-full flex-col gap-1">
+              <div className="h-6 w-4/12 rounded bg-secondary"></div>
+              <div className="h-3 w-6/12 rounded bg-secondary"></div>
+            </div>
+          </div>
+          <div className="ml-[56px] h-6 w-9/12 rounded bg-secondary"></div>
+        </div>
+      ))}
+    </div>
   );
 }

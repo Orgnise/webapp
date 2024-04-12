@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Role } from "@/lib/schema/team.schema";
+import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
 import useUsers from "@/lib/swr/use-users";
 import { UserProps } from "@/lib/types/types";
@@ -55,7 +55,7 @@ const UserCard = ({ user, isOwner }: { user: UserProps; isOwner: boolean }) => {
 
   const { name, email, createdAt, role: currentRole } = user;
 
-  const [role, setRole] = useState<Role>(currentRole);
+  const [role, setRole] = useState<TeamRole>(currentRole);
 
   const { data: session } = useSession();
   const [showRemoveTeammateModal, setShowRemoveTeammateModal] = useState(false);
@@ -157,7 +157,7 @@ const UserCard = ({ user, isOwner }: { user: UserProps; isOwner: boolean }) => {
   );
 };
 
-const UserPlaceholder = () => (
+export const UserPlaceholder = () => (
   <div className="flex items-center justify-between space-x-3 px-4 py-3 sm:px-8">
     <div className="flex items-center space-x-3">
       <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200" />

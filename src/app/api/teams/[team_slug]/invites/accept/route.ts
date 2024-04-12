@@ -17,7 +17,7 @@ export const POST = withSession(async ({ session, params }) => {
   const teamUserCollection = client.db(databaseName).collection("teamUsers");
   const teamInviteCollection = client
     .db(databaseName)
-    .collection("teamInviteUsers");
+    .collection("teamInvites");
 
   try {
     const team = (await teamCollection.findOne({

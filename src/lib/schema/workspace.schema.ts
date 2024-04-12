@@ -1,4 +1,5 @@
-import { MetaSchema, Role } from "./team.schema";
+import { TeamRole } from "@/lib/constants/team-role";
+import { MetaSchema } from "./team.schema";
 
 import { ObjectId } from "mongodb";
 
@@ -9,7 +10,7 @@ export interface WorkspaceSchema {
   description: string;
   members: {
     user: ObjectId;
-    role: Role;
+    role: TeamRole;
   }[];
   visibility: keyof typeof Visibility;
   meta: MetaSchema;

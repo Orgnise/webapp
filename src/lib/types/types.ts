@@ -1,4 +1,4 @@
-import { Role } from "../schema/team.schema";
+import { TeamRole } from "@/lib/constants/team-role";
 import { Visibility } from "../schema/workspace.schema";
 
 export interface Team {
@@ -6,7 +6,7 @@ export interface Team {
   name: string;
   description: string;
   teamMembers: TeamUsers[];
-  role: Role;
+  role: TeamRole;
   plan: Plan;
   meta: Meta;
   createdAt: string;
@@ -21,12 +21,12 @@ export interface Team {
 
 export interface Member {
   user: string;
-  role: Role;
+  role: TeamRole;
   _id: string;
 }
 export interface TeamUsers {
   _id: string;
-  role: Role;
+  role: TeamRole;
   user: User;
   teamId: string;
   createdAt: string;
@@ -38,7 +38,7 @@ export interface UserProps {
   email: string;
   image?: string;
   createdAt: Date;
-  role: Role;
+  role: TeamRole;
 }
 
 export interface Meta {
@@ -91,5 +91,5 @@ export interface Invite {
   expires: Date;
   team: Team;
   createdAt: Date;
-  role: Role;
+  role: TeamRole;
 }

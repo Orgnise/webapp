@@ -1,7 +1,7 @@
 import { inviteUser } from "@/lib/api/users";
 import { withAuth } from "@/lib/auth";
+import { TeamRole } from "@/lib/constants/team-role";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { Role } from "@/lib/schema/team.schema";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
@@ -11,59 +11,64 @@ const emailInviteSchema = z.object({
   email: z.string().email(),
 });
 
-export const GET = withAuth(async ({ team, headers }) => {
-  const client = await mongoDb;
-  const teamUserCollection = client
-    .db(databaseName)
-    .collection("teamInviteUsers");
-  const query = { teamId: new ObjectId(team._id) };
-  const teamData = await teamUserCollection.findOne(query);
-  if (!hasValue(teamData)) {
-    return NextResponse.json({ users: [] }, { status: 200 });
-  }
-  const dbResults = (await teamUserCollection
-    .aggregate([
-      {
-        $match: {
-          teamId: new ObjectId(team._id),
+export const GET = withAuth(
+  async ({ team, headers }) => {
+    const client = await mongoDb;
+    const teamUserCollection = client
+      .db(databaseName)
+      .collection("teamInvites");
+    const query = { teamId: new ObjectId(team._id) };
+    const teamData = await teamUserCollection.findOne(query);
+    if (!hasValue(teamData)) {
+      return NextResponse.json({ users: [] }, { status: 200 });
+    }
+    const dbResults = (await teamUserCollection
+      .aggregate([
+        {
+          $match: {
+            teamId: new ObjectId(team._id),
+          },
         },
-      },
-      // {
-      //   '$lookup': {
-      //     'from': 'users',
-      //     'localField': 'email',
-      //     'foreignField': 'email',
-      //     'as': 'user'
-      //   },
-      // },
-      // { "$unwind": "$user" },
-      // {
-      //   '$addFields': {
-      //     'existingUser': {
-      //       '$cond': {
-      //         'if': { '$eq': ['$user.email', '$email'] },
-      //         'then': true,
-      //         'else': false
-      //       },
-      //     }
-      //   }
-      // },
-      // {
-      //   '$project': {
-      //     'role': 1,
-      //     // 'name': '$user.name',
-      //     // 'email': '$user.email',
-      //     // 'image': '$user.image',
-      //     // 'user': 1,
-      //     'createdAt': 1,
-      //     'email': 1
-      //   }
-      // }
-    ])
-    .toArray()) as unknown as any[];
+        // {
+        //   '$lookup': {
+        //     'from': 'users',
+        //     'localField': 'email',
+        //     'foreignField': 'email',
+        //     'as': 'user'
+        //   },
+        // },
+        // { "$unwind": "$user" },
+        // {
+        //   '$addFields': {
+        //     'existingUser': {
+        //       '$cond': {
+        //         'if': { '$eq': ['$user.email', '$email'] },
+        //         'then': true,
+        //         'else': false
+        //       },
+        //     }
+        //   }
+        // },
+        // {
+        //   '$project': {
+        //     'role': 1,
+        //     // 'name': '$user.name',
+        //     // 'email': '$user.email',
+        //     // 'image': '$user.image',
+        //     // 'user': 1,
+        //     'createdAt': 1,
+        //     'email': 1
+        //   }
+        // }
+      ])
+      .toArray()) as unknown as any[];
 
-  return NextResponse.json({ users: dbResults }, { status: 200 });
-});
+    return NextResponse.json({ users: dbResults }, { status: 200 });
+  },
+  {
+    requiredRole: ["owner", "moderator"],
+  },
+);
 
 // POST /api/team/[slug]/invites – invite a team member
 export const POST = withAuth(
@@ -77,7 +82,7 @@ export const POST = withAuth(
     // const email = emails![0].email;
     // const client = await mongoDb;
     // const teamUserCollection = client.db(databaseName).collection("teamUsers");
-    // const teamInviteUsersCollection = client.db(databaseName).collection("teamInviteUsers");
+    // const teamInviteCollection = client.db(databaseName).collection("teamInvites");
     // const [alreadyInTeam, teamUserCount, teamInviteCount] =
     //   await Promise.all([
     //     await teamUserCollection.findOne({
@@ -87,7 +92,7 @@ export const POST = withAuth(
     //     await teamUserCollection.countDocuments({
     //       teamId: new ObjectId(team._id),
     //     }),
-    //     await teamInviteUsersCollection.countDocuments({
+    //     await teamInviteCollection.countDocuments({
     //       teamId: new ObjectId(team._id),
     //     }),
     //   ]);
@@ -126,7 +131,7 @@ export const POST = withAuth(
     }
   },
   {
-    requiredRole: ["owner"],
+    requiredRole: ["owner", "moderator"],
   },
 );
 
@@ -139,10 +144,10 @@ export const DELETE = withAuth(
       return new Response("Email is required", { status: 400 });
     }
     const client = await mongoDb;
-    const teamInviteUsersCollection = client
+    const teamInviteCollection = client
       .db(databaseName)
-      .collection("teamInviteUsers");
-    const result = await teamInviteUsersCollection.deleteOne({
+      .collection("teamInvites");
+    const result = await teamInviteCollection.deleteOne({
       email,
       teamId: new ObjectId(team._id),
     });
@@ -155,5 +160,5 @@ export const DELETE = withAuth(
 
 export interface EmailInvite {
   email: string;
-  role: Role;
+  role: TeamRole;
 }

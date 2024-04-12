@@ -32,24 +32,34 @@ interface Props {
 export default function CollectionList(prop: Props) {
   const { error, loading, collections, mutate } = useCollections();
   return (
-    <ListView
-      className="flex h-full flex-col gap-6 overflow-y-auto px-4 pb-28"
-      items={collections}
-      loading={loading}
-      renderItem={(collection, index) => (
-        <RenderCollection key={index} collection={collection} />
-      )}
-      noItemsElement={<NoCollectionView />}
-      placeholder={
-        <>
-          <div className="flex flex-col gap-2">
-            <div className="flex h-full w-full place-content-center items-center">
-              <Spinner />
-            </div>
+    <>
+      <ListView
+        className="flex flex-col gap-6 overflow-y-auto px-4 pb-28"
+        items={collections}
+        loading={loading}
+        renderItem={(collection, index) => (
+          <RenderCollection key={index} collection={collection} />
+        )}
+        noItemsElement={<NoCollectionView />}
+        placeholder={
+          <div className="ml-1 flex  animate-pulse flex-col gap-4  border-l border-border">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <>
+                <div className={cx(" -mx-px flex flex-col gap-2  py-1 pl-4 ")}>
+                  <div className="h-5 w-6/12 rounded bg-secondary-foreground/10 " />
+
+                  <div className="flex w-full flex-col gap-4 border-l-2 border-secondary pl-4">
+                    <div className="h-4 w-6/12 rounded bg-secondary" />
+                    <div className="h-4 w-4/12 rounded bg-secondary" />
+                    <div className="h-4 w-8/12 rounded bg-secondary" />
+                  </div>
+                </div>
+              </>
+            ))}
           </div>
-        </>
-      }
-    />
+        }
+      />
+    </>
   );
 }
 type Status = "IDLE" | "CREATING-ITEM" | "CREATING-COLLECTION" | "DELETING";
