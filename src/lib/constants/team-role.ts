@@ -80,8 +80,9 @@ export const teamRolePermissions: TeamRolePermission = {
 } as const;
 
 export function checkPermissions(
-  role: TeamRole,
+  role: TeamRole | undefined,
   permission: TeamPermission,
 ): boolean {
+  if (!role) return false;
   return teamRolePermissions[role][permission];
 }
