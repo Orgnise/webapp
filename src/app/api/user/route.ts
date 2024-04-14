@@ -33,7 +33,8 @@ export const PUT = withSession(async ({ req, session }) => {
       _id: new ObjectId(session.user.id,)
     }, {
       $set: {
-        ...obj
+        ...obj,
+        updatedAt: new Date().toISOString(),
       },
     });
     return NextResponse.json(result);

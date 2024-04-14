@@ -51,7 +51,7 @@ class StorageClient {
       });
 
       return {
-        url: `${process.env.STORAGE_BASE_URL}/${key}`,
+        url: `${process.env.STORAGE_BASE_URL}/${this.env}/${key}`,
       };
     } catch (error: any) {
       throw new Error(`Failed to upload file: ${error.message}`);

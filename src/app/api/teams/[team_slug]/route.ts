@@ -54,7 +54,6 @@ export const PATCH = withAuth(
         name: reqTeam.name,
         description: reqTeam.description,
         inviteCode: reqTeam.inviteCode,
-        updatedAt: new Date().toISOString(),
         updatedBy: new ObjectId(session.user.id),
         meta: {
           ...team.meta,
@@ -73,6 +72,7 @@ export const PATCH = withAuth(
       const update = await teamsDb.updateOne(query, {
         $set: {
           ...updatedTeam,
+          updatedAt: new Date().toISOString(),
         },
       });
 

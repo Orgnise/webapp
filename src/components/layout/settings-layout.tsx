@@ -13,7 +13,7 @@ export default function SettingsLayout({
   children: ReactNode;
 }) {
   return (
-    <div className="h-[calc(100vh-16px)] ">
+    <div className=" ">
       <div className="flex h-36 items-center border-b border-border bg-background">
         <MaxWidthWrapper>
           <div className="flex h-28   lg:h-36">

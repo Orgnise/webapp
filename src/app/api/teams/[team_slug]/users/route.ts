@@ -70,7 +70,7 @@ export const PUT = withAuth(
         teamId: new ObjectId(team._id),
       };
       const response = await teamUserCollection.updateOne(query, {
-        $set: { role: role },
+        $set: { role: role, updatedAt: new Date().toISOString(), },
       });
 
       return NextResponse.json(
