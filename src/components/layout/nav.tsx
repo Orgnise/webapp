@@ -4,13 +4,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 
+import { LogOutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "../atom/logo";
@@ -51,15 +50,27 @@ const Nav = ({}) => {
                   />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="border-border">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuContent
+                className="max-w-[224px] border-border p-2"
+                align="end"
+              >
+                <div className=" p-2 text-sm">
+                  <p className="whitespace-nowrap font-bold truncate">{user.name}</p>
+                  <p className="truncate text-secondary-foreground/85">
+                    {user.email}
+                  </p>
+                </div>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Link href="/settings" className="flex items-center">
+                    <Settings size={18} className="mr-2" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                  className="cursor-pointer"
                   onClick={() => signOut()}
                 >
-                  Logout
+                  <LogOutIcon size={18} className="mr-2" /> Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

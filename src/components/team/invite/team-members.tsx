@@ -38,7 +38,7 @@ export default function TeamMembers() {
         noItemsElement={
           <div className="flex flex-col items-center justify-center py-10">
             <p className="text-sm text-muted-foreground">
-              No invitations sent yet.
+              No teammates have been added yet.
             </p>
           </div>
         }

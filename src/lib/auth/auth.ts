@@ -13,6 +13,7 @@ import { sendEmailV2 } from "../../../emails";
 import LoginLink from "../../../emails/login-link";
 import { APP_DOMAIN } from "../constants";
 import mongoDb, { databaseName } from "../mongodb";
+import { ObjectId } from "mongodb";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
@@ -184,7 +185,7 @@ export const NextAuthOptions = {
       }
       return true; // Do different verification for other providers that don't have `email_verified`
     },
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account, profile, trigger }) {
       // console.log("jwt begin", { token, user, account, profile })
       if (!token.email) {
         return {};
@@ -196,6 +197,24 @@ export const NextAuthOptions = {
       if (user) {
         token.user = user;
       }
+      // refresh the user's data if they update their name / email
+      if (trigger === "update") {
+        const client = await mongoDb;
+        const users = client.db(databaseName).collection("users");
+        const refreshedUser = await users.findOne({ _id: new ObjectId(token.sub) });
+        if (refreshedUser) {
+          const user = {
+            id: refreshedUser._id,
+            email: refreshedUser.email,
+            name: refreshedUser.name,
+            image: refreshedUser.image,
+          };
+          token.user = user;
+        } else {
+          return {};
+        }
+      }
+
       return token;
     },
 
@@ -215,7 +234,8 @@ export const NextAuthOptions = {
       // console.log("session begin", { session, token, user })
       session.user = {
         id: token.sub,
-        ...session.user,
+        // @ts-ignore
+        ...(token || session).user,
       };
       return session;
     },
