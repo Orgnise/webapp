@@ -4,7 +4,7 @@ import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ListView } from "@/components/ui/listview";
 import { Popover } from "@/components/ui/popover";
-import { TWO_WEEKS_IN_SECONDS } from "@/lib/constants";
+import { TWO_WEEKS_IN_SECONDS } from "@/lib/constants/constants";
 import useTeamInvite from "@/lib/swr/use-team-invite";
 import { UserProps } from "@/lib/types/types";
 import { timeAgo } from "@/lib/utility/datetime";

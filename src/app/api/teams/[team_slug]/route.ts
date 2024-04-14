@@ -113,22 +113,41 @@ export const DELETE = withAuth(
       const teamsDb = client.db(databaseName).collection<TeamSchema>("teams");
       const collectionsDb = client.db(databaseName).collection("collections");
       const workspaceDb = client.db(databaseName).collection("workspaces");
+      const teamUsersDb = client.db(databaseName).collection("teamUsers");
+      const teamInviteCollection = client
+        .db(databaseName)
+        .collection("teamInvites");
+
+
       const deleteQuery = {
         team: new ObjectId(team._id),
+      };
+      // TODO: Update teamId to team 
+      const deleteQuery2 = {
+        teamId: new ObjectId(team._id),
       };
       const deleteTeam = await teamsDb.deleteOne({
         _id: new ObjectId(team._id),
       });
-      const deleteCollection = await collectionsDb.deleteMany(deleteQuery);
-      const deleteWorkspace = await workspaceDb.deleteMany(deleteQuery);
+
+      // Delete all collections, workspaces and team users associated with the team
+      const [deleteCollection, deleteWorkspace, deleteTeamUsers] = await Promise.all([
+        await collectionsDb.deleteMany(deleteQuery),
+        await workspaceDb.deleteMany(deleteQuery),
+        await teamUsersDb.deleteMany(deleteQuery2),
+        await teamInviteCollection.deleteMany(deleteQuery2),
+      ]);
+
 
       return NextResponse.json(
         {
           success: true,
           message: "Team is deleted successfully",
-          deleteTeam,
-          deleteCollection,
-          deleteWorkspace,
+          deletedContent: {
+            collection: deleteCollection.deletedCount,
+            workspace: deleteWorkspace.deletedCount,
+            users: deleteTeamUsers.deletedCount,
+          }
         },
         { status: 200 },
       );
@@ -144,6 +163,6 @@ export const DELETE = withAuth(
     }
   },
   {
-    requiredRole: ["owner", "moderator"],
+    requiredRole: ["owner"],
   },
 );

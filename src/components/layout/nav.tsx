@@ -4,13 +4,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut, useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 
+import { LogOutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "../atom/logo";
@@ -19,7 +18,7 @@ import { ModeToggle } from "../ui/toggle-theme";
 
 const Nav = ({}) => {
   const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const user = session?.user;
 
   return (
@@ -32,6 +31,9 @@ const Nav = ({}) => {
       </div>
       <div className="flex items-center gap-2">
         <ModeToggle />
+        {status === "loading" && (
+          <div className="h-8 w-8 animate-pulse rounded-full bg-accent" />
+        )}
         {user && Object.keys(user).length !== 0 && (
           <div className="flex items-center space-x-4 ">
             <DropdownMenu>
@@ -46,20 +48,34 @@ const Nav = ({}) => {
                     className="h-8 w-8 rounded-full"
                     onError={(e) => {
                       (e.target as any).src =
-                        `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+                        `https://api.dicebear.com/8.x/initials/svg?seed=${user?.name}&scale=70&size=40`;
                     }}
                   />
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="border-border">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuContent
+                className="max-w-[224px] border-border p-2"
+                align="end"
+              >
+                <div className=" p-2 text-sm">
+                  <p className="truncate whitespace-nowrap font-bold">
+                    {user.name}
+                  </p>
+                  <p className="truncate text-secondary-foreground/85">
+                    {user.email}
+                  </p>
+                </div>
+                <DropdownMenuItem className="cursor-pointer">
+                  <Link href="/settings" className="flex items-center">
+                    <Settings size={18} className="mr-2" />
+                    Settings
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem
-                  className="cursor-pointer text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                  className="cursor-pointer"
                   onClick={() => signOut()}
                 >
-                  Logout
+                  <LogOutIcon size={18} className="mr-2" /> Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

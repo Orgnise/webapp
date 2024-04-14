@@ -11,8 +11,10 @@ import Twitter from "next-auth/providers/twitter";
 import { z } from "zod";
 import { sendEmailV2 } from "../../../emails";
 import LoginLink from "../../../emails/login-link";
-import { APP_DOMAIN } from "../constants";
+import { APP_DOMAIN } from "../constants/constants";
 import mongoDb, { databaseName } from "../mongodb";
+import { ObjectId } from "mongodb";
+import { isStored, storage } from "../storage";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
@@ -135,32 +137,60 @@ export const NextAuthOptions = {
 
   callbacks: {
     async signIn({ account, profile, user }: any) {
-      // console.log("signIn begin", { account, profile, user });
+      if (account?.provider === "slack") {
+        console.log("signIn begin", { account, profile, user });
+      }
       if (!user?.email) {
         return false;
       }
 
-      if (["google", "github"].includes(account.provider)) {
+      if (["google", "github", "slack"].includes(account.provider)) {
         const client = await mongoDb;
         const users = client.db(databaseName).collection("users");
         const userExists = (await users.findOne({
           email: profile.email,
         })) as unknown as mongoUserResult | null;
 
+        if (!userExists || !profile) {
+          return true;
+        }
+        if (userExists && profile) {
+          const profilePic =
+            profile[account.provider === "google" ? "picture" : "avatar_url"];
+          let newAvatar: string | null = null;
+
+          // If the user exists but doesn't have a profile picture, update it
+          if (
+            (!userExists.image || !isStored(userExists.image)) &&
+            profilePic
+          ) {
+            const { url } = await storage.upload(
+              `avatars/${userExists._id}`,
+              profilePic,
+            );
+            newAvatar = url;
+          }
+          await users.updateOne(
+            { email: profile.email },
+            {
+              $set: {
+                ...(!userExists.name && { name: profile.name || profile.login }),
+                ...(newAvatar && { image: newAvatar }),
+              }
+            },
+          );
+        }
         // If the user doesn't exist, create a new one
         if (!userExists) {
+
           const image =
-            profile.avatar_url ??
-            profile.picture ??
-            profile.profile_image_url ??
-            `https://api.dicebear.com/7.x/initials/svg?seed=${profile.name}`;
+            profile[account.provider === "google" ? "picture" : "avatar_url"];
+
           const newUser = {
             email: profile.email,
             name: profile.name,
             image: image,
             provider: account.provider,
-            providerAccountId: account.id,
-            type: "oauth",
             emailVerified: true,
           };
           const insertResult = await users.insertOne(newUser);
@@ -172,19 +202,10 @@ export const NextAuthOptions = {
           };
           return customUser;
         }
-        // Update the user's image if it doesn't exist
-        else if (userExists && !userExists.image && profile.picture) {
-          const image =
-            profile.avatar_url ?? profile.picture ?? profile.profile_image_url;
-          await users.updateOne(
-            { email: profile.email },
-            { $set: { image: image } },
-          );
-        }
       }
       return true; // Do different verification for other providers that don't have `email_verified`
     },
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user, account, profile, trigger }) {
       // console.log("jwt begin", { token, user, account, profile })
       if (!token.email) {
         return {};
@@ -196,6 +217,24 @@ export const NextAuthOptions = {
       if (user) {
         token.user = user;
       }
+      // refresh the user's data if they update their name / email
+      if (trigger === "update") {
+        const client = await mongoDb;
+        const users = client.db(databaseName).collection("users");
+        const refreshedUser = await users.findOne({ _id: new ObjectId(token.sub) });
+        if (refreshedUser) {
+          const user = {
+            id: refreshedUser._id,
+            email: refreshedUser.email,
+            name: refreshedUser.name,
+            image: refreshedUser.image,
+          };
+          token.user = user;
+        } else {
+          return {};
+        }
+      }
+
       return token;
     },
 
@@ -215,7 +254,8 @@ export const NextAuthOptions = {
       // console.log("session begin", { session, token, user })
       session.user = {
         id: token.sub,
-        ...session.user,
+        // @ts-ignore
+        ...(token || session).user,
       };
       return session;
     },

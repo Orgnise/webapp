@@ -23,17 +23,7 @@ export const GET = withAuth(async ({ team, headers }) => {
   const client = await mongoDb;
   const teamUsersDb = client.db(databaseName).collection("teamUsers");
   const query = { teamId: new ObjectId(team._id) };
-  const teamData = await teamUsersDb.findOne(query);
-  if (!hasValue(teamData)) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Team not found",
-        error: "Operation failed",
-      },
-      { status: 404 },
-    );
-  }
+
   const dbResults = (await teamUsersDb
     .aggregate([
       {

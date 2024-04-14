@@ -9,7 +9,7 @@ import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth/next";
 import { log } from "@/lib/functions/log";
-import { APP_DOMAIN } from "@/lib/constants";
+import { APP_DOMAIN } from "@/lib/constants/constants";
 
 // GET /api/teams - get all teams for the current user
 export async function GET(request: NextRequest) {

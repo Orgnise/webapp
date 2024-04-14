@@ -59,9 +59,7 @@ export async function POST(request: Request) {
       id: existingUser._id.toString(), //required field!!
       email: existingUser.email,
       name: existingUser.name,
-      image:
-        existingUser.image ??
-        `https://api.dicebear.com/7.x/initials/svg?seed=${existingUser.name}`,
+      image: existingUser.image
     };
 
     return NextResponse.json({ user }, { status: 200 });

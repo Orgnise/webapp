@@ -5,7 +5,7 @@ import { randomBytes } from "crypto";
 import { sendEmailV2 } from "../../../emails";
 import TeamInvite from "../../../emails/team-invite";
 import { hashToken } from "../auth/auth";
-import { APP_DOMAIN, TWO_WEEKS_IN_SECONDS } from "../constants";
+import { APP_DOMAIN, TWO_WEEKS_IN_SECONDS } from "../constants/constants";
 import { Team } from "../types/types";
 
 export async function inviteUser({
