@@ -1,4 +1,4 @@
-import { HOME_DOMAIN } from "@/lib/constants";
+import { HOME_DOMAIN } from "@/lib/constants/constants";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";

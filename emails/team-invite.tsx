@@ -1,4 +1,4 @@
-import { ORGNISE_LOGO } from "@/lib/constants";
+import { ORGNISE_LOGO } from "@/lib/constants/constants";
 import {
   Body,
   Container,

@@ -1,3 +1,4 @@
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Orgnise";
 export const APP_DOMAIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
     ? `https://app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`

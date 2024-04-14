@@ -2,7 +2,7 @@ import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/ui/copy-button";
-import { APP_DOMAIN } from "@/lib/constants";
+import { APP_DOMAIN } from "@/lib/constants/constants";
 import useTeam from "@/lib/swr/use-team";
 import { Team } from "@/lib/types/types";
 import { useMemo, useState } from "react";

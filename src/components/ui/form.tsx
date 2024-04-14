@@ -46,10 +46,6 @@ export function Form({
         {typeof inputAttrs.defaultValue === "string" ? (
           <Input
             {...inputAttrs}
-            placeholder="My team"
-            minLength={3}
-            maxLength={32}
-            name="name"
             type={inputAttrs.type || "text"}
             disabled={disabled ? true : false}
             required

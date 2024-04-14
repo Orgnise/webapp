@@ -11,7 +11,7 @@ import Twitter from "next-auth/providers/twitter";
 import { z } from "zod";
 import { sendEmailV2 } from "../../../emails";
 import LoginLink from "../../../emails/login-link";
-import { APP_DOMAIN } from "../constants";
+import { APP_DOMAIN } from "../constants/constants";
 import mongoDb, { databaseName } from "../mongodb";
 import { ObjectId } from "mongodb";
 import { isStored, storage } from "../storage";

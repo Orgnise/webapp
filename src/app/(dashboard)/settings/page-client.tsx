@@ -3,6 +3,7 @@ import { DeleteAccountSection } from "@/components/ui/account/delete-account";
 import UploadAvatar from "@/components/ui/account/upload-avatar";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
+import { APP_NAME } from "@/lib/constants/constants";
 import { useSession } from "next-auth/react";
 
 export default function SettingsPageClient() {
@@ -34,7 +35,42 @@ export default function SettingsPageClient() {
               // await update();
               update();
               toast({
+                title: "Success",
                 description: "Successfully updated your name!",
+              });
+            } else {
+              const { error } = await res.json();
+              toast({
+                description: error.message,
+                variant: "destructive",
+              });
+            }
+          })
+        }
+      />
+      <Form
+        title="Your Email"
+        description={`This will be the email you use to log in to ${APP_NAME} and receive notifications.`}
+        inputAttrs={{
+          name: "email",
+          type: "email",
+          defaultValue: session?.user?.email || undefined,
+          placeholder: "stevs@jobs.co",
+        }}
+        helpText="Must be a valid email address."
+        handleSubmit={(data) =>
+          fetch("/api/user", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }).then(async (res) => {
+            if (res.status === 200) {
+              update();
+              toast({
+                title: "Success",
+                description: "Successfully updated your email!",
               });
             } else {
               const { error } = await res.json();
