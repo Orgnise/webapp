@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         password: hashedPassword,
         name: parsedCredentials.data.name,
         provider: "credentials",
-        image: `https://api.dicebear.com/7.x/initials/svg?seed=${parsedCredentials.data.name}`,
+        image: `https://api.dicebear.com/8.x/initials/svg?seed=${parsedCredentials.data.name}&scale=70&size=40`
       };
       const insertResult = await users.insertOne(newUser);
       const customUser: User = {

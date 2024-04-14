@@ -4,6 +4,7 @@ import { trim } from "@/lib/functions/trim";
 import z from "@/lib/zod";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
+import { storage } from "@/lib/storage";
 
 const updateUserSchema = z.object({
   name: z.preprocess(trim, z.string().min(1).max(64)).optional(),
@@ -17,10 +18,15 @@ export const PUT = withSession(async ({ req, session }) => {
     await req.json(),
   );
   try {
+    if (image) {
+      const { url } = await storage.upload(`avatars/${session.user.id}`, image);
+      image = url;
+      console.log({ image });
+    }
     const obj = {} as any;
     if (name) obj.name = name;
     if (email) obj.email = email;
-    if (image) obj.picture = image;
+    if (image) obj.image = image;
     const client = await mongoDb;
     const usersCollection = client.db(databaseName).collection("users");
     const result = await usersCollection.updateOne({
@@ -52,7 +58,15 @@ export const DELETE = withSession(async ({ session }) => {
     );
   } else {
     const usersColl = client.db(databaseName).collection("users");
-    usersColl.deleteOne({ _id: new ObjectId(session.user.id) });
+    await Promise.allSettled([
+      // if the user has a custom avatar, delete it
+      session.user.image?.startsWith(process.env.STORAGE_BASE_URL as string) &&
+      storage.delete(`avatars/${session.user.id}`),
+
+      // Delete the user
+      usersColl.deleteOne({ _id: new ObjectId(session.user.id) }),
+    ]);
+
 
     return NextResponse.json({
       success: true,

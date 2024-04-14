@@ -18,7 +18,7 @@ import { ModeToggle } from "../ui/toggle-theme";
 
 const Nav = ({}) => {
   const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const user = session?.user;
 
   return (
@@ -31,6 +31,9 @@ const Nav = ({}) => {
       </div>
       <div className="flex items-center gap-2">
         <ModeToggle />
+        {status === "loading" && (
+          <div className="h-8 w-8 animate-pulse rounded-full bg-accent" />
+        )}
         {user && Object.keys(user).length !== 0 && (
           <div className="flex items-center space-x-4 ">
             <DropdownMenu>
@@ -45,7 +48,7 @@ const Nav = ({}) => {
                     className="h-8 w-8 rounded-full"
                     onError={(e) => {
                       (e.target as any).src =
-                        `https://api.dicebear.com/7.x/initials/svg?seed=${user.name}`;
+                        `https://api.dicebear.com/8.x/initials/svg?seed=${user?.name}&scale=70&size=40`;
                     }}
                   />
                 </div>
@@ -55,7 +58,9 @@ const Nav = ({}) => {
                 align="end"
               >
                 <div className=" p-2 text-sm">
-                  <p className="whitespace-nowrap font-bold truncate">{user.name}</p>
+                  <p className="truncate whitespace-nowrap font-bold">
+                    {user.name}
+                  </p>
                   <p className="truncate text-secondary-foreground/85">
                     {user.email}
                   </p>
