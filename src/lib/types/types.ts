@@ -4,6 +4,7 @@ import { Visibility } from "../schema/workspace.schema";
 export interface Team {
   _id: string;
   name: string;
+  logo: string;
   description: string;
   teamMembers: TeamUsers[];
   role: TeamRole;
@@ -48,6 +49,8 @@ export interface Meta {
 }
 
 export type Plan = "free" | "pro" | "business" | "enterprise";
+
+export const plans = ["free", "pro", "business", "enterprise"] as const;
 
 export interface Workspace {
   _id: string;

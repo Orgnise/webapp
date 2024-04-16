@@ -1,3 +1,4 @@
+import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,16 +7,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronsUpDown } from "lucide-react";
-import { usePathname } from "next/navigation";
-
-import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
 import useTeam from "@/lib/swr/use-team";
 import useTeams from "@/lib/swr/use-teams";
 import { Team } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
 import cx from "classnames";
+import { ChevronsUpDown } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useContext } from "react";
 import { Button } from "./button";
 
@@ -29,10 +29,25 @@ export function TeamToggleDropDown() {
 
   return (
     <div className="ml-4 flex items-center gap-2 bg-background">
-      <div className="h-6 w-[2px] rotate-[30deg] bg-gray-200" />
+      <div className=" h-6 w-[2px] rotate-[30deg] bg-gray-200" />
+
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-2 focus-visible:outline-none">
           <Button variant={"ghost"} className="flex items-center gap-2">
+            {activeTeam && (
+              <Image
+                unoptimized={true}
+                height={32}
+                width={32}
+                src={activeTeam?.logo ?? ""}
+                alt="user"
+                className="h-8 w-8 rounded-full"
+                onError={(e) => {
+                  (e.target as any).src =
+                    `https://api.dicebear.com/8.x/initials/svg?seed=${activeTeam?.name}&scale=70&size=40`;
+                }}
+              />
+            )}
             {activeTeam?.name ?? "Not found"}
             <ChevronsUpDown size={18} />
           </Button>
@@ -57,9 +72,11 @@ export function TeamToggleDropDown() {
                   value={teams}
                   ifPresent={(teams: Team[]) => (
                     <div className="flex flex-col gap-1">
-                      {teams.map((team: any, index) => (
-                        <TeamRow team={team} key={index} />
-                      ))}
+                      {teams
+                        ?.filter((e) => e.meta)
+                        .map((team: any, index) => (
+                          <TeamRow team={team} key={index} />
+                        ))}
                     </div>
                   )}
                   ifAbsent={() => (

@@ -16,6 +16,7 @@ export interface TeamSchema {
   inviteCode: string;
   membersLimit: number;
   workspaceLimit: number;
+  logo: string;
 }
 
 export interface MetaSchema {

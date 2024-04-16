@@ -4,6 +4,7 @@ import { Spinner } from "@/components/atom/spinner";
 import { P } from "@/components/atom/typography";
 import TeamPermission from "@/components/molecule/team-permisson-view";
 import NotFoundView from "@/components/team/team-not-found";
+import UploadLogo from "@/components/team/upload-logo";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,10 +14,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { checkPermissions } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
-import { hasValue } from "@/lib/utils";
 import { useState } from "react";
 import { mutate } from "swr";
 import TeamSettingsLoading from "./loading";
@@ -38,6 +40,7 @@ export default function TeamSettingsPage() {
       <div className="mx-auto  grid max-w-screen-md flex-col gap-8 px-4 ">
         <TeamName />
         <TeamSlug />
+        <UploadLogo />
         <DeleteTeam />
       </div>
     </div>
@@ -45,218 +48,81 @@ export default function TeamSettingsPage() {
 }
 
 function TeamName() {
-  const [enableSubmit, setEnableSubmit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const { team, error, loading, updateTeamAsync } = useTeam();
+
   const { toast } = useToast();
 
-  function handleUpdateTeamName(e: any) {
-    e.preventDefault();
-    const name = e.target.name.value;
-    if (!team || name === team.name) {
-      return;
-    }
-    if (!team.meta?.slug) {
-      console.error("Team slug not present");
-      toast({
-        title: "Error!",
-        description:
-          "Unable to update team name. Try refreshing page and try again",
-      });
-      return;
-    }
-    setIsLoading(true);
-    updateTeamAsync(
-      {
-        ...team!,
-        name,
-      },
-      team.meta.slug,
-    )
-      .then(() => {
-        toast({
-          title: "Success!",
-          description: "Team name updated successfully",
-        });
-        mutate(`/api/teams`);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
-
   return (
-    <TeamPermission
-      permission={"UPDATE_TEAM_INFO"}
-      unAuthorized={
-        <div className="rounded-lg  border border-border bg-card ">
-          <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-            <div className="flex flex-col space-y-3">
-              <h2 className="text-xl font-medium">Team Name</h2>
-              <p className="text-sm text-muted-foreground">
-                This is the name of your project on Orgnise
-              </p>
-            </div>
-            <Input
-              name="name"
-              disabled
-              required
-              type="text"
-              min={3}
-              maxLength={32}
-              defaultValue={team!.name}
-              className="pointer-events-none"
-            />
-          </div>
-        </div>
+    <Form
+      title={"Name"}
+      description={"This is the name of your team on Orgnise"}
+      inputAttrs={{
+        name: "name",
+        defaultValue: loading ? undefined : team.name || "",
+        placeholder: "Acme Inc.",
+        maxLength: 32,
+      }}
+      helpText="Max 32 characters."
+      handleSubmit={(data) =>
+        updateTeamAsync(
+          {
+            name: data?.name,
+          },
+          team.meta.slug,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Team name updated successfully",
+          });
+          mutate(`/api/teams`);
+        })
       }
-    >
-      <form
-        onSubmit={handleUpdateTeamName}
-        className="rounded-lg border border-border bg-card"
-      >
-        <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-          <div className="flex flex-col space-y-3">
-            <h2 className="text-xl font-medium">Team Name</h2>
-            <p className="text-sm text-muted-foreground">
-              This is the name of your project on Orgnise
-            </p>
-          </div>
-          <Input
-            placeholder="My team"
-            minLength={3}
-            maxLength={32}
-            name="name"
-            required
-            defaultValue={team!.name}
-            onChange={(e) => {
-              setEnableSubmit(
-                hasValue(e.target.value) && e.target.value !== team!.name,
-              );
-            }}
-          />
-        </div>
-        <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
-          <P className="text-sm text-muted-foreground">Max 32 characters.</P>
-          <div className="shrink-0">
-            <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
-              {isLoading ? <Spinner /> : <p>Save Changes</p>}
-            </Button>
-          </div>
-        </div>
-      </form>
-    </TeamPermission>
+      buttonText="Save changes"
+      disabledTooltip={
+        checkPermissions(team.role, "UPDATE_TEAM_INFO")
+          ? undefined
+          : "Only the team owner can update the team name"
+      }
+    />
   );
 }
 
 function TeamSlug() {
-  const [enableSubmit, setEnableSubmit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const { team, error, loading, updateTeamAsync } = useTeam();
   const { toast } = useToast();
-  function handleUpdateTeamSlug(e: any) {
-    e.preventDefault();
-    const slug = e.target.slug.value;
-    if (!team || slug === team?.meta?.slug) {
-      return;
-    }
-    if (!team?.meta?.slug) {
-      console.error("Team slug not present");
-      toast({
-        title: "Error!",
-        description:
-          "Unable to update team slug. Try refreshing page and try again",
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsLoading(true);
-    updateTeamAsync(
-      {
-        ...team!,
-        meta: {
-          ...team!.meta,
-          slug,
-        },
-      },
-      team?.meta.slug,
-    )
-      .then(() => {
-        toast({
-          title: "Success!",
-          description: "Team name updated successfully",
-        });
-        mutate(`/api/teams`);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
+
   return (
-    <TeamPermission
-      permission={"UPDATE_TEAM_INFO"}
-      unAuthorized={
-        <div className="rounded-lg  border border-border bg-card ">
-          <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-            <div className="flex flex-col space-y-3">
-              <h2 className="text-xl font-medium">Team Slug</h2>
-              <p className="text-sm text-muted-foreground">
-                This is your team&apos;s unique slug on Orgnise
-              </p>
-            </div>
-            <Input
-              name="slug"
-              placeholder="my-team-slug"
-              disabled
-              required
-              type="text"
-              min={3}
-              maxLength={32}
-              defaultValue={team?.meta?.slug}
-              className="pointer-events-none"
-            />
-          </div>
-        </div>
+    <Form
+      title={"Slug"}
+      description={"This is your team's unique slug on Orgnise"}
+      inputAttrs={{
+        name: "slug",
+        defaultValue: loading ? undefined : team?.meta?.slug || "",
+        placeholder: "acme-inc",
+        maxLength: 48,
+      }}
+      helpText="Max 48 characters."
+      handleSubmit={(data) =>
+        updateTeamAsync(
+          {
+            slug: data?.slug,
+          },
+          team.meta.slug,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Team slug updated successfully",
+          });
+          mutate(`/api/teams`);
+        })
       }
-    >
-      <form
-        onSubmit={handleUpdateTeamSlug}
-        className="rounded-lg border border-border bg-card"
-      >
-        <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-          <div className="flex flex-col space-y-3">
-            <h2 className="text-xl font-medium">Team Slug</h2>
-            <p className="text-sm text-muted-foreground">
-              This is your team&apos;s unique slug on Orgnise
-            </p>
-          </div>
-          <Input
-            name="slug"
-            placeholder="my-team-slug"
-            required
-            type="text"
-            min={3}
-            maxLength={32}
-            defaultValue={team?.meta?.slug}
-            onChange={(e) => {
-              setEnableSubmit(
-                hasValue(e.target.value) && e.target.value !== team!.name,
-              );
-            }}
-          />
-        </div>
-        <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
-          <P className="text-muted-foreground">
-            Only lowercase letters, numbers, and dashes. Max 48 characters.
-          </P>
-          <div className="shrink-0">
-            <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
-              {isLoading ? <Spinner /> : <p>Save Changes</p>}
-            </Button>
-          </div>
-        </div>
-      </form>
-    </TeamPermission>
+      buttonText="Save changes"
+      disabledTooltip={
+        checkPermissions(team.role, "UPDATE_TEAM_INFO")
+          ? undefined
+          : "Only the team owner can update the team slug"
+      }
+    />
   );
 }
 

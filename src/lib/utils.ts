@@ -76,16 +76,16 @@ export function hasValue(obj: any): boolean {
 
 export type PrettiFy<T> = {
   [P in keyof T]: T[P] extends string
-    ? string
-    : T[P] extends number
-      ? number
-      : T[P] extends boolean
-        ? boolean
-        : T[P] extends object
-          ? PrettiFy<T[P]>
-          : T[P] extends Array<infer P>
-            ? Array<PrettiFy<P>>
-            : T[P];
+  ? string
+  : T[P] extends number
+  ? number
+  : T[P] extends boolean
+  ? boolean
+  : T[P] extends object
+  ? PrettiFy<T[P]>
+  : T[P] extends Array<infer P>
+  ? Array<PrettiFy<P>>
+  : T[P];
 } & {};
 
 export async function generateSlug({
@@ -119,6 +119,8 @@ export async function generateSlug({
   }
   return slug;
 }
+
+export const validSlugRegex = new RegExp(/^[a-zA-Z0-9\-]+$/);
 
 /**
  * Generate a uuid v4.
