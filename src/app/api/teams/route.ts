@@ -78,6 +78,7 @@ export async function GET(request: NextRequest) {
             inviteCode: "$team.inviteCode",
             membersLimit: "$team.membersLimit",
             workspaceLimit: "$team.workspaceLimit",
+            logo: "$team.logo",
           },
         },
         // Remove team object from root object

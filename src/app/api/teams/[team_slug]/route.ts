@@ -1,102 +1,105 @@
+import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
+import { fetchDecoratedTeam } from "@/lib/api/team";
 import { withAuth } from "@/lib/auth";
+import { DEFAULT_REDIRECTS } from "@/lib/constants/constants";
+import { trim } from "@/lib/functions/trim";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { TeamSchema } from "@/lib/schema/team.schema";
-import { Team } from "@/lib/types/types";
-import { hasValue, randomId } from "@/lib/utils";
+import { hasValue, validSlugRegex } from "@/lib/utils";
+import z from "@/lib/zod";
+import slugify from "@sindresorhus/slugify";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
+
+
+const updateTeamSchema = z.object({
+  name: z.preprocess(trim, z.string().min(1).max(32)).optional(),
+  description: z.preprocess(trim, z.string().max(120)).optional(),
+  slug: z
+    .preprocess(
+      trim,
+      z
+        .string()
+        .min(3, "Slug must be at least 3 characters")
+        .max(48, "Slug must be less than 48 characters")
+        .transform((v) => slugify(v))
+        .refine((v) => validSlugRegex.test(v), {
+          message: "Invalid slug format",
+        })
+        .refine(
+          // @ts-ignore
+          async (v) => !DEFAULT_REDIRECTS[v],
+          {
+            message: "Cannot use reserved slugs",
+          },
+        ),
+    )
+    .optional(),
+});
 
 // GET /api/team/[slug] – get a specific team
 export const GET = withAuth(async ({ team }) => {
   return NextResponse.json(team);
 });
 
-// Update team
-export const PATCH = withAuth(
+// PUT /api/team/[slug] – edit a specific team
+export const PUT = withAuth(
   async ({ team, req, session }) => {
     try {
       const client = await mongoDb;
-      const { team: reqTeam } = (await req.json()) as { team?: Team };
-      if (!reqTeam) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "Operation failed",
-            error: "Invalid team",
-          },
-          { status: 400 },
-        );
-      }
+      const { name, description, slug, } = await updateTeamSchema.parseAsync(await req.json());
 
       const teamsDb = client.db(databaseName).collection("teams");
-      const query = { _id: new ObjectId(reqTeam._id) };
+      const query = { _id: new ObjectId(team._id) };
 
-      let slug = reqTeam?.meta?.slug;
+      // let slug = team?.meta?.slug;
 
       // Update slug if it is changed
       if (hasValue(slug) && team?.meta?.slug !== slug) {
         const data = await teamsDb.findOne({
-          "meta.slug": reqTeam?.meta?.slug,
+          "meta.slug": slug,
         });
         if (data) {
-          return NextResponse.json(
+          throw new OrgniseApiError(
             {
-              success: false,
-              message: "Team with this slug already exists",
-              error: "Operation failed",
-            },
-            { status: 409 },
+              code: 'conflict',
+              message: "Team with this slug already exists"
+            }
           );
         }
       }
 
       let updatedTeam = {
-        name: reqTeam.name,
-        description: reqTeam.description,
-        inviteCode: reqTeam.inviteCode,
+        name: name ?? team.name,
+        description: description ?? team.description,
         updatedBy: new ObjectId(session.user.id),
         meta: {
           ...team.meta,
-          slug: slug,
+          slug: slug ?? team.meta.slug,
         },
       } as any;
 
-      // Update invite code if it is changed
-      if (reqTeam?.inviteCode !== team.inviteCode) {
-        updatedTeam = {
-          ...updatedTeam,
-          inviteCode: randomId(16),
-        };
-      }
 
       const update = await teamsDb.updateOne(query, {
         $set: {
           ...updatedTeam,
           updatedAt: new Date().toISOString(),
+          updatedBy: new ObjectId(session.user.id),
         },
       });
+
+      updatedTeam = await fetchDecoratedTeam(team._id, session.user.id);
 
       return NextResponse.json(
         {
           success: true,
           message: "Team updated",
-          team: {
-            ...reqTeam,
-            ...updatedTeam,
-            _id: reqTeam._id,
-          },
+          team: updatedTeam,
         },
         { status: 200 },
       );
     } catch (error: any) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: error.toString(),
-        },
-        { status: 500 },
-      );
+      return handleAndReturnErrorResponse(error);
     }
   },
   {

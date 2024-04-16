@@ -8,6 +8,32 @@ export const APP_DOMAIN =
 
 export const HOME_DOMAIN = `https://${process.env.NEXT_PUBLIC_APP_DOMAIN}`;
 
+export const API_DOMAIN =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+    ? `https://api.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
+    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
+      ? `https://api-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
+      : "http://api.localhost:8888";
+
 export const ORGNISE_LOGO = "https://app.orgnise.in/_static/logo.png";
 
 export const TWO_WEEKS_IN_SECONDS = 60 * 60 * 24 * 14;
+
+export const DEFAULT_REDIRECTS = {
+  home: "https://orgnise.in",
+  orgnise: "https://orgnise.in",
+  signin: "https://app.orgnise.in/signin",
+  login: "https://app.orgnise.in/login",
+  register: "https://app.orgnise.in/signup",
+  signup: "https://app.orgnise.in/register",
+  app: "https://app.orgnise.in",
+  dashboard: "https://app.orgnise.in",
+  links: "https://app.orgnise.in/links",
+  settings: "https://app.orgnise.in/settings",
+  welcome: "https://app.orgnise.in/welcome",
+  invites: "https://app.orgnise.in/invites",
+  policy: "https://orgnise.in/policy",
+  terms: "https://orgnise.in/terms",
+  create: "https://app.orgnise.in/create",
+  new: "https://app.orgnise.in/new",
+};

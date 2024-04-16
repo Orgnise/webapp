@@ -1,6 +1,5 @@
 import { InputHTMLAttributes, ReactNode, useMemo, useState } from "react";
-import { Spinner } from "../atom/spinner";
-import { Button } from "./button";
+import { Button2 } from "./button";
 import { Input } from "./input";
 
 export function Form({
@@ -9,7 +8,7 @@ export function Form({
   inputAttrs,
   helpText,
   buttonText = "Save Changes",
-  disabled,
+  disabledTooltip,
   handleSubmit,
 }: {
   title: string;
@@ -17,7 +16,7 @@ export function Form({
   inputAttrs: InputHTMLAttributes<HTMLInputElement>;
   helpText?: string | ReactNode;
   buttonText?: string;
-  disabled?: string | ReactNode;
+  disabledTooltip?: string | ReactNode;
   handleSubmit: (data: any) => Promise<any>;
 }) {
   const [value, setValue] = useState(inputAttrs.defaultValue);
@@ -47,7 +46,7 @@ export function Form({
           <Input
             {...inputAttrs}
             type={inputAttrs.type || "text"}
-            disabled={disabled ? true : false}
+            disabled={disabledTooltip ? true : false}
             required
             // defaultValue={team!.name}
             onChange={(e) => setValue(e.target.value)}
@@ -67,9 +66,12 @@ export function Form({
           helpText
         )}
         <div className="flex shrink-0 items-center">
-          <Button disabled={saveDisabled} variant={"default"}>
-            {saving ? <Spinner className="h-8" /> : buttonText}
-          </Button>
+          <Button2
+            disabled={saveDisabled}
+            variant={"default"}
+            text={buttonText}
+            disabledTooltip={disabledTooltip}
+          />
         </div>
       </div>
     </form>

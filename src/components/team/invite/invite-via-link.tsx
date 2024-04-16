@@ -6,29 +6,36 @@ import { APP_DOMAIN } from "@/lib/constants/constants";
 import useTeam from "@/lib/swr/use-team";
 import { Team } from "@/lib/types/types";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 export default function InviteViaLink({ team }: { team?: Team }) {
   const [resetLinkStatus, setResetLinkStatus] = useState<
     "IDLE" | "LOADING" | "SUCCESS"
   >();
 
-  const { team: activeTeam, updateTeamAsync } = useTeam();
+  const { mutate } = useTeam();
   const inviteLink = useMemo(() => {
     return `${APP_DOMAIN}/invites/${team?.inviteCode}`;
   }, [team?.inviteCode]);
 
   function resetLink() {
     setResetLinkStatus("LOADING");
-    updateTeamAsync({ ...team!, inviteCode: "" }, team?.meta?.slug ?? "")
-      .then((data) => {
-        toast.success("Invite link reset successfully.");
-        setResetLinkStatus("SUCCESS");
+    fetch(`/api/teams/${team?.meta?.slug}/invites/reset`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(async (res) => {
+        if (res.ok) {
+          const json = await res.json();
+          console.log("Invite link reset successfully.", json);
+          setResetLinkStatus("SUCCESS");
+          const updatedTeam = { ...team, inviteCode: json.inviteCode };
+          mutate(
+            { ...updatedTeam },
+            { revalidate: false, optimisticData: updatedTeam },
+          );
+        }
       })
-      .catch((error) => {
-        toast.error("Failed to reset invite link.");
-        setResetLinkStatus("IDLE");
-      });
+      .catch((error) => {});
   }
 
   return (

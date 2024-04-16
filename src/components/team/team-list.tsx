@@ -5,8 +5,8 @@ import useTeams from "@/lib/swr/use-teams";
 import { Team } from "@/lib/types/types";
 import { pluralize } from "@/lib/utils";
 import { Shapes, UserCircle2Icon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { Logo } from "../atom/logo";
 import { P } from "../atom/typography";
 import { Badge } from "../ui/badge";
 
@@ -72,7 +72,18 @@ function TeamCard({ team, index }: any) {
       className="prose-base flex w-full cursor-pointer flex-col place-content-between items-start rounded border border-border bg-card p-4   hover:text-accent-foreground hover:shadow"
     >
       <div className=" flex w-full items-center gap-4">
-        <Logo className="h-10 flex-none" />
+        <Image
+          unoptimized={true}
+          height={40}
+          width={40}
+          src={team.logo ?? ""}
+          alt="logo"
+          className="h-10 w-10 rounded-full"
+          onError={(e) => {
+            (e.target as any).src =
+              `https://api.dicebear.com/8.x/initials/svg?seed=${team?.name}&scale=70&size=40`;
+          }}
+        />
         <div className="flex flex-grow place-content-between items-start">
           <div className="flex-grow flex-col items-center">
             <div className="flex w-full place-content-between items-center">

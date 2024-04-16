@@ -3,6 +3,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+import { ToolTipWrapper } from "./tooltip";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
@@ -56,3 +58,64 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
+
+export interface ButtonProps2
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  text?: string;
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link"
+    | "subtle";
+  loading?: boolean;
+  icon?: React.ReactNode;
+  shortcut?: string;
+  disabled?: boolean;
+  disabledTooltip?: string | React.ReactNode;
+}
+
+export function Button2({
+  text,
+  loading,
+  disabled,
+  icon,
+  disabledTooltip,
+  ...props
+}: ButtonProps2) {
+  if (disabledTooltip) {
+    return (
+      <ToolTipWrapper content={disabledTooltip}>
+        <div
+          className={cn(
+            "flex h-10 w-full cursor-not-allowed items-center justify-center space-x-2 rounded-md border border-border bg-accent/20 px-4 text-sm text-muted-foreground/40 transition-all focus:outline-none",
+            {
+              "border-transparent bg-transparent":
+                props?.variant?.endsWith("outline"),
+            },
+            props.className,
+          )}
+        >
+          {icon}
+          <p>{text}</p>
+        </div>
+      </ToolTipWrapper>
+    );
+  }
+  return (
+    <Button
+      {...props}
+      disabled={disabled || loading}
+      className={cn(props.className, "space-x-2")}
+    >
+      {loading ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : icon ? (
+        icon
+      ) : null}
+      {text && <p>{text}</p>}
+    </Button>
+  );
+}

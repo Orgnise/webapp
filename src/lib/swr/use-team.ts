@@ -4,6 +4,7 @@ import { fetcher } from "../fetcher";
 import { Team } from "../types/types";
 import { displayToast } from "./use-collections";
 
+type UpdateTeam = { name?: string; description?: string; slug?: string };
 interface ITeam {
   error: any;
   loading: boolean;
@@ -12,7 +13,8 @@ interface ITeam {
   mutate: KeyedMutator<any>;
   exceedingFreeTeam: boolean;
   deleteTeamAsync: (teamSlug: string) => Promise<void>;
-  updateTeamAsync: (team: Team, teamSlug: string) => Promise<void>;
+  updateTeamAsync: ({ name, description, slug }: UpdateTeam, teamSlug: string) => Promise<void>;
+
 }
 export default function useTeam(): ITeam {
   const router = useRouter();
@@ -65,14 +67,14 @@ export default function useTeam(): ITeam {
   }
 
   // Update collection name
-  async function updateTeamAsync(team: Team, teamSlug: string) {
+  async function updateTeamAsync({ name, description, slug }: UpdateTeam, teamSlug: string) {
     try {
       const response = await fetcher(`/api/teams/${teamSlug}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ team: team }),
+        body: JSON.stringify({ name, description, slug }),
       });
       // Change the url if the collection slug has changed
       if (teamSlug != response.team.meta.slug) {
