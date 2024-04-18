@@ -2,7 +2,7 @@
 import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
 import { P } from "@/components/atom/typography";
-import TeamPermission from "@/components/molecule/team-permisson-view";
+import TeamPermissionView from "@/components/molecule/team-permisson-view";
 import NotFoundView from "@/components/team/team-not-found";
 import UploadLogo from "@/components/team/upload-logo";
 import { Button } from "@/components/ui/button";
@@ -128,7 +128,7 @@ function TeamSlug() {
 
 function DeleteTeam() {
   return (
-    <TeamPermission
+    <TeamPermissionView
       permission={"DELETE_TEAM"}
       unAuthorized={
         <div className="rounded-lg  border border-info bg-card dark:border-border">
@@ -169,7 +169,7 @@ function DeleteTeam() {
           </DeleteWorkspaceModel>
         </div>
       </div>
-    </TeamPermission>
+    </TeamPermissionView>
   );
 }
 

@@ -1,22 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-
-import { NextAuthOptions } from "@/lib/auth/auth";
+import { NextResponse } from "next/server";
+import { withSession } from "@/lib/auth";
+import { APP_DOMAIN } from "@/lib/constants/constants";
 import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
+import { log } from "@/lib/functions/log";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { TeamMemberSchema, TeamSchema } from "@/lib/schema/team.schema";
 import { Team } from "@/lib/types/types";
 import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
-import { getServerSession } from "next-auth/next";
-import { log } from "@/lib/functions/log";
-import { APP_DOMAIN } from "@/lib/constants/constants";
 
 // GET /api/teams - get all teams for the current user
-export async function GET(request: NextRequest) {
+export const GET = withSession(async ({ session }) => {
   const client = await mongoDb;
   await client.connect();
   try {
-    const session = await getServerSession(NextAuthOptions);
 
     if (!session || session?.user === null) {
       return NextResponse.json(
@@ -32,6 +29,7 @@ export async function GET(request: NextRequest) {
     const teamsMembers = client
       .db(databaseName)
       .collection<TeamMemberSchema>("teamUsers");
+
     const teamList = (await teamsMembers
       .aggregate([
         {
@@ -143,24 +141,20 @@ export async function GET(request: NextRequest) {
     //     },
     //   },
     // ]).toArray() as TeamSchema[];
-
     return NextResponse.json({ teams: teamList });
   } catch (err: any) {
     return NextResponse.json(
       { success: false, message: "Operation failed", error: err.toString() },
       { status: 500 },
     );
-  } finally {
-    // client.close();
   }
-}
+});
 
-export async function POST(req: NextRequest) {
+export const POST = withSession(async ({ req, session }) => {
   const client = await mongoDb;
   await client.connect();
 
   try {
-    const session = await getServerSession(NextAuthOptions);
 
     if (!session || session?.user === null) {
       return NextResponse.json(
@@ -265,4 +259,4 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

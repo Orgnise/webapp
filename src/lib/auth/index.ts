@@ -1,5 +1,5 @@
 import { Invite, Plan, Team } from "../types/types";
-
+import { createHash } from "crypto";
 import { TeamRole } from "@/lib/constants/team-role";
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
@@ -19,6 +19,19 @@ export interface Session {
     image?: string;
   };
 }
+
+export const hashToken = (
+  token: string,
+  {
+    noSecret = false,
+  }: {
+    noSecret?: boolean;
+  } = {},
+) => {
+  return createHash("sha256")
+    .update(`${token}${noSecret ? "" : process.env.AUTH_SECRET}`)
+    .digest("hex");
+};
 
 export const getSession = async () => {
   return getServerSession(NextAuthOptions) as Promise<Session>;
@@ -58,14 +71,8 @@ export const withAuth =
       { params }: { params: Record<string, string> | undefined },
     ) => {
       try {
-
         const searchParams = getSearchParams(req.url);
         const team_slug = params?.team_slug;
-
-        const domain = params?.domain || searchParams.domain;
-        const key = searchParams.key;
-
-        let session: Session | undefined;
 
         // if there's no team defined
         if (!team_slug) {
@@ -76,19 +83,9 @@ export const withAuth =
             },
           );
         }
-
-        session = await getSession();
-        if (!session?.user?.id) {
-          return NextResponse.json(
-            {
-              success: false,
-              message: "Unauthorized: Login required.",
-              error: "Operation failed",
-            },
-            { status: 401 },
-          );
-        }
         const client = await mongodb;
+        const session = await generateSession(req);
+
         const teamsCollection = client
           .db(databaseName)
           .collection<TeamSchema>("teams");
@@ -309,19 +306,91 @@ export const withSession =
     async (req: Request, { params }: { params: Record<string, string> }) => {
       try {
         let session: Session | undefined;
-        let headers = {};
 
-        session = await getSession();
-        if (!session?.user.id) {
-          throw new OrgniseApiError({
-            code: "unauthorized",
-            message: "Unauthorized: Login required.",
-          });
-        }
+        session = await generateSession(req);
 
         const searchParams = getSearchParams(req.url);
         return await handler({ req, params, searchParams, session });
-      } catch (error) {
+      } catch (error: any) {
         return handleAndReturnErrorResponse(error);
       }
     };
+
+async function generateSession(req: Request): Promise<Session> {
+  const authorizationHeader = req.headers.get("Authorization");
+  let session: Session | undefined;
+  if (authorizationHeader) {
+    if (!authorizationHeader.includes("Bearer ")) {
+      throw new OrgniseApiError({
+        code: "bad_request",
+        message:
+          "Misconfigured authorization header. Did you forget to add 'Bearer '? Learn more: https://https://docs.orgnise.in/api-reference/introduction#authentication",
+      });
+    }
+
+    const apiKey = authorizationHeader.replace("Bearer ", "");
+    const hashedKey = hashToken(apiKey, {
+      noSecret: true,
+    });
+    const client = await mongodb;
+    const userCollection = client.db(databaseName).collection("users");
+
+    const users = await userCollection.aggregate([
+      {
+        $lookup: {
+          from: "token",
+          localField: "_id",
+          foreignField: "user",
+          as: "tokens",
+        },
+      },
+      {
+        $match:
+        {
+          tokens: {
+            $elemMatch: {
+              hashedKey:
+                hashedKey
+            },
+          },
+        },
+      },
+      {
+        $unwind: "$tokens",
+      },
+      {
+        $project:
+        {
+          name: 1,
+          email: 1,
+          image: 1,
+        },
+      },
+    ]).toArray() as any[];
+    const user = users?.[0];
+    if (!user) {
+      throw new OrgniseApiError({
+        code: "unauthorized",
+        message: `Unauthorized: Invalid API key: ${apiKey}`,
+        docUrl: 'https://docs.orgnise.in/api-reference/introduction#authentication'
+      });
+    }
+
+    session = {
+      user: {
+        id: user._id,
+        name: user.name || "",
+        email: user.email || "",
+      },
+    };
+  } else {
+    session = await getSession();
+  }
+  if (!session?.user.id) {
+    throw new OrgniseApiError({
+      code: "unauthorized",
+      message: "Unauthorized: Login required.",
+    });
+  }
+  return session;
+}

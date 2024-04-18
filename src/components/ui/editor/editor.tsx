@@ -10,14 +10,15 @@ import {
   EditorContent,
   EditorInstance,
   EditorRoot,
-  defaultEditorProps,
   type JSONContent,
 } from "novel";
-import { ImageResizer } from "novel/extensions";
+import { ImageResizer, handleCommandNavigation } from "novel/extensions";
+import { handleImageDrop, handleImagePaste } from "novel/plugins";
 import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { Separator } from "../separator";
 import { defaultExtensions } from "./extensions";
+import { uploadFn } from "./image-upload";
 import { ColorSelector } from "./selectors/color-selector";
 import { LinkSelector } from "./selectors/link-selector";
 import { NodeSelector } from "./selectors/node-selector";
@@ -101,7 +102,13 @@ const TailwindEditor = ({
             editorClassName,
           )}
           editorProps={{
-            ...defaultEditorProps,
+            handleDOMEvents: {
+              keydown: (_view, event) => handleCommandNavigation(event),
+            },
+            handlePaste: (view, event) =>
+              handleImagePaste(view, event, uploadFn),
+            handleDrop: (view, event, _slice, moved) =>
+              handleImageDrop(view, event, moved, uploadFn),
             attributes: {
               class: `prose-base prose-stone dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full`,
             },

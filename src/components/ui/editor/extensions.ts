@@ -1,43 +1,26 @@
 import {
-  HorizontalRule,
-  Placeholder,
-  StarterKit,
-  TaskItem,
-  TaskList,
   TiptapImage,
   TiptapLink,
   UpdatedImage,
+  TaskList,
+  TaskItem,
+  HorizontalRule,
+  StarterKit,
+  Placeholder,
 } from "novel/extensions";
 import { UploadImagesPlugin } from "novel/plugins";
 
 import { cx } from "class-variance-authority";
 
-//TODO I am using cx here to get tailwind autocomplete working, idk if someone else can write a regex to just capture the class key in objects
+// TODO I am using cx here to get tailwind autocomplete working, idk if someone else can write a regex to just capture the class key in objects
 
-//You can overwrite the placeholder with your own configuration
+// You can overwrite the placeholder with your own configuration
 const placeholder = Placeholder;
 const tiptapLink = TiptapLink.configure({
   HTMLAttributes: {
     class: cx(
       "text-muted-foreground underline underline-offset-[3px] hover:text-primary transition-colors cursor-pointer",
     ),
-  },
-});
-
-const tiptapImage = TiptapImage.extend({
-  addProseMirrorPlugins() {
-    return [UploadImagesPlugin()];
-  },
-}).configure({
-  allowBase64: true,
-  HTMLAttributes: {
-    class: cx("rounded-lg border border-muted"),
-  },
-});
-
-const updatedImage = UpdatedImage.configure({
-  HTMLAttributes: {
-    class: cx("rounded-lg border border-muted"),
   },
 });
 
@@ -82,9 +65,7 @@ const starterKit = StarterKit.configure({
   },
   codeBlock: {
     HTMLAttributes: {
-      class: cx(
-        "rounded-sm bg-muted border border-border p-5 font-mono font-medium",
-      ),
+      class: cx("rounded-sm bg-muted border border-border p-5 font-mono font-medium"),
     },
   },
   code: {
@@ -101,12 +82,28 @@ const starterKit = StarterKit.configure({
   gapcursor: false,
 });
 
+const tiptapImage = TiptapImage.extend({
+  addProseMirrorPlugins() {
+    return [
+      UploadImagesPlugin({
+        imageClass: cx("opacity-40 rounded-lg border border-stone-200"),
+      }),
+    ];
+  },
+}).configure({
+  allowBase64: true,
+  HTMLAttributes: {
+    class: cx("rounded-lg border border-muted"),
+  },
+});
+
+
 export const defaultExtensions = [
   starterKit,
   placeholder,
-  tiptapLink,
+  TiptapLink,
   tiptapImage,
-  updatedImage,
+  UpdatedImage,
   taskList,
   taskItem,
   horizontalRule,

@@ -16,7 +16,7 @@ export function Avatar({
     return (
       <div
         className={cn(
-          "h-10 w-10 animate-pulse rounded-full border border-gray-300 bg-gray-100",
+          "h-10 w-10 animate-pulse rounded-full border border-border bg-gray-100",
           className,
         )}
       />
@@ -34,8 +34,21 @@ export function Avatar({
         user?.image ||
         `https://api.dicebear.com/8.x/initials/svg?seed=${user?.name}&scale=70&size=40`
       }
-      className={cn("h-10 w-10 rounded-full border border-gray-300", className)}
+      className={cn("h-10 w-10 rounded-full border border-border", className)}
       draggable={false}
+    />
+  );
+}
+
+export function TokenAvatar({ id }: { id: string }) {
+  return (
+    <Image
+      src={`https://api.dicebear.com/7.x/shapes/svg?seed=${id}`}
+      alt="avatar"
+      className="h-10 w-10 rounded-full"
+      draggable={false}
+      width={40}
+      height={40}
     />
   );
 }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getToken } from "next-auth/jwt";
 import { parse } from "./lib/utils";
+import { API_HOSTNAMES } from "./lib/constants/constants";
+import ApiMiddleware from "./lib/middleware/api";
 
 export const config = {
   matcher: [
@@ -19,6 +21,14 @@ export const config = {
 };
 
 export const middleware = async (req: NextRequest) => {
+  const { domain, path, fullPath } = parse(req);
+
+  // for API
+  if (API_HOSTNAMES.has(domain)) {
+    return ApiMiddleware(req);
+  }
+
+
   const session = await getToken({
     req: req,
     secret: process.env.AUTH_SECRET,
@@ -29,7 +39,7 @@ export const middleware = async (req: NextRequest) => {
   });
 
   const loggedIn = session?.user ? true : false;
-  const { path, fullPath } = parse(req);
+
 
   if (["/terms", "/policy"].includes(path)) {
     return NextResponse.next();
