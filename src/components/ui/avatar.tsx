@@ -43,12 +43,13 @@ export function Avatar({
 export function TokenAvatar({ id }: { id: string }) {
   return (
     <Image
-      src={`https://api.dicebear.com/7.x/shapes/svg?seed=${id}`}
+      src={`https://api.dicebear.com/8.x/shapes/svg?seed=${id}&scale=70&size=40`}
       alt="avatar"
       className="h-10 w-10 rounded-full"
       draggable={false}
       width={40}
       height={40}
+      unoptimized
     />
   );
 }
