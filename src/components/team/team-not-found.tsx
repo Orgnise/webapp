@@ -12,7 +12,7 @@ export default function NotFoundView({ item }: NotFoundViewProps) {
         <div className="rounded-full bg-accent p-3">
           <FileX2 className="h-6 w-6 text-gray-600" />
         </div>
-        <h1 className="my-3 text-xl font-semibold text-gray-700">
+        <h1 className="my-3 text-xl font-semibold text-secondary-foreground/85">
           {item} Not Found
         </h1>
         <p className="z-10 max-w-sm text-center text-sm text-gray-600">

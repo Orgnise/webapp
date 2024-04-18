@@ -27,7 +27,7 @@ export function SignupForm() {
             // googleLogin();
             await signIn("google");
           }}
-          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-card p-1.5"
         >
           <Image
             unoptimized={true}
@@ -45,7 +45,7 @@ export function SignupForm() {
             e.preventDefault();
             await signIn("github");
           }}
-          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-card p-1.5"
         >
           <Image
             unoptimized={true}
@@ -59,7 +59,7 @@ export function SignupForm() {
         </button>
         {/* Twitter Login */}
         {/* <button
-          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-card p-1.5"
           onClick={async (e) => {
             e.preventDefault();
             // googleLogin();
@@ -77,7 +77,7 @@ export function SignupForm() {
           <span className="px-2 text-sm">Continue with X</span>
         </button> */}
         <button
-          className="flex w-full place-content-center items-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-full place-content-center items-center rounded-sm border border-border bg-card p-1.5"
           onClick={async (e) => {
             e.preventDefault();
             // googleLogin();

@@ -1,12 +1,19 @@
 export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Orgnise";
+
 export const APP_DOMAIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
     ? `https://app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      ? `https://preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
       : "http://localhost:3000";
 
 export const HOME_DOMAIN = `https://${process.env.NEXT_PUBLIC_APP_DOMAIN}`;
+
+export const API_HOSTNAMES = new Set([
+  `api.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+  `api-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+  "api.localhost:8888",
+]);
 
 export const API_DOMAIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"

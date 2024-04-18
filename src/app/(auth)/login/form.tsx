@@ -79,7 +79,7 @@ export function LoginForm() {
             // googleLogin();
             await signIn("google");
           }}
-          className="flex w-1/3 place-content-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
         >
           <Image
             unoptimized={true}
@@ -96,7 +96,7 @@ export function LoginForm() {
             e.preventDefault();
             await signIn("github");
           }}
-          className="flex w-1/3 place-content-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
         >
           <Image
             unoptimized={true}
@@ -109,7 +109,7 @@ export function LoginForm() {
         </button>
         {/* X Login */}
         {/* <button
-          className="flex w-1/3 place-content-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
           onClick={async (e) => {
             e.preventDefault();
             // googleLogin();
@@ -127,7 +127,7 @@ export function LoginForm() {
         </button> */}
         {/** Slack */}
         <button
-          className="flex w-1/3 place-content-center rounded-sm border border-border bg-white p-1.5"
+          className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
           onClick={async (e) => {
             e.preventDefault();
             // googleLogin();

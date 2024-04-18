@@ -14,7 +14,7 @@ export interface Props {
 
 /**
  * Permission view component
- * @param {TeamPermission} permission - Permission to check
+ * @param {TeamPermissionView} permission - Permission to check
  * @param {React.ReactNode} children - Children to render if permission is present
  * @param {string} className - Class name
  * @param {React.ReactNode} placeholder - Placeholder to render while loading
@@ -24,7 +24,7 @@ export interface Props {
  *  Create
  * </TeamPermission>
  */
-function TeamPermission({
+function TeamPermissionView({
   permission,
   children,
   className,
@@ -47,4 +47,4 @@ function TeamPermission({
   );
 }
 
-export default TeamPermission;
+export default TeamPermissionView;

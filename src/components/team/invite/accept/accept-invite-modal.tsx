@@ -63,8 +63,8 @@ export default function AcceptInviteModal({
               disabled={accepting}
               className={`${
                 accepting
-                  ? "cursor-not-allowed border-border bg-gray-100 text-gray-400"
-                  : "border-black bg-black text-white hover:bg-white hover:text-black dark:border-gray-700"
+                  ? "cursor-not-allowed border-border bg-accent/20 text-muted-foreground/70"
+                  : "border-border bg-secondary-foreground text-background hover:bg-card hover:text-secondary-foreground dark:border-gray-700"
               } flex h-10 w-full items-center justify-center rounded-md border text-sm transition-all focus:outline-none`}
             >
               {accepting ? <Spinner /> : <p>Accept invite</p>}
@@ -83,7 +83,7 @@ export default function AcceptInviteModal({
           <div className="flex flex-col space-y-6 bg-gray-50 px-4 py-8 text-left sm:px-16">
             <Link
               href="/"
-              className="flex h-10 w-full items-center justify-center rounded-md border border-black bg-black text-sm text-white transition-all hover:bg-white hover:text-black focus:outline-none"
+              className="flex h-10 w-full items-center justify-center rounded-md border border-black bg-black text-sm text-white transition-all hover:bg-card hover:text-black focus:outline-none"
             >
               Back to dashboard
             </Link>

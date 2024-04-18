@@ -105,7 +105,7 @@ export function LoginWithCredentialsForm() {
             // googleLogin();
             await signIn("google");
           }}
-          className=" rounded-full bg-white p-2 shadow"
+          className=" rounded-full bg-card p-2 shadow"
         >
           <Image
             unoptimized={true}
@@ -122,7 +122,7 @@ export function LoginWithCredentialsForm() {
             e.preventDefault();
             await signIn("github");
           }}
-          className="rounded-full bg-white p-2 shadow"
+          className="rounded-full bg-card p-2 shadow"
         >
           <Image
             unoptimized={true}

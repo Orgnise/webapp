@@ -161,6 +161,10 @@ export function pluralize(word: string, count: number): string {
 }
 
 export const parse = (req: NextRequest) => {
+  let domain = req.headers.get("host") as string;
+  // remove www. from domain and convert to lowercase
+  domain = domain.replace("www.", "").toLowerCase();
+
   // path is the path of the URL (e.g. orgnise.in/home/settings -> /home/settings)
   let path = req.nextUrl.pathname;
 
@@ -168,5 +172,5 @@ export const parse = (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams.toString();
   const fullPath = `${path}${searchParams.length > 0 ? `?${searchParams}` : ""}`;
 
-  return { path, fullPath };
+  return { path, fullPath, domain };
 };

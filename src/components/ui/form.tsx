@@ -59,7 +59,7 @@ export function Form({
       <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
         {typeof helpText === "string" ? (
           <p
-            className="prose-sm text-muted-foreground transition-colors prose-a:underline prose-a:underline-offset-4 hover:prose-a:text-gray-700"
+            className="prose-sm text-muted-foreground transition-colors prose-a:underline prose-a:underline-offset-4 hover:prose-a:text-secondary-foreground/85"
             dangerouslySetInnerHTML={{ __html: helpText || "" }}
           />
         ) : (

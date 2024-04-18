@@ -96,3 +96,14 @@ export interface Invite {
   createdAt: Date;
   role: TeamRole;
 }
+
+
+export interface Token {
+  _id: string,
+  name: string,
+  hashedKey: string,
+  partialKey: string,
+  userId: string,
+  createdAt: Date,
+  lastUsed: Date,
+}
