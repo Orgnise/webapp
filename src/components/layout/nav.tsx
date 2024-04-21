@@ -13,8 +13,8 @@ import { LogOutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "../atom/logo";
-import { TeamToggleDropDown } from "../ui/team-select";
-import { ModeToggle } from "../ui/toggle-theme";
+import { TeamSwitcher } from "../ui/team-switcher";
+import { ThemeSwitcher } from "../ui/theme-switcher";
 
 const Nav = ({}) => {
   const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
@@ -27,10 +27,9 @@ const Nav = ({}) => {
         <Link href="/" className="Logo flex items-center gap-2">
           <Logo className="h-8" />
         </Link>
-        {user && team_slug && <TeamToggleDropDown />}
+        {user && <TeamSwitcher />}
       </div>
       <div className="flex items-center gap-2">
-        <ModeToggle />
         {status === "loading" && (
           <div className="h-8 w-8 animate-pulse rounded-full bg-accent" />
         )}
@@ -65,6 +64,7 @@ const Nav = ({}) => {
                     {user.email}
                   </p>
                 </div>
+                <ThemeSwitcher />
                 <DropdownMenuItem className="cursor-pointer">
                   <Link href="/settings" className="flex items-center">
                     <Settings size={18} className="mr-2" />

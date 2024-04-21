@@ -1,6 +1,7 @@
 "use client";
 
 import { ListView } from "@/components/ui/listview";
+import { DICEBEAR_AVATAR_URL } from "@/lib/constants/constants";
 import useTeams from "@/lib/swr/use-teams";
 import { Team } from "@/lib/types/types";
 import { pluralize } from "@/lib/utils";
@@ -71,41 +72,40 @@ function TeamCard({ team, index }: any) {
       href={`/${team.meta.slug}`}
       className="prose-base flex w-full cursor-pointer flex-col place-content-between items-start rounded border border-border bg-card p-4   hover:text-accent-foreground hover:shadow"
     >
-      <div className=" flex w-full items-center gap-4">
+      <div className="flex w-full flex-row items-start">
         <Image
           unoptimized={true}
           height={40}
           width={40}
           src={team.logo ?? ""}
           alt="logo"
-          className="h-10 w-10 rounded-full"
+          className="mr-2 mt-1 h-10 max-h-10 w-10 rounded-full"
           onError={(e) => {
-            (e.target as any).src =
-              `https://api.dicebear.com/8.x/initials/svg?seed=${team?.name}&scale=70&size=40`;
+            (e.target as any).src = DICEBEAR_AVATAR_URL + team?.name;
           }}
         />
-        <div className="flex flex-grow place-content-between items-start">
-          <div className="flex-grow flex-col items-center">
-            <div className="flex w-full place-content-between items-center">
-              <h3 className="m-0 max-w-[200px] truncate p-0">{team.name}</h3>
-            </div>
-            {team?.description && (
-              <p className="m-0 text-sm text-muted-foreground">
-                {team.description}
-              </p>
-            )}
+        <div className="">
+          <div className="flex w-full place-content-between items-center">
+            <h3 className="m-0 max-w-[200px] truncate p-0">{team.name}</h3>
           </div>
-          <Badge className="mt-1">{team.plan ?? "Free"}</Badge>
+          {team?.description && (
+            <p className="m-0 text-sm text-muted-foreground [text-wrap:balance]">
+              {team.description}
+            </p>
+          )}
         </div>
       </div>
-      <span className="flex items-center gap-1 pt-6 text-sm text-muted-foreground">
-        <UserCircle2Icon className="" size={16} />
-        {/* TODO: Fetch and display members/workspaces count */}
-        {team?.membersCount}
-        <span className="pl-px">
-          {pluralize("member", team?.members?.length)}
+
+      <div className="mt-6 flex w-full place-content-between items-center">
+        <span className="flex items-center gap-1  text-sm text-muted-foreground">
+          <UserCircle2Icon className="" size={16} />
+          {team?.membersCount}
+          <span className="pl-px">
+            {pluralize("member", team?.members?.length)}
+          </span>
         </span>
-      </span>
+        <Badge className="">{team.plan ?? "Free"}</Badge>
+      </div>
     </Link>
   );
 }

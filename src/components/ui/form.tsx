@@ -30,9 +30,11 @@ export function Form({
       onSubmit={async (e) => {
         e.preventDefault();
         setSaving(true);
-        await handleSubmit({
-          [inputAttrs.name as string]: value,
-        });
+        try {
+          await handleSubmit({
+            [inputAttrs.name as string]: value,
+          });
+        } catch (error) {}
         setSaving(false);
       }}
       className="rounded-lg border border-border bg-card"

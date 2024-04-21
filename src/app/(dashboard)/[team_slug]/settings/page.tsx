@@ -40,6 +40,7 @@ export default function TeamSettingsPage() {
       <div className="mx-auto  grid max-w-screen-md flex-col gap-8 px-4 ">
         <TeamName />
         <TeamSlug />
+        <TeamDescription />
         <UploadLogo />
         <DeleteTeam />
       </div>
@@ -121,6 +122,45 @@ function TeamSlug() {
         checkPermissions(team.role, "UPDATE_TEAM_INFO")
           ? undefined
           : "Only the team owner can update the team slug"
+      }
+    />
+  );
+}
+
+function TeamDescription() {
+  const { team, error, loading, updateTeamAsync } = useTeam();
+  const { toast } = useToast();
+
+  return (
+    <Form
+      title={"Description"}
+      description={"This is the description of your team on Orgnise"}
+      inputAttrs={{
+        name: "description",
+        defaultValue: loading ? undefined : team?.description || "",
+        placeholder: "Acme Inc. is a software company...",
+        maxLength: 120,
+      }}
+      helpText="Max 120 characters."
+      handleSubmit={(data) =>
+        updateTeamAsync(
+          {
+            description: data?.description,
+          },
+          team.meta.slug,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Team description updated successfully",
+          });
+          mutate(`/api/teams`);
+        })
+      }
+      buttonText="Save changes"
+      disabledTooltip={
+        checkPermissions(team.role, "UPDATE_TEAM_INFO")
+          ? undefined
+          : "Only the team owner can update the team description"
       }
     />
   );

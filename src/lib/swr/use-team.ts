@@ -86,10 +86,9 @@ export default function useTeam(): ITeam {
         { revalidate: false, optimisticData: response.team },
       );
     } catch (error: any) {
-      console.error("error", error);
       displayToast({
         title: "Error",
-        description: error?.message ?? "Failed to update team",
+        description: error?.error?.message ?? error?.message ?? "Failed to update team",
         variant: "error",
       });
       throw error;

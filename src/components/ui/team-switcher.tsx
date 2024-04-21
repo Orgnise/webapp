@@ -1,4 +1,3 @@
-import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,23 +6,60 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import useTeam from "@/lib/swr/use-team";
+import { DICEBEAR_AVATAR_URL } from "@/lib/constants/constants";
 import useTeams from "@/lib/swr/use-teams";
-import { Team } from "@/lib/types/types";
+import { Plan, Team } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
 import cx from "classnames";
-import { ChevronsUpDown } from "lucide-react";
+import { CheckIcon, ChevronsUpDown } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useContext } from "react";
+import { useParams } from "next/navigation";
+import { useMemo } from "react";
+import { Badge } from "./badge";
 import { Button } from "./button";
 
-export function TeamToggleDropDown() {
-  const data = useContext(TeamContext);
+export function TeamSwitcher() {
   const { error, loading: teamsLoading, teams } = useTeams();
-  const { team: activeTeam, loading: teamLoading } = useTeam();
-  if (!activeTeam && teamLoading) {
+  const { data } = useSession();
+  const { key, team_slug } = useParams() as {
+    team_slug?: string;
+    key?: string;
+  };
+
+  const selected = useMemo(() => {
+    const selectedTeam = teams?.find(
+      (workspace) => workspace?.meta?.slug === team_slug,
+    );
+
+    if (team_slug && teams && selectedTeam) {
+      return {
+        ...selectedTeam,
+        image:
+          selectedTeam.logo || `${DICEBEAR_AVATAR_URL}${selectedTeam.name}`,
+        slug: selectedTeam.meta.slug,
+        plan: selectedTeam.plan ?? "free",
+      };
+
+      // return personal account selector if there's no workspace or error (user doesn't have access to workspace)
+    } else {
+      return {
+        name: data?.user?.name || data?.user?.email,
+        slug: "/",
+        image: data?.user?.image || DICEBEAR_AVATAR_URL + data?.user?.email,
+        plan: "free",
+      };
+    }
+  }, [team_slug, teams, data]) as {
+    id?: string;
+    name: string;
+    slug: string;
+    image: string;
+    plan: Plan;
+  };
+
+  if (!teams || teamsLoading) {
     return <TeamToggleDropdownPlaceholder />;
   }
 
@@ -34,21 +70,21 @@ export function TeamToggleDropDown() {
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-2 focus-visible:outline-none">
           <Button variant={"ghost"} className="flex items-center gap-2">
-            {activeTeam && (
+            {selected && (
               <Image
                 unoptimized={true}
                 height={32}
                 width={32}
-                src={activeTeam?.logo ?? ""}
+                src={selected.image}
                 alt="user"
                 className="h-8 w-8 rounded-full"
-                onError={(e) => {
-                  (e.target as any).src =
-                    `https://api.dicebear.com/8.x/initials/svg?seed=${activeTeam?.name}&scale=70&size=40`;
-                }}
+                onError={(e) =>
+                  ((e.target as any).src = DICEBEAR_AVATAR_URL + selected?.name)
+                }
               />
             )}
-            {activeTeam?.name ?? "Not found"}
+            {selected.name}
+            {selected.slug !== "/" && <Badge>{selected.plan}</Badge>}
             <ChevronsUpDown size={18} />
           </Button>
         </DropdownMenuTrigger>
@@ -75,7 +111,11 @@ export function TeamToggleDropDown() {
                       {teams
                         ?.filter((e) => e.meta)
                         .map((team: any, index) => (
-                          <TeamRow team={team} key={index} />
+                          <TeamRow
+                            team={team}
+                            key={index}
+                            selectedSlug={selected.slug}
+                          />
                         ))}
                     </div>
                   )}
@@ -96,20 +136,36 @@ export function TeamToggleDropDown() {
   );
 }
 
-function TeamRow({ team }: { team: Team }) {
-  const pathname = usePathname();
+function TeamRow({ team, selectedSlug }: { team: Team; selectedSlug: string }) {
+  const isSelected = selectedSlug === team.meta.slug;
   return (
     <Link href={`/${team.meta.slug}`}>
       <div
-        className={cx("flex w-full items-center  gap-2 rounded", {
-          "bg-primary text-primary-foreground": pathname?.startsWith(
-            `/${team.meta.slug}`,
-          ),
-          "hover:bg-accent": pathname !== `/${team.meta.slug}`,
-        })}
+        className={cx(
+          "flex w-full items-center  gap-2 rounded hover:bg-accent",
+        )}
       >
         <DropdownMenuItem className="w-full cursor-pointer ">
-          <span className="max-w-[220px] truncate text-sm">{team.name}</span>
+          <span className="flex max-w-[220px] items-center gap-2 truncate text-sm">
+            <Image
+              unoptimized={true}
+              height={32}
+              width={32}
+              src={team?.logo}
+              alt="user"
+              className="h-6 w-6 rounded-full"
+              onError={(e) => {
+                (e.target as any).src = DICEBEAR_AVATAR_URL + team.name;
+              }}
+            />
+            {team.name}
+            <CheckIcon
+              className={cx("h-4 w-4", {
+                "text-primary": isSelected,
+                hidden: !isSelected,
+              })}
+            />
+          </span>
         </DropdownMenuItem>
       </div>
     </Link>
