@@ -1,7 +1,9 @@
+import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withAuth } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import { generateSlug } from "@/lib/utils";
+import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
@@ -29,26 +31,21 @@ export const POST = withAuth(
   async ({ team, session, req }) => {
     const client = await mongoDb;
     try {
-      const body = await req.json();
-      if (!body || !body.name) {
-        return NextResponse.json(
-          { success: false, message: "Invalid request" },
-          { status: 400 },
-        );
-      }
+      const { name, description, accessLevel, visibility } = await createWorkspaceSchema.parseAsync(await req.json());
+
       const userId = session?.user?.id;
       const workspaces = client
         .db(databaseName)
         .collection<WorkspaceSchema>("workspaces");
       const slug = await generateSlug({
-        title: body.name,
+        title: name,
         didExist: async (val: string) => {
           const work = await workspaces.findOne({ "meta.slug": val });
           return !!work;
         },
       });
       const workspace = {
-        name: body.name,
+        name: name,
         team: new ObjectId(team._id),
         members: [
           {
@@ -56,17 +53,18 @@ export const POST = withAuth(
             user: new ObjectId(userId),
           },
         ],
-        description: body.description || "",
+        description: description || "",
         meta: {
           slug: slug,
-          title: body?.name?.substring(0, 50),
-          description: body?.description?.substring(0, 150),
+          title: name,
+          description: description,
         },
-        visibility: body?.visibility ?? "Private",
+        visibility: visibility,
         updatedBy: new ObjectId(userId),
         createdAt: new Date().toISOString(),
         createdBy: new ObjectId(userId),
         updatedAt: new Date().toISOString(),
+        accessLevel: accessLevel,
       } as WorkspaceSchema;
 
       const dbResult = await workspaces.insertOne(workspace);
@@ -77,11 +75,8 @@ export const POST = withAuth(
           _id: dbResult.insertedId,
         },
       });
-    } catch (err: any) {
-      return NextResponse.json(
-        { success: false, message: "Operation failed", error: err.toString() },
-        { status: 500 },
-      );
+    } catch (error: any) {
+      return handleAndReturnErrorResponse(error);
     }
   },
   {

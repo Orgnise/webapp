@@ -36,15 +36,15 @@ const Nav = ({}) => {
         {user && Object.keys(user).length !== 0 && (
           <div className="flex items-center space-x-4 ">
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <div className="bg-primary-200 flex h-10 w-10 place-content-center items-center rounded-full text-lg font-bold hover:text-teal-700">
+              <DropdownMenuTrigger className="group">
+                <div className="bg-primary-200  flex h-10 w-10 place-content-center items-center rounded-full text-lg font-bold hover:text-teal-700">
                   <Image
                     unoptimized={true}
-                    height={32}
-                    width={32}
+                    height={40}
+                    width={40}
                     src={user.image ?? ""}
                     alt="user"
-                    className="h-8 w-8 rounded-full"
+                    className="h-10 w-10 rounded-full border border-border group-active:scale-95"
                     onError={(e) => {
                       (e.target as any).src =
                         `https://api.dicebear.com/8.x/initials/svg?seed=${user?.name}&scale=70&size=40`;

@@ -1,3 +1,4 @@
+import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withAuth } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
@@ -31,15 +32,7 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
     )) as unknown as WorkspaceSchema;
 
     if (!workspaceInDb) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "workspace not found in database",
-          query,
-        },
-        { status: 404 },
-      );
+      throw OrgniseApiError.NOT_FOUND("Workspace not found in database");
     }
     let data = { ...reqWorkspace } as any;
     delete data._id;
@@ -59,14 +52,8 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
         team: new ObjectId(team._id),
       });
       if (work) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "workspace with this slug already exists",
-            error: "Operation failed",
-            query,
-          },
-          { status: 409 },
+        throw OrgniseApiError.CONFLICT(
+          "workspace with this slug already exists",
         );
       }
     } else {
@@ -108,10 +95,7 @@ export const PATCH = withAuth(async ({ req, session, team }) => {
       { status: 200 },
     );
   } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: error.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(error);
   }
 });
 
@@ -127,15 +111,7 @@ export const DELETE = withAuth(async ({ params }) => {
     )) as unknown as WorkspaceSchema;
 
     if (!workspaceInDb) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "Workspace not found in database",
-          query,
-        },
-        { status: 404 },
-      );
+      throw OrgniseApiError.NOT_FOUND("Workspace not found in database");
     }
 
     const deleteResult = await workspaceDb.deleteMany(query);
@@ -149,9 +125,6 @@ export const DELETE = withAuth(async ({ params }) => {
       { status: 200 },
     );
   } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: error.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(error);
   }
 });

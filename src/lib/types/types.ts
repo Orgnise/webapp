@@ -48,7 +48,7 @@ export interface Meta {
   slug: string;
 }
 
-export type Plan = "free" | "pro" | "business" | "enterprise";
+export type Plan = (typeof plans)[number];
 
 export const plans = ["free", "pro", "business", "enterprise"] as const;
 
@@ -64,7 +64,14 @@ export interface Workspace {
   updatedAt: string;
   updatedBy: string;
   meta: Meta;
+  accessLevel: AccessLevel;
 }
+
+
+export const accessLevels = ["full", "read-only"] as const;
+
+export type AccessLevel = (typeof accessLevels)[number];
+
 
 export interface User {
   name: string;

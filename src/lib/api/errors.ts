@@ -68,6 +68,21 @@ export type ErrorResponse = z.infer<typeof ErrorSchema>;
 export type ErrorCodes = z.infer<typeof ErrorCode>;
 
 export class OrgniseApiError extends Error {
+  static CONFLICT(message: string) {
+    throw new OrgniseApiError({
+      code: "conflict",
+      message: message,
+      docUrl: `${docErrorUrl}#conflict`,
+    });
+  }
+
+  static NOT_FOUND(message: string) {
+    throw new OrgniseApiError({
+      code: "not_found",
+      message: message,
+      docUrl: `${docErrorUrl}#not-found`,
+    });
+  }
   public readonly code: z.infer<typeof ErrorCode>;
   public readonly docUrl?: string;
 

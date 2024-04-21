@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 import { fetcher } from "@/lib/fetcher";
 import useWorkspaces from "@/lib/swr/use-wrorkspaces";
+import z from "@/lib/zod";
+import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { useParams, useRouter } from "next/navigation";
 
 export default function Providers({ children }: { children: ReactNode }) {
@@ -21,7 +23,9 @@ interface TeamProviderProps {
     workspaces?: Workspace[];
     activeWorkspace?: Workspace;
   };
-  createWorkspace: (name: string, description?: string) => Promise<void>;
+  createWorkspace: (
+    data: z.infer<typeof createWorkspaceSchema>,
+  ) => Promise<void>;
   deleteWorkspace: (workspaceSlug: string) => Promise<void>;
   updateWorkspace: (workspace: Workspace) => Promise<void>;
 }
@@ -46,7 +50,7 @@ function TeamProvider({ children }: { children: ReactNode }) {
   // const { toast } = useToast();
 
   // Create workspace
-  async function createWorkspace(name: string, description?: string) {
+  async function createWorkspace(data: z.infer<typeof createWorkspaceSchema>) {
     const teamSlug = param?.team_slug;
     try {
       const response = await fetcher(`/api/teams/${teamSlug}/workspaces`, {
@@ -54,7 +58,7 @@ function TeamProvider({ children }: { children: ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, description }),
+        body: JSON.stringify(data),
       });
 
       workspacesResponse.mutate(
@@ -71,10 +75,11 @@ function TeamProvider({ children }: { children: ReactNode }) {
         description: `Workspace ${name} has been created`,
         duration: 5000,
       });
-    } catch (error) {
+    } catch (error: any) {
       displayToast({
         title: "Error",
-        description: `Error occurred while creating workspace ${name}`,
+        description:
+          error?.error?.message ?? "Error occurred while creating workspace",
         duration: 2000,
         variant: "destructive",
       });

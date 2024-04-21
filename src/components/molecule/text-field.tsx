@@ -1,13 +1,15 @@
 import cx from "classnames";
+import { CircleHelpIcon } from "lucide-react";
 import React from "react";
-import Label from "../atom/label";
 import { Input } from "../ui/input";
+import { ToolTipWrapper } from "../ui/tooltip";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   wrapperClassName?: string;
   label?: string;
   error?: string;
+  hint?: React.ReactNode;
 }
 
 /**
@@ -18,21 +20,36 @@ export interface InputProps
  * <TextField name="name" label="Name" value={name} onChange={e => setName(e.target.value)} />
  */
 const TextField = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, wrapperClassName, label, error, ...props }, ref) => {
+  ({ className, wrapperClassName, hint, label, error, ...props }, ref) => {
     return (
       <div className={cx("flex flex-col gap-2", wrapperClassName)}>
-        <Label variant="t2"> {label}</Label>
+        <label
+          htmlFor={label}
+          className="flex items-center gap-1 text-base font-medium"
+        >
+          {label}
+          {hint && (
+            <ToolTipWrapper content={hint}>
+              <CircleHelpIcon
+                className="ml-1 cursor-pointer text-muted-foreground/80"
+                size={16}
+              />
+            </ToolTipWrapper>
+          )}
+        </label>
         <div className={cx("mb-5 flex flex-col gap-1")}>
           <Input
+            ref={ref}
+            id={label}
             placeholder={props.placeholder || `Enter ${label}`}
             className={cx("theme-input   ", {
-              "border-red-500 ": error,
+              "border-destructive ": error,
             })}
             // type={props.type}
             {...props}
           />
           <label
-            className={cx("text-xs text-red-500", {
+            className={cx("text-xs text-destructive", {
               "inline-block  scale-100": error !== "" && error !== undefined,
               "h-0": !error,
             })}

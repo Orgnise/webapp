@@ -1,25 +1,15 @@
 "use client";
 
-import { H3 } from "@/components/atom/typography";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { LockIcon } from "lucide-react";
-import { useContext, useState } from "react";
+import { HashIcon, LockIcon } from "lucide-react";
+import { useContext } from "react";
 
-import Label from "@/components/atom/label";
-import { Logo } from "@/components/atom/logo";
-import { Spinner } from "@/components/atom/spinner";
+import { H3 } from "@/components/atom/typography";
 import TeamPermissionView from "@/components/molecule/team-permisson-view";
-import { TextField } from "@/components/molecule/text-field";
 import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view";
 import { Button } from "@/components/ui/button";
 import { ListView } from "@/components/ui/listview";
+import { useCreateWorkspaceModal } from "@/components/ui/models/create-workspace-modal";
+import { ToolTipWrapper } from "@/components/ui/tooltip";
 import { Visibility } from "@/lib/schema/workspace.schema";
 import useTeam from "@/lib/swr/use-team";
 import { Workspace } from "@/lib/types/types";
@@ -32,20 +22,27 @@ export default function TeamsPageClient() {
   const { loading, team } = useTeam();
   const { team_slug } = useParams() as { team_slug?: string };
   const { workspacesData } = useContext(TeamContext);
+  const { setShowModal, DeleteAccountModal } = useCreateWorkspaceModal();
   if (loading) {
     return <TeamPageLoading />;
   }
 
   return (
     <div className="">
+      <DeleteAccountModal />
       <div className="flex h-36 items-center border-b border-border bg-background">
         <div className="mx-auto w-full max-w-screen-xl px-2.5">
           <div className="flex items-center justify-between">
             <h1 className="prose-2xl">My Workspaces</h1>
             <TeamPermissionView permission="CREATE_WORKSPACE">
-              <CerateWorkspaceModel>
-                <Button size={"sm"}>Create Workspace</Button>
-              </CerateWorkspaceModel>
+              <Button
+                size={"sm"}
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                Create Workspace
+              </Button>
             </TeamPermissionView>
           </div>
         </div>
@@ -60,18 +57,28 @@ export default function TeamsPageClient() {
             href={`${team_slug}/${item.meta.slug}`}
             className=" flex h-32 w-full cursor-pointer place-content-between items-start rounded border border-border bg-card p-6 hover:text-accent-foreground  hover:shadow"
           >
-            <div className="flex items-start gap-4">
-              <Logo className="mt-1 h-7 min-h-6 w-6 min-w-6" />
-              <div className="flex-grow">
+            <div className="flex items-start gap-2">
+              {/* <Logo className="mt-1 h-7 min-h-6 w-6 min-w-6" /> */}
+
+              <HashIcon
+                size={22}
+                className=" mt-1 min-w-6 text-muted-foreground"
+              />
+              <div className="flex flex-col">
                 <H3>{item.name}</H3>
+
                 {item?.description && (
-                  <p className="line-clamp-2 text-sm">{item.description}</p>
+                  <p className=" ] text-sm">{item.description}</p>
                 )}
               </div>
             </div>
 
             <span>
-              {item?.visibility === Visibility.Private && <LockIcon />}
+              {item?.visibility === Visibility.Private && (
+                <ToolTipWrapper content={<p>Private workspace</p>}>
+                  <LockIcon size={15} className="text-muted-foreground" />
+                </ToolTipWrapper>
+              )}
             </span>
           </Link>
         )}
@@ -79,74 +86,6 @@ export default function TeamsPageClient() {
         placeholder={<WorkspacePlaceholder />}
       />
     </div>
-  );
-}
-
-interface CerateWorkspaceModelProps {
-  children: React.ReactNode;
-}
-
-export function CerateWorkspaceModel({ children }: CerateWorkspaceModelProps) {
-  const [status, setStatus] = useState<"idle" | "loading">("idle");
-  const { createWorkspace } = useContext(TeamContext);
-
-  function handleCreateWorkspace(e: any) {
-    e.preventDefault();
-    const name = e.target.name.value;
-    const description = e.target.description.value;
-    if (status === "loading") {
-      return;
-    }
-    setStatus("loading");
-    createWorkspace(name, description).finally(() => {
-      setStatus("idle");
-    });
-  }
-
-  return (
-    <Dialog modal={true}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="border-border p-6">
-        <DialogHeader>
-          <Label size="h2" variant="t2">
-            Create workspace
-          </Label>
-          <DialogDescription>
-            Create a new workspace to start managing your collections.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleCreateWorkspace} className="flex flex-col pt-3">
-          <TextField
-            maxLength={30}
-            minLength={3}
-            name="name"
-            label="Workspace name"
-            required
-            placeholder="Workspace name"
-          />
-
-          <TextField
-            maxLength={60}
-            name="description"
-            label="Workspace description"
-            placeholder="Workspace description"
-          />
-
-          <div className="flex justify-end">
-            <DialogClose className="hidden" id="CreateWorkspaceCloseButton">
-              Cancel
-            </DialogClose>
-            <Button type="submit">
-              {status === "loading" ? (
-                <Spinner className="text-primary-foreground" />
-              ) : (
-                "Create"
-              )}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
   );
 }
 
