@@ -15,8 +15,8 @@ export interface WorkspaceSchema {
   }[];
   visibility: keyof typeof Visibility;
   meta: MetaSchema;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   createdBy: ObjectId;
   updatedBy?: ObjectId;
   accessLevel: AccessLevel

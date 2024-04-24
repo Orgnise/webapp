@@ -1,5 +1,5 @@
 import "dotenv-flow/config";
-import mongodb, { databaseName } from "../src/lib/mongodb";
+import mongodb, { databaseName } from "@/lib/mongodb";
 
 
 //  npm run script get-api-users
