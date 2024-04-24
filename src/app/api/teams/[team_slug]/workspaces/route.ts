@@ -15,9 +15,8 @@ export const GET = withAuth(async ({ team, session }) => {
       .collection<WorkspaceSchema>("workspaces");
     const query = {
       team: new ObjectId(team._id),
-      // members: { $elemMatch: { user: new ObjectId(userId) } },
     };
-    const list = await workspaces.aggregate([{ $match: query }]).toArray();
+    const list = await workspaces.find(query).toArray();
     return NextResponse.json({ workspaces: list });
   } catch (err: any) {
     return NextResponse.json(

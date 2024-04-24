@@ -15,7 +15,7 @@ export const openApiObject: ZodOpenApiObject = {
     contact: {
       name: "Orgnise Support",
       email: "orgnisehq@gmail.com",
-      url: "https://orgnise.in/api",
+      url: "http://docs.orgnise.in/api-reference/introduction",
     },
     license: {
       name: "AGPL-3.0 license",
@@ -24,7 +24,7 @@ export const openApiObject: ZodOpenApiObject = {
   },
   servers: [
     {
-      url: API_DOMAIN,
+      url: `https://api.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
       description: "Production API",
     },
   ],
@@ -54,15 +54,6 @@ export const openApiObject: ZodOpenApiObject = {
         name: "teamId",
         in: "query",
         required: true,
-        schema: {
-          type: "string",
-        },
-      },
-      {
-        "x-speakeasy-globals-hidden": true,
-        name: "teamSlug",
-        in: "query",
-        deprecated: true,
         schema: {
           type: "string",
         },

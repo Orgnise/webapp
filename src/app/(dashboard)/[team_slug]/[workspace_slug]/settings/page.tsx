@@ -12,13 +12,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
+import { useToast } from "@/components/ui/use-toast";
 import useTeam from "@/lib/swr/use-team";
-import { hasValue } from "@/lib/utils";
+import useWorkspaces from "@/lib/swr/use-wrorkspaces";
 import { ChevronRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useContext, useState } from "react";
+import { mutate } from "swr";
 import { TeamContext } from "../../providers";
 
 export default function WorkspaceSettingsPage() {
@@ -61,6 +64,7 @@ export default function WorkspaceSettingsPage() {
       </div>
       <div className="mx-auto flex max-w-screen-md flex-col gap-8 px-4 py-10">
         <WorkspaceName />
+        <WorkspaceDescription />
         <WorkspaceSlug />
         <DeleteWorkspace />
       </div>
@@ -69,133 +73,128 @@ export default function WorkspaceSettingsPage() {
 }
 
 function WorkspaceName() {
-  const [enableSubmit, setEnableSubmit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const {
     workspacesData: { activeWorkspace, error, loading },
-    updateWorkspace,
   } = useContext(TeamContext);
 
-  function handleUpdateWorkspace(e: any) {
-    e.preventDefault();
-    const name = e.target.name.value;
-    if (name === activeWorkspace!.name) {
-      return;
-    }
-    console.log("name", name, activeWorkspace?.name);
-    setIsLoading(true);
-    updateWorkspace({
-      ...activeWorkspace!,
-      name,
-    }).finally(() => {
-      setIsLoading(false);
-    });
-  }
+  const { updateWorkspace } = useWorkspaces();
 
   return (
-    <form
-      onSubmit={handleUpdateWorkspace}
-      className="rounded-lg border border-border bg-card"
-    >
-      <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-        <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Workspace Name</h2>
-          <p className="text-sm text-muted-foreground">
-            This is the name of your workspace
-          </p>
-        </div>
-        <Input
-          placeholder="My workspace"
-          minLength={3}
-          maxLength={32}
-          name="name"
-          required
-          defaultValue={activeWorkspace!.name}
-          onChange={(e) => {
-            setEnableSubmit(
-              hasValue(e.target.value) &&
-                e.target.value !== activeWorkspace!.name,
-            );
-          }}
-        />
-      </div>
-      <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
-        <P className="text-sm text-muted-foreground">Max 32 characters.</P>
-        <div className="shrink-0">
-          <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
-            {isLoading ? <Spinner /> : <p>Save Changes</p>}
-          </Button>
-        </div>
-      </div>
-    </form>
+    <Form
+      title={"Workspace Name"}
+      description={"This is the name of your workspace"}
+      inputAttrs={{
+        name: "name",
+        defaultValue: loading ? undefined : activeWorkspace?.name || "",
+        placeholder: "My workspace",
+        maxLength: 32,
+      }}
+      helpText="Max 32 characters."
+      handleSubmit={(data) =>
+        updateWorkspace(
+          {
+            name: data?.name,
+          },
+          activeWorkspace?.meta?.slug!,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Team description updated successfully",
+          });
+          // mutate(`/api/teams/${activeWorkspace?.meta?.slug}/workspaces`);
+        })
+      }
+      buttonText="Save changes"
+      // disabledTooltip={
+      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
+      //     ? undefined
+      //     : "Only the team owner can update the team name"
+      // }
+    />
   );
 }
 
 function WorkspaceSlug() {
-  const [enableSubmit, setEnableSubmit] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
   const {
     workspacesData: { activeWorkspace, error, loading },
-    updateWorkspace,
   } = useContext(TeamContext);
-
-  function handleUpdateWorkspace(e: any) {
-    e.preventDefault();
-    const slug = e.target.slug.value;
-    if (slug === activeWorkspace?.meta?.slug) {
-      return;
-    }
-    console.log("slug", slug, activeWorkspace?.meta?.slug);
-    setIsLoading(true);
-    updateWorkspace({
-      ...activeWorkspace!,
-      meta: {
-        ...activeWorkspace!.meta,
-        slug,
-      },
-    }).finally(() => {
-      setIsLoading(false);
-    });
-  }
+  const { updateWorkspace } = useWorkspaces();
   return (
-    <form
-      onSubmit={handleUpdateWorkspace}
-      className="rounded-lg border border-border bg-card"
-    >
-      <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-        <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Workspace Slug</h2>
-          <p className="text-sm text-muted-foreground">
-            This is your workspace&apos;s unique slug
-          </p>
-        </div>
-        <Input
-          name="slug"
-          placeholder="my-workspace-slug"
-          required
-          type="text"
-          min={3}
-          maxLength={32}
-          defaultValue={activeWorkspace?.meta?.slug}
-          onChange={(e) => {
-            setEnableSubmit(
-              hasValue(e.target.value) &&
-                e.target.value !== activeWorkspace!.name,
-            );
-          }}
-        />
-      </div>
-      <div className="flex items-center justify-between space-x-4 rounded-b-lg border-t border-border bg-accent/20 p-3 sm:px-10">
-        <P className="text-muted-foreground">
-          Only lowercase letters, numbers, and dashes. Max 48 characters.
-        </P>
-        <div className="shrink-0">
-          <Button variant={enableSubmit ? "default" : "subtle"} type="submit">
-            {isLoading ? <Spinner /> : <p>Save Changes</p>}
-          </Button>
-        </div>
-      </div>
-    </form>
+    <Form
+      title={"Workspace Slug"}
+      description={"This is your workspace's unique slug"}
+      inputAttrs={{
+        name: "slug",
+        defaultValue: loading ? undefined : activeWorkspace?.meta?.slug || "",
+        placeholder: "my-workspace-slug",
+        maxLength: 48,
+      }}
+      helpText="Only lowercase letters, numbers, and dashes. Max 48 characters."
+      handleSubmit={(data) =>
+        updateWorkspace(
+          {
+            slug: data?.slug,
+          },
+          activeWorkspace?.meta?.slug!,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Workspace slug updated successfully",
+          });
+          // mutate(`/api/teams/${activeWorkspace?.meta?.slug}/workspaces`);
+        })
+      }
+      buttonText="Save changes"
+      // disabledTooltip={
+      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
+      //     ? undefined
+      //     : "Only the team owner can update the team description"
+      // }
+    />
+  );
+}
+
+function WorkspaceDescription() {
+  const { toast } = useToast();
+
+  const {
+    workspacesData: { activeWorkspace, error, loading },
+  } = useContext(TeamContext);
+  const { updateWorkspace } = useWorkspaces();
+  return (
+    <Form
+      title={"Description"}
+      description={"This is the description of your workspace."}
+      inputAttrs={{
+        name: "description",
+        defaultValue: loading ? undefined : activeWorkspace?.description || "",
+        placeholder: "A workspace for the engineering team.",
+        maxLength: 120,
+      }}
+      helpText="Max 120 characters."
+      handleSubmit={(data) =>
+        updateWorkspace(
+          {
+            description: data?.description,
+          },
+          activeWorkspace?.meta?.slug!,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Team description updated successfully",
+          });
+          mutate(`/api/teams/${activeWorkspace?.meta?.slug}/workspaces`);
+        })
+      }
+      buttonText="Save changes"
+      // disabledTooltip={
+      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
+      //     ? undefined
+      //     : "Only the team owner can update the team description"
+      // }
+    />
   );
 }
 

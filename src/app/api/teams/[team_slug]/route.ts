@@ -7,35 +7,13 @@ import mongoDb, { databaseName } from "@/lib/mongodb";
 import { TeamSchema } from "@/lib/schema/team.schema";
 import { hasValue, validSlugRegex } from "@/lib/utils";
 import z from "@/lib/zod";
+import { updateTeamSchema } from "@/lib/zod/schemas/teams";
 import slugify from "@sindresorhus/slugify";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 
-const updateTeamSchema = z.object({
-  name: z.preprocess(trim, z.string().min(1).max(32)).optional(),
-  description: z.preprocess(trim, z.string().max(120)).optional(),
-  slug: z
-    .preprocess(
-      trim,
-      z
-        .string()
-        .min(3, "Slug must be at least 3 characters")
-        .max(48, "Slug must be less than 48 characters")
-        .transform((v) => slugify(v))
-        .refine((v) => validSlugRegex.test(v), {
-          message: "Invalid slug format",
-        })
-        .refine(
-          // @ts-ignore
-          async (v) => !DEFAULT_REDIRECTS[v],
-          {
-            message: "Cannot use reserved slugs",
-          },
-        ),
-    )
-    .optional(),
-});
+
 
 // GET /api/team/[slug] – get a specific team
 export const GET = withAuth(async ({ team }) => {

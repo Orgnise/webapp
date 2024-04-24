@@ -6,7 +6,7 @@ export const createWorkspace = {
   operationId: "createWorkspace",
   "x-speakeasy-name-override": "create",
   summary: "Create a workspace",
-  description: "Create a new workspace for the authenticated user.",
+  description: "Create a new workspace. Workspaces are collections of projects and tasks. Workspaces can be private or public. Private workspaces are only visible to members of the workspace.",
   requestParams: {
     path: z.object({
       team_slug: z.string().describe("The slug of the team.")

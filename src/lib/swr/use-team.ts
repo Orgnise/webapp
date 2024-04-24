@@ -27,7 +27,7 @@ export default function useTeam(): ITeam {
     },
   );
 
-  // Delete collection
+  // Delete team
   async function deleteTeamAsync(teamSlug: string) {
     const activeTeamSlug = team_slug;
     // const workspaceSlug = param?.workspace_slug;

@@ -70,6 +70,7 @@ export function Form({
         <div className="flex shrink-0 items-center">
           <Button2
             disabled={saveDisabled}
+            loading={saving}
             variant={"default"}
             text={buttonText}
             disabledTooltip={disabledTooltip}

@@ -1,24 +1,36 @@
+import { trim } from "@/lib/functions/trim";
 import { Visibility } from "@/lib/schema/workspace.schema";
 import { accessLevels } from "@/lib/types/types";
+import { validSlugRegex } from "@/lib/utils";
 import z from "@/lib/zod";
+import slugify from "@sindresorhus/slugify";
+
+const visibility = z.enum([Visibility.Private, Visibility.Public]).default(Visibility.Public).describe("The visibility of the workspace. Private workspaces are only visible to members of the workspace.").openapi({
+  ref: 'visibility',
+  example: Visibility.Public,
+});
+
+const accessLevel = z.enum(accessLevels).default("full").describe("The access level of the workspace. Full access allows members to perform all actions in the workspace. Read access allows members to view the workspace but not make changes.").openapi({
+  ref: 'accessLevel',
+  example: 'full',
+});
+const description = z.string().max(120).optional().default("").describe("The description of the workspace.");
+
 
 export const WorkspaceSchema = z
   .object({
     _id: z.string().describe("The unique ID of the workspace."),
     name: z.string().describe("The name of the workspace."),
-    slug: z.string().describe("The slug of the workspace."),
-    description: z
-      .string().max(120)
-      .nullable()
-      .describe("The description of the workspace."),
-    visibility: z.enum([Visibility.Private, Visibility.Public]).default(Visibility.Public).describe("The visibility of the workspace. Private workspaces are only visible to members of the workspace."),
-    accessLevel: z.enum(accessLevels).default("full").describe("The access level of the workspace. Full access allows members to perform all actions in the workspace. Read access allows members to view the workspace but not make changes."),
+
+    description: description,
+
+    accessLevel: accessLevel,
     meta: z.object({
       title: z.string().describe("The title of the workspace."),
       description: z.string().describe("The description of the workspace."),
       slug: z.string().describe("The slug of the workspace."),
     }).describe("The meta of the workspace."),
-    Visibility: z.enum([Visibility.Private, Visibility.Public]),
+    Visibility: visibility,
     createdAt: z
       .date()
       .describe("The date and time when the workspace was created."),
@@ -33,17 +45,56 @@ export const WorkspaceSchema = z
 
 export const createWorkspaceSchema = z.object({
   name: z.string().min(1).max(32).describe("The name of the workspace."),
-  description: z.string().max(120).optional().default("").describe("The description of the workspace."),
-  visibility: z.enum([Visibility.Private, Visibility.Public]).default(Visibility.Public).describe("The visibility of the workspace. Private workspaces are only visible to members of the workspace."),
-  accessLevel: z.enum(accessLevels).default("full").describe("The access level of the workspace. Full access allows members to perform all actions in the workspace. Read access allows members to view the workspace but not make changes."),
+  description: description,
+  visibility: visibility,
+  accessLevel: accessLevel,
 })
   .openapi({
     title: "Create Workspace",
     description: "Create a new workspace. Workspaces are collections of projects and tasks. Workspaces can be private or public. Private workspaces are only visible to members of the workspace.",
     example: {
-      name: "My Workspace",
-      description: "This is my workspace.",
+      name: "Engineering Workspace",
+      description: "A workspace for the engineering team.",
       visibility: Visibility.Public,
       accessLevel: "full",
     },
   });
+
+/**
+ * Update workspace schema
+ */
+export const updateWorkspaceSchema = z.object({
+  name: z.preprocess(trim, z.string().min(1).max(32)).optional().describe("The name of the workspace."),
+  description: z.preprocess(trim, z.string().max(120)).optional().describe("The description of the workspace."),
+  slug: z
+    .preprocess(
+      trim,
+      z
+        .string()
+        .min(3, "Slug must be at least 3 characters")
+        .max(48, "Slug must be less than 48 characters")
+        .transform((v) => slugify(v))
+        .refine((v) => validSlugRegex.test(v), {
+          message: "Invalid slug format",
+        })
+        .refine(
+          // @ts-ignore
+          async (v) => !['settings'][v],
+          {
+            message: "Cannot use reserved slugs",
+          },
+        ),
+    )
+    .optional().describe("The slug of the workspace."),
+  visibility: visibility,
+  accessLevel: accessLevel,
+}).openapi({
+  title: "Update Workspace",
+  description: "Update a workspace. Workspaces are collections of projects and tasks. Workspaces can be private or public. Private workspaces are only visible to members of the workspace.",
+  example: {
+    name: "Engineering Workspace",
+    description: "A workspace for the engineering team.",
+    visibility: Visibility.Public,
+    accessLevel: "full",
+  },
+});

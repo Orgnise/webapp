@@ -16,6 +16,7 @@ export default function Providers({ children }: { children: ReactNode }) {
   return <TeamProvider>{children}</TeamProvider>;
 }
 
+
 interface TeamProviderProps {
   workspacesData: {
     loading?: boolean;
@@ -27,7 +28,6 @@ interface TeamProviderProps {
     data: z.infer<typeof createWorkspaceSchema>,
   ) => Promise<void>;
   deleteWorkspace: (workspaceSlug: string) => Promise<void>;
-  updateWorkspace: (workspace: Workspace) => Promise<void>;
 }
 
 export const TeamContext = createContext(
@@ -44,11 +44,6 @@ function TeamProvider({ children }: { children: ReactNode }) {
   const workspace = workspacesResponse?.workspaces?.find(
     (w) => w?.meta?.slug === workspace_slug,
   );
-  // const [createWorkspaceState, setCreateWorkspaceState] =
-  //   useState<Status>("idle");
-
-  // const { toast } = useToast();
-
   // Create workspace
   async function createWorkspace(data: z.infer<typeof createWorkspaceSchema>) {
     const teamSlug = param?.team_slug;
@@ -85,50 +80,6 @@ function TeamProvider({ children }: { children: ReactNode }) {
       });
     }
   }
-
-  // Update workspace
-  async function updateWorkspace(workspace: Workspace) {
-    const teamSlug = param?.team_slug;
-    try {
-      const response = await fetcher(
-        `/api/teams/${teamSlug}/${workspace.meta.slug}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ workspace }),
-        },
-      );
-      if (response.workspace?.meta?.slug !== param?.workspace_slug) {
-        router.replace(
-          `/${teamSlug}/${response.workspace?.meta?.slug}/settings`,
-        );
-      }
-      const list = workspacesResponse.workspaces.map((w) => {
-        if (w?._id === workspace._id) {
-          return response.workspace;
-        }
-        return w;
-      });
-      workspacesResponse.mutate({ workspaces: list }, { revalidate: false });
-      displayToast({
-        title: "Workspace updated",
-        description: `Workspace ${workspace.name} has been updated`,
-        duration: 5000,
-      });
-    } catch (err: any) {
-      displayToast({
-        title: "Error",
-        description:
-          err.message ??
-          `Error occurred while updating workspace ${workspace.name}`,
-        duration: 2000,
-        variant: "destructive",
-      });
-    }
-  }
-
   // Delete workspace
   async function deleteWorkspace(workspaceSlug: string) {
     const teamSlug = param?.team_slug;
@@ -183,7 +134,6 @@ function TeamProvider({ children }: { children: ReactNode }) {
           workspaces: workspacesResponse.workspaces,
         },
         createWorkspace,
-        updateWorkspace,
         deleteWorkspace,
       }}
     >
