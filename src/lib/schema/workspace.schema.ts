@@ -35,10 +35,9 @@ export const Visibility = {
 };
 
 
-export interface WorkspaceUserDBSchema {
+export interface WorkspaceMemberDBSchema {
   role: WorkspaceRole,
   user: ObjectId,
-  accessLevel: AccessLevel,
   workspace: ObjectId,
   team: ObjectId,
   createdAt: Date,

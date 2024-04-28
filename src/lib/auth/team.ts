@@ -1,6 +1,6 @@
 import { TeamRole } from "@/lib/constants/team-role";
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "../api/errors";
 import { TeamMemberSchema, TeamSchema } from "../schema/team.schema";
@@ -12,7 +12,7 @@ import { Session, generateSession } from "./";
 
 
 
-interface WithAuthHandler {
+interface WithTeamHandler {
   ({
     req,
     params,
@@ -27,12 +27,13 @@ interface WithAuthHandler {
     headers?: Record<string, string>;
     session: Session;
     team: Team;
+    client: MongoClient;
   }): Promise<Response>;
 }
 
 export const withTeam =
   (
-    handler: WithAuthHandler,
+    handler: WithTeamHandler,
     {
       requiredPlan = ["free", "pro", "business", "enterprise"], // if the action needs a specific plan
       requiredRole = ["owner", "member", "guest", "moderator"], // if the action needs a specific role
@@ -256,6 +257,7 @@ export const withTeam =
           searchParams,
           session,
           team,
+          client,
         });
       } catch (error) {
         return handleAndReturnErrorResponse(error);

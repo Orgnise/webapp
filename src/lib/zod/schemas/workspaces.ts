@@ -1,3 +1,4 @@
+import { workspaceRole } from "@/lib/constants/workspace-role";
 import { trim } from "@/lib/functions/trim";
 import { Visibility } from "@/lib/schema/workspace.schema";
 import { accessLevels } from "@/lib/types/types";
@@ -96,5 +97,56 @@ export const updateWorkspaceSchema = z.object({
     description: "A workspace for the engineering team.",
     visibility: Visibility.Public,
     accessLevel: "full",
+  },
+});
+
+/**
+ * Add workspace member schema
+ */
+export const addWorkspaceMemberSchema = z.array(
+  z.object({
+    email: z.string().email().describe("The ID of the user to add to the workspace."),
+    role: z.enum(workspaceRole).describe("The role of the user in the workspace."),
+  }),
+).openapi({
+  title: "Add Workspace Member",
+  description: "Add a user to a workspace. Users can have the role of editor or reader.",
+  example: [
+    {
+      email: "jondoe@gmail.com",
+      role: "editor",
+    },
+  ],
+});
+
+/**
+ * Update workspace role schema
+ */
+export const updateWorkspaceRoleSchema = z.object({
+  userId: z.string().min(1),
+  role: z.enum(workspaceRole, {
+    errorMap: () => ({
+      message: `Role must be one of "editor" or "reader"`,
+    }),
+  }),
+}).openapi({
+  title: "Update Workspace Role",
+  description: "Update the role of a user in a workspace. Users can have the role of editor or reader.",
+  example: {
+    userId: "60f1a3c7d6d1e3e9b0b1b6f3",
+    role: "editor",
+  },
+});
+
+/**
+ * Remove workspace user schema
+ */
+export const removeWorkspaceUserSchema = z.object({
+  userId: z.string().min(1),
+}).openapi({
+  title: "Remove Workspace User",
+  description: "Remove a user from a workspace.",
+  example: {
+    userId: "60f1a3c7d6d1e3e9b0b1b6f3",
   },
 });

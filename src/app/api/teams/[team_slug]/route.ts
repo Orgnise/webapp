@@ -1,14 +1,10 @@
 import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { fetchDecoratedTeam } from "@/lib/api/team";
 import { withTeam } from "@/lib/auth";
-import { DEFAULT_REDIRECTS } from "@/lib/constants/constants";
-import { trim } from "@/lib/functions/trim";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { TeamSchema } from "@/lib/schema/team.schema";
-import { hasValue, validSlugRegex } from "@/lib/utils";
-import z from "@/lib/zod";
+import { hasValue } from "@/lib/utils";
 import { updateTeamSchema } from "@/lib/zod/schemas/teams";
-import slugify from "@sindresorhus/slugify";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 

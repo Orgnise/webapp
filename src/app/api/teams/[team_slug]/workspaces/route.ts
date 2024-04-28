@@ -1,7 +1,7 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema, WorkspaceUserDBSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceSchema, WorkspaceMemberDBSchema } from "@/lib/schema/workspace.schema";
 import { generateSlug } from "@/lib/utils";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
@@ -73,7 +73,7 @@ export const POST = withTeam(
 
       let workspaceUsersCount: number = 0;
 
-      const workspaceUserCollection = client.db(databaseName).collection<WorkspaceUserDBSchema>("workspace_users");
+      const workspaceUserCollection = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
       if (visibility === "public") {
         // Fetch all the members of the team
         const teamsUsersColl = client.db(databaseName).collection("teamUsers");
@@ -89,7 +89,7 @@ export const POST = withTeam(
               createdAt: new Date(),
               updatedAt: new Date(),
             };
-          }) as WorkspaceUserDBSchema[];
+          }) as WorkspaceMemberDBSchema[];
 
           const res = await workspaceUserCollection.insertMany(workspaceUsers);
           workspaceUsersCount = res.insertedCount;
@@ -104,7 +104,7 @@ export const POST = withTeam(
           team: new ObjectId(team._id),
           createdAt: new Date(),
           updatedAt: new Date(),
-        } as WorkspaceUserDBSchema;
+        } as WorkspaceMemberDBSchema;
         const res = await workspaceUserCollection.insertOne(workspaceUser);
         workspaceUsersCount = 1;
 

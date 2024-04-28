@@ -1,5 +1,6 @@
 import { TeamRole } from "@/lib/constants/team-role";
 import { Visibility } from "../schema/workspace.schema";
+import { WorkspaceRole } from "../constants/workspace-role";
 
 export interface Team {
   _id: string;
@@ -40,6 +41,15 @@ export interface UserProps {
   image?: string;
   createdAt: Date;
   role: TeamRole;
+}
+
+export interface WorkspaceMemberProps {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  createdAt: Date;
+  role: WorkspaceRole;
 }
 
 export interface Meta {

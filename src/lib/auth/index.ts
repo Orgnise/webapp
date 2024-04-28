@@ -1,4 +1,5 @@
 export * from "./auth";
 export * from "./session";
 export * from "./team";
-export * from "./utils"
+export * from "./utils";
+export * from "./workspace";
