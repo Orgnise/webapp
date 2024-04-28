@@ -1,7 +1,7 @@
 import { mongoUserResult } from "@/app/api/auth/signup/route";
 import GitHub from "@auth/core/providers/github";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import { createHash } from "crypto";
+import { ObjectId } from "mongodb";
 import NextAuth, { AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import EmailProvider from "next-auth/providers/email";
@@ -13,23 +13,10 @@ import { sendEmailV2 } from "../../../emails";
 import LoginLink from "../../../emails/login-link";
 import { APP_DOMAIN } from "../constants/constants";
 import mongoDb, { databaseName } from "../mongodb";
-import { ObjectId } from "mongodb";
 import { isStored, storage } from "../storage";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
-export const hashToken = (
-  token: string,
-  {
-    noSecret = false,
-  }: {
-    noSecret?: boolean;
-  } = {},
-) => {
-  return createHash("sha256")
-    .update(`${token}${noSecret ? "" : process.env.AUTH_SECRET}`)
-    .digest("hex");
-};
 
 export const NextAuthOptions = {
   adapter: MongoDBAdapter(mongoDb),

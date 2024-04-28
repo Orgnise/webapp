@@ -1,5 +1,5 @@
 import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import { hasValue } from "@/lib/utils";
@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // Update a workspace
-export const PUT = withAuth(async ({ req, session, team, params }) => {
+export const PUT = withTeam(async ({ req, session, team, params }) => {
   try {
     const { workspace_slug, team_slug } = params ?? {};
     const client = await mongoDb;
@@ -70,7 +70,7 @@ export const PUT = withAuth(async ({ req, session, team, params }) => {
   }
 });
 
-export const DELETE = withAuth(async ({ params }) => {
+export const DELETE = withTeam(async ({ params }) => {
   try {
     const client = await mongoDb;
     const { workspace_slug } = params as { workspace_slug: string };

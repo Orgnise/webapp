@@ -1,6 +1,6 @@
 import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { fetchDecoratedTeam } from "@/lib/api/team";
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import { DEFAULT_REDIRECTS } from "@/lib/constants/constants";
 import { trim } from "@/lib/functions/trim";
 import mongoDb, { databaseName } from "@/lib/mongodb";
@@ -16,12 +16,12 @@ import { NextResponse } from "next/server";
 
 
 // GET /api/team/[slug] – get a specific team
-export const GET = withAuth(async ({ team }) => {
+export const GET = withTeam(async ({ team }) => {
   return NextResponse.json(team);
 });
 
 // PUT /api/team/[slug] – edit a specific team
-export const PUT = withAuth(
+export const PUT = withTeam(
   async ({ team, req, session }) => {
     try {
       const client = await mongoDb;
@@ -86,7 +86,7 @@ export const PUT = withAuth(
 );
 
 // Delete a team
-export const DELETE = withAuth(
+export const DELETE = withTeam(
   async ({ params, team }) => {
     try {
       const client = await mongoDb;

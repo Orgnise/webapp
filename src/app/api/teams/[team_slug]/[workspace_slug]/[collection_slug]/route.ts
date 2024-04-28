@@ -1,4 +1,4 @@
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { CollectionSchema } from "@/lib/schema/collection.schema";
 import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // Update a collection
-export const PATCH = withAuth(async ({ req, session }) => {
+export const PATCH = withTeam(async ({ req, session }) => {
   try {
     const client = await mongoDb;
     const { collection } = (await req.json()) as { collection?: Collection };
@@ -112,7 +112,7 @@ export const PATCH = withAuth(async ({ req, session }) => {
 });
 
 // Delete a collection
-export const DELETE = withAuth(async ({ params, team }) => {
+export const DELETE = withTeam(async ({ params, team }) => {
   try {
     const client = await mongoDb;
     const { collection_slug, workspace_slug } = params as {

@@ -1,10 +1,9 @@
 import { EmailInvite } from "@/app/api/teams/[team_slug]/invites/route";
-import { Session } from "@/lib/auth";
+import { Session, hashToken } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { randomBytes } from "crypto";
 import { sendEmailV2 } from "../../../emails";
 import TeamInvite from "../../../emails/team-invite";
-import { hashToken } from "../auth/auth";
 import { APP_DOMAIN, TWO_WEEKS_IN_SECONDS } from "../constants/constants";
 import { Team } from "../types/types";
 

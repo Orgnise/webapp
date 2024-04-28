@@ -1,5 +1,5 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import { roles } from "@/lib/constants/team-role";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { hasValue } from "@/lib/utils";
@@ -19,7 +19,7 @@ const removeUserSchema = z.object({
   userId: z.string().min(1),
 });
 
-export const GET = withAuth(async ({ team, headers }) => {
+export const GET = withTeam(async ({ team, headers }) => {
   const client = await mongoDb;
   const teamUsersDb = client.db(databaseName).collection("teamUsers");
   const query = { teamId: new ObjectId(team._id) };
@@ -55,7 +55,7 @@ export const GET = withAuth(async ({ team, headers }) => {
 });
 
 // PUT /api/teams/[slug]/users – update a user's role for a specific team
-export const PUT = withAuth(
+export const PUT = withTeam(
   async ({ req, team }) => {
     try {
       const { userId: documentId, role } = updateRoleSchema.parse(
@@ -92,7 +92,7 @@ export const PUT = withAuth(
 );
 
 // DELETE /api/team/[slug]/users – remove a team member
-export const DELETE = withAuth(
+export const DELETE = withTeam(
   async ({ req, team, searchParams }) => {
     const { userId: documentId } = removeUserSchema.parse(searchParams);
     if (!hasValue(documentId)) {

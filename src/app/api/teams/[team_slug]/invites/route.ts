@@ -1,5 +1,5 @@
 import { inviteUser } from "@/lib/api/users";
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import { TeamRole } from "@/lib/constants/team-role";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { hasValue } from "@/lib/utils";
@@ -11,7 +11,7 @@ const emailInviteSchema = z.object({
   email: z.string().email(),
 });
 
-export const GET = withAuth(
+export const GET = withTeam(
   async ({ team, headers }) => {
     const client = await mongoDb;
     const teamUserCollection = client
@@ -71,7 +71,7 @@ export const GET = withAuth(
 );
 
 // POST /api/team/[slug]/invites – invite a team member
-export const POST = withAuth(
+export const POST = withTeam(
   async ({ req, team, session }) => {
     const { emails } = (await req.json()) as {
       emails: Array<EmailInvite> | undefined;
@@ -136,7 +136,7 @@ export const POST = withAuth(
 );
 
 // DELETE /api/team/[slug]/invites – remove a team member invite
-export const DELETE = withAuth(
+export const DELETE = withTeam(
   async ({ req, team, searchParams }) => {
     const { email } = emailInviteSchema.parse(searchParams);
 

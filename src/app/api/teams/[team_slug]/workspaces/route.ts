@@ -1,5 +1,5 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { WorkspaceSchema, WorkspaceUserDBSchema } from "@/lib/schema/workspace.schema";
 import { generateSlug } from "@/lib/utils";
@@ -7,7 +7,7 @@ import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-export const GET = withAuth(async ({ team, session }) => {
+export const GET = withTeam(async ({ team, session }) => {
   const client = await mongoDb;
   try {
     const workspaces = client
@@ -26,7 +26,7 @@ export const GET = withAuth(async ({ team, session }) => {
   }
 });
 
-export const POST = withAuth(
+export const POST = withTeam(
   async ({ team, session, req }) => {
     const client = await mongoDb;
     try {

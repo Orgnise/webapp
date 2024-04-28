@@ -14,12 +14,9 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ToolTipWrapper } from "@/components/ui/tooltip";
 import { useToast } from "@/components/ui/use-toast";
 import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-wrorkspaces";
-import { ChevronRightIcon } from "lucide-react";
-import Link from "next/link";
 import { useContext, useState } from "react";
 import { mutate } from "swr";
 import { TeamContext } from "../../providers";
@@ -41,28 +38,7 @@ export default function WorkspaceSettingsPage() {
   }
   return (
     <div className="WorkspaceSettings">
-      <div className="flex h-28 border-b border-border lg:h-36">
-        <div className="mx-auto flex w-full max-w-screen-xl items-center gap-4 px-2.5 lg:px-20 ">
-          <ToolTipWrapper content={<>Back to workspace</>}>
-            <Link
-              href={`/${activeTeam?.meta?.slug}/${activeWorkspace?.meta?.slug}`}
-            >
-              <span className="flex items-center gap-px">
-                <h1 className="text-xl font-medium text-secondary-foreground/80">
-                  {activeWorkspace?.name}
-                </h1>
-              </span>
-            </Link>
-          </ToolTipWrapper>
-          <ChevronRightIcon className="cursor-pointer" size={18} />
-          <span className="flex items-center gap-px">
-            <h1 className="text-xl font-medium text-secondary-foreground/80">
-              Settings
-            </h1>
-          </span>
-        </div>
-      </div>
-      <div className="mx-auto flex max-w-screen-md flex-col gap-8 px-4 py-10">
+      <div className="mx-auto flex max-w-screen-md flex-col gap-8 px-4">
         <WorkspaceName />
         <WorkspaceDescription />
         <WorkspaceSlug />

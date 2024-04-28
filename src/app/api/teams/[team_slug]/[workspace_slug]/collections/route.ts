@@ -1,4 +1,4 @@
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { CollectionSchema } from "@/lib/schema/collection.schema";
 import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // Get list of collections
-export const GET = withAuth(async ({ team, params }) => {
+export const GET = withTeam(async ({ team, params }) => {
   const client = await mongoDb;
   try {
     const { workspace_slug, team_slug } = params ?? {};
@@ -138,7 +138,7 @@ export const GET = withAuth(async ({ team, params }) => {
 });
 
 // Create a new collection
-export const POST = withAuth(async ({ team, session, req, params }) => {
+export const POST = withTeam(async ({ team, session, req, params }) => {
   const client = await mongoDb;
   try {
     const workspace_slug = params?.workspace_slug;
