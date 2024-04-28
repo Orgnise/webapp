@@ -1,4 +1,4 @@
-export const workspaceRole = ["editor", "viewer"] as const;
+export const workspaceRole = ["editor", "reader"] as const;
 
 export type WorkspaceRole = (typeof workspaceRole)[number];
 
@@ -28,7 +28,7 @@ export const workspaceRolePermissions: WorkspaceRolePermission = {
     UPDATE_WORKSPACE_INFO: true,
     UPDATE_WORKSPACE_VISIBILITY: true,
   },
-  viewer: {
+  reader: {
     VIEW_CONTENT: true,
     CREATE_CONTENT: false,
     EDIT_CONTENT: false,

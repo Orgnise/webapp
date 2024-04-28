@@ -3,6 +3,7 @@ import { MetaSchema } from "./team.schema";
 
 import { ObjectId } from "mongodb";
 import { AccessLevel } from "../types/types";
+import { WorkspaceRole } from "../constants/workspace-role";
 
 export interface WorkspaceSchema {
   _id: string;
@@ -34,3 +35,12 @@ export const Visibility = {
 };
 
 
+export interface WorkspaceUserDBSchema {
+  role: WorkspaceRole,
+  user: ObjectId,
+  accessLevel: AccessLevel,
+  workspace: ObjectId,
+  team: ObjectId,
+  createdAt: Date,
+  updatedAt: Date,
+}

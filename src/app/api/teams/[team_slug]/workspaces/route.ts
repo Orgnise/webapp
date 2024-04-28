@@ -1,7 +1,7 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withAuth } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceSchema, WorkspaceUserDBSchema } from "@/lib/schema/workspace.schema";
 import { generateSlug } from "@/lib/utils";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
@@ -60,19 +60,63 @@ export const POST = withAuth(
         },
         visibility: visibility,
         updatedBy: new ObjectId(userId),
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
         createdBy: new ObjectId(userId),
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
         accessLevel: accessLevel,
       } as WorkspaceSchema;
 
       const dbResult = await workspaces.insertOne(workspace);
+
+      // Add all members of the team to the workspace users if the workspace is public
+      // Otherwise, only add the creator of the workspace
+
+      let workspaceUsersCount: number = 0;
+
+      const workspaceUserCollection = client.db(databaseName).collection<WorkspaceUserDBSchema>("workspace_users");
+      if (visibility === "public") {
+        // Fetch all the members of the team
+        const teamsUsersColl = client.db(databaseName).collection("teamUsers");
+        const teamMembers = await teamsUsersColl.find({ teamId: new ObjectId(team._id) }).toArray();
+        if (teamMembers.length > 0) {
+          const workspaceUsers = teamMembers.map((member) => {
+            return {
+              role: "reader",
+              user: member.user,
+              accessLevel: accessLevel,
+              workspace: new ObjectId(dbResult.insertedId),
+              team: new ObjectId(team._id),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
+          }) as WorkspaceUserDBSchema[];
+
+          const res = await workspaceUserCollection.insertMany(workspaceUsers);
+          workspaceUsersCount = res.insertedCount;
+        }
+      }
+      else {
+        const workspaceUser = {
+          role: "editor",
+          user: new ObjectId(userId),
+          accessLevel: accessLevel,
+          workspace: new ObjectId(dbResult.insertedId),
+          team: new ObjectId(team._id),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as WorkspaceUserDBSchema;
+        const res = await workspaceUserCollection.insertOne(workspaceUser);
+        workspaceUsersCount = 1;
+
+      }
+
       return NextResponse.json({
         success: true,
         workspace: {
           ...workspace,
           _id: dbResult.insertedId,
         },
+        users: workspaceUsersCount || 0,
       });
     } catch (error: any) {
       return handleAndReturnErrorResponse(error);
