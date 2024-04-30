@@ -26,7 +26,6 @@ async function main() {
     for (let i = 0; i < workspaces.length; i++) {
       const workspace = workspaces[i];
       const workspaceMembers = await workspaceUserColl.find({ workspace: new ObjectId(workspace._id) }).toArray();
-      console.log(`Workspace ${workspace.meta.slug} has ${workspaceMembers.length} members.`);
       if (workspaceMembers.length === 0) {
         const user = {
           role: 'editor',
@@ -41,9 +40,14 @@ async function main() {
         insertResult++;
       }
     }
-    console.log(`✅ ${insertResult} Members assigned to workspace \n`);
+    if (insertResult > 0) {
+      console.log(`✅ ${insertResult} workspaces now have at least one member.`);
+    }
+    else {
+      console.log("All workspaces have at least one member");
+    }
   } else {
-    console.log("✅ All workspaces have at least one member.");
+    console.log("No workspaces found.");
   }
   console.log("------------------------------------------------\n");
   client.close();

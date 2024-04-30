@@ -1,12 +1,3 @@
-import { P } from "@/components/atom/typography";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetClose,
@@ -18,9 +9,9 @@ import {
 import {
   ChevronDown,
   Circle,
+  CircleCheck,
   Maximize2,
   Minimize2,
-  MoreVerticalIcon,
   PanelRightOpen,
   PlusIcon,
 } from "lucide-react";
@@ -39,6 +30,7 @@ import { Fold } from "@/lib/utils";
 import cx from "classnames";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { WorkspaceSettingsDropDown } from "../workspace-settings-dropdown";
 import { LeftPanelSize } from "../workspace-view";
 import CollectionBoard from "./collection-board";
 import CollectionList from "./collection-list";
@@ -118,22 +110,10 @@ export default function CollectionPanel({
         />
         <div className="flex-grow" />
         <div className="px-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 ">
-              <button className="">
-                <MoreVerticalIcon size={15} />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="border-border">
-              <DropdownMenuLabel>Options</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer rounded-sm">
-                <Link href={`/${team_slug}/${workspace_slug}/settings`}>
-                  <P>Workspace Settings</P>
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <WorkspaceSettingsDropDown
+            team_slug={team_slug}
+            workspace_slug={workspace_slug}
+          />
         </div>
       </div>
       <PanelTopToolbar
@@ -278,7 +258,7 @@ export function WorkspaceToggleDropDown() {
       </SheetTrigger>
       <SheetContent side="left" className="border-border p-0">
         <SheetHeader className="border-b border-border p-4">
-          <SheetTitle>{workspace?.name}</SheetTitle>
+          <SheetTitle>Workspaces</SheetTitle>
         </SheetHeader>
         <WorkspaceListView workspaces={workspaces} />
       </SheetContent>
@@ -314,27 +294,46 @@ export function WorkspaceListView({ workspaces }: { workspaces: Workspace[] }) {
                   const isActive = workspace_slug === workspace.meta.slug;
                   return (
                     <SheetClose asChild key={index}>
-                      <Link
-                        href={`/${team_slug}/${workspace.meta.slug}`}
-                        className={cx(
-                          "link group flex items-center gap-2 rounded  px-4 py-3",
-                          {
-                            "hover:bg-accent":
-                              workspace_slug !== workspace.meta.slug,
-                            "text-primary ": isActive,
-                          },
-                        )}
-                      >
-                        <Circle
-                          size={15}
-                          fill={isActive ? "true" : "none"}
-                          className={cx("", {
-                            "fill-current": isActive,
-                            "text-muted-foreground": !isActive,
-                          })}
+                      <div className="flex place-content-between items-center">
+                        <Link
+                          href={`/${team_slug}/${workspace.meta.slug}`}
+                          className={cx(
+                            "link group flex flex-grow items-center gap-2  rounded px-4 py-3 hover:bg-accent",
+                            {
+                              "text-primary ": isActive,
+                            },
+                          )}
+                        >
+                          <Circle
+                            size={15}
+                            fill={isActive ? "true" : "none"}
+                            className={cx("", {
+                              hidden: isActive,
+                              "text-muted-foreground": !isActive,
+                            })}
+                          />
+                          <CircleCheck
+                            size={15}
+                            className={cx("", {
+                              "text-primary": isActive,
+                              hidden: !isActive,
+                            })}
+                          />
+                          <p
+                            className={cx(" ", {
+                              "text-primary": isActive,
+                              "text-muted-foreground": !isActive,
+                            })}
+                          >
+                            {workspace.name}
+                          </p>
+                        </Link>
+                        <WorkspaceSettingsDropDown
+                          team_slug={team_slug}
+                          workspace_slug={workspace.meta.slug}
+                          className=" text-muted-foreground"
                         />
-                        <P>{workspace.name}</P>
-                      </Link>
+                      </div>
                     </SheetClose>
                   );
                 }}

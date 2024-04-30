@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
 import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
-import { UserProps } from "@/lib/types/types";
+import { TeamMemberProps } from "@/lib/types/types";
 import { Dispatch, SetStateAction, useState } from "react";
 import { mutate } from "swr";
 
@@ -18,7 +18,7 @@ export default function EditRoleModal({
 }: {
   showEditRoleModal: boolean;
   setShowEditRoleModal: Dispatch<SetStateAction<boolean>>;
-  user: UserProps;
+  user: TeamMemberProps;
   role: TeamRole;
 }) {
   const [editing, setEditing] = useState(false);

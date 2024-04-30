@@ -1,16 +1,15 @@
 "use client";
-
 import { HashIcon, LockIcon } from "lucide-react";
 import { useContext } from "react";
 
 import { H3 } from "@/components/atom/typography";
 import TeamPermissionView from "@/components/molecule/team-permisson-view";
 import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view";
+import { WorkspaceSettingsDropDown } from "@/components/team/workspace/workspace-settings-dropdown";
 import { Button } from "@/components/ui/button";
 import { ListView } from "@/components/ui/listview";
 import { useCreateWorkspaceModal } from "@/components/ui/models/create-workspace-modal";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
-import { Visibility } from "@/lib/schema/workspace.schema";
 import useTeam from "@/lib/swr/use-team";
 import { Workspace } from "@/lib/types/types";
 import Link from "next/link";
@@ -20,8 +19,11 @@ import { TeamContext } from "./providers";
 
 export default function TeamsPageClient() {
   const { loading, team } = useTeam();
-  const { team_slug } = useParams() as { team_slug?: string };
+  const { team_slug } = useParams() as {
+    team_slug?: string;
+  };
   const { workspacesData } = useContext(TeamContext);
+
   const { setShowModal, DeleteAccountModal } = useCreateWorkspaceModal();
   if (loading) {
     return <TeamPageLoading />;
@@ -73,12 +75,17 @@ export default function TeamsPageClient() {
               </div>
             </div>
 
-            <span>
-              {item?.visibility === Visibility.Private && (
+            <span className="flex items-center ">
+              {item?.visibility === "private" && (
                 <ToolTipWrapper content={<p>Private workspace</p>}>
                   <LockIcon size={15} className="text-muted-foreground" />
                 </ToolTipWrapper>
               )}
+              <WorkspaceSettingsDropDown
+                team_slug={team_slug}
+                workspace_slug={item.meta.slug}
+                className="translate-x-2"
+              />
             </span>
           </Link>
         )}

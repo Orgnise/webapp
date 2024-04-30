@@ -1,10 +1,10 @@
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "../fetcher";
-import { UserProps } from "../types/types";
+import { TeamMemberProps } from "../types/types";
 
 interface Props {
-  users: UserProps[],
+  users: TeamMemberProps[],
   loading: boolean,
   error: any
 

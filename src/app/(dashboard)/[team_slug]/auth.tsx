@@ -17,7 +17,7 @@ export default function TeamAuth({ children }: { children: ReactNode }) {
     const { invite } = error as { invite?: Invite };
     // Pending team invite
     return (
-      <div className="container mx-auto bg-card lg:max-w-3xl">
+      <div className="container mx-auto h-full bg-card lg:max-w-3xl">
         <AcceptInvitationRequest invite={invite} />
       </div>
     );
@@ -25,7 +25,7 @@ export default function TeamAuth({ children }: { children: ReactNode }) {
 
   if (error) {
     return (
-      <div className="container mx-auto bg-card lg:max-w-3xl">
+      <div className="container  mx-auto lg:max-w-3xl">
         <NotFoundView item="Team" />
       </div>
     );

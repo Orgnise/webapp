@@ -1,5 +1,8 @@
+import { removeAllTeamInvites, removeAllTeamUsers } from "@/lib/api";
+import { removeAllTeamCollections } from "@/lib/api/collection";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { fetchDecoratedTeam } from "@/lib/api/team";
+import { removeAllTeamWorkspaceMembers, removeAllWorkspaces } from "@/lib/api/workspace";
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { TeamSchema } from "@/lib/schema/team.schema";
@@ -83,36 +86,15 @@ export const PUT = withTeam(
 
 // Delete a team
 export const DELETE = withTeam(
-  async ({ params, team }) => {
+  async ({ params, team, client }) => {
     try {
-      const client = await mongoDb;
-
-      const teamsDb = client.db(databaseName).collection<TeamSchema>("teams");
-      const collectionsDb = client.db(databaseName).collection("collections");
-      const workspaceDb = client.db(databaseName).collection("workspaces");
-      const teamUsersDb = client.db(databaseName).collection("teamUsers");
-      const teamInviteCollection = client
-        .db(databaseName)
-        .collection("teamInvites");
-
-
-      const deleteQuery = {
-        team: new ObjectId(team._id),
-      };
-      // TODO: Update teamId to team 
-      const deleteQuery2 = {
-        teamId: new ObjectId(team._id),
-      };
-      const deleteTeam = await teamsDb.deleteOne({
-        _id: new ObjectId(team._id),
-      });
-
-      // Delete all collections, workspaces and team users associated with the team
-      const [deleteCollection, deleteWorkspace, deleteTeamUsers] = await Promise.all([
-        await collectionsDb.deleteMany(deleteQuery),
-        await workspaceDb.deleteMany(deleteQuery),
-        await teamUsersDb.deleteMany(deleteQuery2),
-        await teamInviteCollection.deleteMany(deleteQuery2),
+      // Delete all collections,workspace members, workspaces, team users and  team users invites associated with the team
+      const [deleteCollection, deleteWorkspaceMembers, deleteWorkspace, deleteTeamUsers, teamInvites] = await Promise.all([
+        await removeAllTeamCollections(client, team._id),
+        await removeAllTeamWorkspaceMembers(client, team._id),
+        await removeAllWorkspaces(client, team._id),
+        await removeAllTeamUsers(client, team._id),
+        await removeAllTeamInvites(client, team._id)
       ]);
 
 
@@ -123,7 +105,9 @@ export const DELETE = withTeam(
           deletedContent: {
             collection: deleteCollection.deletedCount,
             workspace: deleteWorkspace.deletedCount,
+            workspaceMembers: deleteWorkspaceMembers.deletedCount,
             users: deleteTeamUsers.deletedCount,
+            invites: teamInvites.deletedCount
           }
         },
         { status: 200 },

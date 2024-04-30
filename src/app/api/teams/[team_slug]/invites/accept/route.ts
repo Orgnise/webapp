@@ -4,8 +4,9 @@ import {
 } from "@/lib/api/errors";
 import { withSession } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
+import { WorkspaceMemberDBSchema, WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import { Invite, Team } from "@/lib/types/types";
-import { ObjectId } from "mongodb";
+import { InsertManyResult, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // POST /api/teams/[slug]/invites/accept – accept a team invite
@@ -55,7 +56,33 @@ export const POST = withSession(async ({ session, params }) => {
         teamId: team._id,
       }),
     ]);
-    return NextResponse.json(response);
+
+    let workspaceAddResult: Number = 0;
+    // Add the user to all public workspace if the user ir not guest
+    if (invite.role !== "guest") {
+      const workspaceCollection = client.db(databaseName).collection<WorkspaceSchema>("workspaces");
+      const workspaces = await workspaceCollection.find({ team: new ObjectId(team._id), visibility: 'public' }).toArray();
+      if (workspaces.length) {
+        const workspaceUserColl = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
+        const workspaceMembers = workspaces.map(workspace => {
+          return {
+            role: workspace.defaultAccess == "full" ? "editor" : "reader",
+            user: new ObjectId(session.user.id),
+            workspace: new ObjectId(workspace._id),
+            team: new ObjectId(team._id),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }
+        }) as WorkspaceMemberDBSchema[];
+        const res = await workspaceUserColl.insertMany(workspaceMembers);
+        workspaceAddResult = res.insertedCount;
+      }
+      else {
+        workspaceAddResult = -1;
+      }
+
+    }
+    return NextResponse.json({ message: `Invitation accepted`, workspace: workspaceAddResult });
   } catch (error) {
     return handleAndReturnErrorResponse(error);
   }

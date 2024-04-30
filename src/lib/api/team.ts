@@ -1,5 +1,5 @@
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { TeamMemberSchema, TeamSchema } from "../schema/team.schema";
 import { hasValue } from "../utils";
 import { Team } from "../types/types";
@@ -74,4 +74,12 @@ export async function fetchDecoratedTeam(teamId: string, userId: string) {
     return teamList[0] as unknown as Team;
   }
   return null;
+}
+
+// Remove all team members
+export async function removeAllTeamMembers(client: MongoClient, teamId: string) {
+  const teamMembersCol = client
+    .db(databaseName)
+    .collection<TeamMemberSchema>("teamUsers");
+  return await teamMembersCol.deleteMany({ teamId: new ObjectId(teamId) });
 }

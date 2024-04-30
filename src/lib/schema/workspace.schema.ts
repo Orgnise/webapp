@@ -10,29 +10,19 @@ export interface WorkspaceSchema {
   team: ObjectId;
   name: string;
   description: string;
-  members: {
-    user: ObjectId;
-    role: TeamRole;
-  }[];
-  visibility: keyof typeof Visibility;
+  visibility: Visibility;
   meta: MetaSchema;
   createdAt: Date;
   updatedAt: Date;
   createdBy: ObjectId;
   updatedBy?: ObjectId;
-  accessLevel: AccessLevel
+  defaultAccess: AccessLevel
 }
 
-export const Visibility = {
-  Private: "private",
-  Public: "public",
-  Archived: "archived",
-  Active: "active",
-  Pending: "pending",
-  Deleted: "deleted",
-  Draft: "draft",
-  Completed: "completed",
-};
+export const visibilities = ['private', 'public', 'archived', 'deleted'] as const;
+
+export type Visibility = (typeof visibilities)[number];
+
 
 
 export interface WorkspaceMemberDBSchema {

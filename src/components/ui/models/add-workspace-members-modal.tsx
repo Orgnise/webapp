@@ -23,7 +23,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { WorkspaceRole } from "@/lib/constants/workspace-role";
-import { UserProps } from "@/lib/types/types";
+import { TeamMemberProps } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
 import { XIcon } from "lucide-react";
 import {
@@ -37,7 +37,7 @@ import {
 import clsx from "clsx";
 
 interface SelectUser {
-  user: UserProps;
+  user: TeamMemberProps;
   role: WorkspaceRole;
 }
 
@@ -61,7 +61,7 @@ function AddWorkspaceMembersModal({
   } = useWorkspaceUsers();
 
   const [selectedUsers, setSelectedUsers] = useState<SelectUser[]>([]);
-  const [unJoinedMembers, setUnJoinedMembers] = useState<UserProps[]>([]);
+  const [unJoinedMembers, setUnJoinedMembers] = useState<TeamMemberProps[]>([]);
 
   useEffect(() => {
     if (teamLoading || workspaceLoading) return;
@@ -272,8 +272,8 @@ function UsersPlaceholders() {
 }
 
 interface SearchUserBox {
-  users: UserProps[];
-  onUserSelect: (user: UserProps) => void;
+  users: TeamMemberProps[];
+  onUserSelect: (user: TeamMemberProps) => void;
 }
 export function SearchUserBox({ users, onUserSelect }: SearchUserBox) {
   if (users.length === 0) {

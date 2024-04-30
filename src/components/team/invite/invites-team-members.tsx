@@ -6,7 +6,7 @@ import { ListView } from "@/components/ui/listview";
 import { Popover } from "@/components/ui/popover";
 import { TWO_WEEKS_IN_SECONDS } from "@/lib/constants/constants";
 import useTeamInvite from "@/lib/swr/use-team-invite";
-import { UserProps } from "@/lib/types/types";
+import { TeamMemberProps } from "@/lib/types/types";
 import { timeAgo } from "@/lib/utility/datetime";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { UserMinus } from "lucide-react";
@@ -21,7 +21,7 @@ export default function InvitedMembers() {
       <ListView
         items={Array.isArray(users) ? users : []}
         loading={loading}
-        renderItem={(user: UserProps) => (
+        renderItem={(user: TeamMemberProps) => (
           <UserCard key={user.email} user={user} isOwner={false} />
         )}
         noItemsElement={
@@ -43,7 +43,7 @@ const UserCard = ({
   user,
   isOwner,
 }: {
-  user: UserProps;
+  user: TeamMemberProps;
 
   isOwner: boolean;
 }) => {

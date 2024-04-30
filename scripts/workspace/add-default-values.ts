@@ -3,7 +3,7 @@ import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import "dotenv-flow/config";
 
 
-//  npm run script scripts/workspace/add-default-values.ts
+//  npm run script /workspace/add-default-values
 // npx tsx ./scripts/workspace/add-default-values.ts
 async function main() {
   const client = await mongodb;
@@ -14,8 +14,8 @@ async function main() {
   // @ts-ignore
   const workspaces = await workspaceCollection.find({
     $or: [
-      { "accessLevel": { $in: [null, undefined, ''] } },
-      { "visibility": { $in: [null, undefined, ''] }, }
+      { "defaultAccess": { $in: [null, undefined, ''] } },
+      { "visibility": { $in: [null, undefined, '', 'Public', 'Private'] }, }
     ]
   }).toArray();
 
@@ -26,15 +26,29 @@ async function main() {
       {
         updateMany: {
           // @ts-ignore
-          filter: { "accessLevel": { $in: [null, undefined, ''] } },
-          update: { $set: { "accessLevel": "full" } }
-        }
+          filter: { "defaultAccess": { $in: [null, undefined, ''] } },
+          update: { $set: { "defaultAccess": "full" } }
+        },
       },
       {
         updateMany: {
           // @ts-ignore
           filter: { "visibility": { $in: [null, undefined, ''] } },
-          update: { $set: { "visibility": "Public" } }
+          update: { $set: { "visibility": "public" } }
+        }
+      },
+      {
+        updateMany: {
+          // @ts-ignore
+          filter: { "visibility": { $in: ['Public'] } },
+          update: { $set: { "visibility": "public" } }
+        }
+      },
+      {
+        updateMany: {
+          // @ts-ignore
+          filter: { "visibility": { $in: ['Private'] } },
+          update: { $set: { "visibility": "private" } }
         }
       }
     ]);

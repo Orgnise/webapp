@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
 import { fetcher } from "@/lib/fetcher";
 import useTeam from "@/lib/swr/use-team";
-import { UserProps } from "@/lib/types/types";
+import { TeamMemberProps } from "@/lib/types/types";
 import { useSession } from "next-auth/react";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -20,7 +20,7 @@ export default function RemoveTeamMemberModal({
 }: {
   showRemoveTeammateModal: boolean;
   setShowRemoveTeammateModal: Dispatch<SetStateAction<boolean>>;
-  user: UserProps;
+  user: TeamMemberProps;
   invite?: boolean;
 }) {
   // const router = useRouter();

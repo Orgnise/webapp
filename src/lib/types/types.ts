@@ -34,7 +34,7 @@ export interface TeamUsers {
   createdAt: string;
   updatedAt: string;
 }
-export interface UserProps {
+export interface TeamMemberProps {
   _id: string;
   name: string;
   email: string;
@@ -68,13 +68,13 @@ export interface Workspace {
   name: string;
   description: string;
   members: Member[];
-  visibility: keyof typeof Visibility;
+  visibility: Visibility;
   createdBy: any;
   createdAt: string;
   updatedAt: string;
   updatedBy: string;
   meta: Meta;
-  accessLevel: AccessLevel;
+  defaultAccess: AccessLevel;
 }
 
 

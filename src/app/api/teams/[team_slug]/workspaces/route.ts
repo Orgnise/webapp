@@ -1,22 +1,64 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema, WorkspaceMemberDBSchema } from "@/lib/schema/workspace.schema";
+import { TeamMemberSchema } from "@/lib/schema";
+import { WorkspaceMemberDBSchema, WorkspaceSchema } from "@/lib/schema/workspace.schema";
 import { generateSlug } from "@/lib/utils";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
+// GET /api/teams/:team_slug/workspaces - Get all workspaces for a team
 export const GET = withTeam(async ({ team, session }) => {
   const client = await mongoDb;
   try {
-    const workspaces = client
+    const workspaceUsersCol = client
       .db(databaseName)
-      .collection<WorkspaceSchema>("workspaces");
-    const query = {
-      team: new ObjectId(team._id),
-    };
-    const list = await workspaces.find(query).toArray();
+      .collection<WorkspaceSchema>("workspace_users");
+
+    const list = await workspaceUsersCol.aggregate([
+      {
+        $match: {
+          user: new ObjectId(
+            session?.user?.id
+          ),
+          team: new ObjectId(
+            team._id
+          ),
+        },
+      },
+      {
+        $lookup: {
+          from: "workspaces",
+          localField: "workspace",
+          foreignField: "_id",
+          as: "workspace",
+        },
+      },
+      {
+        $unwind: {
+          path: "$workspace",
+          includeArrayIndex: "string",
+        },
+      },
+      {
+        $addFields: {
+          "workspace.role": "$role",
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: "$workspace",
+        },
+      },
+
+      {
+        $project: {
+          members: 0,
+          updatedAt: 0,
+        },
+      },
+    ]).toArray();
     return NextResponse.json({ workspaces: list });
   } catch (err: any) {
     return NextResponse.json(
@@ -26,11 +68,13 @@ export const GET = withTeam(async ({ team, session }) => {
   }
 });
 
+
+// POST /api/teams/:team_slug/workspaces - Create a new workspace
 export const POST = withTeam(
   async ({ team, session, req }) => {
     const client = await mongoDb;
     try {
-      const { name, description, accessLevel, visibility } = await createWorkspaceSchema.parseAsync(await req.json());
+      const { name, description, defaultAccess, visibility } = await createWorkspaceSchema.parseAsync(await req.json());
 
       const userId = session?.user?.id;
       const workspaces = client
@@ -46,12 +90,6 @@ export const POST = withTeam(
       const workspace = {
         name: name,
         team: new ObjectId(team._id),
-        members: [
-          {
-            role: "owner",
-            user: new ObjectId(userId),
-          },
-        ],
         description: description || "",
         meta: {
           slug: slug,
@@ -59,11 +97,11 @@ export const POST = withTeam(
           description: description,
         },
         visibility: visibility,
+        defaultAccess: defaultAccess,
         updatedBy: new ObjectId(userId),
-        createdAt: new Date(),
-        createdBy: new ObjectId(userId),
         updatedAt: new Date(),
-        accessLevel: accessLevel,
+        createdBy: new ObjectId(userId),
+        createdAt: new Date(),
       } as WorkspaceSchema;
 
       const dbResult = await workspaces.insertOne(workspace);
@@ -76,20 +114,21 @@ export const POST = withTeam(
       const workspaceUserCollection = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
       if (visibility === "public") {
         // Fetch all the members of the team
-        const teamsUsersColl = client.db(databaseName).collection("teamUsers");
+        const teamsUsersColl = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
         const teamMembers = await teamsUsersColl.find({ teamId: new ObjectId(team._id) }).toArray();
         if (teamMembers.length > 0) {
-          const workspaceUsers = teamMembers.map((member) => {
+
+          // Add all the members if the team to public workspace except guests
+          const workspaceUsers = teamMembers.filter((user) => user.role !== 'guest').map((member) => {
             return {
-              role: "reader",
-              user: member.user,
-              accessLevel: accessLevel,
+              role: defaultAccess === "full" ? "editor" : "reader",
+              user: new ObjectId(member._id),
               workspace: new ObjectId(dbResult.insertedId),
               team: new ObjectId(team._id),
               createdAt: new Date(),
               updatedAt: new Date(),
-            };
-          }) as WorkspaceMemberDBSchema[];
+            } as WorkspaceMemberDBSchema;
+          });
 
           const res = await workspaceUserCollection.insertMany(workspaceUsers);
           workspaceUsersCount = res.insertedCount;
@@ -99,7 +138,6 @@ export const POST = withTeam(
         const workspaceUser = {
           role: "editor",
           user: new ObjectId(userId),
-          accessLevel: accessLevel,
           workspace: new ObjectId(dbResult.insertedId),
           team: new ObjectId(team._id),
           createdAt: new Date(),

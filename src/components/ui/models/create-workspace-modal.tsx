@@ -47,8 +47,8 @@ export function CreateWorkspaceModel({
     const formData = createWorkspaceSchema.safeParse({
       name: e.target.name.value,
       description: e.target.description.value,
-      visibility: isPrivate ? Visibility.Private : Visibility.Public,
-      accessLevel: e.target.accessLevel.value,
+      visibility: (isPrivate ? "private" : "public") as Visibility,
+      defaultAccess: e.target.defaultAccess.value,
     });
     if (!formData.success) {
       console.error(fromZodError(formData.error));
@@ -165,7 +165,7 @@ export function CreateWorkspaceModel({
                 <HelpCircleIcon className="text-muted-foreground" size={16} />
               </ToolTipWrapper>
             </span>
-            <Select defaultValue="full" name="accessLevel">
+            <Select defaultValue="full" name="defaultAccess">
               <SelectTrigger className="w-[140px] gap-1  px-2 ">
                 <SelectValue placeholder={"Full Access"} />
               </SelectTrigger>
