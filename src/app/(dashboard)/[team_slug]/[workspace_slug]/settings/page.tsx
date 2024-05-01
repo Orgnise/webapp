@@ -14,6 +14,11 @@ import {
 } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useToast } from "@/components/ui/use-toast";
 import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-wrorkspaces";
@@ -42,6 +47,8 @@ export default function WorkspaceSettingsPage() {
         <WorkspaceName />
         <WorkspaceDescription />
         <WorkspaceSlug />
+        <WorkspaceVisibility />
+        <WorkspaceDefaultAccess />
         <DeleteWorkspace />
       </div>
     </div>
@@ -120,6 +127,119 @@ function WorkspaceSlug() {
             description: "Workspace slug updated successfully",
           });
           // mutate(`/api/teams/${activeWorkspace?.meta?.slug}/workspaces`);
+        })
+      }
+      buttonText="Save changes"
+      // disabledTooltip={
+      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
+      //     ? undefined
+      //     : "Only the team owner can update the team description"
+      // }
+    />
+  );
+}
+
+function WorkspaceVisibility() {
+  const { toast } = useToast();
+
+  const {
+    workspacesData: { activeWorkspace, error, loading },
+  } = useContext(TeamContext);
+  const { updateWorkspace } = useWorkspaces();
+  return (
+    <Form
+      title={"Visibility"}
+      description={
+        "This is the visibility of the workspace. Public workspaces are visible to everyone in team. Private workspaces are only visible to team members."
+      }
+      helpText=""
+      inputSwitch={{
+        name: "visibility",
+        labelOnChecked: "Workspace is now Private",
+        labelOnUnChecked: "Workspace is now Public",
+        checked: activeWorkspace?.visibility === "private",
+      }}
+      handleSubmit={(data) =>
+        updateWorkspace(
+          {
+            visibility: data?.visibility ? "private" : "public",
+          },
+          activeWorkspace?.meta?.slug!,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Workspace visibility updated successfully",
+          });
+          mutate(`/api/teams/${activeWorkspace?.meta?.slug}/workspaces`);
+        })
+      }
+      buttonText="Save changes"
+      // disabledTooltip={
+      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
+      //     ? undefined
+      //     : "Only the team owner can update the team description"
+      // }
+    />
+  );
+}
+
+function WorkspaceDefaultAccess() {
+  const { toast } = useToast();
+
+  const {
+    workspacesData: { activeWorkspace, error, loading },
+  } = useContext(TeamContext);
+  const { updateWorkspace } = useWorkspaces();
+  return (
+    <Form
+      title={"Default Access Level"}
+      description={
+        "Default access level for the workspace determines the default permissions when a new member joins the workspace."
+      }
+      helpText={
+        <div className="">
+          <Popover>
+            <PopoverTrigger>
+              <span className="text-sm text-muted-foreground underline">
+                Learn more about Default access
+              </span>
+            </PopoverTrigger>
+            <PopoverContent className=" overflow-hidden sm:w-[600px]">
+              <div className=" space-y-2 text-wrap text-sm">
+                <p className="w-full ">
+                  <span className="font-bold">Editor:</span> Editors have full
+                  access within the scope of a workspace. They can invite new
+                  members, modify all workspace content, and manage settings.
+                  However, guest editors have limited access.
+                </p>
+                <p>
+                  <strong>Read only:</strong> Readers have limited access to a
+                  workspace. They can view content but cannot invite new
+                  members, modify content, or manage settings.
+                </p>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      }
+      inputSwitch={{
+        name: "defaultAccess",
+        labelOnChecked: "Full access",
+        labelOnUnChecked: "Read only access",
+        checked: activeWorkspace?.defaultAccess === "full",
+      }}
+      handleSubmit={(data) =>
+        updateWorkspace(
+          {
+            defaultAccess: data?.defaultAccess ? "full" : "read-only",
+          },
+          activeWorkspace?.meta?.slug!,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Workspace visibility updated successfully",
+          });
+          mutate(`/api/teams/${activeWorkspace?.meta?.slug}/workspaces`);
         })
       }
       buttonText="Save changes"

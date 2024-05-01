@@ -4,13 +4,16 @@ import { useParams, useRouter } from "next/navigation";
 import useSWR, { KeyedMutator } from "swr";
 
 import { fetcher } from "../fetcher";
-import { Workspace } from "../types/types";
+import { AccessLevel, Workspace } from "../types/types";
 import { displayToast } from "./use-collections";
+import { Visibility } from "../schema/workspace.schema";
 
 type UpdateWorkspace = {
   name?: string;
   description?: string;
   slug?: string;
+  visibility?: Visibility;
+  defaultAccess?: AccessLevel
 }
 
 
@@ -20,7 +23,7 @@ interface IWorkspaces {
   loading: boolean;
   workspaces: Workspace[];
   deleteWorkspace: (workspaceSlug: string) => Promise<void>;
-  updateWorkspace: ({ name, description, slug }: UpdateWorkspace, teamSlug: string) => Promise<void>;
+  updateWorkspace: ({ name, description, slug, visibility, defaultAccess }: UpdateWorkspace, teamSlug: string) => Promise<void>;
 }
 export default function useWorkspaces(): IWorkspaces {
   const router = useRouter();

@@ -1,6 +1,8 @@
+import { trim } from "@/lib/functions/trim";
 import { InputHTMLAttributes, ReactNode, useMemo, useState } from "react";
 import { Button2 } from "./button";
 import { Input } from "./input";
+import { Switch } from "./switch";
 
 export function Form({
   title,
@@ -10,29 +12,48 @@ export function Form({
   buttonText = "Save Changes",
   disabledTooltip,
   handleSubmit,
+  inputSwitch,
 }: {
   title: string;
   description: string;
-  inputAttrs: InputHTMLAttributes<HTMLInputElement>;
+  inputAttrs?: InputHTMLAttributes<HTMLInputElement>;
+  inputSwitch?: {
+    name: string;
+    labelOnChecked: string;
+    labelOnUnChecked?: string;
+    checked: boolean;
+  };
   helpText?: string | ReactNode;
   buttonText?: string;
   disabledTooltip?: string | ReactNode;
   handleSubmit: (data: any) => Promise<any>;
 }) {
-  const [value, setValue] = useState(inputAttrs.defaultValue);
+  const [value, setValue] = useState(
+    inputAttrs?.defaultValue ?? inputSwitch?.checked,
+  );
   const [saving, setSaving] = useState(false);
   const saveDisabled = useMemo(() => {
-    return saving || !value || value === inputAttrs.defaultValue;
-  }, [saving, value, inputAttrs.defaultValue]);
+    const isDisabled =
+      saving ||
+      value == undefined ||
+      trim(value) === "" ||
+      value === (inputAttrs?.defaultValue ?? inputSwitch?.checked);
+    return isDisabled;
+  }, [saving, value, inputAttrs?.defaultValue, inputSwitch?.checked]);
 
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault();
         setSaving(true);
+        const keyName = inputAttrs
+          ? inputAttrs.name!
+          : inputSwitch
+            ? inputSwitch.name
+            : "";
         try {
           await handleSubmit({
-            [inputAttrs.name as string]: value,
+            [keyName]: value,
           });
         } catch (error) {}
         setSaving(false);
@@ -44,7 +65,7 @@ export function Form({
           <h2 className="text-xl font-medium">{title}</h2>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        {typeof inputAttrs.defaultValue === "string" ? (
+        {inputAttrs && typeof inputAttrs.defaultValue === "string" ? (
           <Input
             {...inputAttrs}
             type={inputAttrs.type || "text"}
@@ -53,6 +74,26 @@ export function Form({
             // defaultValue={team!.name}
             onChange={(e) => setValue(e.target.value)}
           />
+        ) : inputSwitch ? (
+          <div className="flex h-10 items-center rounded border border-border p-2">
+            <label
+              htmlFor={inputSwitch.name}
+              className="flex-grow text-sm text-muted-foreground"
+            >
+              {value
+                ? inputSwitch.labelOnChecked
+                : inputSwitch.labelOnUnChecked}
+            </label>
+            <Switch
+              id={inputSwitch.name}
+              name={inputSwitch.name}
+              onCheckedChange={(val) => {
+                console.log("Check change to:", val);
+                setValue(val);
+              }}
+              checked={value as boolean}
+            />
+          </div>
         ) : (
           <div className="h-[2.35rem] w-full max-w-md animate-pulse rounded-md bg-accent/40" />
         )}
