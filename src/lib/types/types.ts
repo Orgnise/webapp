@@ -70,6 +70,7 @@ export interface Workspace {
   members: Member[];
   visibility: Visibility;
   createdBy: any;
+  role: WorkspaceRole;
   createdAt: string;
   updatedAt: string;
   updatedBy: string;

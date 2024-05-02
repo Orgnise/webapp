@@ -36,4 +36,13 @@ export const workspaceRolePermissions: WorkspaceRolePermission = {
     UPDATE_WORKSPACE_INFO: false,
     UPDATE_WORKSPACE_VISIBILITY: false,
   },
-};
+} as const;
+
+export function checkWorkspacePermissions(
+  role: WorkspaceRole | undefined,
+  permission: WorkspacePermission,
+): boolean {
+  if (!role) return false;
+  return workspaceRolePermissions[role][permission];
+}
+

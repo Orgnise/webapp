@@ -4,7 +4,7 @@ import { APP_DOMAIN } from "@/lib/constants/constants";
 import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
 import { log } from "@/lib/functions/log";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberSchema, TeamSchema } from "@/lib/schema/team.schema";
+import { TeamMemberSchema, TeamDbSchema } from "@/lib/schema/team.schema";
 import { Team } from "@/lib/types/types";
 import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -88,7 +88,7 @@ export const GET = withSession(async ({ session }) => {
           },
         },
       ])
-      .toArray()) as TeamSchema[];
+      .toArray()) as TeamDbSchema[];
 
     // const teamList = await teams.aggregate([
 
@@ -176,7 +176,7 @@ export const POST = withSession(async ({ req, session }) => {
       );
     }
 
-    const teams = client.db(databaseName).collection<TeamSchema>("teams");
+    const teams = client.db(databaseName).collection<TeamDbSchema>("teams");
     const teamUsersDb = client
       .db(databaseName)
       .collection<TeamMemberSchema>("teamUsers");
@@ -230,7 +230,7 @@ export const POST = withSession(async ({ req, session }) => {
       inviteCode: randomId(16),
       membersLimit: 2,
       workspaceLimit: 3,
-    } as TeamSchema;
+    } as TeamDbSchema;
 
     // Create team
     const teamResult = await teams.insertOne(freeTeam);
@@ -251,7 +251,7 @@ export const POST = withSession(async ({ req, session }) => {
     const customTeam = {
       ...freeTeam,
       _id: teamResult.insertedId,
-    } as TeamSchema;
+    } as TeamDbSchema;
     return NextResponse.json({ team: customTeam }, { status: 201 });
   } catch (err: any) {
     return NextResponse.json(

@@ -1,6 +1,6 @@
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
-import { TeamMemberSchema, TeamSchema } from "../schema/team.schema";
+import { TeamMemberSchema, TeamDbSchema } from "../schema/team.schema";
 import { hasValue } from "../utils";
 import { Team } from "../types/types";
 
@@ -68,7 +68,7 @@ export async function fetchDecoratedTeam(teamId: string, userId: string) {
         },
       },
     ])
-    .toArray()) as TeamSchema[];
+    .toArray()) as TeamDbSchema[];
 
   if (hasValue(teamList)) {
     return teamList[0] as unknown as Team;

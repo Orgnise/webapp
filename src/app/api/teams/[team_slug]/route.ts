@@ -5,7 +5,6 @@ import { fetchDecoratedTeam } from "@/lib/api/team";
 import { removeAllTeamWorkspaceMembers, removeAllWorkspaces } from "@/lib/api/workspace";
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamSchema } from "@/lib/schema/team.schema";
 import { hasValue } from "@/lib/utils";
 import { updateTeamSchema } from "@/lib/zod/schemas/teams";
 import { ObjectId } from "mongodb";

@@ -60,7 +60,7 @@ export const PUT = withTeam(
 
 
       const query = {
-        _id: new ObjectId(documentId),
+        user: new ObjectId(documentId),
         // TODO: Change teamId to team in db schema
         teamId: new ObjectId(team._id),
       };
@@ -71,7 +71,7 @@ export const PUT = withTeam(
       return NextResponse.json(
         {
           success: true,
-          message: "User role updated",
+          message: response.modifiedCount == 1 ? "User role updated" : "User role not updated",
         },
         {
           status: 200,

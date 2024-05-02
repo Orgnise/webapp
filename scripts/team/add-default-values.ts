@@ -1,5 +1,5 @@
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { TeamSchema } from "@/lib/schema/team.schema";
+import { TeamDbSchema } from "@/lib/schema/team.schema";
 import "dotenv-flow/config";
 
 
@@ -7,7 +7,7 @@ import "dotenv-flow/config";
 // npx tsx ./scripts/team/add-default-values.ts
 async function main() {
   const client = await mongodb;
-  const teamCollection = client.db(databaseName).collection<TeamSchema>("teams");
+  const teamCollection = client.db(databaseName).collection<TeamDbSchema>("teams");
 
   console.log("\n-------------------- Teams --------------------\n");
 

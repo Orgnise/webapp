@@ -3,7 +3,7 @@ import { TeamRole } from "@/lib/constants/team-role";
 import { ObjectId } from "mongodb";
 import { Plan } from "../types/types";
 
-export interface TeamSchema {
+export interface TeamDbSchema {
   _id: ObjectId;
   name: string;
   description?: string;

@@ -116,13 +116,14 @@ export const POST = withTeam(
         // Fetch all the members of the team
         const teamsUsersColl = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
         const teamMembers = await teamsUsersColl.find({ teamId: new ObjectId(team._id) }).toArray();
+        // console.log(`Found ${teamMembers.length} members in the team ${team._id}`)
         if (teamMembers.length > 0) {
 
           // Add all the members if the team to public workspace except guests
-          const workspaceUsers = teamMembers.filter((user) => user.role !== 'guest').map((member) => {
+          const workspaceUsers = teamMembers.filter((user) => user.role === 'guest').map((member) => {
             return {
               role: defaultAccess === "full" ? "editor" : "reader",
-              user: new ObjectId(member._id),
+              user: new ObjectId(member.user),
               workspace: new ObjectId(dbResult.insertedId),
               team: new ObjectId(team._id),
               createdAt: new Date(),
@@ -130,8 +131,16 @@ export const POST = withTeam(
             } as WorkspaceMemberDBSchema;
           });
 
-          const res = await workspaceUserCollection.insertMany(workspaceUsers);
-          workspaceUsersCount = res.insertedCount;
+          if (workspaceUsers.length > 0) {
+
+            // console.log(`Adding ${workspaceUsers.length} members to the workspace ${dbResult.insertedId}`)
+            // console.log(`Adding ${workspaceUsers.map((e) => e.user)}`)
+            const res = await workspaceUserCollection.insertMany(workspaceUsers);
+            workspaceUsersCount = res.insertedCount;
+          }
+          else {
+            console.log(`No members found in the team ${team._id} to add to the workspace ${dbResult.insertedId}`)
+          }
         }
       }
       else {

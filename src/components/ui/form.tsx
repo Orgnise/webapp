@@ -87,6 +87,7 @@ export function Form({
             <Switch
               id={inputSwitch.name}
               name={inputSwitch.name}
+              disabled={disabledTooltip ? true : false}
               onCheckedChange={(val) => {
                 console.log("Check change to:", val);
                 setValue(val);

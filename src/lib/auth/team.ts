@@ -3,7 +3,7 @@ import mongodb, { databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "../api/errors";
-import { TeamMemberSchema, TeamSchema } from "../schema/team.schema";
+import { TeamMemberSchema, TeamDbSchema } from "../schema/team.schema";
 import { Invite, Plan, Team } from "../types/types";
 import { getSearchParams } from "../url";
 import { hasValue } from "../utils";
@@ -64,7 +64,7 @@ export const withTeam =
 
         const teamsCollection = client
           .db(databaseName)
-          .collection<TeamSchema>("teams");
+          .collection<TeamDbSchema>("teams");
         const teamsMembers = client
           .db(databaseName)
           .collection<TeamMemberSchema>("teamUsers");
@@ -77,7 +77,7 @@ export const withTeam =
               },
             },
           ])
-          .toArray()) as TeamSchema[];
+          .toArray()) as TeamDbSchema[];
 
         if (!hasValue(teamInDb)) {
           throw new OrgniseApiError({
@@ -144,7 +144,7 @@ export const withTeam =
               },
             },
           ])
-          .toArray()) as TeamSchema[];
+          .toArray()) as TeamDbSchema[];
 
         const team = teamList[0] as unknown as Team;
         if (!team) {

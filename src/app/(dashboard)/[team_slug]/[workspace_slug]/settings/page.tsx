@@ -2,6 +2,7 @@
 import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
 import { P } from "@/components/atom/typography";
+import TeamPermissionView from "@/components/molecule/team-permisson-view";
 import NotFoundView from "@/components/team/team-not-found";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +21,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useToast } from "@/components/ui/use-toast";
+import { checkWorkspacePermissions } from "@/lib/constants/workspace-role";
 import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-wrorkspaces";
 import { useContext, useState } from "react";
@@ -57,6 +59,8 @@ export default function WorkspaceSettingsPage() {
 
 function WorkspaceName() {
   const { toast } = useToast();
+  const { team: activeTeam } = useTeam();
+
   const {
     workspacesData: { activeWorkspace, error, loading },
   } = useContext(TeamContext);
@@ -89,17 +93,21 @@ function WorkspaceName() {
         })
       }
       buttonText="Save changes"
-      // disabledTooltip={
-      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
-      //     ? undefined
-      //     : "Only the team owner can update the team name"
-      // }
+      disabledTooltip={
+        checkWorkspacePermissions(
+          activeWorkspace?.role,
+          "UPDATE_WORKSPACE_INFO",
+        ) && activeTeam?.role !== "guest"
+          ? undefined
+          : "Only the workspace editor can update the workspace name"
+      }
     />
   );
 }
 
 function WorkspaceSlug() {
   const { toast } = useToast();
+  const { team: activeTeam } = useTeam();
   const {
     workspacesData: { activeWorkspace, error, loading },
   } = useContext(TeamContext);
@@ -130,17 +138,21 @@ function WorkspaceSlug() {
         })
       }
       buttonText="Save changes"
-      // disabledTooltip={
-      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
-      //     ? undefined
-      //     : "Only the team owner can update the team description"
-      // }
+      disabledTooltip={
+        checkWorkspacePermissions(
+          activeWorkspace?.role,
+          "UPDATE_WORKSPACE_INFO",
+        ) && activeTeam?.role !== "guest"
+          ? undefined
+          : "Only the workspace editor can update the workspace slug"
+      }
     />
   );
 }
 
 function WorkspaceVisibility() {
   const { toast } = useToast();
+  const { team: activeTeam } = useTeam();
 
   const {
     workspacesData: { activeWorkspace, error, loading },
@@ -174,17 +186,21 @@ function WorkspaceVisibility() {
         })
       }
       buttonText="Save changes"
-      // disabledTooltip={
-      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
-      //     ? undefined
-      //     : "Only the team owner can update the team description"
-      // }
+      disabledTooltip={
+        checkWorkspacePermissions(
+          activeWorkspace?.role,
+          "UPDATE_WORKSPACE_INFO",
+        ) && activeTeam?.role !== "guest"
+          ? undefined
+          : "Only the workspace editor can update the workspace visibility"
+      }
     />
   );
 }
 
 function WorkspaceDefaultAccess() {
   const { toast } = useToast();
+  const { team: activeTeam } = useTeam();
 
   const {
     workspacesData: { activeWorkspace, error, loading },
@@ -243,17 +259,21 @@ function WorkspaceDefaultAccess() {
         })
       }
       buttonText="Save changes"
-      // disabledTooltip={
-      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
-      //     ? undefined
-      //     : "Only the team owner can update the team description"
-      // }
+      disabledTooltip={
+        checkWorkspacePermissions(
+          activeWorkspace?.role,
+          "UPDATE_WORKSPACE_INFO",
+        ) && activeTeam?.role !== "guest"
+          ? undefined
+          : "Only the workspace editor can update the workspace default access"
+      }
     />
   );
 }
 
 function WorkspaceDescription() {
   const { toast } = useToast();
+  const { team: activeTeam } = useTeam();
 
   const {
     workspacesData: { activeWorkspace, error, loading },
@@ -285,36 +305,60 @@ function WorkspaceDescription() {
         })
       }
       buttonText="Save changes"
-      // disabledTooltip={
-      //   checkPermissions(team.role, "UPDATE_TEAM_INFO")
-      //     ? undefined
-      //     : "Only the team owner can update the team description"
-      // }
+      disabledTooltip={
+        checkWorkspacePermissions(
+          activeWorkspace?.role,
+          "UPDATE_WORKSPACE_INFO",
+        ) && activeTeam?.role !== "guest"
+          ? undefined
+          : "Only the workspace editor can update the workspace description"
+      }
     />
   );
 }
-
 function DeleteWorkspace() {
   return (
-    <div className="rounded-lg border border-destructive bg-card">
-      <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
-        <div className="flex flex-col space-y-3">
-          <h2 className="text-xl font-medium">Delete workspace</h2>
-          <P className="text-muted-foreground">
-            Permanently delete your workspace, and all associated collections +
-            their items. This action cannot be undone - please proceed with
-            caution.
-          </P>
+    <TeamPermissionView
+      permission={"DELETE_WORKSPACE"}
+      unAuthorized={
+        <div className="rounded-lg  border border-info bg-card dark:border-border">
+          <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+            <div className="flex flex-col space-y-3">
+              <h2 className="text-xl font-medium">Delete Workspace</h2>
+              <P className="text-muted-foreground">
+                Not authorized to delete this workspace
+              </P>
+            </div>
+          </div>
+          <div className="flex items-center  space-x-4 rounded-b-lg border-t border-info bg-info p-3 sm:px-10">
+            <p className="text-sm text-info-foreground">
+              You do not have permission to delete this workspace. Only the team
+              owner can delete the workspace.
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <div className="rounded-lg border border-destructive bg-card">
+        <div className="relative flex flex-col space-y-6 p-5 sm:p-10">
+          <div className="flex flex-col space-y-3">
+            <h2 className="text-xl font-medium">Delete workspace</h2>
+            <P className="text-muted-foreground">
+              Permanently delete your workspace, and all associated collections
+              + their items. This action cannot be undone - please proceed with
+              caution.
+            </P>
+          </div>
+        </div>
+        <div className="flex items-center justify-end space-x-4 rounded-b-lg border-t border-destructive bg-accent/20 p-3 sm:px-10">
+          <DeleteWorkspaceModel>
+            <Button variant={"destructive"} type="button">
+              <p>Delete workspace</p>
+            </Button>
+          </DeleteWorkspaceModel>
         </div>
       </div>
-      <div className="flex items-center justify-end space-x-4 rounded-b-lg border-t border-destructive bg-accent/20 p-3 sm:px-10">
-        <DeleteWorkspaceModel>
-          <Button variant={"destructive"} type="button">
-            <p>Delete workspace</p>
-          </Button>
-        </DeleteWorkspaceModel>
-      </div>
-    </div>
+    </TeamPermissionView>
   );
 }
 
