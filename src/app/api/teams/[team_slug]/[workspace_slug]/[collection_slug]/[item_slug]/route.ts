@@ -1,6 +1,6 @@
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -88,7 +88,7 @@ export const DELETE = withTeam(async ({ req, params, team }) => {
     const workspace = (await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as WorkspaceSchema;
+    })) as unknown as WorkspaceDbSchema;
     if (!workspace) {
       return NextResponse.json(
         {

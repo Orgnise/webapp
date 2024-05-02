@@ -1,11 +1,9 @@
-import { TeamRole } from "@/lib/constants/team-role";
 import { MetaSchema } from "./team.schema";
-
 import { ObjectId } from "mongodb";
-import { AccessLevel } from "../types/types";
 import { WorkspaceRole } from "../constants/workspace-role";
+import { AccessLevel, Visibility } from "../types";
 
-export interface WorkspaceSchema {
+export interface WorkspaceDbSchema {
   _id: string;
   team: ObjectId;
   name: string;
@@ -18,11 +16,6 @@ export interface WorkspaceSchema {
   updatedBy?: ObjectId;
   defaultAccess: AccessLevel
 }
-
-export const visibilities = ['private', 'public', 'archived', 'deleted'] as const;
-
-export type Visibility = (typeof visibilities)[number];
-
 
 
 export interface WorkspaceMemberDBSchema {

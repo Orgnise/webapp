@@ -4,7 +4,7 @@
 import { ObjectId } from "mongodb";
 import { MetaSchema } from "./team.schema";
 
-export interface CollectionSchema {
+export interface CollectionDbSchema {
   _id: string;
   object: "item" | "collection";
   workspace: ObjectId;

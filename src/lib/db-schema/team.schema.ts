@@ -25,10 +25,11 @@ export interface MetaSchema {
   slug: string;
 }
 
-export interface TeamMemberSchema {
+export interface TeamMemberDbSchema {
   _id?: string;
   role: TeamRole;
   user: ObjectId;
+  // ToDo: Rename this to team
   teamId: ObjectId;
   createdAt: Date;
   updatedAt: Date;

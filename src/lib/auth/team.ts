@@ -3,7 +3,7 @@ import mongodb, { databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "../api/errors";
-import { TeamMemberSchema, TeamDbSchema } from "../schema/team.schema";
+import { TeamMemberDbSchema, TeamDbSchema } from "../db-schema/team.schema";
 import { Invite, Plan, Team } from "../types/types";
 import { getSearchParams } from "../url";
 import { hasValue } from "../utils";
@@ -67,7 +67,7 @@ export const withTeam =
           .collection<TeamDbSchema>("teams");
         const teamsMembers = client
           .db(databaseName)
-          .collection<TeamMemberSchema>("teamUsers");
+          .collection<TeamMemberDbSchema>("teamUsers");
 
         const teamInDb = (await teamsCollection
           .aggregate([

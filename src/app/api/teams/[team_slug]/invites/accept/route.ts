@@ -4,7 +4,7 @@ import {
 } from "@/lib/api/errors";
 import { withSession } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceMemberDBSchema, WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceMemberDBSchema, WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { Invite, Team } from "@/lib/types/types";
 import { InsertManyResult, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
@@ -60,7 +60,7 @@ export const POST = withSession(async ({ session, params }) => {
     let workspaceAddResult: Number = 0;
     // Add the user to all public workspace if the user ir not guest
     if (invite.role !== "guest") {
-      const workspaceCollection = client.db(databaseName).collection<WorkspaceSchema>("workspaces");
+      const workspaceCollection = client.db(databaseName).collection<WorkspaceDbSchema>("workspaces");
       const workspaces = await workspaceCollection.find({ team: new ObjectId(team._id), visibility: 'public' }).toArray();
       if (workspaces.length) {
         const workspaceUserColl = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");

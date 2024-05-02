@@ -3,7 +3,7 @@ import { databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "../api/errors";
 import { WorkspaceRole } from "../constants/workspace-role";
-import { WorkspaceMemberDBSchema, WorkspaceSchema } from "../schema/workspace.schema";
+import { WorkspaceMemberDBSchema, WorkspaceDbSchema } from "../db-schema/workspace.schema";
 import { Plan, Team } from "../types/types";
 import { Session, withTeam } from "./";
 
@@ -27,7 +27,7 @@ interface WithWorkspaceHandler {
     session: Session;
     team: Team;
     client: MongoClient;
-    workspace: WorkspaceSchema;
+    workspace: WorkspaceDbSchema;
   }): Promise<Response>;
 }
 
@@ -79,7 +79,7 @@ export const withWorkspace = (
 
     const workspaceColl = client
       .db(databaseName)
-      .collection<WorkspaceSchema>("workspaces");
+      .collection<WorkspaceDbSchema>("workspaces");
 
     const workspace = await workspaceColl.findOne({
       team: new ObjectId(team._id),

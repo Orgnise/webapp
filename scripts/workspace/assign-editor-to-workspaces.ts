@@ -1,5 +1,5 @@
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceMemberDBSchema, WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceMemberDBSchema, WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import "dotenv-flow/config";
 import { ObjectId } from "mongodb";
 
@@ -10,13 +10,13 @@ import { ObjectId } from "mongodb";
 // Script to assign default editor to workspaces
 async function main() {
   const client = await mongodb;
-  const workspaceCollection = client.db(databaseName).collection<WorkspaceSchema>("workspaces");
+  const workspaceCollection = client.db(databaseName).collection<WorkspaceDbSchema>("workspaces");
   const workspaceUserColl = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
 
   console.log("\n-------------------- workspaces --------------------\n");
 
   // @ts-ignore
-  const workspaces = await workspaceCollection.find().toArray() as WorkspaceSchema[];
+  const workspaces = await workspaceCollection.find().toArray() as WorkspaceDbSchema[];
 
   console.log(`Total ${workspaces.length} workspaces available\n`);
 

@@ -1,7 +1,7 @@
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { CollectionSchema } from "@/lib/schema/collection.schema";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { CollectionDbSchema } from "@/lib/db-schema/collection.schema";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { createTreeFromCollection } from "@/lib/utility/collection-tree-structure";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -14,15 +14,15 @@ export const GET = withTeam(async ({ team, params }) => {
     const { workspace_slug, team_slug } = params ?? {};
     const collections = client
       .db(databaseName)
-      .collection<CollectionSchema>("collections");
+      .collection<CollectionDbSchema>("collections");
 
     const workspaces = client
       .db(databaseName)
-      .collection<WorkspaceSchema>("workspaces");
+      .collection<WorkspaceDbSchema>("workspaces");
     const workspaceDate = (await workspaces.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as WorkspaceSchema;
+    })) as unknown as WorkspaceDbSchema;
 
     if (!workspaceDate) {
       return NextResponse.json(
@@ -78,7 +78,7 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
     }
     const workspaceDb = client
       .db(databaseName)
-      .collection<CollectionSchema>("workspaces");
+      .collection<CollectionDbSchema>("workspaces");
     const workspace = await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
@@ -98,7 +98,7 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
 
     const collectionsDb = client
       .db(databaseName)
-      .collection<CollectionSchema>("collections");
+      .collection<CollectionDbSchema>("collections");
     const slug = await generateSlug({
       title: collectionToCreate?.name ?? "collection ",
       didExist: async (val: string) => {
@@ -135,7 +135,7 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: new ObjectId(session.user.id),
-    } as CollectionSchema;
+    } as CollectionDbSchema;
 
     const dbResult = await collectionsDb.insertOne(collection);
     return NextResponse.json({

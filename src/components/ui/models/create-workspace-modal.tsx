@@ -15,8 +15,8 @@ import { Switch } from "../switch";
 
 import { Logo } from "@/components/atom/logo";
 import { fromZodError } from "@/lib/api/errors";
-import { Visibility } from "@/lib/schema/workspace.schema";
 import useTeam from "@/lib/swr/use-team";
+import { Visibility } from "@/lib/types";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import Image from "next/image";
 import {

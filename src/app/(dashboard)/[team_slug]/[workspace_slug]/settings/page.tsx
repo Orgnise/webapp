@@ -23,7 +23,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { checkWorkspacePermissions } from "@/lib/constants/workspace-role";
 import useTeam from "@/lib/swr/use-team";
-import useWorkspaces from "@/lib/swr/use-wrorkspaces";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import { useContext, useState } from "react";
 import { mutate } from "swr";
 import { TeamContext } from "../../providers";

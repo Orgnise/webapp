@@ -1,6 +1,6 @@
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { TeamDbSchema } from "@/lib/schema";
-import { WorkspaceMemberDBSchema, WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { TeamDbSchema } from "@/lib/db-schema";
+import { WorkspaceMemberDBSchema, WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import "dotenv-flow/config";
 import { ObjectId } from "mongodb";
 
@@ -12,7 +12,7 @@ import { ObjectId } from "mongodb";
 async function main() {
   const client = await mongodb;
   const teamCollection = client.db(databaseName).collection<TeamDbSchema>("teams");
-  const workspaceCollection = client.db(databaseName).collection<WorkspaceSchema>("workspaces");
+  const workspaceCollection = client.db(databaseName).collection<WorkspaceDbSchema>("workspaces");
   const workspaceUserColl = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
 
   console.log("\n-------------------- teams --------------------\n");

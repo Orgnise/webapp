@@ -2,8 +2,8 @@ import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withTeam } from "@/lib/auth";
 import { roles } from "@/lib/constants/team-role";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberSchema } from "@/lib/schema";
-import { WorkspaceMemberDBSchema } from "@/lib/schema/workspace.schema";
+import { TeamMemberDbSchema } from "@/lib/db-schema";
+import { WorkspaceMemberDBSchema } from "@/lib/db-schema/workspace.schema";
 import { TeamMemberProps } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import { removeUserFromTeamSchema, updateUserInTeamRoleSchema } from "@/lib/zod/schemas";
@@ -94,7 +94,7 @@ export const DELETE = withTeam(
       return new Response("User Id is required", { status: 400 });
     }
     const client = await mongoDb;
-    const teamUserCollection = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
+    const teamUserCollection = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
     const workspaceUSerCollection = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
     const query = {
       user: new ObjectId(userId),

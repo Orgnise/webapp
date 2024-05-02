@@ -1,8 +1,8 @@
 import { Logo } from "@/components/atom/logo";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getSession } from "@/lib/auth";
+import { TeamMemberDbSchema } from "@/lib/db-schema/team.schema";
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberSchema } from "@/lib/schema/team.schema";
 import { Team } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -105,12 +105,12 @@ async function VerifyInvite({ code }: { code: string }) {
 
   const teamUserCollection = client
     .db(databaseName)
-    .collection<TeamMemberSchema>("teamUsers");
+    .collection<TeamMemberDbSchema>("teamUsers");
 
   const member = (await teamUserCollection.findOne({
     teamId: new ObjectId(team._id),
     user: new ObjectId(session.user.id),
-  })) as unknown as TeamMemberSchema;
+  })) as unknown as TeamMemberDbSchema;
 
   // check if user is already in the team
   if (member) {

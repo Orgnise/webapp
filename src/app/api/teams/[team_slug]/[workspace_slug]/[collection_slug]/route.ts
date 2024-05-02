@@ -1,7 +1,7 @@
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { CollectionSchema } from "@/lib/schema/collection.schema";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { CollectionDbSchema } from "@/lib/db-schema/collection.schema";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { Collection } from "@/lib/types/types";
 import { generateSlug, hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -28,7 +28,7 @@ export const PATCH = withTeam(async ({ req, session }) => {
     const query = { _id: new ObjectId(collection._id), object: "collection" };
     const collectionInDb = (await collectionsDb.findOne(
       query,
-    )) as unknown as CollectionSchema;
+    )) as unknown as CollectionDbSchema;
 
     if (!collectionInDb) {
       return NextResponse.json(
@@ -124,7 +124,7 @@ export const DELETE = withTeam(async ({ params, team }) => {
     const workspace = (await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as WorkspaceSchema;
+    })) as unknown as WorkspaceDbSchema;
     if (!workspace) {
       return NextResponse.json(
         {

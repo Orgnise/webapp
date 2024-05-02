@@ -4,7 +4,7 @@ import { APP_DOMAIN } from "@/lib/constants/constants";
 import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
 import { log } from "@/lib/functions/log";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberSchema, TeamDbSchema } from "@/lib/schema/team.schema";
+import { TeamMemberDbSchema, TeamDbSchema } from "@/lib/db-schema/team.schema";
 import { Team } from "@/lib/types/types";
 import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -28,7 +28,7 @@ export const GET = withSession(async ({ session }) => {
     // const teams = client.db(databaseName).collection<TeamSchema>("teams");
     const teamsMembers = client
       .db(databaseName)
-      .collection<TeamMemberSchema>("teamUsers");
+      .collection<TeamMemberDbSchema>("teamUsers");
 
     const teamList = (await teamsMembers
       .aggregate([
@@ -179,7 +179,7 @@ export const POST = withSession(async ({ req, session }) => {
     const teams = client.db(databaseName).collection<TeamDbSchema>("teams");
     const teamUsersDb = client
       .db(databaseName)
-      .collection<TeamMemberSchema>("teamUsers");
+      .collection<TeamMemberDbSchema>("teamUsers");
 
     const freeTeams = await teams
       .find({

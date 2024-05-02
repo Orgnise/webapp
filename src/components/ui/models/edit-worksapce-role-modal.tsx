@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
 import { WorkspaceRole } from "@/lib/constants/workspace-role";
 import useTeam from "@/lib/swr/use-team";
-import useWorkspaces from "@/lib/swr/use-wrorkspaces";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import { WorkspaceMemberProps } from "@/lib/types/types";
 import { useParams } from "next/navigation";
 import {

@@ -1,5 +1,5 @@
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import "dotenv-flow/config";
 
 
@@ -7,7 +7,7 @@ import "dotenv-flow/config";
 // npx tsx ./scripts/workspace/add-default-values.ts
 async function main() {
   const client = await mongodb;
-  const workspaceCollection = client.db(databaseName).collection<WorkspaceSchema>("workspaces");
+  const workspaceCollection = client.db(databaseName).collection<WorkspaceDbSchema>("workspaces");
 
   console.log("\n-------------------- workspaces --------------------\n");
 

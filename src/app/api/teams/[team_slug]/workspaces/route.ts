@@ -1,8 +1,8 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberSchema } from "@/lib/schema";
-import { WorkspaceMemberDBSchema, WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { TeamMemberDbSchema } from "@/lib/db-schema";
+import { WorkspaceMemberDBSchema, WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { generateSlug } from "@/lib/utils";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
@@ -14,7 +14,7 @@ export const GET = withTeam(async ({ team, session }) => {
   try {
     const workspaceUsersCol = client
       .db(databaseName)
-      .collection<WorkspaceSchema>("workspace_users");
+      .collection<WorkspaceDbSchema>("workspace_users");
 
     const list = await workspaceUsersCol.aggregate([
       {
@@ -79,7 +79,7 @@ export const POST = withTeam(
       const userId = session?.user?.id;
       const workspaces = client
         .db(databaseName)
-        .collection<WorkspaceSchema>("workspaces");
+        .collection<WorkspaceDbSchema>("workspaces");
       const slug = await generateSlug({
         title: name,
         didExist: async (val: string) => {
@@ -102,7 +102,7 @@ export const POST = withTeam(
         updatedAt: new Date(),
         createdBy: new ObjectId(userId),
         createdAt: new Date(),
-      } as WorkspaceSchema;
+      } as WorkspaceDbSchema;
 
       const dbResult = await workspaces.insertOne(workspace);
 
@@ -114,7 +114,7 @@ export const POST = withTeam(
       const workspaceUserCollection = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
       if (visibility === "public") {
         // Fetch all the members of the team
-        const teamsUsersColl = client.db(databaseName).collection<TeamMemberSchema>("teamUsers");
+        const teamsUsersColl = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
         const teamMembers = await teamsUsersColl.find({ teamId: new ObjectId(team._id) }).toArray();
         // console.log(`Found ${teamMembers.length} members in the team ${team._id}`)
         if (teamMembers.length > 0) {

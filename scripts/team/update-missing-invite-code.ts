@@ -1,5 +1,5 @@
 import mongodb, { databaseName } from "@/lib/mongodb";
-import { TeamDbSchema } from "@/lib/schema/team.schema";
+import { TeamDbSchema } from "@/lib/db-schema/team.schema";
 import { randomId } from "@/lib/utils";
 import "dotenv-flow/config";
 

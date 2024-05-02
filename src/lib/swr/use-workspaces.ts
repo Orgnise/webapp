@@ -4,9 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import useSWR, { KeyedMutator } from "swr";
 
 import { fetcher } from "../fetcher";
-import { AccessLevel, Workspace } from "../types/types";
+import { AccessLevel, Visibility, Workspace, } from "@/lib/types";
 import { displayToast } from "./use-collections";
-import { Visibility } from "../schema/workspace.schema";
 
 type UpdateWorkspace = {
   name?: string;

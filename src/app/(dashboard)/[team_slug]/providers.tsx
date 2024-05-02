@@ -7,7 +7,7 @@ import { ReactNode, createContext } from "react";
 import { toast } from "sonner";
 
 import { fetcher } from "@/lib/fetcher";
-import useWorkspaces from "@/lib/swr/use-wrorkspaces";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import z from "@/lib/zod";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { useParams, useRouter } from "next/navigation";
@@ -15,7 +15,6 @@ import { useParams, useRouter } from "next/navigation";
 export default function Providers({ children }: { children: ReactNode }) {
   return <TeamProvider>{children}</TeamProvider>;
 }
-
 
 interface TeamProviderProps {
   workspacesData: {

@@ -1,5 +1,4 @@
 import { TeamRole } from "@/lib/constants/team-role";
-import { Visibility } from "../schema/workspace.schema";
 import { WorkspaceRole } from "../constants/workspace-role";
 
 export interface Team {
@@ -82,6 +81,11 @@ export interface Workspace {
 export const accessLevels = ["full", "read-only"] as const;
 
 export type AccessLevel = (typeof accessLevels)[number];
+
+
+export const visibilities = ['private', 'public', 'archived', 'deleted'] as const;
+
+export type Visibility = (typeof visibilities)[number];
 
 
 export interface User {

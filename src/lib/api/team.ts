@@ -1,6 +1,6 @@
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
-import { TeamMemberSchema, TeamDbSchema } from "../schema/team.schema";
+import { TeamMemberDbSchema, TeamDbSchema } from "../db-schema/team.schema";
 import { hasValue } from "../utils";
 import { Team } from "../types/types";
 
@@ -8,7 +8,7 @@ export async function fetchDecoratedTeam(teamId: string, userId: string) {
   const client = await mongoDb;
   const teamsMembers = client
     .db(databaseName)
-    .collection<TeamMemberSchema>("teamUsers");
+    .collection<TeamMemberDbSchema>("teamUsers");
   const teamList = (await teamsMembers
     .aggregate([
       {
@@ -80,6 +80,6 @@ export async function fetchDecoratedTeam(teamId: string, userId: string) {
 export async function removeAllTeamMembers(client: MongoClient, teamId: string) {
   const teamMembersCol = client
     .db(databaseName)
-    .collection<TeamMemberSchema>("teamUsers");
+    .collection<TeamMemberDbSchema>("teamUsers");
   return await teamMembersCol.deleteMany({ teamId: new ObjectId(teamId) });
 }

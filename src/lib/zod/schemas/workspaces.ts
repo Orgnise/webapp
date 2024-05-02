@@ -1,7 +1,6 @@
 import { workspaceRole } from "@/lib/constants/workspace-role";
 import { trim } from "@/lib/functions/trim";
-import { Visibility } from "@/lib/schema/workspace.schema";
-import { accessLevels } from "@/lib/types/types";
+import { Visibility, accessLevels } from "@/lib/types";
 import { validSlugRegex } from "@/lib/utils";
 import z from "@/lib/zod";
 import slugify from "@sindresorhus/slugify";

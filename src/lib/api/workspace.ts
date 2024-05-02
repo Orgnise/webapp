@@ -1,6 +1,6 @@
 import { databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
-import { WorkspaceMemberDBSchema } from "../schema/workspace.schema";
+import { WorkspaceMemberDBSchema } from "../db-schema/workspace.schema";
 
 /**
  * Remove all workspace members. Operation to be performed when a team is deleted

@@ -2,7 +2,7 @@ import { removeAllTeamCollections, removeAllTeamWorkspaceMembers, removeAllWorks
 import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withTeam, withWorkspace } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { hasValue } from "@/lib/utils";
 import { updateWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
@@ -22,7 +22,7 @@ export const PUT = withTeam(async ({ req, session, team, params }) => {
     };
     const workspaceInDb = (await workspaceDb.findOne(
       query,
-    )) as unknown as WorkspaceSchema;
+    )) as unknown as WorkspaceDbSchema;
 
     if (!workspaceInDb) {
       throw OrgniseApiError.NOT_FOUND("Workspace not found in database");
@@ -80,7 +80,7 @@ export const DELETE = withWorkspace(async ({ params, team, workspace }) => {
     const query = { "meta.slug": workspace_slug };
     const workspaceInDb = (await workspaceDb.findOne(
       query,
-    )) as unknown as WorkspaceSchema;
+    )) as unknown as WorkspaceDbSchema;
 
     if (!workspaceInDb) {
       throw OrgniseApiError.NOT_FOUND("Workspace not found in database");
