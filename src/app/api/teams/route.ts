@@ -77,6 +77,13 @@ export const GET = withSession(async ({ session }) => {
             membersLimit: "$team.membersLimit",
             workspaceLimit: "$team.workspaceLimit",
             logo: "$team.logo",
+            joinedAt: "$createdAt",
+          },
+        },
+        {
+          $sort:
+          {
+            joinedAt: -1,
           },
         },
         // Remove team object from root object

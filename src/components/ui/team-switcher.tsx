@@ -18,7 +18,6 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import { Badge } from "./badge";
-import { Button } from "./button";
 
 export function TeamSwitcher() {
   const { error, loading: teamsLoading, teams } = useTeams();
@@ -64,29 +63,34 @@ export function TeamSwitcher() {
   }
 
   return (
-    <div className="ml-4 flex items-center gap-2 bg-background">
-      <div className=" h-6 w-[2px] rotate-[30deg] bg-gray-200" />
+    <div className="flex items-center gap-2 bg-background">
+      <div className=" mr-4 hidden h-6 w-[2px] rotate-[30deg] bg-gray-200 sm:flex" />
 
+      <Link
+        href={`/${selected?.slug}`}
+        className="flex cursor-pointer items-center gap-1.5"
+      >
+        {selected && (
+          <Image
+            unoptimized={true}
+            height={32}
+            width={32}
+            src={selected.image}
+            alt="user"
+            className="h-8 w-8 rounded-full"
+            onError={(e) =>
+              ((e.target as any).src = DICEBEAR_AVATAR_URL + selected?.name)
+            }
+          />
+        )}
+        {selected.name}
+        {selected.slug !== "/" && <Badge>{selected.plan}</Badge>}
+      </Link>
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-2 focus-visible:outline-none">
-          <Button variant={"ghost"} className="flex items-center gap-2">
-            {selected && (
-              <Image
-                unoptimized={true}
-                height={32}
-                width={32}
-                src={selected.image}
-                alt="user"
-                className="h-8 w-8 rounded-full"
-                onError={(e) =>
-                  ((e.target as any).src = DICEBEAR_AVATAR_URL + selected?.name)
-                }
-              />
-            )}
-            {selected.name}
-            {selected.slug !== "/" && <Badge>{selected.plan}</Badge>}
+          <div className="flex items-center gap-2 rounded px-2 py-1 hover:bg-accent">
             <ChevronsUpDown size={18} />
-          </Button>
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="border-border">
           <DropdownMenuLabel>
@@ -148,10 +152,11 @@ function TeamRow({ team, selectedSlug }: { team: Team; selectedSlug: string }) {
         <DropdownMenuItem className="w-full cursor-pointer ">
           <span className="flex max-w-[220px] items-center gap-2 truncate text-sm">
             <Image
+              id={`team_${team?._id}`}
               unoptimized={true}
               height={32}
               width={32}
-              src={team?.logo}
+              src={team?.logo ?? DICEBEAR_AVATAR_URL + team.name}
               alt="user"
               className="h-6 w-6 rounded-full"
               onError={(e) => {

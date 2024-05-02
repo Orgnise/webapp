@@ -203,7 +203,12 @@ export const NextAuthOptions = {
         token.userId = account.providerAccountId;
       }
       if (user) {
-        token.user = user;
+        token.user = {
+          name: user.name,
+          email: user.email,
+          image: user.image,
+          id: user.id,
+        };
       }
       // refresh the user's data if they update their name / email
       if (trigger === "update") {
@@ -239,7 +244,6 @@ export const NextAuthOptions = {
       return true;
     },
     async session({ session, token, user }) {
-      // console.log("session begin", { session, token, user })
       session.user = {
         id: token.sub,
         // @ts-ignore

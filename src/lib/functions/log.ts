@@ -1,6 +1,7 @@
 const logTypeToEnv = {
   alerts: process.env.ORGNISE_SLACK_HOOK_ALERTS,
   newTeam: process.env.ORGNISE_SLACK_HOOK_NEW_TEAM,
+  waitlist: process.env.ORGNISE_SLACK_HOOK_NEW_TEAM,
   errors: process.env.ORGNISE_SLACK_HOOK_ERRORS,
 };
 
@@ -10,7 +11,7 @@ export const log = async ({
   mention = false,
 }: {
   message: string;
-  type: "alerts" | 'newTeam' | "errors";
+  type: "alerts" | 'newTeam' | "errors" | "waitlist";
   mention?: boolean;
 }) => {
   if (

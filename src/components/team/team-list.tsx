@@ -63,7 +63,7 @@ export default function TeamsList() {
 
 function TeamCard({ team, index }: any) {
   if (!team || !team.meta) {
-    console.error("TeamCard team or team.meta is missing", team?.id);
+    console.warn("TeamCard team or team.meta is missing", team?.id);
     return null;
   }
   return (
@@ -77,7 +77,7 @@ function TeamCard({ team, index }: any) {
           unoptimized={true}
           height={40}
           width={40}
-          src={team.logo ?? ""}
+          src={team.logo ?? DICEBEAR_AVATAR_URL + team.name}
           alt="logo"
           className="mr-2 mt-1 h-10 max-h-10 w-10 rounded-full"
           onError={(e) => {

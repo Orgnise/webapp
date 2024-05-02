@@ -23,8 +23,11 @@ const Nav = ({}) => {
 
   return (
     <div className="flex h-16 w-full place-content-between items-center">
-      <div className="flex items-center gap-2">
-        <Link href="/" className="Logo flex items-center gap-2">
+      <div className="flex items-center sm:gap-2">
+        <Link
+          href="/"
+          className="Logo hidden items-center gap-2 sm:mr-4 sm:flex "
+        >
           <Logo className="h-8" />
         </Link>
         {user && <TeamSwitcher />}
