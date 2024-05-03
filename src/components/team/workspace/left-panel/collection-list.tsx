@@ -110,7 +110,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
         </Link>
         <div className="invisible absolute  -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background">
           <div className="flex h-full items-center gap-2 px-1">
-            <ToolTipWrapper content={<span>Create Item</span>}>
+            <ToolTipWrapper content={<span>Create Page</span>}>
               <button
                 onClick={() => {
                   handleCreateItem("item");

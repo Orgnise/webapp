@@ -63,7 +63,7 @@ export default function CollectionContentPageClient() {
               size={"sm"}
             >
               <CreateItemCTA activeCollection={activeCollection!}>
-                &nbsp; Create Item
+                &nbsp; Create Page
               </CreateItemCTA>
             </Button>
           )}
@@ -106,7 +106,7 @@ function NoItemsView({ activeCollection }: { activeCollection?: Collection }) {
           size={"sm"}
         >
           <CreateItemCTA activeCollection={activeCollection!}>
-            &nbsp; Create Item
+            &nbsp; Create Page
           </CreateItemCTA>
         </Button>
       </div>

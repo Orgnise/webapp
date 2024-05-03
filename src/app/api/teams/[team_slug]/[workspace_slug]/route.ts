@@ -109,4 +109,7 @@ export const DELETE = withWorkspace(async ({ params, team, workspace }) => {
   } catch (error: any) {
     return handleAndReturnErrorResponse(error);
   }
-});
+},
+  {
+    requiredTeamRole: ['owner', 'moderator'],
+  });

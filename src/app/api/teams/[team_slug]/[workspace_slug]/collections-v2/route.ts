@@ -147,7 +147,7 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
       message:
         collection.object === "collection"
           ? "Collection has been created successfully"
-          : "Item has been created successfully",
+          : "Page has been created successfully",
     });
   } catch (err: any) {
     return NextResponse.json(

@@ -39,7 +39,7 @@ export default function ItemContent({
             // createCollection();
           }}
         >
-          Create Item
+          Create Page
         </Button>
       </div>
     );

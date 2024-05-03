@@ -15,7 +15,7 @@ export function CreateItemCTA({ activeCollection, children }: CreateItemProps) {
   const param = useParams();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  // Create a new Collection/Item
+  // Create a new Collection/Page
   async function handleCreateCollection() {
     const item = {
       object: "item",

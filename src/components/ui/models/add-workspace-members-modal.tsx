@@ -25,7 +25,7 @@ import {
 import { WorkspaceRole } from "@/lib/constants/workspace-role";
 import { TeamMemberProps } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
-import { XIcon } from "lucide-react";
+import { MinusCircleIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -172,7 +172,7 @@ function AddWorkspaceMembersModal({
                                 </p>
                               </div>
                             </div>
-                            <div className="flex flex-row space-x-4">
+                            <div className="flex flex-row items-center space-x-1">
                               <SelectAccessLevel
                                 defaultRole={selected.role}
                                 onValueChange={(val: WorkspaceRole) => {
@@ -187,21 +187,24 @@ function AddWorkspaceMembersModal({
                                 }}
                               />
                               <button
+                                className="group flex h-8 w-8 place-content-center items-center rounded-full text-center "
                                 onClick={() => {
-                                  setSelectedUsers(
-                                    selectedUsers.filter(
-                                      (selected) =>
-                                        selected.user.email !==
-                                        selected.user.email,
-                                    ),
-                                  );
-                                  setUnJoinedMembers([
+                                  const unSelected = [
                                     ...unJoinedMembers,
                                     { ...selected.user },
-                                  ]);
+                                  ];
+
+                                  const selectedList = selectedUsers.filter(
+                                    (s) => s.user.email !== selected.user.email,
+                                  );
+                                  setSelectedUsers(selectedList);
+                                  setUnJoinedMembers(unSelected);
                                 }}
                               >
-                                <XIcon className="text-destructive" />
+                                <MinusCircleIcon
+                                  className=" rounded-full bg-destructive text-destructive-foreground transition-transform duration-150 ease-in-out group-hover:scale-95"
+                                  size={20}
+                                />
                               </button>
                             </div>
                           </div>
@@ -249,7 +252,9 @@ function SelectAccessLevel({
   return (
     <Select defaultValue={defaultRole} onValueChange={onValueChange}>
       <SelectTrigger className="w-[140px] gap-1  px-2 ">
-        <SelectValue placeholder={"Editor"} />
+        <SelectValue
+          placeholder={defaultRole === "editor" ? "Editor" : "Reader"}
+        />
       </SelectTrigger>
       <SelectContent className="border-border">
         <SelectItem value={"editor"}>Editor</SelectItem>
@@ -278,7 +283,28 @@ interface SearchUserBox {
 export function SearchUserBox({ users, onUserSelect }: SearchUserBox) {
   if (users.length === 0) {
     return null;
+  } else if (users.length < 5) {
+    return (
+      <div className="flex flex-col gap-2">
+        <h3 className="text-sm text-muted-foreground ">Team members</h3>
+        {users.map((user, index) => (
+          <div
+            key={index}
+            className="flex cursor-pointer items-center space-x-3 rounded-lg px-2 py-2 hover:bg-accent/70"
+            onClick={() => onUserSelect(user)}
+          >
+            <Avatar user={user} />
+            <div className="flex flex-col">
+              <h3 className="text-sm font-medium">{user.name}</h3>
+              <p className="text-xs text-muted-foreground">{user.email}</p>
+            </div>
+          </div>
+        ))}
+        <hr className="mt-3" />
+      </div>
+    );
   }
+
   return (
     <Command className="rounded-lg border border-border">
       <CommandInput placeholder="Search" className="border-border" />

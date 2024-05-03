@@ -16,8 +16,8 @@ interface IWorkspaces {
   loading: boolean;
   collections: Collection[];
   /**
-   * Create a new collection / Item
-   * To create item, pass the parent collection slug
+   * Create a new collection / Page
+   * To create Page, pass the parent collection slug
    */
   createCollection(collection: Collection): Promise<void>;
   updateCollection: (collection: Collection) => void;
@@ -50,7 +50,7 @@ export default function useCollections(): IWorkspaces {
     },
   );
 
-  // Create a new Collection/Item
+  // Create a new Collection/Page
   async function createCollection(collection: Collection) {
     try {
       const response = await fetcher(
@@ -239,8 +239,8 @@ export default function useCollections(): IWorkspaces {
     )
       .then(() => {
         displayToast({
-          title: "Item deleted - 1",
-          description: "Item has been deleted successfully",
+          title: "Page deleted",
+          description: "Page has been deleted successfully",
         });
         const collectionTree = removeFromCollectionTree(
           data?.collections,

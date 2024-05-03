@@ -48,6 +48,25 @@ export const withWorkspace = (
       .db(databaseName)
       .collection<WorkspaceMemberDBSchema>("workspace_users");
 
+
+    const workspaceColl = client
+      .db(databaseName)
+      .collection<WorkspaceDbSchema>("workspaces");
+
+    const workspace = await workspaceColl.findOne({
+      team: new ObjectId(team._id),
+      "meta.slug": params.workspace_slug,
+    });
+
+    if (!workspace) {
+      return handleAndReturnErrorResponse(
+        new OrgniseApiError({
+          code: "not_found",
+          message: "Workspace not found.",
+        }),
+      );
+    }
+
     const workspaceMember = await workspaceUserColl.findOne({
       team: new ObjectId(team._id),
       user: new ObjectId(session.user.id),
@@ -77,23 +96,7 @@ export const withWorkspace = (
       );
     }
 
-    const workspaceColl = client
-      .db(databaseName)
-      .collection<WorkspaceDbSchema>("workspaces");
 
-    const workspace = await workspaceColl.findOne({
-      team: new ObjectId(team._id),
-      "meta.slug": params.workspace_slug,
-    });
-
-    if (!workspace) {
-      return handleAndReturnErrorResponse(
-        new OrgniseApiError({
-          code: "not_found",
-          message: "Workspace not found.",
-        }),
-      );
-    }
 
     return handler({
       req,

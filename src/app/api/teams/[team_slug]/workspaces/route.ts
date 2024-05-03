@@ -120,7 +120,7 @@ export const POST = withTeam(
         if (teamMembers.length > 0) {
 
           // Add all the members if the team to public workspace except guests
-          const workspaceUsers = teamMembers.filter((user) => user.role === 'guest').map((member) => {
+          const workspaceUsers = teamMembers.filter((user) => user.role !== 'guest').map((member) => {
             return {
               role: defaultAccess === "full" ? "editor" : "reader",
               user: new ObjectId(member.user),

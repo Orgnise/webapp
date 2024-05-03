@@ -114,7 +114,7 @@ export const DELETE = withTeam(async ({ req, params, team }) => {
         {
           success: false,
           message: "Operation failed",
-          error: "Item not found in database",
+          error: "Page not found in database",
           query,
         },
         { status: 404 },
@@ -125,7 +125,7 @@ export const DELETE = withTeam(async ({ req, params, team }) => {
     return NextResponse.json(
       {
         success: true,
-        message: "Item deleted",
+        message: "Page deleted",
         deleteResult,
       },
       { status: 200 },

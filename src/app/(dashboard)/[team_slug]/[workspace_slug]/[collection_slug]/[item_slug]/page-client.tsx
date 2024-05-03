@@ -82,7 +82,7 @@ export default function ItemPageClient() {
   if (!hasValue(activeItem)) {
     return (
       <div className="ItemPageClient h-full w-full py-12">
-        <NotFoundView item="Item" />
+        <NotFoundView item="Page" />
       </div>
     );
   }

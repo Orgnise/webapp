@@ -108,7 +108,7 @@ export function CollectionItemCard({
     return <CollectionCard collection={item} />;
   }
   return (
-    <div id={`Item-${index}`} className="group relative mb-1">
+    <div id={`Page-${index}`} className="group relative mb-1">
       <Link
         href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}/${item?.meta?.slug}`}
         className={cx(
