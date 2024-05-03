@@ -1,6 +1,5 @@
 "use client";
 import { HashIcon, LockIcon } from "lucide-react";
-import { useContext } from "react";
 
 import { H3 } from "@/components/atom/typography";
 import TeamPermissionView from "@/components/molecule/team-permisson-view";
@@ -11,18 +10,18 @@ import { ListView } from "@/components/ui/listview";
 import { useCreateWorkspaceModal } from "@/components/ui/models/create-workspace-modal";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
 import useTeam from "@/lib/swr/use-team";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import { Workspace } from "@/lib/types/types";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import TeamPageLoading from "./loading";
-import { TeamContext } from "./providers";
 
 export default function TeamsPageClient() {
   const { loading, team } = useTeam();
   const { team_slug } = useParams() as {
     team_slug?: string;
   };
-  const { workspacesData } = useContext(TeamContext);
+  const { workspaces, error, loading: workspacesLoading } = useWorkspaces();
 
   const { setShowModal, DeleteAccountModal } = useCreateWorkspaceModal();
   if (loading) {
@@ -50,8 +49,8 @@ export default function TeamsPageClient() {
         </div>
       </div>
       <ListView
-        items={workspacesData?.workspaces}
-        loading={workspacesData.loading}
+        items={workspaces}
+        loading={workspacesLoading}
         className="mx-auto grid max-w-screen-xl grid-cols-1 gap-5 px-2.5 py-10 sm:grid-cols-2 lg:grid-cols-3 lg:px-20"
         renderItem={(item: Workspace, index: number) => (
           <Link

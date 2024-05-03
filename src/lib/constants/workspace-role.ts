@@ -9,6 +9,7 @@ export const WorkspacePermissions = [
   "DELETE_CONTENT",
   "UPDATE_WORKSPACE_INFO",
   "UPDATE_WORKSPACE_VISIBILITY",
+  "INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER"
 ] as const;
 
 export type WorkspacePermission = (typeof WorkspacePermissions)[number];
@@ -27,6 +28,7 @@ export const workspaceRolePermissions: WorkspaceRolePermission = {
     DELETE_CONTENT: true,
     UPDATE_WORKSPACE_INFO: true,
     UPDATE_WORKSPACE_VISIBILITY: true,
+    INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER: true,
   },
   reader: {
     VIEW_CONTENT: true,
@@ -35,6 +37,7 @@ export const workspaceRolePermissions: WorkspaceRolePermission = {
     DELETE_CONTENT: false,
     UPDATE_WORKSPACE_INFO: false,
     UPDATE_WORKSPACE_VISIBILITY: false,
+    INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER: false,
   },
 } as const;
 

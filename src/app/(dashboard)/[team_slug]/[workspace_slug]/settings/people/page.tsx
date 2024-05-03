@@ -1,15 +1,17 @@
 "use client";
 
 import Tab from "@/components/atom/tab";
-import TeamPermissionView from "@/components/molecule/team-permisson-view";
+import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import WorkspaceMembers from "@/components/team/workspace/settings/workspace-members";
 import { Button } from "@/components/ui/button";
 import { useAddWorkspaceModal } from "@/components/ui/models";
+import useTeam from "@/lib/swr/use-team";
 import { useState } from "react";
 
 const tabs: Array<"Members"> = ["Members"];
 
 export default function ProjectPeopleClient() {
+  const { team } = useTeam();
   const [currentTab, setCurrentTab] = useState<"Members">("Members");
   const { AddWorkspaceMembersModal, setShowAddWorkspaceMembersModal } =
     useAddWorkspaceModal();
@@ -24,19 +26,22 @@ export default function ProjectPeopleClient() {
               Teammates that have access to this workspace.
             </p>
           </div>
-          <TeamPermissionView permission="INVITE_MANAGE_REMOVE_TEAM_MEMBER">
+          <WorkspacePermissionView
+            permission="INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER"
+            additionalCheck={team.role !== "guest"}
+          >
             <Button
               className="h-9"
               onClick={() => setShowAddWorkspaceMembersModal(true)}
             >
               Add Members
             </Button>
-          </TeamPermissionView>
+          </WorkspacePermissionView>
         </div>
         <div className="flex space-x-3 border-b border-border px-3 sm:px-7">
           {tabs.map((tab, index) => (
-            <TeamPermissionView
-              permission="INVITE_MANAGE_REMOVE_TEAM_MEMBER"
+            <WorkspacePermissionView
+              permission="INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER"
               key={index}
             >
               <Tab
@@ -45,7 +50,7 @@ export default function ProjectPeopleClient() {
                 selected={tab === currentTab}
                 onClick={() => setCurrentTab(tab)}
               />
-            </TeamPermissionView>
+            </WorkspacePermissionView>
           ))}
         </div>
         <WorkspaceMembers />

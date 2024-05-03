@@ -85,7 +85,7 @@ export const POST = withWorkspace(async ({ team, client, workspace, req }) => {
 });
 
 // PUT /api/team/[team_slug]/[workspace_slug]/users – update a user's role in a workspace
-export const PUT = withTeam(
+export const PUT = withWorkspace(
   async ({ req, team }) => {
     try {
       const { userId: documentId, role } = updateWorkspaceRoleSchema.parse(
@@ -118,7 +118,8 @@ export const PUT = withTeam(
     }
   },
   {
-    requiredRole: ["owner", "moderator"],
+    requiredTeamRole: ["owner", "moderator", 'member'],
+    requiredWorkspaceRole: ["editor"]
   },
 );
 
@@ -136,6 +137,7 @@ export const DELETE = withWorkspace(
     return NextResponse.json({ message: "User removed from team", result, query });
   },
   {
-    requiredTeamRole: ["owner", 'moderator'],
+    requiredTeamRole: ["owner", "moderator", 'member'],
+    requiredWorkspaceRole: ["editor"]
   },
 );

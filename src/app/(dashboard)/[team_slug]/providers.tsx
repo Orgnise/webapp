@@ -21,7 +21,6 @@ interface TeamProviderProps {
     loading?: boolean;
     error?: any;
     workspaces?: Workspace[];
-    activeWorkspace?: Workspace;
   };
   createWorkspace: (
     data: z.infer<typeof createWorkspaceSchema>,
@@ -39,10 +38,7 @@ function TeamProvider({ children }: { children: ReactNode }) {
   const workspacesResponse = useWorkspaces();
 
   const param = useParams();
-  const workspace_slug = param?.workspace_slug;
-  const workspace = workspacesResponse?.workspaces?.find(
-    (w) => w?.meta?.slug === workspace_slug,
-  );
+
   // Create workspace
   async function createWorkspace(data: z.infer<typeof createWorkspaceSchema>) {
     const teamSlug = param?.team_slug;
@@ -127,7 +123,6 @@ function TeamProvider({ children }: { children: ReactNode }) {
     <TeamContext.Provider
       value={{
         workspacesData: {
-          activeWorkspace: workspace,
           error: workspacesResponse.error,
           loading: workspacesResponse.loading,
           workspaces: workspacesResponse.workspaces,

@@ -29,9 +29,7 @@ import { mutate } from "swr";
 import { TeamContext } from "../../providers";
 
 export default function WorkspaceSettingsPage() {
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
   const { team: activeTeam } = useTeam();
 
   if (loading) {
@@ -61,9 +59,7 @@ function WorkspaceName() {
   const { toast } = useToast();
   const { team: activeTeam } = useTeam();
 
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
 
   const { updateWorkspace } = useWorkspaces();
 
@@ -108,9 +104,7 @@ function WorkspaceName() {
 function WorkspaceSlug() {
   const { toast } = useToast();
   const { team: activeTeam } = useTeam();
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();
   return (
     <Form
@@ -154,9 +148,7 @@ function WorkspaceVisibility() {
   const { toast } = useToast();
   const { team: activeTeam } = useTeam();
 
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();
   return (
     <Form
@@ -202,9 +194,7 @@ function WorkspaceDefaultAccess() {
   const { toast } = useToast();
   const { team: activeTeam } = useTeam();
 
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();
   return (
     <Form
@@ -275,9 +265,7 @@ function WorkspaceDescription() {
   const { toast } = useToast();
   const { team: activeTeam } = useTeam();
 
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();
   return (
     <Form
@@ -368,10 +356,8 @@ interface CerateWorkspaceModelProps {
 
 function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-    deleteWorkspace,
-  } = useContext(TeamContext);
+  const { deleteWorkspace } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
 
   function handleDeleteWorkspace(e: any) {
     e.preventDefault();

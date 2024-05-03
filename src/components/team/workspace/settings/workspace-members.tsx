@@ -9,9 +9,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { WorkspaceRole } from "@/lib/constants/workspace-role";
+import {
+  WorkspaceRole,
+  checkWorkspacePermissions,
+} from "@/lib/constants/workspace-role";
 import useTeam from "@/lib/swr/use-team";
 import useWorkspaceUsers from "@/lib/swr/use-workspace-users";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import { WorkspaceMemberProps } from "@/lib/types/types";
 import { cn } from "@/lib/utils";
 import { UserMinus } from "lucide-react";
@@ -21,6 +25,13 @@ import { useState } from "react";
 export default function WorkspaceMembers() {
   const { error, loading, users } = useWorkspaceUsers();
   const { team } = useTeam();
+  const { activeWorkspace } = useWorkspaces();
+  const canModifyRole =
+    team.role !== "guest" &&
+    checkWorkspacePermissions(
+      activeWorkspace?.role,
+      "INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER",
+    );
 
   return (
     <div className="grid divide-y divide-border">
@@ -31,7 +42,7 @@ export default function WorkspaceMembers() {
           <UserCard
             key={user.email}
             user={user}
-            isOwner={team.role === "owner"}
+            isOwner={team.role === "owner" || canModifyRole}
           />
         )}
         noItemsElement={

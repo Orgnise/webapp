@@ -1,14 +1,15 @@
-import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
 import {
   WorkspacePermission,
   checkWorkspacePermissions,
 } from "@/lib/constants/workspace-role";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import { Fold } from "@/lib/utils";
 import cx from "classnames";
-import React, { useContext } from "react";
+import React from "react";
 
 export interface Props {
   className?: string;
+  additionalCheck?: boolean;
   permission: WorkspacePermission;
   unAuthorized?: React.ReactNode | JSX.Element;
   placeholder?: React.ReactNode;
@@ -33,17 +34,19 @@ export function WorkspacePermissionView({
   className,
   placeholder,
   unAuthorized,
+  additionalCheck = true,
 }: Props) {
-  const {
-    workspacesData: { activeWorkspace, error, loading },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
   if (loading) {
     return <div className={cx(className)}>{placeholder}</div>;
   }
 
   return (
     <Fold
-      value={checkWorkspacePermissions(activeWorkspace?.role, permission)}
+      value={
+        checkWorkspacePermissions(activeWorkspace?.role, permission) &&
+        additionalCheck
+      }
       ifPresent={(value: any) => (
         <div className={cx(className)}>{children}</div>
       )}
