@@ -25,9 +25,9 @@ export default function WorkspacePage() {
       <div className="mx-auto flex h-full max-w-xl flex-1 flex-col place-content-center items-center gap-10 pt-56 text-center">
         <LightbulbIcon size={64} className="text-accent" />
         <span className="font-normal">
-          <strong>Collections</strong> are a way to organize and group items
+          <strong>Collections</strong> are a way to organize and group pages
           together. They provide a convenient way to <strong>categorize</strong>{" "}
-          and manage related items within your workspace. By creating
+          and manage related pages within your workspace. By creating
           collections, you can easily organize your work / docs and improve
           productivity.
         </span>
@@ -35,7 +35,7 @@ export default function WorkspacePage() {
           value={collections}
           ifPresent={(value: Collection[]) => (
             <div className="text-base text-muted-foreground">
-              Select a collection to view its items
+              Select a collection to view its pages
             </div>
           )}
           ifAbsent={() => (

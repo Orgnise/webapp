@@ -7,14 +7,14 @@ import { Editor as Editor$1 } from "@tiptap/core";
 
 interface CollectionContentProps {
   activeItem?: Collection;
-  isEditing?: boolean;
+  editable?: boolean;
   onDebouncedUpdate?:
     | ((editor?: Editor$1 | undefined) => void | Promise<void>)
     | undefined;
 }
 export default function ItemContent({
   activeItem,
-  isEditing = false,
+  editable = true,
   onDebouncedUpdate,
 }: CollectionContentProps) {
   if (!hasValue(activeItem)) {
@@ -53,15 +53,18 @@ export default function ItemContent({
         </Label>
 
         <Label size="caption" variant="s1">
-          Select and item or collection from the left panel
+          Select a page or collection from the left panel
         </Label>
       </div>
     );
   }
+  console.log("Editable:", editable);
   return (
     <NovelEditor
       content={activeItem?.content}
       storageKey={activeItem!._id}
+      editable={editable}
+      autofocus={editable}
       onDebouncedUpdate={onDebouncedUpdate}
     />
   );

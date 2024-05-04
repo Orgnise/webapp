@@ -1,12 +1,15 @@
 "use client";
 
+import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import NotFoundView from "@/components/team/team-not-found";
 import { CollectionItemCard } from "@/components/team/workspace/collection/collection-items-card";
 import { CreateItemCTA } from "@/components/team/workspace/collection/content/item/create-item-cta";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ListView } from "@/components/ui/listview";
+import { checkWorkspacePermissions } from "@/lib/constants/workspace-role";
 import useCollections from "@/lib/swr/use-collections";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import { Collection } from "@/lib/types/types";
 import { findInCollectionTree } from "@/lib/utility/collection-tree-structure";
 import { LightbulbIcon } from "lucide-react";
@@ -16,6 +19,7 @@ import Loading from "./loading";
 
 export default function CollectionContentPageClient() {
   const { collections, loading, error, updateCollection } = useCollections();
+  const { activeWorkspace } = useWorkspaces();
   const param = useParams();
   const activeCollectionSlug = param?.collection_slug;
 
@@ -52,20 +56,25 @@ export default function CollectionContentPageClient() {
         <div className="flex place-content-between items-center border-b border-border pb-2">
           <CollectionNameField
             name={activeCollection?.name}
+            disabled={
+              !checkWorkspacePermissions(activeWorkspace?.role, "EDIT_CONTENT")
+            }
             onUpdateName={(name: string) => {
               updateCollection({ ...activeCollection!, name });
             }}
           />
           {activeCollection!.children.length > 0 && (
-            <Button
-              variant={"default"}
-              className="border-dotted  border-muted-foreground "
-              size={"sm"}
-            >
-              <CreateItemCTA activeCollection={activeCollection!}>
-                &nbsp; Create Page
-              </CreateItemCTA>
-            </Button>
+            <WorkspacePermissionView permission="CREATE_CONTENT">
+              <Button
+                variant={"default"}
+                className="border-dotted  border-muted-foreground "
+                size={"sm"}
+              >
+                <CreateItemCTA activeCollection={activeCollection!}>
+                  &nbsp; Create Page
+                </CreateItemCTA>
+              </Button>
+            </WorkspacePermissionView>
           )}
         </div>
         <ListView
@@ -100,15 +109,17 @@ function NoItemsView({ activeCollection }: { activeCollection?: Collection }) {
           item could contain decisions made in a meeting. Items are grouped
           inside <strong>collections</strong>.
         </span>
-        <Button
-          variant={"default"}
-          className="border-dotted  border-muted-foreground "
-          size={"sm"}
-        >
-          <CreateItemCTA activeCollection={activeCollection!}>
-            &nbsp; Create Page
-          </CreateItemCTA>
-        </Button>
+        <WorkspacePermissionView permission="CREATE_CONTENT">
+          <Button
+            variant={"default"}
+            className="border-dotted  border-muted-foreground "
+            size={"sm"}
+          >
+            <CreateItemCTA activeCollection={activeCollection!}>
+              &nbsp; Create Page
+            </CreateItemCTA>
+          </Button>
+        </WorkspacePermissionView>
       </div>
     </div>
   );
@@ -117,9 +128,11 @@ function NoItemsView({ activeCollection }: { activeCollection?: Collection }) {
 function CollectionNameField({
   name,
   onUpdateName,
+  disabled,
 }: {
   name?: string;
   onUpdateName?: any;
+  disabled?: boolean;
 }) {
   return (
     <form
@@ -135,6 +148,7 @@ function CollectionNameField({
       <Input
         type="text"
         autoFocus
+        disabled={disabled}
         className="border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
         maxLength={70}
         defaultValue={name}

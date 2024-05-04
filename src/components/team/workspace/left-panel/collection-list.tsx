@@ -13,6 +13,7 @@ import React from "react";
 // import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
 import { Spinner } from "@/components/atom/spinner";
 import { H5 } from "@/components/atom/typography";
+import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import { ListView } from "@/components/ui/listview";
 import useCollections from "@/lib/swr/use-collections";
 import { Collection } from "@/lib/types/types";
@@ -22,10 +23,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { NoCollectionView } from "./collection-board";
 
-interface Props {
-  // collections: Array<Collection>;
-  // isLoading?: boolean;
-}
+interface Props {}
 /**
  * Display collections in list component
  */
@@ -44,17 +42,18 @@ export default function CollectionList(prop: Props) {
         placeholder={
           <div className="ml-1 flex  animate-pulse flex-col gap-4  border-l border-border">
             {Array.from({ length: 5 }).map((_, i) => (
-              <>
-                <div className={cx(" -mx-px flex flex-col gap-2  py-1 pl-4 ")}>
-                  <div className="h-5 w-6/12 rounded bg-secondary-foreground/10 " />
+              <div
+                key={i}
+                className={cx(" -mx-px flex flex-col gap-2  py-1 pl-4 ")}
+              >
+                <div className="h-5 w-6/12 rounded bg-secondary-foreground/10 " />
 
-                  <div className="flex w-full flex-col gap-4 border-l-2 border-secondary pl-4">
-                    <div className="h-4 w-6/12 rounded bg-secondary" />
-                    <div className="h-4 w-4/12 rounded bg-secondary" />
-                    <div className="h-4 w-8/12 rounded bg-secondary" />
-                  </div>
+                <div className="flex w-full flex-col gap-4 border-l-2 border-secondary pl-4">
+                  <div className="h-4 w-6/12 rounded bg-secondary" />
+                  <div className="h-4 w-4/12 rounded bg-secondary" />
+                  <div className="h-4 w-8/12 rounded bg-secondary" />
                 </div>
-              </>
+              </div>
             ))}
           </div>
         }
@@ -108,58 +107,60 @@ function RenderCollection({ collection }: RenderCollectionProps) {
               : "Untitled collection"}
           </H5>
         </Link>
-        <div className="invisible absolute  -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background">
-          <div className="flex h-full items-center gap-2 px-1">
-            <ToolTipWrapper content={<span>Create Page</span>}>
-              <button
-                onClick={() => {
-                  handleCreateItem("item");
-                }}
-              >
-                {createItemStatus === "CREATING-ITEM" ? (
-                  <Spinner className="h-5" />
-                ) : (
-                  <PlusIcon size={15} />
-                )}
-              </button>
-            </ToolTipWrapper>
-            <ToolTipWrapper content={<span>Create Collection</span>}>
-              <button
-                onClick={() => {
-                  handleCreateItem("collection");
-                }}
-              >
-                {createItemStatus === "CREATING-COLLECTION" ? (
-                  <Spinner className="h-5" />
-                ) : (
-                  <CopyPlus size={15} />
-                )}
-              </button>
-            </ToolTipWrapper>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-2 ">
-                <button>
-                  {deleteStatus === "DELETING" ? (
+        <WorkspacePermissionView permission="CREATE_CONTENT">
+          <div className="invisible absolute  -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background">
+            <div className="flex h-full items-center gap-2 px-1">
+              <ToolTipWrapper content={<span>Create Page</span>}>
+                <button
+                  onClick={() => {
+                    handleCreateItem("item");
+                  }}
+                >
+                  {createItemStatus === "CREATING-ITEM" ? (
                     <Spinner className="h-5" />
                   ) : (
-                    <MoreVerticalIcon size={15} />
+                    <PlusIcon size={15} />
                   )}
                 </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="border-border">
-                <DropdownMenuLabel>Options</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="cursor-pointer rounded-sm text-destructive focus:bg-destructive focus:text-destructive-foreground"
-                  onClick={HandleDeleteCollection}
+              </ToolTipWrapper>
+              <ToolTipWrapper content={<span>Create Collection</span>}>
+                <button
+                  onClick={() => {
+                    handleCreateItem("collection");
+                  }}
                 >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  {createItemStatus === "CREATING-COLLECTION" ? (
+                    <Spinner className="h-5" />
+                  ) : (
+                    <CopyPlus size={15} />
+                  )}
+                </button>
+              </ToolTipWrapper>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-2 ">
+                  <button>
+                    {deleteStatus === "DELETING" ? (
+                      <Spinner className="h-5" />
+                    ) : (
+                      <MoreVerticalIcon size={15} />
+                    )}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="border-border">
+                  <DropdownMenuLabel>Options</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="cursor-pointer rounded-sm text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                    onClick={HandleDeleteCollection}
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
-        </div>
+        </WorkspacePermissionView>
       </div>
 
       <ListView
@@ -229,31 +230,33 @@ function RenderItem({ item, collection }: RenderItemProps) {
           {hasValue(item.name) ? item.name : "Untitled item"}
         </span>
       </Link>
-      <div className="invisible absolute  -right-3 bottom-0 top-0 text-muted-foreground group-hover:visible group-hover:bg-background">
-        <div className="flex h-full items-center gap-2 px-1">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="flex items-center gap-2 ">
-              <button>
-                {status === "DELETING" ? (
-                  <Spinner className="h-5" />
-                ) : (
-                  <MoreVerticalIcon size={15} />
-                )}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="border-border">
-              <DropdownMenuLabel>Options</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer rounded-sm text-destructive focus:bg-destructive focus:text-destructive-foreground"
-                onClick={HandleDeleteItem}
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <WorkspacePermissionView permission="CREATE_CONTENT">
+        <div className="invisible absolute  -right-3 bottom-0 top-0 text-muted-foreground group-hover:visible group-hover:bg-background">
+          <div className="flex h-full items-center gap-2 px-1">
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-2 ">
+                <button>
+                  {status === "DELETING" ? (
+                    <Spinner className="h-5" />
+                  ) : (
+                    <MoreVerticalIcon size={15} />
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="border-border">
+                <DropdownMenuLabel>Options</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-sm text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                  onClick={HandleDeleteItem}
+                >
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
+      </WorkspacePermissionView>
     </div>
   );
 }

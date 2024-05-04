@@ -3,6 +3,7 @@ import React, { useState } from "react";
 
 import { Spinner } from "@/components/atom/spinner";
 import Tab from "@/components/atom/tab";
+import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
 import useCollections from "@/lib/swr/use-collections";
 import { Collection, Workspace } from "@/lib/types/types";
@@ -164,18 +165,20 @@ export function PanelTopToolbar({
     <div className="flex place-content-between items-center border-b border-r border-border bg-background  px-1">
       <WorkspaceSwitcher />
       <div className="ml-2 flex h-4 items-center">
-        <ToolTipWrapper content={<>Create Collection</>}>
-          {status === "LOADING" ? (
-            <Spinner className="theme-text-primary h-6" />
-          ) : (
-            <PlusIcon
-              className="theme-text-primary cursor-pointer rounded p-1 outline-1"
-              onClick={async () => {
-                await handleCreateCollection();
-              }}
-            />
-          )}
-        </ToolTipWrapper>
+        <WorkspacePermissionView permission="CREATE_CONTENT">
+          <ToolTipWrapper content={<>Create Collection</>}>
+            {status === "LOADING" ? (
+              <Spinner className="theme-text-primary h-6" />
+            ) : (
+              <PlusIcon
+                className="theme-text-primary cursor-pointer rounded p-1 outline-1"
+                onClick={async () => {
+                  await handleCreateCollection();
+                }}
+              />
+            )}
+          </ToolTipWrapper>
+        </WorkspacePermissionView>
         {leftPanelSize === LeftPanelSize.max ? (
           <Maximize2
             className="hover:bg-onSurface cursor-pointer rounded p-1 outline-1"

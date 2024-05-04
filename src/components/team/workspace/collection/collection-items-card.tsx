@@ -2,6 +2,7 @@
 // import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
 import { Spinner } from "@/components/atom/spinner";
 import { H5 } from "@/components/atom/typography";
+import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ListView } from "@/components/ui/listview";
@@ -126,38 +127,43 @@ export function CollectionItemCard({
           <div className="font-sans ">Untitled item</div>
         )}
       </Link>
-      <div
-        className={cx("absolute bottom-0 right-0 top-0 group-hover:visible ", {
-          visible: status === "Deleting",
-          invisible: status === "Idle",
-        })}
-      >
-        <div className="flex h-full place-content-center items-center gap-2 px-2">
-          <Button
-            variant={"ghost"}
-            className="h-7 w-7 p-1 transition-all duration-75 hover:scale-105 hover:shadow group-hover:bg-accent-foreground/50"
-            onClick={() => {
-              if (status !== "Idle") {
-                return;
-              }
-              setIsEditEnabled(true);
-            }}
-          >
-            <Edit2Icon size={14} className="text-destructive-foreground" />
-          </Button>
-          <Button
-            variant={"destructive"}
-            className="h-7 w-7 p-1 transition-all duration-75 hover:scale-105 hover:shadow"
-            onClick={handleDeleteItem}
-          >
-            {status === "Deleting" ? (
-              <Spinner className="h-5" />
-            ) : (
-              <Trash2 size={14} />
-            )}
-          </Button>
+      <WorkspacePermissionView permission="EDIT_CONTENT">
+        <div
+          className={cx(
+            "absolute bottom-0 right-0 top-0 group-hover:visible ",
+            {
+              visible: status === "Deleting",
+              invisible: status === "Idle",
+            },
+          )}
+        >
+          <div className="flex h-full place-content-center items-center gap-2 px-2">
+            <Button
+              variant={"ghost"}
+              className="h-7 w-7 p-1 transition-all duration-75 hover:scale-105 hover:shadow group-hover:bg-accent-foreground/50"
+              onClick={() => {
+                if (status !== "Idle") {
+                  return;
+                }
+                setIsEditEnabled(true);
+              }}
+            >
+              <Edit2Icon size={14} className="text-destructive-foreground" />
+            </Button>
+            <Button
+              variant={"destructive"}
+              className="h-7 w-7 p-1 transition-all duration-75 hover:scale-105 hover:shadow"
+              onClick={handleDeleteItem}
+            >
+              {status === "Deleting" ? (
+                <Spinner className="h-5" />
+              ) : (
+                <Trash2 size={14} />
+              )}
+            </Button>
+          </div>
         </div>
-      </div>
+      </WorkspacePermissionView>
     </div>
   );
 }
