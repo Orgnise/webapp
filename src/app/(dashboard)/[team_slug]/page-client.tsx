@@ -17,7 +17,7 @@ import { useParams } from "next/navigation";
 import TeamPageLoading from "./loading";
 
 export default function TeamsPageClient() {
-  const { loading, team } = useTeam();
+  const { loading } = useTeam();
   const { team_slug } = useParams() as {
     team_slug?: string;
   };

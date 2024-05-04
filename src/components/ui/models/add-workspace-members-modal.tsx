@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from "../select";
 
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import clsx from "clsx";
 
 interface SelectUser {
@@ -59,6 +60,8 @@ function AddWorkspaceMembersModal({
     error: workspaceError,
     addMembers,
   } = useWorkspaceUsers();
+
+  const { activeWorkspace } = useWorkspaces();
 
   const [selectedUsers, setSelectedUsers] = useState<SelectUser[]>([]);
   const [unJoinedMembers, setUnJoinedMembers] = useState<TeamMemberProps[]>([]);
@@ -108,7 +111,7 @@ function AddWorkspaceMembersModal({
         </p>
       ) : selectedUsers.length == 0 && unJoinedMembers.length == 0 ? (
         <div className="flex h-40 flex-col place-content-center bg-accent/30 text-center text-sm text-muted-foreground">
-          All users have been added to the workspace.
+          All team members have been added to the workspace.
         </div>
       ) : (
         <div className="flex flex-col">
@@ -130,7 +133,13 @@ function AddWorkspaceMembersModal({
                 users={unJoinedMembers}
                 onUserSelect={(user) => {
                   setSelectedUsers([
-                    { user: user, role: "editor" },
+                    {
+                      user: user,
+                      role:
+                        activeWorkspace?.defaultAccess == "full"
+                          ? "editor"
+                          : "reader",
+                    },
                     ...selectedUsers,
                   ]);
                   setUnJoinedMembers(
@@ -174,7 +183,11 @@ function AddWorkspaceMembersModal({
                             </div>
                             <div className="flex flex-row items-center space-x-1">
                               <SelectAccessLevel
-                                defaultRole={selected.role}
+                                defaultRole={
+                                  activeWorkspace?.defaultAccess == "full"
+                                    ? "editor"
+                                    : "reader"
+                                }
                                 onValueChange={(val: WorkspaceRole) => {
                                   setSelectedUsers(
                                     selectedUsers.map((selectedUser) =>

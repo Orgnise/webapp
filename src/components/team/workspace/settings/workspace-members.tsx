@@ -24,10 +24,10 @@ import { useState } from "react";
 
 export default function WorkspaceMembers() {
   const { error, loading, users } = useWorkspaceUsers();
-  const { team } = useTeam();
+  const { activeTeam } = useTeam();
   const { activeWorkspace } = useWorkspaces();
   const canModifyRole =
-    team.role !== "guest" &&
+    activeTeam?.role !== "guest" &&
     checkWorkspacePermissions(
       activeWorkspace?.role,
       "INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER",
@@ -42,7 +42,7 @@ export default function WorkspaceMembers() {
           <UserCard
             key={user.email}
             user={user}
-            isOwner={team.role === "owner" || canModifyRole}
+            isOwner={activeTeam?.role === "owner" || canModifyRole}
           />
         )}
         noItemsElement={

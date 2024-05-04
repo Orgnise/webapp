@@ -6,7 +6,7 @@ import { useMemo } from "react";
 import TeamBillingSettingsLoading from "./loading";
 
 export default function TeamBillingPage() {
-  const { team: activeTeam, loading } = useTeam();
+  const { activeTeam, loading } = useTeam();
   const plan = activeTeam?.plan ?? "free";
   const billingCycleStart = activeTeam?.billingCycleStart;
 

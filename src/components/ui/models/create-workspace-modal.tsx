@@ -39,7 +39,7 @@ export function CreateWorkspaceModel({
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
 
   const { createWorkspace } = useContext(TeamContext);
-  const { team } = useTeam();
+  const { activeTeam } = useTeam();
 
   function CreateWorkspaceModal(e: any) {
     e.preventDefault();
@@ -82,9 +82,9 @@ export function CreateWorkspaceModel({
           <XIcon className="text-muted-foreground" size={16} />
         </Button>
         <div className="flex flex-col items-center justify-center space-y-3 border-b border-border px-4 py-4 pt-8 sm:px-16">
-          {team.logo ? (
+          {activeTeam?.logo ? (
             <Image
-              src={team.logo}
+              src={activeTeam.logo}
               unoptimized
               alt={"Logo"}
               className="h-16 w-16 rounded-full"

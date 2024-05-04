@@ -31,7 +31,7 @@ function EditWorkspaceRoleModal({
 }) {
   const { workspace_slug } = useParams() as { workspace_slug: string };
   const [editing, setEditing] = useState(false);
-  const { team } = useTeam();
+  const { activeTeam } = useTeam();
   const { workspaces } = useWorkspaces();
   const workspace = workspaces?.find((w) => w?.meta?.slug === workspace_slug);
   const { _id, name, email } = user;
@@ -63,17 +63,20 @@ function EditWorkspaceRoleModal({
         <Button
           onClick={() => {
             setEditing(true);
-            fetch(`/api/teams/${team?.meta?.slug}/${workspace_slug}/users`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: _id,
-                role,
-              }),
-            }).then(async (res) => {
+            fetch(
+              `/api/teams/${activeTeam?.meta?.slug}/${workspace_slug}/users`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  userId: _id,
+                  role,
+                }),
+              },
+            ).then(async (res) => {
               if (res.status === 200) {
                 await mutate(
-                  `/api/teams/${team?.meta?.slug}/${workspace_slug}/users`,
+                  `/api/teams/${activeTeam?.meta?.slug}/${workspace_slug}/users`,
                 );
                 setShowEditRoleModal(false);
                 toast({

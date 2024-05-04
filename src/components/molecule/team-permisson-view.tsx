@@ -31,14 +31,14 @@ function TeamPermissionView({
   placeholder,
   unAuthorized,
 }: Props) {
-  const { loading, team } = useTeam();
+  const { loading, activeTeam } = useTeam();
   if (loading) {
     return <div className={cx(className)}>{placeholder}</div>;
   }
 
   return (
     <Fold
-      value={checkPermissions(team.role, permission)}
+      value={checkPermissions(activeTeam?.role, permission)}
       ifPresent={(value: any) => (
         <div className={cx(className)}>{children}</div>
       )}

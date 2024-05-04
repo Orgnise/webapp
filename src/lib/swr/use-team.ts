@@ -8,7 +8,6 @@ type UpdateTeam = { name?: string; description?: string; slug?: string };
 interface ITeam {
   error: any;
   loading: boolean;
-  team: Team;
   activeTeam?: Team;
   mutate: KeyedMutator<any>;
   exceedingFreeTeam: boolean;
@@ -98,7 +97,7 @@ export default function useTeam(): ITeam {
   const freeProjects = (data?.plan === "free" || !data?.plan) && data?.isOwner;
 
   return {
-    team: data,
+    activeTeam: data,
     error,
     mutate,
     exceedingFreeTeam: freeProjects?.length >= 2 ? true : false,

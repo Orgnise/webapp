@@ -31,8 +31,8 @@ function RemoveWorkspaceMemberModal({
 }) {
   const { workspace_slug } = useParams() as { workspace_slug: string };
   const [removing, setRemoving] = useState(false);
-  const { team } = useTeam();
-  const { name: workspaceName } = team;
+  const { activeTeam } = useTeam();
+
   const { data: session } = useSession();
   const { _id, name, email } = user;
   const { toast } = useToast();
@@ -40,14 +40,16 @@ function RemoveWorkspaceMemberModal({
   const handleRemoveTeammate = async () => {
     setRemoving(true);
     fetcher(
-      `/api/teams/${team?.meta?.slug}/${workspace_slug}/users?userId=${user._id}`,
+      `/api/teams/${activeTeam?.meta?.slug}/${workspace_slug}/users?userId=${user._id}`,
       {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       },
     )
       .then(async (res) => {
-        await mutate(`/api/teams/${team?.meta?.slug}/${workspace_slug}/users`);
+        await mutate(
+          `/api/teams/${activeTeam?.meta?.slug}/${workspace_slug}/users`,
+        );
         if (session?.user?.email === email) {
           await mutate("/api/teams/workspace");
         } else {
@@ -92,7 +94,7 @@ function RemoveWorkspaceMemberModal({
             ? "You're about to leave "
             : "This will remove "}
           <span className="font-semibold ">
-            {session?.user?.email === email ? workspaceName : name || email}
+            {session?.user?.email === email ? activeTeam?.name : name || email}
           </span>
           {session?.user?.email === email
             ? ". You will lose all access to this team. "

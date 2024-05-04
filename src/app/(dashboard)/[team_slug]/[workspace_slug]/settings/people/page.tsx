@@ -11,7 +11,7 @@ import { useState } from "react";
 const tabs: Array<"Members"> = ["Members"];
 
 export default function ProjectPeopleClient() {
-  const { team } = useTeam();
+  const { activeTeam } = useTeam();
   const [currentTab, setCurrentTab] = useState<"Members">("Members");
   const { AddWorkspaceMembersModal, setShowAddWorkspaceMembersModal } =
     useAddWorkspaceModal();
@@ -28,7 +28,7 @@ export default function ProjectPeopleClient() {
           </div>
           <WorkspacePermissionView
             permission="INVITE_MANAGE_REMOVE_WORKSPACE_MEMBER"
-            additionalCheck={team.role !== "guest"}
+            additionalCheck={activeTeam?.role !== "guest"}
           >
             <Button
               className="h-9"

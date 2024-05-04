@@ -2,6 +2,7 @@ import {
   WorkspacePermission,
   checkWorkspacePermissions,
 } from "@/lib/constants/workspace-role";
+import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-workspaces";
 import { Fold } from "@/lib/utils";
 import cx from "classnames";
@@ -37,6 +38,7 @@ export function WorkspacePermissionView({
   additionalCheck = true,
 }: Props) {
   const { activeWorkspace, loading, error } = useWorkspaces();
+  const { activeTeam } = useTeam();
   if (loading) {
     return <div className={cx(className)}>{placeholder}</div>;
   }
@@ -44,8 +46,9 @@ export function WorkspacePermissionView({
   return (
     <Fold
       value={
-        checkWorkspacePermissions(activeWorkspace?.role, permission) &&
-        additionalCheck
+        (checkWorkspacePermissions(activeWorkspace?.role, permission) &&
+          additionalCheck) ||
+        activeTeam?.role === "owner"
       }
       ifPresent={(value: any) => (
         <div className={cx(className)}>{children}</div>

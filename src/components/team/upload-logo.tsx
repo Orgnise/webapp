@@ -9,15 +9,17 @@ import { mutate } from "swr";
 import { useToast } from "../ui/use-toast";
 
 export default function UploadLogo() {
-  const { team } = useTeam();
-  const isOwner = team?.role === "owner";
+  const { activeTeam } = useTeam();
+  const isOwner = activeTeam?.role === "owner";
   const { toast } = useToast();
 
   const [image, setImage] = useState<string | null>();
 
   useEffect(() => {
-    setImage(team?.logo || null);
-  }, [team]);
+    if (activeTeam) {
+      setImage(activeTeam?.logo || null);
+    }
+  }, [activeTeam]);
 
   const [dragActive, setDragActive] = useState(false);
 
@@ -49,7 +51,7 @@ export default function UploadLogo() {
       onSubmit={async (e) => {
         setUploading(true);
         e.preventDefault();
-        fetch(`/api/teams/${team?.meta?.slug}/logo`, {
+        fetch(`/api/teams/${activeTeam?.meta?.slug}/logo`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -59,7 +61,7 @@ export default function UploadLogo() {
           if (res.status === 200) {
             await Promise.all([
               mutate("/api/teams"),
-              mutate(`/api/teams/${team?.meta?.slug}`),
+              mutate(`/api/teams/${activeTeam?.meta?.slug}`),
             ]);
             toast({
               description: "Successfully uploaded team logo!",
@@ -92,11 +94,13 @@ export default function UploadLogo() {
               onDragOver={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (!isOwner) return;
                 setDragActive(true);
               }}
               onDragEnter={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (!isOwner) return;
                 setDragActive(true);
               }}
               onDragLeave={(e) => {
@@ -107,6 +111,7 @@ export default function UploadLogo() {
               onDrop={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                if (!isOwner) return;
                 setDragActive(false);
                 const file = e.dataTransfer.files && e.dataTransfer.files[0];
                 if (file) {
@@ -165,6 +170,7 @@ export default function UploadLogo() {
               type="file"
               accept="image/*"
               className="sr-only"
+              disabled={!isOwner}
               onChange={onChangePicture}
             />
           </div>
@@ -178,7 +184,7 @@ export default function UploadLogo() {
         </p>
         <div className="shrink-0">
           <Button2
-            disabled={!team || !image || team?.logo === image}
+            disabled={!activeTeam || !image || activeTeam?.logo === image}
             shortcut="CMD+S"
             text="Save changes"
             loading={uploading}

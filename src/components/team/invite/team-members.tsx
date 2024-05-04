@@ -21,7 +21,7 @@ import RemoveTeamMemberModal from "./remove-member-model";
 
 export default function TeamMembers() {
   const { error, loading, users } = useUsers();
-  const { team } = useTeam();
+  const { activeTeam } = useTeam();
 
   return (
     <div className="grid divide-y divide-border">
@@ -32,7 +32,7 @@ export default function TeamMembers() {
           <UserCard
             key={user.email}
             user={user}
-            isOwner={team.role === "owner"}
+            isOwner={activeTeam?.role === "owner"}
           />
         )}
         noItemsElement={

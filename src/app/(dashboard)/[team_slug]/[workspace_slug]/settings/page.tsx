@@ -30,7 +30,6 @@ import { TeamContext } from "../../providers";
 
 export default function WorkspaceSettingsPage() {
   const { activeWorkspace, loading, error } = useWorkspaces();
-  const { team: activeTeam } = useTeam();
 
   if (loading) {
     return <div>Loading...</div>;
@@ -57,7 +56,7 @@ export default function WorkspaceSettingsPage() {
 
 function WorkspaceName() {
   const { toast } = useToast();
-  const { team: activeTeam } = useTeam();
+  const { activeTeam } = useTeam();
 
   const { activeWorkspace, loading, error } = useWorkspaces();
 
@@ -103,7 +102,7 @@ function WorkspaceName() {
 
 function WorkspaceSlug() {
   const { toast } = useToast();
-  const { team: activeTeam } = useTeam();
+  const { activeTeam } = useTeam();
   const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();
   return (
@@ -146,7 +145,7 @@ function WorkspaceSlug() {
 
 function WorkspaceVisibility() {
   const { toast } = useToast();
-  const { team: activeTeam } = useTeam();
+  const { activeTeam } = useTeam();
 
   const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();
@@ -192,7 +191,7 @@ function WorkspaceVisibility() {
 
 function WorkspaceDefaultAccess() {
   const { toast } = useToast();
-  const { team: activeTeam } = useTeam();
+  const { activeTeam } = useTeam();
 
   const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();
@@ -263,7 +262,7 @@ function WorkspaceDefaultAccess() {
 
 function WorkspaceDescription() {
   const { toast } = useToast();
-  const { team: activeTeam } = useTeam();
+  const { activeTeam } = useTeam();
 
   const { activeWorkspace, loading, error } = useWorkspaces();
   const { updateWorkspace } = useWorkspaces();

@@ -69,11 +69,17 @@ export interface Workspace {
   members: Member[];
   visibility: Visibility;
   createdBy: any;
+  /**
+   * Role of the current auth user in the workspace
+   */
   role: WorkspaceRole;
   createdAt: string;
   updatedAt: string;
   updatedBy: string;
   meta: Meta;
+  /**
+   * Default access level for new member in the workspace
+   */
   defaultAccess: AccessLevel;
 }
 
