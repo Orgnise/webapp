@@ -149,3 +149,10 @@ export const removeWorkspaceUserSchema = z.object({
     userId: "60f1a3c7d6d1e3e9b0b1b6f3",
   },
 });
+
+export const deleteWorkspaceUserSchema = z.object({
+  message: z.string().optional().default(""),
+  // deletedContent:z.object({
+  //   collection: z.number().optional().default(0),
+  // })
+})
