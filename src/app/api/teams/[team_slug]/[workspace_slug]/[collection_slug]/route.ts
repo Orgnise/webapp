@@ -47,8 +47,8 @@ export const PATCH = withTeam(async ({ req, session }) => {
     delete data.team;
     delete data.workspace;
     delete data.parent;
-    delete data.ceratedBy;
-    delete data.lastUpdatedUserId;
+    delete data.createdBy;
+    delete data.children;
     // remove all null or undefined fields from the collection object and update the collection
     for (const key in data) {
       if (data[key] === null || data[key] === undefined) {
@@ -79,11 +79,7 @@ export const PATCH = withTeam(async ({ req, session }) => {
           ...collectionInDb.meta,
           slug: slug,
         },
-        name: hasValue(collection?.name)
-          ? collection?.name
-          : hasValue(collectionInDb.title)
-            ? collectionInDb.title
-            : collectionInDb.name,
+        name: collection?.name,
         updatedAt: new Date().toISOString(),
         updatedBy: new ObjectId(session.user.id),
       },

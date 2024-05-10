@@ -119,7 +119,6 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
       },
       sortIndex: 0,
       children: [],
-      title: collectionToCreate?.name ?? "",
       name: collectionToCreate?.name ?? "",
       content: collectionToCreate.content ?? "",
       object: collectionToCreate.object

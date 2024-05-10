@@ -41,8 +41,7 @@ export const PATCH = withTeam(async ({ req, session }) => {
     delete data.team;
     delete data.workspace;
     delete data.parent;
-    delete data.ceratedBy;
-    delete data.lastUpdatedUserId;
+    delete data.createdBy;
     // remove all null or undefined fields from the item object and update the collection
     for (const key in data) {
       if (data[key] === null || data[key] === undefined) {
