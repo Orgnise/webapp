@@ -6,7 +6,7 @@ import Tab from "@/components/atom/tab";
 import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import { ToolTipWrapper } from "@/components/ui/tooltip";
 import useCollections from "@/lib/swr/use-collections";
-import { Collection, Workspace } from "@/lib/types/types";
+import { Workspace } from "@/lib/types/types";
 import { useParams } from "next/navigation";
 import { WorkspaceSettingsDropDown } from "../workspace-settings-dropdown";
 import { LeftPanelSize } from "../workspace-view";
@@ -153,10 +153,9 @@ export function PanelTopToolbar({
 
   async function handleCreateCollection() {
     setStatus("LOADING");
-    const col = {
+    const response = await createCollection({
       object: "collection",
-    } as Collection;
-    const response = await createCollection(col).finally(() => {
+    }).finally(() => {
       setStatus("IDLE");
     });
   }

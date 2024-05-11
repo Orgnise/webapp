@@ -13,12 +13,12 @@ export default function WorkspacePage() {
 
   async function handleCreateCollection() {
     setStatus("LOADING");
-    const col = {
-      object: "collection",
-    } as Collection;
-    const response = await createCollection(col).finally(() => {
-      setStatus("IDLE");
-    });
+
+    const response = await createCollection({ object: "collection" }).finally(
+      () => {
+        setStatus("IDLE");
+      },
+    );
   }
   return (
     <div className="WorkspacePage h-full w-full flex-grow bg-background">

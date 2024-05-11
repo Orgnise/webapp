@@ -9,6 +9,7 @@ import {
   removeFromCollectionTree,
   updateInCollectionTree,
 } from "../utility/collection-tree-structure";
+import { CreateCollectionSchema, UpdateCollectionSchema } from "../zod/schemas/collection";
 
 interface IWorkspaces {
   error: any;
@@ -19,8 +20,8 @@ interface IWorkspaces {
    * Create a new collection / Page
    * To create Page, pass the parent collection slug
    */
-  createCollection(collection: Collection): Promise<void>;
-  updateCollection: (collection: Collection) => void;
+  createCollection(data: typeof CreateCollectionSchema._type): Promise<void>;
+  updateCollection: (id: string, collection: typeof UpdateCollectionSchema._type) => void;
   UpdateItem: (item: Collection, parent: Collection) => Promise<void>;
   deleteCollection(id: string, collectionSlug: string): Promise<void>;
   deleteItem(
@@ -36,6 +37,7 @@ export default function useCollections(): IWorkspaces {
     item_slug?: string;
     collection_slug?: string;
   };
+
   const { team_slug, workspace_slug } = param;
   const router = useRouter();
   const {
@@ -43,7 +45,7 @@ export default function useCollections(): IWorkspaces {
     error,
     mutate,
   } = useSWR<any>(
-    `/api/teams/${team_slug}/${workspace_slug}/collections-v2`,
+    `/api/teams/${team_slug}/${workspace_slug}/collections`,
     fetcher,
     {
       dedupingInterval: 120000,
@@ -51,7 +53,7 @@ export default function useCollections(): IWorkspaces {
   );
 
   // Create a new Collection/Page
-  async function createCollection(collection: Collection) {
+  async function createCollection(collection: typeof CreateCollectionSchema._type) {
     try {
       const response = await fetcher(
         `/api/teams/${team_slug}/${workspace_slug}/collections`,
@@ -60,7 +62,7 @@ export default function useCollections(): IWorkspaces {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ collection: collection }),
+          body: JSON.stringify({ ...collection }),
         },
       );
 
@@ -71,7 +73,7 @@ export default function useCollections(): IWorkspaces {
       if (collection.object === "collection") {
         collectionTree = addInCollectionTree(
           collections,
-          collection.parent,
+          collection?.parent,
           response.collection,
         );
         mutate(
@@ -147,25 +149,25 @@ export default function useCollections(): IWorkspaces {
   }
 
   // Update collection name
-  async function updateCollection(collection: Collection) {
+  async function updateCollection(id: string, collection: typeof UpdateCollectionSchema._type) {
     const teamSlug = param?.team_slug;
     const workspaceSlug = param?.workspace_slug;
-    const collectionSlug = collection?.meta?.slug;
+    const collectionSlug = param?.collection_slug;
     try {
       const response = await fetcher(
-        `/api/teams/${teamSlug}/${workspaceSlug}/${collection?.meta?.slug}`,
+        `/api/teams/${teamSlug}/${workspaceSlug}/${collectionSlug}`,
         {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ collection: collection }),
+          body: JSON.stringify(collection),
         },
       );
 
       const collectionTree = updateInCollectionTree(
         data?.collections,
-        collection._id,
+        id,
         response.collection,
       );
       // Change the url if the collection slug has changed

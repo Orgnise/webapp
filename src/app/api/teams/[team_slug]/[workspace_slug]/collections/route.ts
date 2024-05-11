@@ -1,187 +1,54 @@
-import { withTeam } from "@/lib/auth";
-import mongoDb, { databaseName } from "@/lib/mongodb";
+import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api";
+import { withTeam, withWorkspace } from "@/lib/auth";
 import { CollectionDbSchema } from "@/lib/db-schema/collection.schema";
-import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
-import { Collection } from "@/lib/types/types";
+import { databaseName } from "@/lib/mongodb";
+import { createTreeFromCollection } from "@/lib/utility/collection-tree-structure";
 import { generateSlug } from "@/lib/utils";
+import { CreateCollectionSchema } from "@/lib/zod/schemas/collection";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-// Get list of collections
-export const GET = withTeam(async ({ team, params }) => {
-  const client = await mongoDb;
+// GET /api/teams/:team_slug/workspaces/:workspace_slug/collections - Get list of collections
+export const GET = withWorkspace(async ({ workspace, team, params, client }) => {
   try {
-    const { workspace_slug, team_slug } = params ?? {};
     const collections = client
       .db(databaseName)
-      .collection<Collection>("collections");
-
-    const workspaces = client
-      .db(databaseName)
-      .collection<WorkspaceDbSchema>("workspaces");
-    const workspaceDate = (await workspaces.findOne({
-      "meta.slug": workspace_slug,
-      team: new ObjectId(team._id),
-    })) as unknown as WorkspaceDbSchema;
-
-    if (!workspaceDate) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "Workspace not found",
-          workspace_slug: workspace_slug,
-          team_slug: team_slug,
-        },
-        { status: 404 },
-      );
-    }
+      .collection<CollectionDbSchema>("collections");
 
     const query = {
-      workspace: new ObjectId(workspaceDate?._id),
-      $or: [
-        {
-          parent: null,
-        },
-        { parent: { $exists: false } },
-      ],
+      team: new ObjectId(team._id),
+      workspace: new ObjectId(workspace?._id),
     };
-    const dbResult = await collections
-      .aggregate([
-        { $match: query },
+    const dbResult = await collections.find(query).toArray();
 
-        {
-          $lookup: {
-            from: "collections",
-            localField: "_id",
-            foreignField: "parent",
-            as: "children",
-          },
-        },
-        {
-          $addFields: { itemCount: { $size: "$children" } },
-        },
-        {
-          $lookup: {
-            from: "teams",
-            localField: "team",
-            foreignField: "_id",
-            as: "team",
-          },
-        },
+    // create a tree structure from this
+    const tree = createTreeFromCollection(dbResult);
 
-        {
-          $unwind: "$team",
-        },
-        {
-          $lookup: {
-            from: "workspaces",
-            localField: "workspace",
-            foreignField: "_id",
-            as: "workspace",
-          },
-        },
-        {
-          $unwind: "$workspace",
-        },
-        {
-          $project: {
-            parent: 1,
-            meta: 1,
-            createdAt: 1,
-            itemCount: 1,
-            title: 1,
-            name: 1,
-            content: 1,
-            contentMeta: 1,
-            object: 1,
-            sortIndex: 1,
-            "workspace._id": 1,
-            "workspace.name": 1,
-            "workspace.meta": 1,
-            "team._id": 1,
-            "team.name": 1,
-            "team.meta.slug": 1,
-            children: 1,
-          },
-        },
-        {
-          $group: {
-            // Group by parent and build tree-like structure with children array property
-            _id: "$_id",
-            team: { $first: "$team" },
-            workspace: { $first: "$workspace" },
-            meta: { $first: "$meta" },
-            createdAt: { $first: "$createdAt" },
-            itemCount: { $first: "$itemCount" },
-            parent: { $first: "$parent" },
-            title: { $first: "$title" },
-            name: { $first: "$name" },
-            content: { $first: "$content" },
-            contentMeta: { $first: "$contentMeta" },
-            object: { $first: "$object" },
-            children: { $first: "$children" },
-            sortIndex: { $first: "$sortIndex" },
-          },
-        },
-        { $sort: { createdAt: 1 } },
-      ])
-      .toArray();
 
-    return NextResponse.json({ collections: dbResult });
+    // create a tree structure from this
+    // const tree = createTreeFromCollection(dbResult);
+    return NextResponse.json({
+      collections: tree,
+      itemCount: dbResult.length,
+    });
   } catch (err: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: err.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(err);
   }
 });
 
-// Create a new collection
-export const POST = withTeam(async ({ team, session, req, params }) => {
-  const client = await mongoDb;
-  try {
-    const workspace_slug = params?.workspace_slug;
-    const body = await req.json();
-    const collectionToCreate = body?.collection;
-    if (
-      !collectionToCreate ||
-      !["item", "collection", undefined].includes(collectionToCreate?.object)
-    ) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unable to create collection",
-          error: "Invalid request",
-        },
-        { status: 400 },
-      );
-    }
-    const workspaceDb = client
-      .db(databaseName)
-      .collection<CollectionDbSchema>("workspaces");
-    const workspace = await workspaceDb.findOne({
-      "meta.slug": workspace_slug,
-      team: new ObjectId(team._id),
-    });
 
-    if (!workspace) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "Workspace not found",
-          workspace_slug: workspace_slug,
-        },
-        { status: 404 },
-      );
-    }
+//  POST /api/teams/:team_slug/workspaces/:workspace_slug/collections - Create a new collection
+export const POST = withWorkspace(async ({ team, workspace, session, req, params, client }) => {
+  try {
+
+    const { name, object, parent } = await CreateCollectionSchema.parseAsync(await req.json());
+
 
     const collectionsDb = client
       .db(databaseName)
       .collection<CollectionDbSchema>("collections");
     const slug = await generateSlug({
-      title: collectionToCreate?.name ?? "collection ",
+      title: object === "collection" ? `col_${name ?? ''}` : `pag_${name ?? ''}`,
       didExist: async (val: string) => {
         const work = await collectionsDb.findOne({
           "meta.slug": val,
@@ -191,30 +58,24 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
       },
       suffixLength: 6,
     });
+
     const collection = {
       team: new ObjectId(team._id),
       meta: {
         slug: slug,
-        title: collectionToCreate?.name?.splice(0, 50),
-        description: collectionToCreate?.description?.splice(0, 150),
+        title: name,
       },
       sortIndex: 0,
+      name: name ?? "",
+      object: object,
+      parent: parent && new ObjectId(parent),
+      content: '',
       children: [],
-      name: collectionToCreate?.name ?? "",
-      content: collectionToCreate.content ?? "",
-      object: collectionToCreate.object
-        ? collectionToCreate.object
-        : collectionToCreate.parent
-          ? "item"
-          : "collection",
-      parent: collectionToCreate.parent
-        ? new ObjectId(collectionToCreate.parent)
-        : undefined,
       updatedBy: new ObjectId(session.user.id),
       workspace: new ObjectId(workspace._id),
-      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: new ObjectId(session.user.id),
+      createdAt: new Date().toISOString(),
     } as CollectionDbSchema;
 
     const dbResult = await collectionsDb.insertOne(collection);
@@ -224,15 +85,13 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
         ...collection,
         _id: dbResult.insertedId,
       },
+      object,
       message:
         collection.object === "collection"
           ? "Collection has been created successfully"
           : "Page has been created successfully",
     });
   } catch (err: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: err.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(err);
   }
 });

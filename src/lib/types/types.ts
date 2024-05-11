@@ -100,6 +100,10 @@ export interface User {
   id: string;
 }
 
+// Todo: Change item to page
+export const collectionTypes = ['collection', 'item'] as const;
+
+export type CollectionType = (typeof collectionTypes)[number];
 export interface Collection {
   _id: string;
   children: Array<Collection>;
@@ -113,7 +117,7 @@ export interface Collection {
   updatedBy: string;
   workspace: Workspace;
   meta: Meta;
-  object?: "item" | "collection";
+  object?: CollectionType;
 }
 
 export interface Invite {

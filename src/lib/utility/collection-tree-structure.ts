@@ -73,7 +73,7 @@ export function updateInCollectionTree(
  */
 export function addInCollectionTree(
   tree: TreeNode<Collection>[],
-  id: string,
+  id: string | undefined | null,
   newNode: TreeNode<Collection>,
 ): TreeNode<Collection>[] {
   if (tree.length === 0) {

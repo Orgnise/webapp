@@ -37,8 +37,20 @@ export default function CollectionContentPageClient() {
   }
   if (error) {
     return (
-      <div className="CollectionContentPageClient h-full w-full py-12">
-        Something went wrong
+      <div className="flex h-full  w-full flex-col place-content-center items-center py-12">
+        <div className="text-sm text-muted-foreground">
+          Something went wrong
+        </div>
+        <Button
+          variant={"outline"}
+          size={"sm"}
+          className="my-4 text-sm"
+          onClick={() => {
+            window.location.reload();
+          }}
+        >
+          Refresh
+        </Button>
       </div>
     );
   }
@@ -60,7 +72,7 @@ export default function CollectionContentPageClient() {
               !checkWorkspacePermissions(activeWorkspace?.role, "EDIT_CONTENT")
             }
             onUpdateName={(name: string) => {
-              updateCollection({ ...activeCollection!, name });
+              updateCollection(activeCollection!._id, { name });
             }}
           />
           {activeCollection!.children.length > 0 && (

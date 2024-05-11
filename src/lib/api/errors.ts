@@ -83,6 +83,14 @@ export class OrgniseApiError extends Error {
       docUrl: `${docErrorUrl}#not-found`,
     });
   }
+
+  static BAD_REQUEST(message: string) {
+    throw new OrgniseApiError({
+      code: "bad_request",
+      message: message,
+      docUrl: `${docErrorUrl}#bad-request`,
+    });
+  }
   public readonly code: z.infer<typeof ErrorCode>;
   public readonly docUrl?: string;
 

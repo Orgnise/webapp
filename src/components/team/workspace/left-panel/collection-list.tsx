@@ -89,7 +89,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
     createCollection({
       object: object,
       parent: collection._id,
-    } as Collection).finally(() => {
+    }).finally(() => {
       setCreateItemStatus("IDLE");
     });
   }

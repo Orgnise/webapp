@@ -17,13 +17,8 @@ export function CreateItemCTA({ activeCollection, children }: CreateItemProps) {
   const [isLoading, setIsLoading] = useState(false);
   // Create a new Collection/Page
   async function handleCreateCollection() {
-    const item = {
-      object: "item",
-      parent: activeCollection?._id,
-    } as Collection;
-
     setIsLoading(true);
-    await createCollection(item);
+    await createCollection({ object: "item", parent: activeCollection?._id });
     setIsLoading(false);
   }
 

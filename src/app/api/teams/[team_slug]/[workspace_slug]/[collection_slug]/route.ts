@@ -1,66 +1,44 @@
-import { withTeam } from "@/lib/auth";
-import mongoDb, { databaseName } from "@/lib/mongodb";
+import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api";
+import { withWorkspace } from "@/lib/auth";
 import { CollectionDbSchema } from "@/lib/db-schema/collection.schema";
-import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
-import { Collection } from "@/lib/types/types";
+import { databaseName } from "@/lib/mongodb";
 import { generateSlug, hasValue } from "@/lib/utils";
-import { ObjectId } from "mongodb";
+import { UpdateCollectionSchema } from "@/lib/zod/schemas/collection";
+import { Collection, Filter, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-// Update a collection
-export const PATCH = withTeam(async ({ req, session }) => {
+// PATCH - /api/teams/:team_slug/workspaces/:workspace_slug/:collection_slug - Update a collection
+export const PATCH = withWorkspace(async ({ req, session, client, params, team, workspace }) => {
   try {
-    const client = await mongoDb;
-    const { collection } = (await req.json()) as { collection?: Collection };
+    const collection_slug = params.collection_slug as string;
+    const { name, parent } = await UpdateCollectionSchema.parseAsync(await req.json());
 
-    if (!collection || !ObjectId.isValid(collection!._id)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "Invalid collection",
-        },
-        { status: 400 },
-      );
-    }
 
-    const collectionsDb = client.db(databaseName).collection("collections");
-    const query = { _id: new ObjectId(collection._id), object: "collection" };
-    const collectionInDb = (await collectionsDb.findOne(
+
+    const collectionsColl = client.db(databaseName).collection<CollectionDbSchema>("collections");
+    const query = {
+      team: new ObjectId(team._id),
+      workspace: new ObjectId(workspace._id),
+      object: "collection",
+      "meta.slug": collection_slug,
+    } as Filter<CollectionDbSchema>;
+
+    const collectionInDb = (await collectionsColl.findOne(
       query,
-    )) as unknown as CollectionDbSchema;
+    ));
 
     if (!collectionInDb) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unable to update collection",
-          error: "collection not found in database",
-          query,
-        },
-        { status: 404 },
-      );
+
+      throw OrgniseApiError.NOT_FOUND("Collection not found")
+
     }
-    let data = { ...collection } as any;
-    delete data._id;
-    delete data.children;
-    delete data.team;
-    delete data.workspace;
-    delete data.parent;
-    delete data.createdBy;
-    delete data.children;
-    // remove all null or undefined fields from the collection object and update the collection
-    for (const key in data) {
-      if (data[key] === null || data[key] === undefined) {
-        delete data[key];
-      }
-    }
+
     let slug = collectionInDb.meta.slug;
-    if (!hasValue(collectionInDb?.name) && hasValue(collection?.name)) {
+    if (!hasValue(collectionInDb?.name) && hasValue(name) || collectionInDb?.name !== name && name) {
       slug = await generateSlug({
-        title: collection?.name,
+        title: collectionInDb.object === "collection" ? `col_${name ?? ''}` : `pag_${name ?? ''}`,
         didExist: async (val: string) => {
-          const work = await collectionsDb.findOne({
+          const work = await collectionsColl.findOne({
             "meta.slug": val,
             workspace: new ObjectId(collectionInDb.workspace),
           });
@@ -72,14 +50,19 @@ export const PATCH = withTeam(async ({ req, session }) => {
       console.log("slug", slug);
     }
 
-    const update = await collectionsDb.updateOne(query, {
+    const collectionToUpdate = {
+      name: name ?? collectionInDb.name,
+      parent: collectionInDb.parent && new ObjectId(parent ?? collectionInDb.parent),
+      meta: {
+        ...collectionInDb.meta,
+        slug: slug,
+      },
+    };
+
+    const update = await collectionsColl.updateOne(query, {
       $set: {
-        ...data,
-        meta: {
-          ...collectionInDb.meta,
-          slug: slug,
-        },
-        name: collection?.name,
+
+        ...collectionToUpdate,
         updatedAt: new Date().toISOString(),
         updatedBy: new ObjectId(session.user.id),
       },
@@ -88,111 +71,80 @@ export const PATCH = withTeam(async ({ req, session }) => {
     return NextResponse.json(
       {
         success: true,
-        message: "collection updated",
+        message: "collection updated successfully",
         collection: {
-          ...collection,
-          meta: {
-            ...collectionInDb.meta,
-            slug: slug,
-          },
-        },
+          ...collectionInDb,
+          ...collectionToUpdate,
+        }
       },
       { status: 200 },
     );
   } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: error.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(error);
   }
 });
 
-// Delete a collection
-export const DELETE = withTeam(async ({ params, team }) => {
+// DELETE - /api/teams/:team_slug/workspaces/:workspace_slug/:collection_slug - Delete a collection
+export const DELETE = withWorkspace(async ({ params, team, client, workspace }) => {
   try {
-    const client = await mongoDb;
-    const { collection_slug, workspace_slug } = params as {
+    const { collection_slug } = params as {
       collection_slug: string;
       workspace_slug: string;
     };
 
-    const workspaceDb = client.db(databaseName).collection("workspaces");
-    const workspace = (await workspaceDb.findOne({
-      "meta.slug": workspace_slug,
-      team: new ObjectId(team._id),
-    })) as unknown as WorkspaceDbSchema;
-    if (!workspace) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "workspace not found in database",
-          error: "Operation failed",
-        },
-        { status: 404 },
-      );
-    }
-
-    const collectionsDb = client.db(databaseName).collection("collections");
+    const collectionsColl = client.db(databaseName).collection<CollectionDbSchema>("collections");
     const query = {
       "meta.slug": collection_slug,
       workspace: new ObjectId(workspace._id),
       team: new ObjectId(team._id),
     };
-    const collectionInDb = (await collectionsDb.findOne(
+    const collectionInDb = (await collectionsColl.findOne(
       query,
-    )) as unknown as Collection;
+    ));
 
     if (!collectionInDb) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unable to delete collection",
-          error: "collection not found in database",
-          query,
-          workspace,
-        },
-        { status: 404 },
-      );
+      throw OrgniseApiError.NOT_FOUND("Collection not found")
     }
     const deleteQuery = {
       $or: [
         { parent: new ObjectId(collectionInDb._id) },
         { _id: new ObjectId(collectionInDb._id) },
       ],
-    };
+    } as Filter<CollectionDbSchema>;
 
     // delete all children recursively
-    await deleteDocumentAndChildren(
-      collectionsDb,
+    const deletedCount = await deleteDocumentAndChildren(
+      collectionsColl,
       new ObjectId(collectionInDb._id),
     );
 
     // delete the record itself
-    const deleteResult = await collectionsDb.deleteMany(deleteQuery);
+    const deleteResult = await collectionsColl.deleteMany(deleteQuery);
 
     return NextResponse.json(
       {
         success: true,
         message: "Collection is deleted successfully",
-        deleteResult,
+        subCollectionsAndPageCount: deletedCount,
       },
       { status: 200 },
     );
   } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: error.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(error);
   }
+}, {
+  requiredWorkspaceRole: ['editor'],
 });
 
 /**
  * Delete all the children (n-level) of a given documentId (MongoId) and a collection
  */
-async function deleteDocumentAndChildren(collection: any, documentId: any) {
+async function deleteDocumentAndChildren(collection: Collection<CollectionDbSchema>, documentId: any, deletedCount = 0) {
   const children = await collection.find({ parent: documentId }).toArray();
   for (const child of children) {
-    await deleteDocumentAndChildren(collection, child._id);
+    deletedCount = await deleteDocumentAndChildren(collection, child._id, deletedCount);
     await collection.deleteOne({ _id: child._id });
+    deletedCount++;
   }
+  return deletedCount;
 }

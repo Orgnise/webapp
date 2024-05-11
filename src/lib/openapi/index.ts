@@ -5,6 +5,8 @@ import { API_DOMAIN } from "../constants/constants";
 import { TeamSchema } from "../zod/schemas/teams";
 import { workspacePath } from "./workspace";
 import { teamsPath } from "./teams";
+import { collectionsPath } from "./collection";
+import { CollectionSchema, WorkspaceSchema } from "../zod/schemas";
 
 export const openApiObject: ZodOpenApiObject = {
   openapi: "3.0.3",
@@ -30,11 +32,14 @@ export const openApiObject: ZodOpenApiObject = {
   ],
   paths: {
     ...teamsPath,
-    ...workspacePath
+    ...workspacePath,
+    ...collectionsPath,
   },
   components: {
     schemas: {
       TeamSchema,
+      WorkspaceSchema,
+      CollectionSchema,
     },
     securitySchemes: {
       token: {
