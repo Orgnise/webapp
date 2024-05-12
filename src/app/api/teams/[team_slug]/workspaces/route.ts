@@ -7,6 +7,7 @@ import { generateSlug } from "@/lib/utils";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
+import { log } from "@/lib/functions";
 
 // GET /api/teams/:team_slug/workspaces - Get all workspaces for a team
 export const GET = withTeam(async ({ team, session }) => {
@@ -112,17 +113,28 @@ export const POST = withTeam(
       let workspaceUsersCount: number = 0;
 
       const workspaceUserCollection = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
+      const teamsUsersColl = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
       if (visibility === "public") {
         // Fetch all the members of the team
-        const teamsUsersColl = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
         const teamMembers = await teamsUsersColl.find({ teamId: new ObjectId(team._id) }).toArray();
         // console.log(`Found ${teamMembers.length} members in the team ${team._id}`)
         if (teamMembers.length > 0) {
 
           // Add all the members if the team to public workspace except guests
           const workspaceUsers = teamMembers.filter((user) => user.role !== 'guest').map((member) => {
+
+            let role = defaultAccess === "full" ? "editor" : "reader";
+            // Team owner will always be an editor
+            if (member.role === "owner") {
+              role = "editor";
+            }
+            // Workspace creator is always an editor
+            else if (member.user.toString() === userId) {
+              role = "editor";
+            }
+
             return {
-              role: defaultAccess === "full" ? "editor" : "reader",
+              role: role,
               user: new ObjectId(member.user),
               workspace: new ObjectId(dbResult.insertedId),
               team: new ObjectId(team._id),
@@ -144,6 +156,9 @@ export const POST = withTeam(
         }
       }
       else {
+
+        let workspaceMembers = [];
+        // Add the creator of the workspace to the workspace users
         const workspaceUser = {
           role: "editor",
           user: new ObjectId(userId),
@@ -152,8 +167,29 @@ export const POST = withTeam(
           createdAt: new Date(),
           updatedAt: new Date(),
         } as WorkspaceMemberDBSchema;
-        const res = await workspaceUserCollection.insertOne(workspaceUser);
+
+        workspaceMembers.push(workspaceUser);
         workspaceUsersCount = 1;
+
+        // Add the team owner to the workspace users as editor
+        const teamOwner = await teamsUsersColl.findOne({ teamId: new ObjectId(team._id), role: "owner" });
+
+        if (teamOwner) {
+          const ownerWorkspaceUser = {
+            role: "editor",
+            user: new ObjectId(teamOwner.user),
+            workspace: new ObjectId(dbResult.insertedId),
+            team: new ObjectId(team._id),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          } as WorkspaceMemberDBSchema;
+          workspaceMembers.push(ownerWorkspaceUser);
+          workspaceUsersCount++;
+        } else {
+          log({ message: `No team owner found for the team ${team._id}`, type: 'errors' })
+        }
+
+        const res = await workspaceUserCollection.insertMany(workspaceMembers);
 
       }
 
@@ -161,6 +197,7 @@ export const POST = withTeam(
         success: true,
         workspace: {
           ...workspace,
+          role: 'editor', // The creator of the workspace is always an 'editor'
           _id: dbResult.insertedId,
         },
         users: workspaceUsersCount || 0,
