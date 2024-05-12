@@ -36,6 +36,7 @@ import {
 
 import useWorkspaces from "@/lib/swr/use-workspaces";
 import clsx from "clsx";
+import { Badge } from "../badge";
 
 interface SelectUser {
   user: TeamMemberProps;
@@ -307,10 +308,11 @@ export function SearchUserBox({ users, onUserSelect }: SearchUserBox) {
             onClick={() => onUserSelect(user)}
           >
             <Avatar user={user} />
-            <div className="flex flex-col">
+            <div className="flex flex-grow flex-col">
               <h3 className="text-sm font-medium">{user.name}</h3>
               <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
+            <Badge>{user.role}</Badge>
           </div>
         ))}
         <hr className="mt-3" />
@@ -334,10 +336,11 @@ export function SearchUserBox({ users, onUserSelect }: SearchUserBox) {
               }}
             >
               <Avatar user={user} />
-              <div className="flex flex-col">
+              <div className="flex flex-grow flex-col">
                 <h3 className="text-sm font-medium">{user.name}</h3>
                 <p className="text-xs text-muted-foreground">{user.email}</p>
               </div>
+              <Badge>{user.role}</Badge>
             </CommandItem>
           ))}
         </CommandGroup>
