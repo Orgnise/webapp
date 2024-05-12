@@ -7,7 +7,9 @@ import { ReactNode, createContext } from "react";
 import { toast } from "sonner";
 
 import { fetcher } from "@/lib/fetcher";
-import useWorkspaces from "@/lib/swr/use-wrorkspaces";
+import useWorkspaces from "@/lib/swr/use-workspaces";
+import z from "@/lib/zod";
+import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { useParams, useRouter } from "next/navigation";
 
 export default function Providers({ children }: { children: ReactNode }) {
@@ -19,11 +21,11 @@ interface TeamProviderProps {
     loading?: boolean;
     error?: any;
     workspaces?: Workspace[];
-    activeWorkspace?: Workspace;
   };
-  createWorkspace: (name: string, description?: string) => Promise<void>;
+  createWorkspace: (
+    data: z.infer<typeof createWorkspaceSchema>,
+  ) => Promise<void>;
   deleteWorkspace: (workspaceSlug: string) => Promise<void>;
-  updateWorkspace: (workspace: Workspace) => Promise<void>;
 }
 
 export const TeamContext = createContext(
@@ -36,17 +38,9 @@ function TeamProvider({ children }: { children: ReactNode }) {
   const workspacesResponse = useWorkspaces();
 
   const param = useParams();
-  const workspace_slug = param?.workspace_slug;
-  const workspace = workspacesResponse?.workspaces?.find(
-    (w) => w?.meta?.slug === workspace_slug,
-  );
-  // const [createWorkspaceState, setCreateWorkspaceState] =
-  //   useState<Status>("idle");
-
-  // const { toast } = useToast();
 
   // Create workspace
-  async function createWorkspace(name: string, description?: string) {
+  async function createWorkspace(data: z.infer<typeof createWorkspaceSchema>) {
     const teamSlug = param?.team_slug;
     try {
       const response = await fetcher(`/api/teams/${teamSlug}/workspaces`, {
@@ -54,7 +48,7 @@ function TeamProvider({ children }: { children: ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, description }),
+        body: JSON.stringify(data),
       });
 
       workspacesResponse.mutate(
@@ -71,59 +65,16 @@ function TeamProvider({ children }: { children: ReactNode }) {
         description: `Workspace ${name} has been created`,
         duration: 5000,
       });
-    } catch (error) {
-      displayToast({
-        title: "Error",
-        description: `Error occurred while creating workspace ${name}`,
-        duration: 2000,
-        variant: "destructive",
-      });
-    }
-  }
-
-  // Update workspace
-  async function updateWorkspace(workspace: Workspace) {
-    const teamSlug = param?.team_slug;
-    try {
-      const response = await fetcher(
-        `/api/teams/${teamSlug}/${workspace.meta.slug}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ workspace }),
-        },
-      );
-      if (response.workspace?.meta?.slug !== param?.workspace_slug) {
-        router.replace(
-          `/${teamSlug}/${response.workspace?.meta?.slug}/settings`,
-        );
-      }
-      const list = workspacesResponse.workspaces.map((w) => {
-        if (w?._id === workspace._id) {
-          return response.workspace;
-        }
-        return w;
-      });
-      workspacesResponse.mutate({ workspaces: list }, { revalidate: false });
-      displayToast({
-        title: "Workspace updated",
-        description: `Workspace ${workspace.name} has been updated`,
-        duration: 5000,
-      });
-    } catch (err: any) {
+    } catch (error: any) {
       displayToast({
         title: "Error",
         description:
-          err.message ??
-          `Error occurred while updating workspace ${workspace.name}`,
+          error?.error?.message ?? "Error occurred while creating workspace",
         duration: 2000,
         variant: "destructive",
       });
     }
   }
-
   // Delete workspace
   async function deleteWorkspace(workspaceSlug: string) {
     const teamSlug = param?.team_slug;
@@ -172,13 +123,11 @@ function TeamProvider({ children }: { children: ReactNode }) {
     <TeamContext.Provider
       value={{
         workspacesData: {
-          activeWorkspace: workspace,
           error: workspacesResponse.error,
           loading: workspacesResponse.loading,
           workspaces: workspacesResponse.workspaces,
         },
         createWorkspace,
-        updateWorkspace,
         deleteWorkspace,
       }}
     >

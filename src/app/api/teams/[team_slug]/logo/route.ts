@@ -1,5 +1,5 @@
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import { storage } from "@/lib/storage";
 import z from "@/lib/zod";
 import { NextResponse } from "next/server";
@@ -10,7 +10,7 @@ const uploadLogoSchema = z.object({
 });
 
 // POST /api/teams/[team_slug]/logo – upload a new team logo
-export const POST = withAuth(
+export const POST = withTeam(
   async ({ req, team }) => {
     const { image } = uploadLogoSchema.parse(await req.json());
 

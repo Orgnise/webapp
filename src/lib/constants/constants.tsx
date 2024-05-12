@@ -44,3 +44,6 @@ export const DEFAULT_REDIRECTS = {
   create: "https://app.orgnise.in/create",
   new: "https://app.orgnise.in/new",
 };
+
+export const DICEBEAR_AVATAR_URL =
+  "https://api.dicebear.com/8.x/initials/svg?backgroundType=gradientLinear&fontFamily=Helvetica&fontSize=40&size=40&seed=";

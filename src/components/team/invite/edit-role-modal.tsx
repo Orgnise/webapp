@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
 import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
-import { UserProps } from "@/lib/types/types";
+import { TeamMemberProps } from "@/lib/types/types";
 import { Dispatch, SetStateAction, useState } from "react";
 import { mutate } from "swr";
 
@@ -18,12 +18,11 @@ export default function EditRoleModal({
 }: {
   showEditRoleModal: boolean;
   setShowEditRoleModal: Dispatch<SetStateAction<boolean>>;
-  user: UserProps;
+  user: TeamMemberProps;
   role: TeamRole;
 }) {
   const [editing, setEditing] = useState(false);
-  const { team } = useTeam();
-  const { name: workspaceName } = team;
+  const { activeTeam } = useTeam();
   const { _id, name, email } = user;
   const { toast } = useToast();
 
@@ -36,9 +35,10 @@ export default function EditRoleModal({
           This will change{" "}
           <b className="text-secondary-foreground">{name || email}</b>
           &apos;s role in{" "}
-          <b className="text-secondary-foreground">{workspaceName}</b> to{" "}
-          <b className="text-secondary-foreground">{role}</b>. Are you sure you
-          want to continue?
+          <b className="text-secondary-foreground">
+            {activeTeam?.name}
+          </b> to <b className="text-secondary-foreground">{role}</b>. Are you
+          sure you want to continue?
         </p>
       </div>
 
@@ -53,7 +53,7 @@ export default function EditRoleModal({
         <Button
           onClick={() => {
             setEditing(true);
-            fetch(`/api/teams/${team?.meta?.slug}/users`, {
+            fetch(`/api/teams/${activeTeam?.meta?.slug}/users`, {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -62,7 +62,7 @@ export default function EditRoleModal({
               }),
             }).then(async (res) => {
               if (res.status === 200) {
-                await mutate(`/api/teams/${team?.meta?.slug}/users`);
+                await mutate(`/api/teams/${activeTeam?.meta?.slug}/users`);
                 setShowEditRoleModal(false);
                 toast({
                   description: `Successfully changed ${name || email}'s role to ${role}.`,

@@ -3,6 +3,7 @@ import { ZodOpenApiPathsObject } from "zod-openapi";
 import { createTeam } from "./create-team";
 import { getTeamInfo } from "./get-team-info";
 import { getTeams } from "./get-teams";
+import { updateTeam } from "./update-a team";
 
 export const teamsPath: ZodOpenApiPathsObject = {
   "/teams": {
@@ -11,5 +12,6 @@ export const teamsPath: ZodOpenApiPathsObject = {
   },
   "/teams/{team_slug}": {
     get: getTeamInfo,
+    put: updateTeam
   },
 };

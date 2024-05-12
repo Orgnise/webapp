@@ -7,8 +7,8 @@ interface NotFoundViewProps {
 
 export default function NotFoundView({ item }: NotFoundViewProps) {
   return (
-    <div className="flex h-screen flex-col ">
-      <div className="my-10 flex flex-col items-center justify-center rounded-md border border-border bg-background py-12">
+    <div className="my-10 flex flex-col rounded-md bg-card">
+      <div className=" flex flex-col items-center justify-center rounded-md border border-border/80 bg-background py-12">
         <div className="rounded-full bg-accent p-3">
           <FileX2 className="h-6 w-6 text-gray-600" />
         </div>

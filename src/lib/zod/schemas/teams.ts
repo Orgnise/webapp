@@ -3,6 +3,7 @@ import slugify from "@sindresorhus/slugify";
 import { planSchema } from "./misc";
 import { validSlugRegex } from "@/lib/utils";
 import { DEFAULT_REDIRECTS } from "@/lib/constants/constants";
+import { trim } from "@/lib/functions/trim";
 
 export const TeamSchema = z
   .object({
@@ -62,4 +63,37 @@ export const createTeamSchema = z.object({
     .string()
     .max(120)
     .optional()
+});
+
+export const updateTeamSchema = z.object({
+  name: z.preprocess(trim, z.string().min(1).max(32)).optional(),
+  description: z.preprocess(trim, z.string().max(120)).optional(),
+  slug: z
+    .preprocess(
+      trim,
+      z
+        .string()
+        .min(3, "Slug must be at least 3 characters")
+        .max(48, "Slug must be less than 48 characters")
+        .transform((v) => slugify(v))
+        .refine((v) => validSlugRegex.test(v), {
+          message: "Invalid slug format",
+        })
+        .refine(
+          // @ts-ignore
+          async (v) => !DEFAULT_REDIRECTS[v],
+          {
+            message: "Cannot use reserved slugs",
+          },
+        ),
+    )
+    .optional(),
+}).openapi({
+  title: "Update Team",
+  description: "Update a team.",
+  example: {
+    name: "Engineering Team",
+    description: "A team for the engineering department.",
+    slug: "engineering",
+  },
 });

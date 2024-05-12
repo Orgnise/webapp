@@ -1,4 +1,5 @@
 import { HOME_DOMAIN } from "@/lib/constants/constants";
+import { log } from "@/lib/functions";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -48,6 +49,8 @@ export async function POST(request: Request) {
         { status: 200 },
       );
     }
+
+    log({ message: `New email added to waitlist: ${parsedCredentials.data.email}`, type: "waitlist" });
 
     const user = await waitListCollection.insertOne({
       email: parsedCredentials.data.email,

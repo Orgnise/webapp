@@ -1,4 +1,4 @@
-import { CollectionSchema } from "../schema/collection.schema";
+import { CollectionDbSchema } from "../db-schema/collection.schema";
 import { Collection } from "../types/types";
 
 interface TreeNode<CollectionSchema> {
@@ -10,16 +10,16 @@ interface TreeNode<CollectionSchema> {
 }
 
 export function createTreeFromCollection(
-  arr: CollectionSchema[],
-): TreeNode<CollectionSchema>[] {
-  const map = new Map<string, TreeNode<CollectionSchema>>();
+  arr: CollectionDbSchema[],
+): TreeNode<CollectionDbSchema>[] {
+  const map = new Map<string, TreeNode<CollectionDbSchema>>();
   arr.forEach((obj) => {
     map.set(obj._id.toString(), {
       ...obj,
       children: [],
-    } as unknown as TreeNode<CollectionSchema>);
+    } as unknown as TreeNode<CollectionDbSchema>);
   });
-  const root: TreeNode<CollectionSchema> = {
+  const root: TreeNode<CollectionDbSchema> = {
     _id: null as any,
     parent: null,
     children: [],
@@ -73,7 +73,7 @@ export function updateInCollectionTree(
  */
 export function addInCollectionTree(
   tree: TreeNode<Collection>[],
-  id: string,
+  id: string | undefined | null,
   newNode: TreeNode<Collection>,
 ): TreeNode<Collection>[] {
   if (tree.length === 0) {

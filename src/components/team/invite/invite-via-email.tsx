@@ -12,7 +12,6 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { TeamRole } from "@/lib/constants/team-role";
 import { fetcher } from "@/lib/fetcher";
-import useTeam from "@/lib/swr/use-team";
 import { Team } from "@/lib/types/types";
 import clsx from "clsx";
 import { MinusCircleIcon, Plus } from "lucide-react";
@@ -38,8 +37,6 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
       role: "member",
     },
   ]);
-
-  const { team: activeTeam, error, loading, updateTeamAsync } = useTeam();
 
   function senInvitedMail(e: any) {
     e.preventDefault();

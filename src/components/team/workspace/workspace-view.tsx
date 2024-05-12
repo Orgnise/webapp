@@ -1,9 +1,9 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { TeamContext } from "@/app/(dashboard)/[team_slug]/providers";
 import { Spinner } from "@/components/atom/spinner";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import NotFoundView from "../team-not-found";
 import CollectionPanel from "./left-panel/collection-panel.view";
 import WorkspaceContentView from "./workspace-content-view";
@@ -23,9 +23,7 @@ export default function WorkspaceView({
 }: {
   children?: React.ReactNode;
 }) {
-  const {
-    workspacesData: { error, loading, activeWorkspace },
-  } = useContext(TeamContext);
+  const { activeWorkspace, loading, error } = useWorkspaces();
 
   const [leftPanelSize, setLeftPanelSize] = useState<number>(LeftPanelSize.min);
 

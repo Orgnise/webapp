@@ -1,13 +1,13 @@
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // Update an item
-export const PATCH = withAuth(async ({ req, session }) => {
+export const PATCH = withTeam(async ({ req, session }) => {
   try {
     const client = await mongoDb;
     const { item } = (await req.json()) as { item?: Collection };
@@ -41,8 +41,7 @@ export const PATCH = withAuth(async ({ req, session }) => {
     delete data.team;
     delete data.workspace;
     delete data.parent;
-    delete data.ceratedBy;
-    delete data.lastUpdatedUserId;
+    delete data.createdBy;
     // remove all null or undefined fields from the item object and update the collection
     for (const key in data) {
       if (data[key] === null || data[key] === undefined) {
@@ -75,7 +74,7 @@ export const PATCH = withAuth(async ({ req, session }) => {
 });
 
 // Delete an item
-export const DELETE = withAuth(async ({ req, params, team }) => {
+export const DELETE = withTeam(async ({ req, params, team }) => {
   try {
     const client = await mongoDb;
     const { item_slug, workspace_slug } = params as {
@@ -88,7 +87,7 @@ export const DELETE = withAuth(async ({ req, params, team }) => {
     const workspace = (await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as WorkspaceSchema;
+    })) as unknown as WorkspaceDbSchema;
     if (!workspace) {
       return NextResponse.json(
         {
@@ -114,7 +113,7 @@ export const DELETE = withAuth(async ({ req, params, team }) => {
         {
           success: false,
           message: "Operation failed",
-          error: "Item not found in database",
+          error: "Page not found in database",
           query,
         },
         { status: 404 },
@@ -125,7 +124,7 @@ export const DELETE = withAuth(async ({ req, params, team }) => {
     return NextResponse.json(
       {
         success: true,
-        message: "Item deleted",
+        message: "Page deleted",
         deleteResult,
       },
       { status: 200 },

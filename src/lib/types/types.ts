@@ -1,5 +1,5 @@
 import { TeamRole } from "@/lib/constants/team-role";
-import { Visibility } from "../schema/workspace.schema";
+import { WorkspaceRole } from "../constants/workspace-role";
 
 export interface Team {
   _id: string;
@@ -33,7 +33,7 @@ export interface TeamUsers {
   createdAt: string;
   updatedAt: string;
 }
-export interface UserProps {
+export interface TeamMemberProps {
   _id: string;
   name: string;
   email: string;
@@ -42,13 +42,22 @@ export interface UserProps {
   role: TeamRole;
 }
 
+export interface WorkspaceMemberProps {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  createdAt: Date;
+  role: WorkspaceRole;
+}
+
 export interface Meta {
   title: string;
   description: string;
   slug: string;
 }
 
-export type Plan = "free" | "pro" | "business" | "enterprise";
+export type Plan = (typeof plans)[number];
 
 export const plans = ["free", "pro", "business", "enterprise"] as const;
 
@@ -58,13 +67,32 @@ export interface Workspace {
   name: string;
   description: string;
   members: Member[];
-  visibility: keyof typeof Visibility;
+  visibility: Visibility;
   createdBy: any;
+  /**
+   * Role of the current auth user in the workspace
+   */
+  role: WorkspaceRole;
   createdAt: string;
   updatedAt: string;
   updatedBy: string;
   meta: Meta;
+  /**
+   * Default access level for new member in the workspace
+   */
+  defaultAccess: AccessLevel;
 }
+
+
+export const accessLevels = ["full", "read-only"] as const;
+
+export type AccessLevel = (typeof accessLevels)[number];
+
+
+export const visibilities = ['private', 'public', 'archived', 'deleted'] as const;
+
+export type Visibility = (typeof visibilities)[number];
+
 
 export interface User {
   name: string;
@@ -72,6 +100,10 @@ export interface User {
   id: string;
 }
 
+// Todo: Change item to page
+export const collectionTypes = ['collection', 'item'] as const;
+
+export type CollectionType = (typeof collectionTypes)[number];
 export interface Collection {
   _id: string;
   children: Array<Collection>;
@@ -85,7 +117,7 @@ export interface Collection {
   updatedBy: string;
   workspace: Workspace;
   meta: Meta;
-  object?: "item" | "collection";
+  object?: CollectionType;
 }
 
 export interface Invite {

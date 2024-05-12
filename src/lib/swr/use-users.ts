@@ -1,8 +1,15 @@
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "../fetcher";
+import { TeamMemberProps } from "../types/types";
 
-export default function useUsers() {
+interface Props {
+  users: TeamMemberProps[],
+  loading: boolean,
+  error: any
+
+}
+export default function useUsers(): Props {
   const { team_slug } = useParams() as {
     team_slug: string;
   };

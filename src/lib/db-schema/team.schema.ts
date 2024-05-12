@@ -3,7 +3,7 @@ import { TeamRole } from "@/lib/constants/team-role";
 import { ObjectId } from "mongodb";
 import { Plan } from "../types/types";
 
-export interface TeamSchema {
+export interface TeamDbSchema {
   _id: ObjectId;
   name: string;
   description?: string;
@@ -25,10 +25,11 @@ export interface MetaSchema {
   slug: string;
 }
 
-export interface TeamMemberSchema {
+export interface TeamMemberDbSchema {
   _id?: string;
   role: TeamRole;
   user: ObjectId;
+  // ToDo: Rename this to team
   teamId: ObjectId;
   createdAt: Date;
   updatedAt: Date;

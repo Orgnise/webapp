@@ -13,11 +13,12 @@ export default function NavLink({
   children: ReactNode;
 }) {
   const selectedLayoutSegment = useSelectedLayoutSegment();
-  const { team_slug } = useParams() as {
+  const { team_slug, workspace_slug } = useParams() as {
     team_slug?: string;
+    workspace_slug: string;
   };
 
-  const href = `${team_slug ? `/${team_slug}` : ""}/settings${
+  const href = `${team_slug ? `/${team_slug}` : ""}${workspace_slug ? `/${workspace_slug}` : ""}/settings${
     segment ? `/${segment}` : ""
   }`;
 

@@ -1,121 +1,77 @@
-import { withAuth } from "@/lib/auth";
+import { removeAllTeamCollections, removeAllTeamWorkspaceMembers, removeAllWorkspaceCollection, removeAllWorkspaceMembers, removeWorkspace } from "@/lib/api";
+import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
+import { withTeam, withWorkspace } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
-import { generateSlug, hasValue } from "@/lib/utils";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
+import { hasValue } from "@/lib/utils";
+import { updateWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
-// Update a workspace
-export const PATCH = withAuth(async ({ req, session, team }) => {
+// PUT /api/teams/:team_slug/:workspace_slug - Update a workspace
+export const PUT = withTeam(async ({ req, session, team, params }) => {
   try {
+    const { workspace_slug, team_slug } = params ?? {};
     const client = await mongoDb;
-    const { workspace: reqWorkspace } = (await req.json()) as {
-      workspace: WorkspaceSchema;
-    };
-
-    if (!reqWorkspace || !ObjectId.isValid(reqWorkspace!._id)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "Invalid workspace",
-        },
-        { status: 400 },
-      );
-    }
+    const { defaultAccess, visibility, description, name, slug } = await updateWorkspaceSchema.parseAsync(await req.json());
 
     const workspaceDb = client.db(databaseName).collection("workspaces");
-    const query = { _id: new ObjectId(reqWorkspace._id) };
+    const query = {
+      "meta.slug": workspace_slug,
+      team: new ObjectId(team._id),
+    };
     const workspaceInDb = (await workspaceDb.findOne(
       query,
-    )) as unknown as WorkspaceSchema;
+    )) as unknown as WorkspaceDbSchema;
 
     if (!workspaceInDb) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "workspace not found in database",
-          query,
-        },
-        { status: 404 },
-      );
+      throw OrgniseApiError.NOT_FOUND("Workspace not found in database");
     }
-    let data = { ...reqWorkspace } as any;
-    delete data._id;
-    delete data.team;
-    delete data.createdBy;
-    delete data.members;
-    // remove all null or undefined fields from the workspace object and update the workspace
-    for (const key in data) {
-      if (data[key] === null || data[key] === undefined) {
-        delete data[key];
-      }
-    }
-    let slug = reqWorkspace?.meta?.slug;
     if (hasValue(slug) && workspaceInDb?.meta?.slug !== slug) {
       const work = await workspaceDb.findOne({
-        "meta.slug": reqWorkspace?.meta?.slug,
+        "meta.slug": slug,
         team: new ObjectId(team._id),
       });
       if (work) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "workspace with this slug already exists",
-            error: "Operation failed",
-            query,
-          },
-          { status: 409 },
+        throw OrgniseApiError.CONFLICT(
+          "workspace with this slug already exists",
         );
       }
-    } else {
-      slug = await generateSlug({
-        title: workspaceInDb.meta.slug,
-        didExist: async (val: string) => {
-          const work = await workspaceDb.findOne({
-            "meta.slug": val,
-            team: new ObjectId(team._id),
-          });
-          return work ? true : false;
-        },
-        suffixLength: 4,
-      });
     }
+
+    const toUpdate = {
+      name: name ?? workspaceInDb.name,
+      description: description ?? workspaceInDb.description,
+      visibility: visibility ?? workspaceInDb.visibility,
+      defaultAccess: defaultAccess ?? workspaceInDb.defaultAccess,
+      updatedAt: new Date().toISOString(),
+      updatedBy: new ObjectId(session.user.id),
+    };
     const update = await workspaceDb.updateOne(query, {
-      $set: {
-        ...data,
-        meta: {
-          ...workspaceInDb.meta,
-          slug: slug,
-        },
-        updatedAt: new Date().toISOString(),
-        updatedBy: new ObjectId(session.user.id),
-      },
+      $set: { ...toUpdate, "meta.slug": slug ?? workspaceInDb.meta.slug }
+
     });
     return NextResponse.json(
       {
         success: true,
         message: "workspace updated",
         workspace: {
-          ...data,
+          ...workspaceInDb,
+          ...toUpdate,
           meta: {
             ...workspaceInDb.meta,
-            slug: slug,
+            slug: slug ?? workspaceInDb.meta.slug,
           },
         },
       },
       { status: 200 },
     );
   } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: error.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(error);
   }
 });
 
-export const DELETE = withAuth(async ({ params }) => {
+export const DELETE = withWorkspace(async ({ params, team, workspace }) => {
   try {
     const client = await mongoDb;
     const { workspace_slug } = params as { workspace_slug: string };
@@ -124,34 +80,36 @@ export const DELETE = withAuth(async ({ params }) => {
     const query = { "meta.slug": workspace_slug };
     const workspaceInDb = (await workspaceDb.findOne(
       query,
-    )) as unknown as WorkspaceSchema;
+    )) as unknown as WorkspaceDbSchema;
 
     if (!workspaceInDb) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Operation failed",
-          error: "Workspace not found in database",
-          query,
-        },
-        { status: 404 },
-      );
+      throw OrgniseApiError.NOT_FOUND("Workspace not found in database");
     }
 
-    const deleteResult = await workspaceDb.deleteMany(query);
+    // Delete all collections and workspace members and associated with the workspace
+    const [deleteCollection, deleteWorkspaceMembers, deleteWorkspace] = await Promise.all([
+      await removeAllWorkspaceCollection(client, team._id, workspace._id),
+      await removeAllWorkspaceMembers(client, team._id, workspace._id),
+      await removeWorkspace(client, team._id, workspace._id),
+    ]);
+
 
     return NextResponse.json(
       {
         success: true,
         message: "Workspace is deleted successfully",
-        deleteResult,
+        deletedContent: {
+          collection: deleteCollection.deletedCount,
+          workspace: deleteWorkspace.deletedCount,
+          workspaceMembers: deleteWorkspaceMembers.deletedCount,
+        }
       },
       { status: 200 },
     );
   } catch (error: any) {
-    return NextResponse.json(
-      { success: false, message: "Operation failed", error: error.toString() },
-      { status: 500 },
-    );
+    return handleAndReturnErrorResponse(error);
   }
-});
+},
+  {
+    requiredTeamRole: ['owner', 'moderator'],
+  });

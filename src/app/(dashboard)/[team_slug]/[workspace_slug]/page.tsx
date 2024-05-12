@@ -13,21 +13,21 @@ export default function WorkspacePage() {
 
   async function handleCreateCollection() {
     setStatus("LOADING");
-    const col = {
-      object: "collection",
-    } as Collection;
-    const response = await createCollection(col).finally(() => {
-      setStatus("IDLE");
-    });
+
+    const response = await createCollection({ object: "collection" }).finally(
+      () => {
+        setStatus("IDLE");
+      },
+    );
   }
   return (
     <div className="WorkspacePage h-full w-full flex-grow bg-background">
       <div className="mx-auto flex h-full max-w-xl flex-1 flex-col place-content-center items-center gap-10 pt-56 text-center">
         <LightbulbIcon size={64} className="text-accent" />
         <span className="font-normal">
-          <strong>Collections</strong> are a way to organize and group items
+          <strong>Collections</strong> are a way to organize and group pages
           together. They provide a convenient way to <strong>categorize</strong>{" "}
-          and manage related items within your workspace. By creating
+          and manage related pages within your workspace. By creating
           collections, you can easily organize your work / docs and improve
           productivity.
         </span>
@@ -35,7 +35,7 @@ export default function WorkspacePage() {
           value={collections}
           ifPresent={(value: Collection[]) => (
             <div className="text-base text-muted-foreground">
-              Select a collection to view its items
+              Select a collection to view its pages
             </div>
           )}
           ifAbsent={() => (

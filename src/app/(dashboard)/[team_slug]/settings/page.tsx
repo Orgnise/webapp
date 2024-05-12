@@ -24,11 +24,11 @@ import { mutate } from "swr";
 import TeamSettingsLoading from "./loading";
 
 export default function TeamSettingsPage() {
-  const { team, loading, error } = useTeam();
+  const { activeTeam, loading, error } = useTeam();
 
   if (loading) {
     return <TeamSettingsLoading />;
-  } else if (error || !team) {
+  } else if (error || !activeTeam) {
     return (
       <div className="TeamSettingsPage h-full w-full py-12">
         <NotFoundView item="Team" />
@@ -40,6 +40,7 @@ export default function TeamSettingsPage() {
       <div className="mx-auto  grid max-w-screen-md flex-col gap-8 px-4 ">
         <TeamName />
         <TeamSlug />
+        <TeamDescription />
         <UploadLogo />
         <DeleteTeam />
       </div>
@@ -48,7 +49,7 @@ export default function TeamSettingsPage() {
 }
 
 function TeamName() {
-  const { team, error, loading, updateTeamAsync } = useTeam();
+  const { activeTeam, error, loading, updateTeamAsync } = useTeam();
 
   const { toast } = useToast();
 
@@ -58,7 +59,7 @@ function TeamName() {
       description={"This is the name of your team on Orgnise"}
       inputAttrs={{
         name: "name",
-        defaultValue: loading ? undefined : team.name || "",
+        defaultValue: loading ? undefined : activeTeam?.name || "",
         placeholder: "Acme Inc.",
         maxLength: 32,
       }}
@@ -68,7 +69,7 @@ function TeamName() {
           {
             name: data?.name,
           },
-          team.meta.slug,
+          activeTeam!.meta.slug,
         ).then(() => {
           toast({
             title: "Success!",
@@ -79,7 +80,7 @@ function TeamName() {
       }
       buttonText="Save changes"
       disabledTooltip={
-        checkPermissions(team.role, "UPDATE_TEAM_INFO")
+        checkPermissions(activeTeam?.role, "UPDATE_TEAM_INFO")
           ? undefined
           : "Only the team owner can update the team name"
       }
@@ -88,7 +89,7 @@ function TeamName() {
 }
 
 function TeamSlug() {
-  const { team, error, loading, updateTeamAsync } = useTeam();
+  const { activeTeam, error, loading, updateTeamAsync } = useTeam();
   const { toast } = useToast();
 
   return (
@@ -97,7 +98,7 @@ function TeamSlug() {
       description={"This is your team's unique slug on Orgnise"}
       inputAttrs={{
         name: "slug",
-        defaultValue: loading ? undefined : team?.meta?.slug || "",
+        defaultValue: loading ? undefined : activeTeam?.meta?.slug || "",
         placeholder: "acme-inc",
         maxLength: 48,
       }}
@@ -107,7 +108,7 @@ function TeamSlug() {
           {
             slug: data?.slug,
           },
-          team.meta.slug,
+          activeTeam!.meta.slug,
         ).then(() => {
           toast({
             title: "Success!",
@@ -118,9 +119,48 @@ function TeamSlug() {
       }
       buttonText="Save changes"
       disabledTooltip={
-        checkPermissions(team.role, "UPDATE_TEAM_INFO")
+        checkPermissions(activeTeam?.role, "UPDATE_TEAM_INFO")
           ? undefined
           : "Only the team owner can update the team slug"
+      }
+    />
+  );
+}
+
+function TeamDescription() {
+  const { activeTeam, error, loading, updateTeamAsync } = useTeam();
+  const { toast } = useToast();
+
+  return (
+    <Form
+      title={"Description"}
+      description={"This is the description of your team on Orgnise"}
+      inputAttrs={{
+        name: "description",
+        defaultValue: loading ? undefined : activeTeam?.description || "",
+        placeholder: "Acme Inc. is a software company...",
+        maxLength: 120,
+      }}
+      helpText="Max 120 characters."
+      handleSubmit={(data) =>
+        updateTeamAsync(
+          {
+            description: data?.description,
+          },
+          activeTeam!.meta.slug,
+        ).then(() => {
+          toast({
+            title: "Success!",
+            description: "Team description updated successfully",
+          });
+          mutate(`/api/teams`);
+        })
+      }
+      buttonText="Save changes"
+      disabledTooltip={
+        checkPermissions(activeTeam?.role, "UPDATE_TEAM_INFO")
+          ? undefined
+          : "Only the team owner can update the team description"
       }
     />
   );
@@ -142,8 +182,8 @@ function DeleteTeam() {
           </div>
           <div className="flex items-center  space-x-4 rounded-b-lg border-t border-info bg-info p-3 sm:px-10">
             <p className="text-sm text-info-foreground">
-              You do not have permission to delete this team. Only the team
-              owner can delete the team.
+              You do not have permission to delete this activeTeam?. Only the
+              team owner can delete the activeTeam?.
             </p>
           </div>
         </div>
@@ -179,13 +219,13 @@ interface CerateWorkspaceModelProps {
 
 function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { team, error, loading, deleteTeamAsync } = useTeam();
+  const { activeTeam, error, loading, deleteTeamAsync } = useTeam();
 
   function handleDeleteTeam(e: any) {
     e.preventDefault();
 
     setIsDeleting(true);
-    deleteTeamAsync(team?.meta?.slug!).finally(() => {
+    deleteTeamAsync(activeTeam?.meta?.slug!).finally(() => {
       setIsDeleting(false);
     });
   }
@@ -213,14 +253,14 @@ function DeleteWorkspaceModel({ children }: CerateWorkspaceModelProps) {
               >
                 Enter the team slug
                 <span className="cursor-text select-text px-1 font-semibold text-secondary-foreground">
-                  {team?.meta?.slug}
+                  {activeTeam?.meta?.slug}
                 </span>
                 to continue:
               </label>
               <div className="relative mt-1 rounded-md ">
                 <Input
                   id="team-slug"
-                  pattern={team?.meta?.slug}
+                  pattern={activeTeam?.meta?.slug}
                   type="text"
                   required
                   autoComplete="off"

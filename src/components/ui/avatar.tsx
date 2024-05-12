@@ -32,7 +32,7 @@ export function Avatar({
       referrerPolicy="no-referrer"
       src={
         user?.image ||
-        `https://api.dicebear.com/8.x/initials/svg?seed=${user?.name}&scale=70&size=40`
+        `https://api.dicebear.com/8.x/initials/svg?seed=${user?.name ?? user?.email}&scale=70&size=40`
       }
       className={cn("h-10 w-10 rounded-full border border-border", className)}
       draggable={false}

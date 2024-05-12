@@ -13,8 +13,8 @@ import { LogOutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "../atom/logo";
-import { TeamToggleDropDown } from "../ui/team-select";
-import { ModeToggle } from "../ui/toggle-theme";
+import { TeamSwitcher } from "../ui/team-switcher";
+import { ThemeSwitcher } from "../ui/theme-switcher";
 
 const Nav = ({}) => {
   const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
@@ -23,29 +23,31 @@ const Nav = ({}) => {
 
   return (
     <div className="flex h-16 w-full place-content-between items-center">
-      <div className="flex items-center gap-2">
-        <Link href="/" className="Logo flex items-center gap-2">
+      <div className="flex items-center sm:gap-2">
+        <Link
+          href="/"
+          className="Logo hidden items-center gap-2 sm:mr-4 sm:flex "
+        >
           <Logo className="h-8" />
         </Link>
-        {user && team_slug && <TeamToggleDropDown />}
+        {user && <TeamSwitcher />}
       </div>
       <div className="flex items-center gap-2">
-        <ModeToggle />
         {status === "loading" && (
           <div className="h-8 w-8 animate-pulse rounded-full bg-accent" />
         )}
         {user && Object.keys(user).length !== 0 && (
           <div className="flex items-center space-x-4 ">
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <div className="bg-primary-200 flex h-10 w-10 place-content-center items-center rounded-full text-lg font-bold hover:text-teal-700">
+              <DropdownMenuTrigger className="group">
+                <div className="bg-primary-200  flex h-10 w-10 place-content-center items-center rounded-full text-lg font-bold hover:text-teal-700">
                   <Image
                     unoptimized={true}
-                    height={32}
-                    width={32}
+                    height={40}
+                    width={40}
                     src={user.image ?? ""}
                     alt="user"
-                    className="h-8 w-8 rounded-full"
+                    className="h-10 w-10 rounded-full border border-border group-active:scale-95"
                     onError={(e) => {
                       (e.target as any).src =
                         `https://api.dicebear.com/8.x/initials/svg?seed=${user?.name}&scale=70&size=40`;
@@ -65,6 +67,7 @@ const Nav = ({}) => {
                     {user.email}
                   </p>
                 </div>
+                <ThemeSwitcher />
                 <DropdownMenuItem className="cursor-pointer">
                   <Link href="/settings" className="flex items-center">
                     <Settings size={18} className="mr-2" />

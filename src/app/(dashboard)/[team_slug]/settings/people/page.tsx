@@ -26,7 +26,7 @@ export default function ProjectPeopleClient() {
     "Members",
   );
 
-  const { team: activeTeam } = useTeam();
+  const { activeTeam } = useTeam();
 
   return (
     <>

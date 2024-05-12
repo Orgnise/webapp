@@ -1,28 +1,28 @@
-import { withAuth } from "@/lib/auth";
+import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { CollectionSchema } from "@/lib/schema/collection.schema";
-import { WorkspaceSchema } from "@/lib/schema/workspace.schema";
+import { CollectionDbSchema } from "@/lib/db-schema/collection.schema";
+import { WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
 import { createTreeFromCollection } from "@/lib/utility/collection-tree-structure";
 import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // Get list of collections
-export const GET = withAuth(async ({ team, params }) => {
+export const GET = withTeam(async ({ team, params }) => {
   const client = await mongoDb;
   try {
     const { workspace_slug, team_slug } = params ?? {};
     const collections = client
       .db(databaseName)
-      .collection<CollectionSchema>("collections");
+      .collection<CollectionDbSchema>("collections");
 
     const workspaces = client
       .db(databaseName)
-      .collection<WorkspaceSchema>("workspaces");
+      .collection<WorkspaceDbSchema>("workspaces");
     const workspaceDate = (await workspaces.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
-    })) as unknown as WorkspaceSchema;
+    })) as unknown as WorkspaceDbSchema;
 
     if (!workspaceDate) {
       return NextResponse.json(
@@ -57,7 +57,7 @@ export const GET = withAuth(async ({ team, params }) => {
 });
 
 // Create a new collection
-export const POST = withAuth(async ({ team, session, req, params }) => {
+export const POST = withTeam(async ({ team, session, req, params }) => {
   const client = await mongoDb;
   try {
     const workspace_slug = params?.workspace_slug;
@@ -78,7 +78,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
     }
     const workspaceDb = client
       .db(databaseName)
-      .collection<CollectionSchema>("workspaces");
+      .collection<CollectionDbSchema>("workspaces");
     const workspace = await workspaceDb.findOne({
       "meta.slug": workspace_slug,
       team: new ObjectId(team._id),
@@ -98,7 +98,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
 
     const collectionsDb = client
       .db(databaseName)
-      .collection<CollectionSchema>("collections");
+      .collection<CollectionDbSchema>("collections");
     const slug = await generateSlug({
       title: collectionToCreate?.name ?? "collection ",
       didExist: async (val: string) => {
@@ -119,7 +119,6 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
       },
       sortIndex: 0,
       children: [],
-      title: collectionToCreate?.name ?? "",
       name: collectionToCreate?.name ?? "",
       content: collectionToCreate.content ?? "",
       object: collectionToCreate.object
@@ -135,7 +134,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: new ObjectId(session.user.id),
-    } as CollectionSchema;
+    } as CollectionDbSchema;
 
     const dbResult = await collectionsDb.insertOne(collection);
     return NextResponse.json({
@@ -147,7 +146,7 @@ export const POST = withAuth(async ({ team, session, req, params }) => {
       message:
         collection.object === "collection"
           ? "Collection has been created successfully"
-          : "Item has been created successfully",
+          : "Page has been created successfully",
     });
   } catch (err: any) {
     return NextResponse.json(

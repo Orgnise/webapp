@@ -9,7 +9,7 @@ export default function NavTabs() {
     team_slug?: string;
     workspace_slug?: string;
   };
-  const { loading, error, team } = useTeam();
+  const { loading, error, activeTeam } = useTeam();
 
   const tabs = [
     { name: "Workspaces", href: `/${team_slug}` },
@@ -26,7 +26,7 @@ export default function NavTabs() {
 
   return (
     <div className="flex h-12 items-end justify-start space-x-2 overflow-x-auto">
-      {loading && !team ? (
+      {loading && !activeTeam ? (
         <div className="h-12 w-full"></div>
       ) : (
         tabs.map(({ name, href }) => (

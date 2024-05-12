@@ -6,7 +6,7 @@ import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
 import { fetcher } from "@/lib/fetcher";
 import useTeam from "@/lib/swr/use-team";
-import { UserProps } from "@/lib/types/types";
+import { TeamMemberProps } from "@/lib/types/types";
 import { useSession } from "next-auth/react";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -20,13 +20,12 @@ export default function RemoveTeamMemberModal({
 }: {
   showRemoveTeammateModal: boolean;
   setShowRemoveTeammateModal: Dispatch<SetStateAction<boolean>>;
-  user: UserProps;
+  user: TeamMemberProps;
   invite?: boolean;
 }) {
   // const router = useRouter();
   const [removing, setRemoving] = useState(false);
-  const { team } = useTeam();
-  const { name: workspaceName } = team;
+  const { activeTeam } = useTeam();
   const { data: session } = useSession();
   const { _id, name, email } = user;
   const { toast } = useToast();
@@ -34,7 +33,7 @@ export default function RemoveTeamMemberModal({
   const handleRemoveTeammate = async () => {
     setRemoving(true);
     fetcher(
-      `/api/teams/${team?.meta?.slug}/${
+      `/api/teams/${activeTeam?.meta?.slug}/${
         invite
           ? `invites?email=${encodeURIComponent(email)}`
           : `users?userId=${user._id}`
@@ -46,7 +45,7 @@ export default function RemoveTeamMemberModal({
     )
       .then(async (res) => {
         await mutate(
-          `/api/teams/${team?.meta?.slug}/${invite ? "invites" : "users"}`,
+          `/api/teams/${activeTeam?.meta?.slug}/${invite ? "invites" : "users"}`,
         );
         if (session?.user?.email === email) {
           await mutate("/api/teams");
@@ -99,7 +98,7 @@ export default function RemoveTeamMemberModal({
               ? "You're about to leave "
               : "This will remove "}
           <span className="font-semibold ">
-            {session?.user?.email === email ? workspaceName : name || email}
+            {session?.user?.email === email ? activeTeam?.name : name || email}
           </span>
           {invite
             ? "'s invitation to join your team. "

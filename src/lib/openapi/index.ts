@@ -5,6 +5,8 @@ import { API_DOMAIN } from "../constants/constants";
 import { TeamSchema } from "../zod/schemas/teams";
 import { workspacePath } from "./workspace";
 import { teamsPath } from "./teams";
+import { collectionsPath } from "./collection";
+import { CollectionSchema, WorkspaceSchema } from "../zod/schemas";
 
 export const openApiObject: ZodOpenApiObject = {
   openapi: "3.0.3",
@@ -15,7 +17,7 @@ export const openApiObject: ZodOpenApiObject = {
     contact: {
       name: "Orgnise Support",
       email: "orgnisehq@gmail.com",
-      url: "https://orgnise.in/api",
+      url: "http://docs.orgnise.in/api-reference/introduction",
     },
     license: {
       name: "AGPL-3.0 license",
@@ -24,17 +26,20 @@ export const openApiObject: ZodOpenApiObject = {
   },
   servers: [
     {
-      url: API_DOMAIN,
+      url: `https://api.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
       description: "Production API",
     },
   ],
   paths: {
     ...teamsPath,
-    ...workspacePath
+    ...workspacePath,
+    ...collectionsPath,
   },
   components: {
     schemas: {
       TeamSchema,
+      WorkspaceSchema,
+      CollectionSchema,
     },
     securitySchemes: {
       token: {
@@ -54,15 +59,6 @@ export const openApiObject: ZodOpenApiObject = {
         name: "teamId",
         in: "query",
         required: true,
-        schema: {
-          type: "string",
-        },
-      },
-      {
-        "x-speakeasy-globals-hidden": true,
-        name: "teamSlug",
-        in: "query",
-        deprecated: true,
         schema: {
           type: "string",
         },

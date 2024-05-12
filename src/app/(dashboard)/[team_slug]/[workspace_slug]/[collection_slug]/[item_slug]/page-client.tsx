@@ -4,7 +4,9 @@ import { SmallLabel } from "@/components/atom/typography";
 import NotFoundView from "@/components/team/team-not-found";
 import ItemContent from "@/components/team/workspace/collection/content/content";
 import { Input } from "@/components/ui/input";
+import { checkWorkspacePermissions } from "@/lib/constants/workspace-role";
 import useCollections from "@/lib/swr/use-collections";
+import useWorkspaces from "@/lib/swr/use-workspaces";
 import { Collection } from "@/lib/types/types";
 import { findInCollectionTree } from "@/lib/utility/collection-tree-structure";
 import { hasValue } from "@/lib/utils";
@@ -24,6 +26,8 @@ export default function ItemPageClient() {
     error,
     loading,
   } = useCollections();
+
+  const { activeWorkspace } = useWorkspaces();
 
   const content = useRef<any>(undefined);
   const { team_slug, workspace_slug, collection_slug, item_slug } =
@@ -82,7 +86,7 @@ export default function ItemPageClient() {
   if (!hasValue(activeItem)) {
     return (
       <div className="ItemPageClient h-full w-full py-12">
-        <NotFoundView item="Item" />
+        <NotFoundView item="Page" />
       </div>
     );
   }
@@ -99,6 +103,12 @@ export default function ItemPageClient() {
           <div className="flex place-content-between items-center gap-2">
             <CollectionNameField
               name={activeItem?.name}
+              disabled={
+                !checkWorkspacePermissions(
+                  activeWorkspace?.role,
+                  "EDIT_CONTENT",
+                )
+              }
               onUpdateName={(name: string) => {
                 console.log("name", name);
                 UpdateActiveItem(
@@ -122,7 +132,10 @@ export default function ItemPageClient() {
         >
           <ItemContent
             activeItem={activeItem}
-            isEditing={true}
+            editable={checkWorkspacePermissions(
+              activeWorkspace?.role,
+              "EDIT_CONTENT",
+            )}
             onDebouncedUpdate={(editor) => {
               if (editor) {
                 content.current = editor.getJSON();
@@ -138,8 +151,10 @@ export default function ItemPageClient() {
 function CollectionNameField({
   name,
   onUpdateName,
+  disabled,
 }: {
   name?: string;
+  disabled?: boolean;
   onUpdateName: (name: string) => void;
 }) {
   return (
@@ -156,6 +171,7 @@ function CollectionNameField({
       <Input
         type="text"
         autoFocus
+        disabled={disabled}
         className=" border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
         maxLength={70}
         defaultValue={name}

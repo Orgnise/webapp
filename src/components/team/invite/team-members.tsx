@@ -11,7 +11,7 @@ import {
 import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
 import useUsers from "@/lib/swr/use-users";
-import { UserProps } from "@/lib/types/types";
+import { TeamMemberProps } from "@/lib/types/types";
 import { cn } from "@/lib/utils";
 import { UserMinus } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -21,18 +21,18 @@ import RemoveTeamMemberModal from "./remove-member-model";
 
 export default function TeamMembers() {
   const { error, loading, users } = useUsers();
-  const { team } = useTeam();
+  const { activeTeam } = useTeam();
 
   return (
     <div className="grid divide-y divide-border">
       <ListView
         items={Array.isArray(users) ? users : []}
         loading={loading}
-        renderItem={(user: UserProps) => (
+        renderItem={(user: TeamMemberProps) => (
           <UserCard
             key={user.email}
             user={user}
-            isOwner={team.role === "owner"}
+            isOwner={activeTeam?.role === "owner"}
           />
         )}
         noItemsElement={
@@ -50,7 +50,13 @@ export default function TeamMembers() {
   );
 }
 
-const UserCard = ({ user, isOwner }: { user: UserProps; isOwner: boolean }) => {
+const UserCard = ({
+  user,
+  isOwner,
+}: {
+  user: TeamMemberProps;
+  isOwner: boolean;
+}) => {
   const [openPopover, setOpenPopover] = useState(false);
 
   const { name, email, createdAt, role: currentRole } = user;

@@ -1,49 +1,25 @@
+import { removeAllTeamInvites, removeAllTeamUsers } from "@/lib/api";
+import { removeAllTeamCollections } from "@/lib/api/collection";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { fetchDecoratedTeam } from "@/lib/api/team";
-import { withAuth } from "@/lib/auth";
-import { DEFAULT_REDIRECTS } from "@/lib/constants/constants";
-import { trim } from "@/lib/functions/trim";
+import { removeAllTeamWorkspaceMembers, removeAllWorkspaces } from "@/lib/api/workspace";
+import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamSchema } from "@/lib/schema/team.schema";
-import { hasValue, validSlugRegex } from "@/lib/utils";
-import z from "@/lib/zod";
-import slugify from "@sindresorhus/slugify";
+import { hasValue } from "@/lib/utils";
+import { updateTeamSchema } from "@/lib/zod/schemas/teams";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 
-const updateTeamSchema = z.object({
-  name: z.preprocess(trim, z.string().min(1).max(32)).optional(),
-  description: z.preprocess(trim, z.string().max(120)).optional(),
-  slug: z
-    .preprocess(
-      trim,
-      z
-        .string()
-        .min(3, "Slug must be at least 3 characters")
-        .max(48, "Slug must be less than 48 characters")
-        .transform((v) => slugify(v))
-        .refine((v) => validSlugRegex.test(v), {
-          message: "Invalid slug format",
-        })
-        .refine(
-          // @ts-ignore
-          async (v) => !DEFAULT_REDIRECTS[v],
-          {
-            message: "Cannot use reserved slugs",
-          },
-        ),
-    )
-    .optional(),
-});
+
 
 // GET /api/team/[slug] – get a specific team
-export const GET = withAuth(async ({ team }) => {
+export const GET = withTeam(async ({ team }) => {
   return NextResponse.json(team);
 });
 
 // PUT /api/team/[slug] – edit a specific team
-export const PUT = withAuth(
+export const PUT = withTeam(
   async ({ team, req, session }) => {
     try {
       const client = await mongoDb;
@@ -108,37 +84,16 @@ export const PUT = withAuth(
 );
 
 // Delete a team
-export const DELETE = withAuth(
-  async ({ params, team }) => {
+export const DELETE = withTeam(
+  async ({ params, team, client }) => {
     try {
-      const client = await mongoDb;
-
-      const teamsDb = client.db(databaseName).collection<TeamSchema>("teams");
-      const collectionsDb = client.db(databaseName).collection("collections");
-      const workspaceDb = client.db(databaseName).collection("workspaces");
-      const teamUsersDb = client.db(databaseName).collection("teamUsers");
-      const teamInviteCollection = client
-        .db(databaseName)
-        .collection("teamInvites");
-
-
-      const deleteQuery = {
-        team: new ObjectId(team._id),
-      };
-      // TODO: Update teamId to team 
-      const deleteQuery2 = {
-        teamId: new ObjectId(team._id),
-      };
-      const deleteTeam = await teamsDb.deleteOne({
-        _id: new ObjectId(team._id),
-      });
-
-      // Delete all collections, workspaces and team users associated with the team
-      const [deleteCollection, deleteWorkspace, deleteTeamUsers] = await Promise.all([
-        await collectionsDb.deleteMany(deleteQuery),
-        await workspaceDb.deleteMany(deleteQuery),
-        await teamUsersDb.deleteMany(deleteQuery2),
-        await teamInviteCollection.deleteMany(deleteQuery2),
+      // Delete all collections,workspace members, workspaces, team users and  team users invites associated with the team
+      const [deleteCollection, deleteWorkspaceMembers, deleteWorkspace, deleteTeamUsers, teamInvites] = await Promise.all([
+        await removeAllTeamCollections(client, team._id),
+        await removeAllTeamWorkspaceMembers(client, team._id),
+        await removeAllWorkspaces(client, team._id),
+        await removeAllTeamUsers(client, team._id),
+        await removeAllTeamInvites(client, team._id)
       ]);
 
 
@@ -149,7 +104,9 @@ export const DELETE = withAuth(
           deletedContent: {
             collection: deleteCollection.deletedCount,
             workspace: deleteWorkspace.deletedCount,
+            workspaceMembers: deleteWorkspaceMembers.deletedCount,
             users: deleteTeamUsers.deletedCount,
+            invites: teamInvites.deletedCount
           }
         },
         { status: 200 },

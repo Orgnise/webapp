@@ -8,7 +8,6 @@ type UpdateTeam = { name?: string; description?: string; slug?: string };
 interface ITeam {
   error: any;
   loading: boolean;
-  team: Team;
   activeTeam?: Team;
   mutate: KeyedMutator<any>;
   exceedingFreeTeam: boolean;
@@ -27,7 +26,7 @@ export default function useTeam(): ITeam {
     },
   );
 
-  // Delete collection
+  // Delete team
   async function deleteTeamAsync(teamSlug: string) {
     const activeTeamSlug = team_slug;
     // const workspaceSlug = param?.workspace_slug;
@@ -86,10 +85,9 @@ export default function useTeam(): ITeam {
         { revalidate: false, optimisticData: response.team },
       );
     } catch (error: any) {
-      console.error("error", error);
       displayToast({
         title: "Error",
-        description: error?.message ?? "Failed to update team",
+        description: error?.error?.message ?? error?.message ?? "Failed to update team",
         variant: "error",
       });
       throw error;
@@ -99,7 +97,7 @@ export default function useTeam(): ITeam {
   const freeProjects = (data?.plan === "free" || !data?.plan) && data?.isOwner;
 
   return {
-    team: data,
+    activeTeam: data,
     error,
     mutate,
     exceedingFreeTeam: freeProjects?.length >= 2 ? true : false,
