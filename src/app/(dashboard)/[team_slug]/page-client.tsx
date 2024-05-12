@@ -56,7 +56,7 @@ export default function TeamsPageClient() {
           <Link
             key={index}
             href={`${team_slug}/${item.meta.slug}`}
-            className=" flex h-32 w-full cursor-pointer place-content-between items-start rounded border border-border bg-card p-4 hover:text-accent-foreground  hover:shadow"
+            className=" flex min-h-32 w-full cursor-pointer place-content-between items-start rounded border border-border bg-card p-4 hover:text-accent-foreground  hover:shadow"
           >
             <div className="flex items-start gap-2">
               {/* <Logo className="mt-1 h-7 min-h-6 w-6 min-w-6" /> */}
@@ -69,12 +69,10 @@ export default function TeamsPageClient() {
                   />
                 </ToolTipWrapper>
               ) : (
-                <ToolTipWrapper content={<p>Public workspace</p>}>
-                  <HashIcon
-                    size={22}
-                    className=" mt-1 min-w-6 text-muted-foreground"
-                  />
-                </ToolTipWrapper>
+                <HashIcon
+                  size={22}
+                  className=" mt-1 min-w-6 text-muted-foreground"
+                />
               )}
 
               <div className="flex flex-col">
