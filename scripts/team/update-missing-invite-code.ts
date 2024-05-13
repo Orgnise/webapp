@@ -4,7 +4,7 @@ import { randomId } from "@/lib/utils";
 import "dotenv-flow/config";
 
 
-//  npm run script scripts/team/update-missing-invite-code.ts
+//  npm run script /team/update-missing-invite-code
 // npx tsx ./scripts/team/update-missing-invite-code.ts
 async function main() {
   const client = await mongodb;
@@ -24,7 +24,7 @@ async function main() {
         await teamCollection.updateOne({ _id: team._id }, { $set: { inviteCode: randomId() } });
       }
     }
-    console.log(`✅ Invite codes added for ${teams} teams.`);
+    console.log(`✅ Invite codes added for ${teams.length} teams.`);
   } else {
     console.log("✅ All teams have invite code");
   }

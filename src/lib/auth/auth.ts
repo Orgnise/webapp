@@ -19,7 +19,9 @@ const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
 
 export const NextAuthOptions = {
-  adapter: MongoDBAdapter(mongoDb),
+  adapter: MongoDBAdapter(mongoDb, {
+    databaseName: databaseName,
+  }),
   pages: {
     error: "/login",
   },
