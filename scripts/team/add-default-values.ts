@@ -3,7 +3,7 @@ import { TeamDbSchema } from "@/lib/db-schema/team.schema";
 import "dotenv-flow/config";
 
 
-//  npm run script scripts/team/add-default-values.ts
+// npm run script /team/add-default-values
 // npx tsx ./scripts/team/add-default-values.ts
 async function main() {
   const client = await mongodb;

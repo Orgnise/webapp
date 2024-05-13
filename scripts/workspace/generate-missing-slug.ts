@@ -4,7 +4,7 @@ import { generateSlug } from "@/lib/utils";
 import { ObjectId } from "mongodb";
 
 
-//  npm run script scripts/workspace/generate-missing-slug.ts
+//  npm run script /workspace/generate-missing-slug
 // npx tsx ./scripts/workspace/generate-missing-slug.ts
 async function main() {
   const client = await mongodb;
