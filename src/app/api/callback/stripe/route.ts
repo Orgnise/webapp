@@ -16,25 +16,28 @@ const relevantEvents = new Set([
 
 // POST /api/callback/stripe – listen to Stripe webhooks
 export const POST = async (req: Request) => {
-  const buf = await req.text();
-  const sig = req.headers.get("Stripe-Signature") as string;
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  let event: Stripe.Event;
-
   try {
-    if (!sig || !webhookSecret) return;
-    event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
-  } catch (err: any) {
-    console.log(`❌ Error message: ${err.message}`);
-    return new Response(`Webhook Error: ${err.message}`, {
-      status: 400,
-    });
-  }
-  if (relevantEvents.has(event.type)) {
-    console.log('Stripe webhook event type:', event);
-    const client = await mongodb;
-    const teamsCollection = client.db(databaseName).collection<TeamDbSchema>("teams");
+    const buf = await req.text();
+    const sig = req.headers.get("Stripe-Signature") as string;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    let event: Stripe.Event;
+
+    console.log('👉 Stripe webhook event received:', webhookSecret);
+
     try {
+      if (!sig || !webhookSecret) return;
+      event = stripe.webhooks.constructEvent(buf, sig, webhookSecret);
+    } catch (err: any) {
+      console.log(`❌ Error message: ${err.message}`);
+      return new Response(`Webhook Error: ${err.message}`, {
+        status: 400,
+      });
+    }
+    if (relevantEvents.has(event.type)) {
+      console.log('Stripe webhook event type:', event);
+      const client = await mongodb;
+      const teamsCollection = client.db(databaseName).collection<TeamDbSchema>("teams");
+
       if (event.type === "checkout.session.completed") {
         const checkoutSession = event.data.object as Stripe.Checkout.Session;
 
@@ -237,23 +240,24 @@ export const POST = async (req: Request) => {
         ]);
       }
 
-    } catch (error: any) {
-      await log({
-        message: `Stripe webook failed. Error: ${error.message}`,
-        type: "errors",
-      });
-      return new Response(
-        'Webhook error: "Webhook handler failed. View logs."',
-        {
-          status: 400,
-        },
-      );
-    }
-  } else {
-    return new Response(`🤷‍♀️ Unhandled event type: ${event.type}`, {
-      status: 400,
-    });
-  }
 
-  return NextResponse.json({ received: true });
+    } else {
+      return new Response(`🤷‍♀️ Unhandled event type: ${event.type}`, {
+        status: 400,
+      });
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (error: any) {
+    await log({
+      message: `Stripe webhook failed. Error: ${error.message}`,
+      type: "errors",
+    });
+    return new Response(
+      'Webhook error: "Webhook handler failed. View logs."',
+      {
+        status: 400,
+      },
+    );
+  }
 };

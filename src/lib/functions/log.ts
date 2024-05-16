@@ -21,6 +21,21 @@ export const log = async ({
   ) {
     console.log(message);
   }
+
+  function switchType(type: string) {
+    switch (type) {
+      case "alerts":
+        return "🚨 ";
+      case "errors":
+        return "❌ ";
+      case "newTeam":
+        return "🎉 ";
+      case "waitlist":
+        return "📝 ";
+      default:
+        return "";
+    }
+  }
   /* Log a message to the console */
   const HOOK = logTypeToEnv[type];
   if (!HOOK) return;
@@ -37,7 +52,7 @@ export const log = async ({
             text: {
               type: "mrkdwn",
               // prettier-ignore
-              text: `${mention ? "<#D06Q02G3Y9L> " : ""}${(type === "alerts" || type === "errors") ? ":alert: " : ""}${message}`,
+              text: `${mention ? "<#D06Q02G3Y9L> " : ""}${switchType(type)}${message}`,
             },
           },
         ],
