@@ -61,7 +61,7 @@ export interface Meta {
 
 export type Plan = (typeof plans)[number];
 
-export const plans = ["free", "pro", , "business", "enterprise"] as const;
+export const plans = ["free", "pro", "business", "enterprise"] as const;
 
 export interface Workspace {
   _id: string;

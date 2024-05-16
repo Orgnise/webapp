@@ -1,6 +1,5 @@
-// import { plans, roles } from "@/lib/types";
 import { roles } from "@/lib/constants/team-role";
-import { plans } from "@/lib/types/types";
+import { plans } from "@/lib/types";
 import z from "@/lib/zod";
 
 export const planSchema = z.enum(plans).describe("The plan of the team.");
