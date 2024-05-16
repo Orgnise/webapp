@@ -1,14 +1,11 @@
-import { FREE_PLAN, getPlanFromPriceId } from "@/lib/constants/pricing";
-import { TeamDbSchema, TeamMemberDbSchema } from "@/lib/db-schema";
 import { log } from "@/lib/functions/log";
-import mongodb, { databaseName } from "@/lib/mongodb";
+import mongodb from "@/lib/mongodb";
 import { stripe } from "@/lib/stripe";
-import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { sendEmailV2 } from "../../../../../emails";
-import UpgradeEmail from "../../../../../emails/upgrade-email";
-import { getTeamOwner } from "@/lib/api";
+import { checkoutSessionCompleted } from "./checkout-session-complete";
+import { customerSubscriptionDeleted } from "./customer-subscription-deleted";
+import { customerSubscriptionUpdated } from "./customer-subscription-updated";
 
 const relevantEvents = new Set([
   "checkout.session.completed",
@@ -38,212 +35,18 @@ export const POST = async (req: Request) => {
     if (relevantEvents.has(event.type)) {
       console.log('Stripe webhook event type:', event);
       const client = await mongodb;
-      const teamsCollection = client.db(databaseName).collection<TeamDbSchema>("teams");
-
       if (event.type === "checkout.session.completed") {
-        const checkoutSession = event.data.object as Stripe.Checkout.Session;
-
-        if (
-          checkoutSession.client_reference_id === null ||
-          checkoutSession.customer === null
-        ) {
-          await log({
-            message: "Missing items in Stripe webhook callback",
-            type: "errors",
-          });
-          return NextResponse.json({ received: true });
-        }
-
-        const subscription = await stripe.subscriptions.retrieve(
-          checkoutSession.subscription as string,
-        );
-        const priceId = subscription.items.data[0].price.id;
-
-        const plan = getPlanFromPriceId(priceId);
-
-        if (!plan) {
-          await log({
-            message: `Invalid price ID in checkout.session.completed event: ${priceId}`,
-            type: "errors",
-          });
-          return;
-        }
-
-        const stripeId = checkoutSession.customer.toString();
-
-
-        // when the team subscribes to a plan, set their stripe customer ID
-        // in the database for easy identification in future webhook events
-        // also update the billingCycleStart to today's date
-        const result = await teamsCollection.updateOne(
-          { _id: new ObjectId(checkoutSession.client_reference_id) },
-          {
-            $set: {
-              stripeId,
-              billingCycleStart: new Date().getDate(),
-              plan: plan.name.toLowerCase() as any,
-              pagesLimit: plan.limits.pages!,
-              membersLimit: plan.limits.users!,
-              workspaceLimit: plan.limits.workspace!,
-            },
-          },
-        );
-
-        if (result.acknowledged) {
-          const teamOwner = await getTeamOwner(client, checkoutSession.client_reference_id.toString());
-          if (!teamOwner) {
-            await log({
-              message:
-                "Team with Stripe ID *`" +
-                stripeId +
-                "`* does not have an owner",
-              type: "errors",
-            });
-            return NextResponse.json({ received: true });
-          }
-          await sendEmailV2({
-            identifier: teamOwner.email!,
-            subject: `Thank you for upgrading to Dub.co ${plan.name}!`,
-            react: UpgradeEmail({
-              name: teamOwner.name,
-              email: teamOwner.email as string,
-              plan: plan.name,
-            })
-          });
-          log({
-            message: "Team with ID `" + checkoutSession.client_reference_id + "`upgraded to ${plan.name} plan",
-            type: 'success',
-          })
-        } else {
-          log({
-            message: `Failed to update team with ID ${checkoutSession.client_reference_id} in Stripe webhook callback`,
-            type: "errors",
-          })
-        }
+        await checkoutSessionCompleted(event, client);
       }
 
       // for subscription updates
       if (event.type === "customer.subscription.updated") {
-        const subscriptionUpdated = event.data.object as Stripe.Subscription;
-        const priceId = subscriptionUpdated.items.data[0].price.id;
-
-        const plan = getPlanFromPriceId(priceId);
-
-        if (!plan) {
-          await log({
-            message: `Invalid price ID in customer.subscription.updated event: ${priceId}`,
-            type: "errors",
-          });
-          return;
-        }
-
-        const stripeId = subscriptionUpdated.customer.toString();
-
-        const team = await teamsCollection.findOne({ stripeId });
-
-        if (!team) {
-          await log({
-            message:
-              "Team with Stripe ID *`" +
-              stripeId +
-              "`* not found in Stripe webhook `customer.subscription.updated` callback",
-            type: "errors",
-          });
-          return NextResponse.json({ received: true });
-        }
-
-        const newPlan = plan.name.toLowerCase();
-
-        // If a team upgrades/downgrades their subscription, update their usage limit in the database.
-        if (team.plan !== newPlan) {
-          const result = await teamsCollection.updateOne(
-            { stripeId: stripeId },
-            {
-              $set: {
-                plan: plan.name.toLowerCase() as any,
-                pagesLimit: plan.limits.pages!,
-                membersLimit: plan.limits.users!,
-                workspaceLimit: plan.limits.workspace!,
-              },
-            },
-          );
-
-          if (!result.acknowledged) {
-            log({
-              message: `Failed to update team with Stripe ID ${stripeId} in Stripe webhook callback`,
-              type: "errors",
-            });
-          }
-          log({
-            message: "Team with id `" + team._id + "`upgraded plan from `" + team.plan + "` to " + plan.name,
-            type: 'tada',
-          })
-        }
+        await customerSubscriptionUpdated(event, client);
       }
 
       // If team cancels their subscription
       if (event.type === "customer.subscription.deleted") {
-        const subscriptionDeleted = event.data.object as Stripe.Subscription;
-
-        const stripeId = subscriptionDeleted.customer.toString();
-
-        // If a team deletes their subscription, reset their usage limit in the database to 1000.
-        // Also remove the root domain redirect for all their domains from Redis.
-        console.log('\n 👉 Cancelling subscription for team:', stripeId)
-        const team = await teamsCollection.findOne({ stripeId: stripeId });
-        if (!team) {
-          await log({
-            message:
-              "Team with Stripe ID *`" +
-              stripeId +
-              "`* not found in Stripe webhook `customer.subscription.deleted` callback",
-            type: "errors",
-          });
-          return NextResponse.json({ received: true });
-        }
-        console.log('\n 👉 Cancelling subscription for team:', team._id, team.meta.slug, team.plan, team.stripeId)
-        const teamOwner = await getTeamOwner(client, team._id.toString());
-        if (!teamOwner) {
-          await log({
-            message:
-              "Team with Stripe ID *`" +
-              stripeId +
-              "`* does not have an owner in Stripe webhook `customer.subscription.deleted` callback",
-            type: "errors",
-          });
-          return NextResponse.json({ received: true });
-        }
-        console.log('\n 👉 Updating the database for team:', teamOwner.email)
-        await Promise.allSettled([
-          await teamsCollection.updateOne(
-            { stripeId: stripeId },
-            {
-              $set: {
-                plan: "free",
-                pagesLimit: FREE_PLAN.limits.pages!,
-                membersLimit: FREE_PLAN.limits.users!,
-                workspaceLimit: FREE_PLAN.limits.workspace!,
-              },
-            },
-          ),
-
-          log({
-            message:
-              ":cry: Team *`" +
-              team.meta.slug +
-              "`* deleted their subscription",
-            type: 'alerts',
-            mention: true,
-          }),
-
-          sendEmailV2({
-            identifier: teamOwner!.email!,
-            subject: "Feedback on your Orgnise.in experience?",
-            text: "Hey!\n\nI noticed you recently cancelled your Orgnise.in subscription - we're sorry to see you go!\n\nI'd love to hear your feedback on your experience with Orgnise what could we have done better?\n\nThanks!\n\nSonu Sharma\nFounder, Orgnise.in",
-          }),
-
-        ]);
-        return NextResponse.json({ received: true });
+        await customerSubscriptionDeleted(event, client);
       }
     }
     return NextResponse.json({ received: true });
