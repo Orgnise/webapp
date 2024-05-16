@@ -61,9 +61,9 @@ export async function customerSubscriptionDeleted(event: Stripe.Event, client: M
 
     log({
       message:
-        ":cry: Team *`" +
+        "Team *" +
         `<${APP_DOMAIN}/${team.meta.slug}|${team.name}>` +
-        "`* deleted their subscription",
+        "* deleted their subscription",
       type: 'alerts',
       mention: true,
     }),
@@ -71,7 +71,12 @@ export async function customerSubscriptionDeleted(event: Stripe.Event, client: M
     sendEmailV2({
       identifier: teamOwner!.email!,
       subject: "Feedback on your Orgnise.in experience?",
-      text: "Hey!\n\nI noticed you recently cancelled your Orgnise.in subscription - we're sorry to see you go!\n\nI'd love to hear your feedback on your experience with Orgnise what could we have done better?\n\nThanks!\n\nSonu Sharma\nFounder, Orgnise.in",
+      text: `Hey!
+      I noticed you recently cancelled your Orgnise.in subscription - we're sorry to see you go!
+      I'd love to hear your feedback on your experience with Orgnise what could we have done better?
+      Thanks!
+      Sonu Sharma
+      Founder, Orgnise.in`,
     }),
 
   ]);

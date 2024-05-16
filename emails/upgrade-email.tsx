@@ -36,7 +36,7 @@ export default function UpgradeEmail({
                 src={ORGNISE_LOGO}
                 width="40"
                 height="40"
-                alt="Dub"
+                alt="Orgnise"
                 className="mx-auto my-0"
               />
             </Section>

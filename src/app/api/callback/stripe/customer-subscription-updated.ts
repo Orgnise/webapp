@@ -18,7 +18,7 @@ export async function customerSubscriptionUpdated(event: Stripe.Event, client: M
 
   if (!plan) {
     await log({
-      message: `Invalid price ID in customer.subscription.updated event: ${priceId}`,
+      message: "Invalid price ID in `customer.subscription.updated` event: " + priceId,
       type: "errors",
     });
     return;
@@ -55,14 +55,8 @@ export async function customerSubscriptionUpdated(event: Stripe.Event, client: M
       },
     );
 
-    if (!result.acknowledged) {
-      log({
-        message: `Failed to update team with Stripe ID ${stripeId} in Stripe webhook callback`,
-        type: "errors",
-      });
-    }
     log({
-      message: "Team " + ` <${APP_DOMAIN}/${team.meta.slug}|${team.name}>` + "` upgraded plan from `" + team.plan + "` to `" + plan.name + "`",
+      message: "Team " + `<${APP_DOMAIN}/${team.meta.slug}|${team.name}>` + " upgraded plan from `" + team.plan + "` to `" + plan.name + "`",
       type: 'tada',
     })
   }
