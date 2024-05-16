@@ -174,6 +174,10 @@ export const POST = async (req: Request) => {
               type: "errors",
             });
           }
+          log({
+            message: "Team with id `" + team._id + "`upgraded plan from `" + team.plan + "` to " + plan.name,
+            type: 'tada',
+          })
         }
       }
 
@@ -187,7 +191,6 @@ export const POST = async (req: Request) => {
         // Also remove the root domain redirect for all their domains from Redis.
         console.log('\n 👉 Cancelling subscription for team:', stripeId)
         const team = await teamsCollection.findOne({ stripeId: stripeId });
-        console.log({ team });
         if (!team) {
           await log({
             message:
@@ -205,7 +208,7 @@ export const POST = async (req: Request) => {
             message:
               "Team with Stripe ID *`" +
               stripeId +
-              "`* does not have an owner",
+              "`* does not have an owner in Stripe webhook `customer.subscription.deleted` callback",
             type: "errors",
           });
           return NextResponse.json({ received: true });

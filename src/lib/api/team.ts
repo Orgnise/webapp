@@ -162,7 +162,7 @@ export async function getTeamOwner(client: MongoClient, teamId: string) {
   const teamUsers = await teamUsersCollection.aggregate([
     {
       $match: {
-        teamId: teamId,
+        teamId: new ObjectId(teamId),
         role: "owner",
       }
     },

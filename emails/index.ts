@@ -76,9 +76,9 @@ export async function sendEmailV2({
     to: identifier,
     from: "noreply@orgnise.in",
     subject: subject,
-    html: "Hi",
+    html: "",
     ...(react && { html: render(react) }),
-    ...(text && { TextBody: text }),
+    ...(text && { html: text }),
   });
   console.log("--------EMAIL TO:----------");
   console.log({ accepted: result.accepted, rejected: result.rejected });
