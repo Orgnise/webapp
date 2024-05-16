@@ -1,9 +1,9 @@
-const logTypeToEnv = {
-  alerts: process.env.ORGNISE_SLACK_HOOK_ALERTS,
-  newTeam: process.env.ORGNISE_SLACK_HOOK_NEW_TEAM,
-  waitlist: process.env.ORGNISE_SLACK_HOOK_NEW_TEAM,
-  errors: process.env.ORGNISE_SLACK_HOOK_ERRORS,
-};
+// const logTypeToEnv = {
+//   alerts: process.env.ORGNISE_SLACK_HOOK_ALERTS,
+//   tada: process.env.ORGNISE_SLACK_HOOK_NEW_TEAM,
+//   waitlist: process.env.ORGNISE_SLACK_HOOK_NEW_TEAM,
+//   errors: process.env.ORGNISE_SLACK_HOOK_ERRORS,
+// };
 
 export const log = async ({
   message,
@@ -11,7 +11,7 @@ export const log = async ({
   mention = false,
 }: {
   message: string;
-  type: "alerts" | 'newTeam' | "errors" | "waitlist";
+  type: "alerts" | 'tada' | "errors" | "waitlist" | 'success'
   mention?: boolean;
 }) => {
   if (
@@ -28,8 +28,10 @@ export const log = async ({
         return "🚨 ";
       case "errors":
         return "❌ ";
-      case "newTeam":
+      case "tada":
         return "🎉 ";
+      case "success":
+        return "✅ ";
       case "waitlist":
         return "📝 ";
       default:
@@ -37,7 +39,7 @@ export const log = async ({
     }
   }
   /* Log a message to the console */
-  const HOOK = logTypeToEnv[type];
+  const HOOK = process.env.ORGNISE_SLACK_HOOK_ALERTS;
   if (!HOOK) return;
   try {
     return await fetch(HOOK, {

@@ -7,6 +7,8 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmailV2 } from "../../../../../emails";
+import UpgradeEmail from "../../../../../emails/upgrade-email";
+import { getTeamOwner } from "@/lib/api";
 
 const relevantEvents = new Set([
   "checkout.session.completed",
@@ -87,7 +89,32 @@ export const POST = async (req: Request) => {
           },
         );
 
-        if (!result.acknowledged) {
+        if (result.acknowledged) {
+          const teamOwner = await getTeamOwner(client, checkoutSession.client_reference_id.toString());
+          if (!teamOwner) {
+            await log({
+              message:
+                "Team with Stripe ID *`" +
+                stripeId +
+                "`* does not have an owner",
+              type: "errors",
+            });
+            return NextResponse.json({ received: true });
+          }
+          await sendEmailV2({
+            identifier: teamOwner.email!,
+            subject: `Thank you for upgrading to Dub.co ${plan.name}!`,
+            react: UpgradeEmail({
+              name: teamOwner.name,
+              email: teamOwner.email as string,
+              plan: plan.name,
+            })
+          });
+          log({
+            message: "Team with ID `" + checkoutSession.client_reference_id + "`upgraded to ${plan.name} plan",
+            type: 'success',
+          })
+        } else {
           log({
             message: `Failed to update team with ID ${checkoutSession.client_reference_id} in Stripe webhook callback`,
             type: "errors",
@@ -172,32 +199,7 @@ export const POST = async (req: Request) => {
           return NextResponse.json({ received: true });
         }
         console.log('\n 👉 Cancelling subscription for team:', team._id, team.meta.slug, team.plan, team.stripeId)
-        const teamUsersCollection = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
-        const teamUsers = await teamUsersCollection.aggregate([
-          {
-            $match: {
-              teamId: team._id,
-              role: "owner",
-            }
-          },
-          {
-            $lookup: {
-              from: "users",
-              localField: "user",
-              foreignField: "_id",
-              as: "user",
-            },
-          },
-          {
-            $unwind: "$user",
-          },
-          {
-            $project: {
-              email: "$user.email",
-            },
-          },
-        ]).toArray();
-        const teamOwner = teamUsers?.[0];
+        const teamOwner = await getTeamOwner(client, team._id.toString());
         if (!teamOwner) {
           await log({
             message:
@@ -227,7 +229,7 @@ export const POST = async (req: Request) => {
               ":cry: Team *`" +
               team.meta.slug +
               "`* deleted their subscription",
-            type: 'alerts',// "cron",
+            type: 'alerts',
             mention: true,
           }),
 
@@ -238,15 +240,9 @@ export const POST = async (req: Request) => {
           }),
 
         ]);
+        return NextResponse.json({ received: true });
       }
-
-
-    } else {
-      return new Response(`🤷‍♀️ Unhandled event type: ${event.type}`, {
-        status: 400,
-      });
     }
-
     return NextResponse.json({ received: true });
   } catch (error: any) {
     await log({

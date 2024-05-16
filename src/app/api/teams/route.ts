@@ -194,7 +194,7 @@ export const POST = withSession(async ({ req, session }) => {
 
     await log({
       message: `A New team <${APP_DOMAIN}/${freeTeam.meta.slug}|${freeTeam.name}> is created by ${session.user.email}`,
-      type: "newTeam",
+      type: "tada",
     });
     const customTeam = {
       ...freeTeam,

@@ -154,3 +154,44 @@ export async function fetchAllTeamOwnedByUser(client: MongoClient, userId: strin
 
   return teamList;
 }
+
+// Get the team owner
+export async function getTeamOwner(client: MongoClient, teamId: string) {
+
+  const teamUsersCollection = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
+  const teamUsers = await teamUsersCollection.aggregate([
+    {
+      $match: {
+        teamId: teamId,
+        role: "owner",
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+    {
+      $project: {
+        email: "$user.email",
+        name: "$user.name",
+        id: "$user._id"
+      },
+    },
+  ]).toArray();
+  const teamOwner = teamUsers?.[0];
+  if (!teamOwner) {
+    return null;
+  }
+  return {
+    email: teamOwner.email,
+    name: teamOwner.name,
+    id: teamOwner.id
+  }
+}
