@@ -10,6 +10,7 @@ export interface Team {
   role: TeamRole;
   plan: Plan;
   meta: Meta;
+  stripeId?: string;
   createdAt: string;
   createdBy: string;
   updatedAt: string;
@@ -18,6 +19,7 @@ export interface Team {
   membersCount: number;
   membersLimit: number;
   workspaceLimit: number;
+  pagesLimit: number;
 }
 
 export interface Member {
@@ -59,7 +61,7 @@ export interface Meta {
 
 export type Plan = (typeof plans)[number];
 
-export const plans = ["free", "pro", "business", "enterprise"] as const;
+export const plans = ["free", "pro", , "business", "enterprise"] as const;
 
 export interface Workspace {
   _id: string;

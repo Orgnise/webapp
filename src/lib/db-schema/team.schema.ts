@@ -9,14 +9,15 @@ export interface TeamDbSchema {
   description?: string;
   createdBy: ObjectId;
   plan: Plan;
-  teamUsers: ObjectId;
+  stripeId?: string;
   meta: MetaSchema;
   createdAt: Date;
   billingCycleStart: number;
   inviteCode: string;
+  logo: string;
+  pagesLimit: number;
   membersLimit: number;
   workspaceLimit: number;
-  logo: string;
 }
 
 export interface MetaSchema {

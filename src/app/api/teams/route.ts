@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { withSession } from "@/lib/auth";
-import { APP_DOMAIN } from "@/lib/constants/constants";
-import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
+import { APP_DOMAIN, DICEBEAR_AVATAR_URL } from "@/lib/constants/constants";
+import { FREE_PLAN, FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
 import { log } from "@/lib/functions/log";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { TeamMemberDbSchema, TeamDbSchema } from "@/lib/db-schema/team.schema";
 import { Team } from "@/lib/types/types";
 import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
+import { fetchAllTeamOwnedByUser } from "@/lib/api";
 
 // GET /api/teams - get all teams for the current user
 export const GET = withSession(async ({ session }) => {
@@ -96,58 +97,6 @@ export const GET = withSession(async ({ session }) => {
         },
       ])
       .toArray()) as TeamDbSchema[];
-
-    // const teamList = await teams.aggregate([
-
-    //   {
-    //     $lookup: {
-    //       from: "teamUsers",
-    //       localField: "_id",
-    //       foreignField: "teamId",
-    //       as: "members",
-    //     },
-    //   },
-    //   {
-    //     $unwind: {
-    //       path: "$members",
-    //       preserveNullAndEmptyArrays: true,
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "users",
-    //       localField: "members.user",
-    //       foreignField: "_id",
-    //       as: "members.user",
-    //     },
-    //   },
-    //   {
-    //     $unwind: {
-    //       path: "$members.user",
-    //       preserveNullAndEmptyArrays: true,
-    //     },
-    //   },
-    //   // Search the session user from members and append with role in members
-    //   {
-    //     $project: {
-    //       name: 1,
-    //       plan: 1,
-    //       meta: 1,
-    //       description: 1,
-    //       inviteCode: 1,
-    //       members: 1,
-    //       membersCount: {
-    //         $size: "$members.users"
-
-    //       }
-    //     },
-    //   },
-    //   {
-    //     $match: {
-    //       "members.users.user": new ObjectId(session.user.id),
-    //     },
-    //   },
-    // ]).toArray() as TeamSchema[];
     return NextResponse.json({ teams: teamList });
   } catch (err: any) {
     return NextResponse.json(
@@ -188,21 +137,9 @@ export const POST = withSession(async ({ req, session }) => {
       .db(databaseName)
       .collection<TeamMemberDbSchema>("teamUsers");
 
-    const freeTeams = await teams
-      .find({
-        $and: [
-          { plan: "free" },
-          {
-            members: {
-              $elemMatch: {
-                user: new ObjectId(session.user.id),
-                role: "owner",
-              },
-            },
-          },
-        ],
-      })
-      .toArray();
+    const allTeams = await fetchAllTeamOwnedByUser(client, session.user.id);
+    const freeTeams = allTeams.filter((t) => t.plan === "free");
+
     if (freeTeams.length >= FREE_TEAMS_LIMIT) {
       return NextResponse.json(
         {
@@ -235,8 +172,12 @@ export const POST = withSession(async ({ req, session }) => {
       },
       billingCycleStart: new Date().getDate(),
       inviteCode: randomId(16),
-      membersLimit: 2,
-      workspaceLimit: 3,
+      membersLimit: FREE_PLAN.limits.users,
+      workspaceLimit: FREE_PLAN.limits.workspace,
+      pagesLimit: FREE_PLAN.limits.pages,
+      logo: DICEBEAR_AVATAR_URL + team.name,
+      createdAt: new Date(),
+
     } as TeamDbSchema;
 
     // Create team

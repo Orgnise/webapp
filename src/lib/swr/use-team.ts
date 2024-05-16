@@ -3,6 +3,7 @@ import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../fetcher";
 import { Team } from "../types/types";
 import { displayToast } from "./use-collections";
+import { PRO_PLAN, getNextPlan } from "../constants/pricing";
 
 type UpdateTeam = { name?: string; description?: string; slug?: string };
 interface ITeam {
@@ -12,6 +13,7 @@ interface ITeam {
   mutate: KeyedMutator<any>;
   exceedingFreeTeam: boolean;
   deleteTeamAsync: (teamSlug: string) => Promise<void>;
+  nextPlan: any;
   updateTeamAsync: ({ name, description, slug }: UpdateTeam, teamSlug: string) => Promise<void>;
 
 }
@@ -98,6 +100,7 @@ export default function useTeam(): ITeam {
 
   return {
     activeTeam: data,
+    nextPlan: data?.plan ? getNextPlan(data.plan) : PRO_PLAN,
     error,
     mutate,
     exceedingFreeTeam: freeProjects?.length >= 2 ? true : false,

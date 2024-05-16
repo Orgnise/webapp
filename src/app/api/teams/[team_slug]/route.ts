@@ -5,6 +5,7 @@ import { fetchDecoratedTeam } from "@/lib/api/team";
 import { removeAllTeamWorkspaceMembers, removeAllWorkspaces } from "@/lib/api/workspace";
 import { withTeam } from "@/lib/auth";
 import mongoDb, { databaseName } from "@/lib/mongodb";
+import { cancelSubscription } from "@/lib/stripe";
 import { hasValue } from "@/lib/utils";
 import { updateTeamSchema } from "@/lib/zod/schemas/teams";
 import { ObjectId } from "mongodb";
@@ -93,7 +94,8 @@ export const DELETE = withTeam(
         await removeAllTeamWorkspaceMembers(client, team._id),
         await removeAllWorkspaces(client, team._id),
         await removeAllTeamUsers(client, team._id),
-        await removeAllTeamInvites(client, team._id)
+        await removeAllTeamInvites(client, team._id),
+        team.stripeId && cancelSubscription(team.stripeId),
       ]);
 
 

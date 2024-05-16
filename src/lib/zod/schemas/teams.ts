@@ -21,6 +21,7 @@ export const TeamSchema = z
       .describe("The description of the team."),
     role: z.string().describe("The role of the authenticated user in the team."),
     membersCount: z.number().describe("The members count of the team."),
+    pagesLimit: z.number().describe("The pages limit of the team."),
     membersLimit: z.number().describe("The members limit of the team."),
     workspaceLimit: z.number().describe("The workspace limit of the team."),
     meta: z.object({

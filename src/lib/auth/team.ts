@@ -130,16 +130,18 @@ export const withTeam =
                 createdAt: "$team.createdAt",
                 billingCycleStart: "$team.billingCycleStart",
                 inviteCode: "$team.inviteCode",
+                pagesLimit: "$team.pagesLimit",
                 membersLimit: "$team.membersLimit",
                 workspaceLimit: "$team.workspaceLimit",
                 logo: "$team.logo",
+                stripeId: "$team.stripeId",
               },
             },
             // Remove team object from root object
             {
               $project: {
                 team: 0,
-                "teamId:": 0,
+                teamId: 0,
                 members: 0,
               },
             },
