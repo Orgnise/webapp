@@ -102,7 +102,7 @@ export const PLANS = [
       yearly: 19,
       ids: [
         'price_1PH267SHsqzoawbHfT36lPoJ',
-        'price_1PH267SHsqzoawbHfT36lPoJ'
+        'price_1PH267SHsqzoawbHcYuCeSlZ'
       ] as string[],
     },
     limits: {
@@ -136,7 +136,7 @@ export const PLANS = [
     workspace: 30,
     ids: [
       'price_1PH29GSHsqzoawbHsqk5dD3y',
-      'price_1PH29GSHsqzoawbHsqk5dD3y'
+      'price_1PH29GSHsqzoawbHTTQ1WGbb'
     ]
   }),
   ,

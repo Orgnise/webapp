@@ -101,7 +101,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event, client: Mong
       })
     });
     log({
-      message: "Team " + `<${APP_DOMAIN}/${team.meta.slug}|${team.name}> ` + `upgraded to ${plan.name} plan`,
+      message: "Team " + `<${APP_DOMAIN}/${team.meta.slug}|${team.name}>` + " upgraded plan `free` to `" + plan.name + "` plan",
       type: 'success',
     })
   } else {

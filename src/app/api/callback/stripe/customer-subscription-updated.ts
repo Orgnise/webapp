@@ -30,10 +30,7 @@ export async function customerSubscriptionUpdated(event: Stripe.Event, client: M
 
   if (!team) {
     await log({
-      message:
-        "Team with Stripe ID *`" +
-        stripeId +
-        "`* not found in Stripe webhook `customer.subscription.updated` callback",
+      message: "Team with Stripe ID *`" + stripeId + "`* not found in Stripe webhook `customer.subscription.updated` callback",
       type: "errors",
     });
     return;
@@ -56,7 +53,7 @@ export async function customerSubscriptionUpdated(event: Stripe.Event, client: M
     );
 
     log({
-      message: "Team " + `<${APP_DOMAIN}/${team.meta.slug}|${team.name}>` + " upgraded plan from `" + team.plan + "` to `" + plan.name + "`",
+      message: "Team " + `<${APP_DOMAIN}/${team.meta.slug}|${team.name}>` + " upgraded from `" + team.plan + "` to `" + plan.name + "` plan",
       type: 'tada',
     })
   }
