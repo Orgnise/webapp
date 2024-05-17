@@ -5,6 +5,7 @@ export * from "./button";
 export * from "./command";
 export * from "./copy-button";
 export * from "./dialog";
+export * from "./divider";
 export * from "./dropdown-menu";
 export * from "./form";
 export * from "./input";

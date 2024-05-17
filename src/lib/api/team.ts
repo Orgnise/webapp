@@ -1,11 +1,13 @@
-import mongoDb, { databaseName } from "@/lib/mongodb";
+import { databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
-import { TeamMemberDbSchema, TeamDbSchema } from "../db-schema/team.schema";
+import { TeamDbSchema, TeamMemberDbSchema } from "../db-schema/team.schema";
 import { hasValue } from "../utils";
-import { Team } from "../types/types";
+import { CollectionDbSchema } from "../db-schema";
+import { TeamSchema, LimitSchema } from "../zod/schemas";
+import { z } from "zod";
 
-export async function fetchDecoratedTeam(teamId: string, userId: string) {
-  const client = await mongoDb;
+export async function fetchDecoratedTeam(client: MongoClient, teamId: string, userId: string) {
+
   const teamsMembers = client
     .db(databaseName)
     .collection<TeamMemberDbSchema>("teamUsers");
@@ -54,26 +56,46 @@ export async function fetchDecoratedTeam(teamId: string, userId: string) {
           createdAt: "$team.createdAt",
           billingCycleStart: "$team.billingCycleStart",
           inviteCode: "$team.inviteCode",
-          membersLimit: "$team.membersLimit",
-          workspaceLimit: "$team.workspaceLimit",
           logo: "$team.logo",
+          limit: "$team.limit",
+          stripeId: "$team.stripeId",
         },
       },
       // Remove team object from root object
       {
         $project: {
           team: 0,
-          "teamId:": 0,
+          teamId: 0,
           members: 0,
         },
       },
     ])
-    .toArray()) as TeamDbSchema[];
+    .toArray()) as any[];
 
+  const pageCollection = client
+    .db(databaseName)
+    .collection<CollectionDbSchema>("collections");
+
+  const workspaceCollection = client
+    .db(databaseName)
+    .collection<CollectionDbSchema>("workspaces");
+  const pageCount = await pageCollection.countDocuments({ team: new ObjectId(teamId), object: 'item' });
+
+  const workspaceCount = await workspaceCollection.countDocuments({ team: new ObjectId(teamId) });
   if (hasValue(teamList)) {
-    return teamList[0] as unknown as Team;
+    const team = TeamSchema.parse({
+      ...teamList[0],
+      _id: teamList[0]._id.toString(),
+      usage: {
+        pages: pageCount,
+        users: teamList[0].membersCount,
+        workspaces: workspaceCount,
+      } as z.infer<typeof LimitSchema>,
+    });
+
+    return team;
   }
-  return null;
+  return undefined;
 }
 
 // Remove all team members
@@ -135,8 +157,7 @@ export async function fetchAllTeamOwnedByUser(client: MongoClient, userId: strin
           createdAt: "$team.createdAt",
           billingCycleStart: "$team.billingCycleStart",
           inviteCode: "$team.inviteCode",
-          membersLimit: "$team.membersLimit",
-          workspaceLimit: "$team.workspaceLimit",
+          limit: "$team.limit",
           logo: "$team.logo",
           stripeId: "$team.stripeId",
         },
@@ -194,4 +215,79 @@ export async function getTeamOwner(client: MongoClient, teamId: string) {
     name: teamOwner.name,
     id: teamOwner.id
   }
+}
+
+// Get all teams for a user in which user is a member
+export async function fetchAllTeamsForUser(client: MongoClient, userId: string) {
+  const teamsMembers = client
+    .db(databaseName)
+    .collection<TeamMemberDbSchema>("teamUsers");
+
+  const teamList = (await teamsMembers
+    .aggregate([
+      {
+        $match: {
+          user: new ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: "teams",
+          localField: "teamId",
+          foreignField: "_id",
+          as: "team",
+        },
+      },
+      {
+        $unwind: {
+          path: "$team",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "teamUsers",
+          localField: "team._id",
+          foreignField: "teamId",
+          as: "members",
+        },
+      },
+      {
+        $addFields: { membersCount: { $size: "$members" } },
+      },
+      // Append team object in root object and make team_id and root id.
+      {
+        $addFields: {
+          _id: "$team._id",
+          name: "$team.name",
+          description: "$team.description",
+          createdBy: "$team.createdBy",
+          plan: "$team.plan",
+          meta: "$team.meta",
+          createdAt: "$team.createdAt",
+          billingCycleStart: "$team.billingCycleStart",
+          inviteCode: "$team.inviteCode",
+          limit: "$team.limit",
+          logo: "$team.logo",
+          joinedAt: "$createdAt",
+        },
+      },
+      {
+        $sort:
+        {
+          joinedAt: -1,
+        },
+      },
+      // Remove team object from root object
+      {
+        $project: {
+          team: 0,
+          "teamId:": 0,
+          members: 0,
+        },
+      },
+    ])
+    .toArray()) as TeamDbSchema[];
+
+  return teamList;
 }

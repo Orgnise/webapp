@@ -1,25 +1,10 @@
 import { TeamRole } from "@/lib/constants/team-role";
-import { WorkspaceRole } from "../constants/workspace-role";
+import { WorkspaceRole } from "@/lib/constants/workspace-role";
+import { TeamSchema } from "@/lib/zod/schemas";
+import z from "../zod";
 
-export interface Team {
-  _id: string;
-  name: string;
-  logo: string;
-  description: string;
-  teamMembers: TeamUsers[];
-  role: TeamRole;
-  plan: Plan;
-  meta: Meta;
+export interface Team extends z.infer<typeof TeamSchema> {
   stripeId?: string;
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string;
-  billingCycleStart: number;
-  inviteCode: string;
-  membersCount: number;
-  membersLimit: number;
-  workspaceLimit: number;
-  pagesLimit: number;
 }
 
 export interface Member {

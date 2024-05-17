@@ -3,7 +3,9 @@
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as React from "react";
 
+import { timeAgo } from "@/lib/utility/datetime";
 import { cn } from "@/lib/utils";
+import { HelpCircle } from "lucide-react";
 import Link from "next/link";
 
 const TooltipProvider = TooltipPrimitive.Provider;
@@ -89,3 +91,49 @@ export {
   TooltipProvider,
   TooltipTrigger,
 };
+
+export function InfoTooltip({
+  content,
+}: {
+  content: React.ReactNode | string;
+}) {
+  return (
+    <ToolTipWrapper content={content}>
+      <HelpCircle className="h-4 w-4 text-gray-500" />
+    </ToolTipWrapper>
+  );
+}
+
+export function NumberTooltip({
+  value,
+  unit = "total clicks",
+  children,
+  lastClicked,
+}: {
+  value?: number | null;
+  unit?: string;
+  children: React.ReactNode;
+  lastClicked?: Date | null;
+}) {
+  if ((!value || value < 1000) && !lastClicked) {
+    return children;
+  }
+  return (
+    <ToolTipWrapper
+      content={
+        <div className="block max-w-xs px-4 py-2 text-center text-sm text-secondary-foreground/70">
+          <p className="text-sm font-semibold text-secondary-foreground/70">
+            {value} {unit}
+          </p>
+          {lastClicked && (
+            <p className="mt-1 text-xs text-gray-500" suppressHydrationWarning>
+              Last clicked {timeAgo(lastClicked, { withAgo: true })}
+            </p>
+          )}
+        </div>
+      }
+    >
+      {children}
+    </ToolTipWrapper>
+  );
+}

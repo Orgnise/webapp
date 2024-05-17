@@ -4,7 +4,7 @@ const BUSINESS_PLAN_MODIFIER = ({
   name = "Business",
   monthly = 12,
   yearly = 10,
-  workspace = 20,
+  workspaces = 20,
   pages = 200,
   users = 12,
   ids = [],
@@ -12,7 +12,7 @@ const BUSINESS_PLAN_MODIFIER = ({
   name: string;
   monthly: number;
   yearly: number;
-  workspace: number;
+  workspaces: number;
   pages: number;
   users: number;
   ids: string[];
@@ -26,7 +26,7 @@ const BUSINESS_PLAN_MODIFIER = ({
     ids: ids,
   },
   limits: {
-    workspace,
+    workspaces,
     pages,
     users,
   },
@@ -44,7 +44,7 @@ const BUSINESS_PLAN_MODIFIER = ({
   features: [
     { text: `${users} users` },
     {
-      text: `${workspace} workspace`,
+      text: `${workspaces} workspace`,
     },
     {
       text: `${pages} pages`,
@@ -68,7 +68,7 @@ export const PLANS = [
       ids: [] as string[],
     },
     limits: {
-      workspace: 3,
+      workspaces: 3,
       pages: 30,
       users: 1,
     },
@@ -106,7 +106,7 @@ export const PLANS = [
       ] as string[],
     },
     limits: {
-      workspace: 10,
+      workspaces: 10,
       pages: 200,
       users: 5,
     },
@@ -133,7 +133,7 @@ export const PLANS = [
     yearly: 49,
     users: 10,
     pages: 600,
-    workspace: 30,
+    workspaces: 30,
     ids: [
       'price_1PH29GSHsqzoawbHsqk5dD3y',
       'price_1PH29GSHsqzoawbHTTQ1WGbb'

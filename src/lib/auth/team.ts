@@ -8,6 +8,7 @@ import { Invite, Plan, Team } from "../types/types";
 import { getSearchParams } from "../url";
 import { hasValue } from "../utils";
 import { Session, generateSession } from "./";
+import { fetchDecoratedTeam } from "../api";
 
 
 
@@ -85,70 +86,9 @@ export const withTeam =
             message: "Team not found",
           });
         }
-        const teamList = (await teamsMembers
-          .aggregate([
-            {
-              $match: {
-                user: new ObjectId(session.user.id),
-                teamId: new ObjectId(teamInDb[0]._id),
-              },
-            },
-            {
-              $lookup: {
-                from: "teams",
-                localField: "teamId",
-                foreignField: "_id",
-                as: "team",
-              },
-            },
-            {
-              $unwind: {
-                path: "$team",
-                preserveNullAndEmptyArrays: true,
-              },
-            },
-            {
-              $lookup: {
-                from: "teamUsers",
-                localField: "team._id",
-                foreignField: "teamId",
-                as: "members",
-              },
-            },
-            {
-              $addFields: { membersCount: { $size: "$members" } },
-            },
-            // Append team object in root object and make team_id and root id.
-            {
-              $addFields: {
-                _id: "$team._id",
-                name: "$team.name",
-                description: "$team.description",
-                createdBy: "$team.createdBy",
-                plan: "$team.plan",
-                meta: "$team.meta",
-                createdAt: "$team.createdAt",
-                billingCycleStart: "$team.billingCycleStart",
-                inviteCode: "$team.inviteCode",
-                pagesLimit: "$team.pagesLimit",
-                membersLimit: "$team.membersLimit",
-                workspaceLimit: "$team.workspaceLimit",
-                logo: "$team.logo",
-                stripeId: "$team.stripeId",
-              },
-            },
-            // Remove team object from root object
-            {
-              $project: {
-                team: 0,
-                teamId: 0,
-                members: 0,
-              },
-            },
-          ])
-          .toArray()) as TeamDbSchema[];
+        const team = await fetchDecoratedTeam(client, teamInDb[0]._id.toString(), session.user.id);
 
-        const team = teamList[0] as unknown as Team;
+        // const team = teamList[0] as unknown as Team;
         if (!team) {
           const teamInviteCollection = client
             .db(databaseName)

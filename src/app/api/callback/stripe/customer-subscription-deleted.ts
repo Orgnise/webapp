@@ -52,9 +52,11 @@ export async function customerSubscriptionDeleted(event: Stripe.Event, client: M
       {
         $set: {
           plan: "free",
-          pagesLimit: FREE_PLAN.limits.pages!,
-          membersLimit: FREE_PLAN.limits.users!,
-          workspaceLimit: FREE_PLAN.limits.workspace!,
+          limit: {
+            pages: FREE_PLAN.limits.pages!,
+            users: FREE_PLAN.limits.users!,
+            workspaces: FREE_PLAN.limits.workspaces!,
+          }
         },
       },
     ),

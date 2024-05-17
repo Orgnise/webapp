@@ -2,6 +2,8 @@
 import { TeamRole } from "@/lib/constants/team-role";
 import { ObjectId } from "mongodb";
 import { Plan } from "../types/types";
+import { LimitSchema } from "../zod/schemas";
+import z from "../zod";
 
 export interface TeamDbSchema {
   _id: ObjectId;
@@ -15,9 +17,7 @@ export interface TeamDbSchema {
   billingCycleStart: number;
   inviteCode: string;
   logo: string;
-  pagesLimit: number;
-  membersLimit: number;
-  workspaceLimit: number;
+  limit: z.infer<typeof LimitSchema>;
 }
 
 export interface MetaSchema {

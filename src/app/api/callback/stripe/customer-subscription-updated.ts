@@ -1,10 +1,9 @@
+import { APP_DOMAIN } from "@/lib/constants";
 import { getPlanFromPriceId } from "@/lib/constants/pricing";
 import { TeamDbSchema } from "@/lib/db-schema";
 import { log } from "@/lib/functions/log";
 import { databaseName } from "@/lib/mongodb";
 import { MongoClient } from "mongodb";
-import { NextResponse } from "next/server";
-import { APP_DOMAIN } from "@/lib/constants";
 import type Stripe from "stripe";
 
 // Handle event "customer.subscription.updated"
@@ -45,9 +44,11 @@ export async function customerSubscriptionUpdated(event: Stripe.Event, client: M
       {
         $set: {
           plan: plan.name.toLowerCase() as any,
-          pagesLimit: plan.limits.pages!,
-          membersLimit: plan.limits.users!,
-          workspaceLimit: plan.limits.workspace!,
+          limit: {
+            pages: plan.limits.pages!,
+            users: plan.limits.users!,
+            workspaces: plan.limits.workspaces!,
+          }
         },
       },
     );

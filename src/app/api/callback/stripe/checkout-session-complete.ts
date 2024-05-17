@@ -70,9 +70,11 @@ export async function checkoutSessionCompleted(event: Stripe.Event, client: Mong
         stripeId,
         billingCycleStart: new Date().getDate(),
         plan: plan.name.toLowerCase() as any,
-        pagesLimit: plan.limits.pages!,
-        membersLimit: plan.limits.users!,
-        workspaceLimit: plan.limits.workspace!,
+        limit: {
+          pages: plan.limits.pages!,
+          users: plan.limits.users!,
+          workspaces: plan.limits.workspaces!,
+        }
       },
     },
   );
