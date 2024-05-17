@@ -14,10 +14,12 @@ import { mutate } from "swr";
 import TeamBillingSettingsLoading from "./loading";
 
 export default function TeamBillingPageClient() {
-  const { activeTeam, loading, nextPlan } = useTeam();
+  const [isManageSubscriptionClicked, setManageSubscriptionClicked] =
+    useState(false);
+  const { activeTeam, loading, nextPlan, stripeId } = useTeam();
   const plan = activeTeam?.plan ?? "free";
   const billingCycleStart = activeTeam?.billingCycleStart;
-  const { queryParams } = useRouterStuff();
+  const { queryParams, router } = useRouterStuff();
   const searchParams = useSearchParams();
 
   const { UpgradePlanModal, setShowUpgradePlanModal } = useUpgradePlanModal();
@@ -75,6 +77,30 @@ export default function TeamBillingPageClient() {
               </>
             )}
           </p>
+          {stripeId && (
+            <div>
+              <Button2
+                text="Manage Subscription"
+                variant="secondary"
+                className="h-9"
+                onClick={() => {
+                  setManageSubscriptionClicked(true);
+                  fetch(`/api/teams/${activeTeam?.meta?.slug}/billing/manage`, {
+                    method: "POST",
+                  })
+                    .then(async (res) => {
+                      const url = await res.json();
+                      router.push(url);
+                    })
+                    .catch((err) => {
+                      alert(err);
+                      setManageSubscriptionClicked(false);
+                    });
+                }}
+                loading={isManageSubscriptionClicked}
+              />
+            </div>
+          )}
         </div>
         <div className="b flex flex-col items-center justify-between space-y-3  border-t border-border px-10 py-4 text-center md:flex-row md:space-y-0 md:text-left">
           {plan ? (

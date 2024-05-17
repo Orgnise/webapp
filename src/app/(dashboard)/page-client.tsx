@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { CustomTooltipContent, ToolTipWrapper } from "@/components/ui/tooltip";
 import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
-import useTeam from "@/lib/swr/use-team";
+import useTeams from "@/lib/swr/use-teams";
 
 import { Fold } from "@/lib/utils";
 
@@ -20,7 +20,7 @@ interface CerateWorkspaceModelProps {
 }
 
 export default function DashboardClient() {
-  const { exceedingFreeTeam } = useTeam();
+  const { exceedingFreeTeam, freeTeams, loading } = useTeams();
   return (
     <div className="">
       <div className="flex h-36 items-center border-b border-border bg-background">
@@ -31,7 +31,7 @@ export default function DashboardClient() {
               value={!exceedingFreeTeam}
               ifPresent={(value: unknown) => (
                 <CerateWorkspaceModel>
-                  <Button size={"sm"} variant={"default"}>
+                  <Button size={"sm"} variant={"default"} disabled={loading}>
                     Create Team
                   </Button>
                 </CerateWorkspaceModel>
@@ -42,7 +42,11 @@ export default function DashboardClient() {
                     <CustomTooltipContent
                       title={`You can only create up to ${FREE_TEAMS_LIMIT} free teams. Additional team require a paid plan.`}
                       cta="Upgrade to Pro"
-                      href={"#"}
+                      href={
+                        freeTeams
+                          ? `/${freeTeams?.[0]?.meta?.slug}/settings/billing?upgrade=pro`
+                          : "https://orgnise.in/pricing"
+                      }
                     />
                   }
                 >

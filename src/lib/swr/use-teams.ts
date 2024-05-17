@@ -10,6 +10,7 @@ interface ITeam {
   teams: Team[];
   mutate: KeyedMutator<any>;
   exceedingFreeTeam: boolean;
+  freeTeams?: Team[];
   createTeamAsync: (team: Team) => Promise<void>;
   // deleteTeamAsync: (teamSlug: string) => Promise<void>;
   // updateTeamAsync: (team: Team, teamSlug: string) => Promise<void>;
@@ -130,15 +131,17 @@ export default function useTeams(): ITeam {
     isOwner: team.role === "owner",
   }));
 
-  const freeProjects = teams?.filter(
+  const freeTeams = teams?.filter(
     (team: any) => (team.plan === "free" || !team.plan) && team.isOwner,
   );
+
 
   return {
     teams: data?.teams ?? [],
     error,
     mutate,
-    exceedingFreeTeam: freeProjects?.length >= 2 ? true : false,
+    exceedingFreeTeam: freeTeams?.length >= 2 ? true : false,
+    freeTeams,
     loading: !data?.teams && !error ? true : false,
     createTeamAsync,
     // deleteTeamAsync,
