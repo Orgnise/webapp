@@ -1,6 +1,7 @@
 import mongodb, { databaseName } from "@/lib/mongodb";
 import { TeamDbSchema } from "@/lib/db-schema/team.schema";
 import "dotenv-flow/config";
+import { FREE_PLAN } from "@/lib/constants";
 
 
 // npm run script /team/add-default-values
@@ -14,6 +15,7 @@ async function main() {
   // @ts-ignore
   const teams = await teamCollection.find({
     $or: [
+      { "pagesLimit": { $in: [null, undefined, ''] } },
       { "membersLimit": { $in: [null, undefined, ''] } },
       { "workspaceLimit": { $in: [null, undefined, ''] }, },
       { "billingCycleStart": { $in: [null, undefined, ''] }, },
@@ -28,15 +30,22 @@ async function main() {
       {
         updateMany: {
           // @ts-ignore
+          filter: { "pagesLimit": { $in: [null, undefined, ''] } },
+          update: { $set: { "pagesLimit": FREE_PLAN.limits.pages } }
+        },
+      },
+      {
+        updateMany: {
+          // @ts-ignore
           filter: { "membersLimit": { $in: [null, undefined, ''] } },
-          update: { $set: { "membersLimit": 1 } }
+          update: { $set: { "membersLimit": FREE_PLAN.limits.users } }
         },
       },
       {
         updateMany: {
           // @ts-ignore
           filter: { "workspaceLimit": { $in: [null, undefined, ''] } },
-          update: { $set: { "workspaceLimit": 3 } }
+          update: { $set: { "workspaceLimit": FREE_PLAN.limits.workspace } }
         }
       },
       {
@@ -51,6 +60,13 @@ async function main() {
           // @ts-ignore
           filter: { "plan": { $in: [null, undefined, ''] } },
           update: { $set: { "plan": "free" } }
+        }
+      },
+      {
+        updateMany: {
+          // @ts-ignore
+          filter: { "pageLimit": 30 },
+          update: { $unset: { "pageLimit": "" } }
         }
       }
     ]);
