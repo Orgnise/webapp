@@ -2,6 +2,7 @@ import mongodb, { databaseName } from "@/lib/mongodb";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "../api/errors";
 import { getSearchParams } from "../url";
 import { Session, getSession, hashToken } from "./";
+import { MongoClient } from "mongodb";
 
 
 interface WithSessionHandler {
@@ -10,11 +11,13 @@ interface WithSessionHandler {
     params,
     searchParams,
     session,
+    client,
   }: {
     req: Request;
     params: Record<string, string>;
     searchParams: Record<string, string>;
     session: Session;
+    client: MongoClient;
   }): Promise<Response>;
 }
 
@@ -24,17 +27,17 @@ export const withSession =
     async (req: Request, { params }: { params: Record<string, string> }) => {
       try {
         let session: Session | undefined;
-
-        session = await generateSession(req);
+        const client = await mongodb;
+        session = await generateSession(req, client);
 
         const searchParams = getSearchParams(req.url);
-        return await handler({ req, params, searchParams, session });
+        return await handler({ req, params, searchParams, session, client });
       } catch (error: any) {
         return handleAndReturnErrorResponse(error);
       }
     };
 
-export async function generateSession(req: Request): Promise<Session> {
+export async function generateSession(req: Request, client: MongoClient): Promise<Session> {
   const authorizationHeader = req.headers.get("Authorization");
   let session: Session | undefined;
   if (authorizationHeader) {
@@ -50,7 +53,7 @@ export async function generateSession(req: Request): Promise<Session> {
     const hashedKey = hashToken(apiKey, {
       noSecret: true,
     });
-    const client = await mongodb;
+
     const userCollection = client.db(databaseName).collection("users");
 
     const users = await userCollection.aggregate([

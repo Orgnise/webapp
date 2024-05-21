@@ -58,10 +58,11 @@ export const Fold = <T, K>({ value, ifPresent, ifAbsent }: FoldProps<T, K>) => {
  * Validator.hasValue(-Infinity); // true
  */
 export function hasValue(obj: any): boolean {
+
   if (!obj || obj === null || obj === undefined) {
     return false;
   }
-  if (typeof obj === "object") {
+  else if (typeof obj === "object") {
     if (Array.isArray(obj)) {
       return obj.length > 0;
     } else {

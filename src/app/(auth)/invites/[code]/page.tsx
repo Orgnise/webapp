@@ -2,7 +2,11 @@ import { Logo } from "@/components/atom/logo";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { getSession } from "@/lib/auth";
 import { TeamMemberDbSchema } from "@/lib/db-schema/team.schema";
-import mongodb, { databaseName } from "@/lib/mongodb";
+import mongodb, {
+  DbCollections,
+  collections,
+  databaseName,
+} from "@/lib/mongodb";
 import { Team } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import { ObjectId } from "mongodb";
@@ -57,7 +61,7 @@ async function VerifyInvite({ code }: { code: string }) {
   }
 
   const client = await mongodb;
-  const teamsCollection = client.db(databaseName).collection("teams");
+  const teamsCollection = collections<TeamMemberDbSchema>(client, "teams");
 
   const teams = (await teamsCollection
     .aggregate([
@@ -68,9 +72,9 @@ async function VerifyInvite({ code }: { code: string }) {
       },
       {
         $lookup: {
-          from: "teamUsers",
+          from: DbCollections.TEAM_USER,
           localField: "_id",
-          foreignField: "teamId",
+          foreignField: "team",
           as: "members",
         },
       },
@@ -105,12 +109,12 @@ async function VerifyInvite({ code }: { code: string }) {
 
   const teamUserCollection = client
     .db(databaseName)
-    .collection<TeamMemberDbSchema>("teamUsers");
+    .collection<TeamMemberDbSchema>("team-users");
 
-  const member = (await teamUserCollection.findOne({
-    teamId: new ObjectId(team._id),
+  const member = await teamUserCollection.findOne({
+    team: new ObjectId(team._id),
     user: new ObjectId(session.user.id),
-  })) as unknown as TeamMemberDbSchema;
+  });
 
   // check if user is already in the team
   if (member) {
@@ -118,7 +122,7 @@ async function VerifyInvite({ code }: { code: string }) {
   }
 
   teamUserCollection.insertOne({
-    teamId: new ObjectId(team._id),
+    team: new ObjectId(team._id),
     user: new ObjectId(session.user.id),
     role: "member",
     createdAt: new Date(),

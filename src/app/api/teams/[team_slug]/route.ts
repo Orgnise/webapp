@@ -65,7 +65,7 @@ export const PUT = withTeam(
         },
       });
 
-      updatedTeam = await fetchDecoratedTeam(team._id, session.user.id);
+      updatedTeam = await fetchDecoratedTeam(client, team._id, session.user.id);
 
       return NextResponse.json(
         {

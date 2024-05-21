@@ -1,49 +1,52 @@
-import { EmailInvite } from "@/app/api/teams/[team_slug]/invites/route";
 import { Session, hashToken } from "@/lib/auth";
-import mongoDb, { databaseName } from "@/lib/mongodb";
+import { collections, databaseName } from "@/lib/mongodb";
 import { randomBytes } from "crypto";
+import { MongoClient, ObjectId } from "mongodb";
 import { sendEmailV2 } from "../../../emails";
 import TeamInvite from "../../../emails/team-invite";
 import { APP_DOMAIN, TWO_WEEKS_IN_SECONDS } from "../constants/constants";
+import { TeamInviteDbSchema } from "../db-schema";
 import { Team } from "../types/types";
-import { MongoClient, ObjectId } from "mongodb";
+import { SendInviteSchema } from "../zod/schemas";
+import { OrgniseApiError } from "@/lib/api";
 
 export async function inviteUser({
-  emails,
+  client,
+  invites,
   team,
   session,
 }: {
-  emails: Array<EmailInvite>;
+  client: MongoClient;
+  invites: typeof SendInviteSchema._type.invites;
   team: Team;
   session?: Session;
 }) {
   // same method of generating a token as next-auth
   const expires = new Date(Date.now() + TWO_WEEKS_IN_SECONDS * 1000);
-  const client = await mongoDb;
-  const teamInviteCollection = client
-    .db(databaseName)
-    .collection("teamInvites");
+
+  const inviteCollection = collections<TeamInviteDbSchema>(client, "team-invites");
 
   // create a team invite record and a verification request token that lasts for a week
   // TODO: add a check to see if the user is already in the team
   try {
     let inviteList = [];
     let verificationList = [];
-    for (let i = 0; i < emails.length; i++) {
+    for (let i = 0; i < invites.length; i++) {
       inviteList.push({
-        email: emails[i].email,
+        email: invites[i].email,
         expires,
-        teamId: team._id,
+        team: new ObjectId(team._id),
         createdAt: new Date(),
-        role: emails[i].role,
-      });
+        role: invites[i].role,
+      } as TeamInviteDbSchema
+      );
       verificationList.push({
-        identifier: emails[i].email,
+        identifier: invites[i].email,
         token: hashToken(randomBytes(32).toString("hex")),
         expires,
       });
     }
-    await teamInviteCollection.insertMany(inviteList);
+    await inviteCollection.insertMany(inviteList);
     const verificationTokenCollection = client
       .db(databaseName)
       .collection("verification_tokens");
@@ -83,6 +86,13 @@ export async function inviteUser({
       }),
     );
   } catch (error: any) {
+    console.error({ error });
+    if (error?.errorResponse?.code) {
+      throw new OrgniseApiError({
+        code: 'bad_request',
+        message: 'Invite are already sent to some of the emails. Please check the emails and try again.'
+      })
+    }
     throw new Error(error.toString());
   }
 }
@@ -92,10 +102,8 @@ export async function inviteUser({
  * Remove all team invites
  */
 export async function removeAllTeamInvites(client: MongoClient, teamId: string) {
-  const teamInvitesCol = client
-    .db(databaseName)
-    .collection("teamInvites");
-  return await teamInvitesCol.deleteMany({ teamId: new ObjectId(teamId) });
+  const inviteCollection = collections<TeamInviteDbSchema>(client, "team-invites");;
+  return await inviteCollection.deleteMany({ team: new ObjectId(teamId) });
 }
 
 /**
@@ -104,6 +112,6 @@ export async function removeAllTeamInvites(client: MongoClient, teamId: string) 
 export async function removeAllTeamUsers(client: MongoClient, teamId: string) {
   const teamUsersCol = client
     .db(databaseName)
-    .collection("teamUsers");
-  return await teamUsersCol.deleteMany({ teamId: new ObjectId(teamId) });
+    .collection("team-users");
+  return await teamUsersCol.deleteMany({ team: new ObjectId(teamId) });
 }

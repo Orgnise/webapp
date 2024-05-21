@@ -8,20 +8,24 @@ import { WorkspaceSettingsDropDown } from "@/components/team/workspace/workspace
 import { Button } from "@/components/ui/button";
 import { ListView } from "@/components/ui/listview";
 import { useCreateWorkspaceModal } from "@/components/ui/models/create-workspace-modal";
-import { ToolTipWrapper } from "@/components/ui/tooltip";
+import { CustomTooltipContent, ToolTipWrapper } from "@/components/ui/tooltip";
+import { getNextPlan } from "@/lib/constants";
+import useUsage from "@/lib/hooks/use-usage";
 import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-workspaces";
 import { Workspace } from "@/lib/types/types";
+import { Fold } from "@/lib/utils";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import TeamPageLoading from "./loading";
 
 export default function TeamsPageClient() {
-  const { loading } = useTeam();
+  const { loading, meta, plan } = useTeam();
   const { team_slug } = useParams() as {
     team_slug?: string;
   };
   const { workspaces, error, loading: workspacesLoading } = useWorkspaces();
+  const { exceedingWorkspaceLimit, limit, usage } = useUsage();
 
   const { setShowModal, DeleteAccountModal } = useCreateWorkspaceModal();
   if (loading) {
@@ -36,14 +40,34 @@ export default function TeamsPageClient() {
           <div className="flex items-center justify-between">
             <h1 className="prose-2xl">My Workspaces</h1>
             <TeamPermissionView permission="CREATE_WORKSPACE">
-              <Button
-                size={"sm"}
-                onClick={() => {
-                  setShowModal(true);
-                }}
-              >
-                Create Workspace
-              </Button>
+              <Fold
+                value={!exceedingWorkspaceLimit}
+                ifPresent={(value: unknown) => (
+                  <Button
+                    size={"sm"}
+                    onClick={() => {
+                      setShowModal(true);
+                    }}
+                  >
+                    Create Workspace
+                  </Button>
+                )}
+                ifAbsent={() => (
+                  <ToolTipWrapper
+                    content={
+                      <CustomTooltipContent
+                        title={`You can only create up to ${limit?.workspaces} workspace on ${plan} plan. Additional workspace require ${getNextPlan(plan)?.name} plan.`}
+                        cta={`Upgrade to ${getNextPlan(plan)?.name}`}
+                        href={`/${meta?.slug}/settings/billing?upgrade=pro`}
+                      />
+                    }
+                  >
+                    <Button size={"sm"} variant={"subtle"}>
+                      Create Workspace
+                    </Button>
+                  </ToolTipWrapper>
+                )}
+              />
             </TeamPermissionView>
           </div>
         </div>

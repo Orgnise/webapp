@@ -1,4 +1,4 @@
-import { databaseName } from "@/lib/mongodb";
+import { DbCollections, databaseName, collections } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
 import { TeamDbSchema, TeamMemberDbSchema } from "../db-schema/team.schema";
 import { hasValue } from "../utils";
@@ -8,21 +8,19 @@ import { z } from "zod";
 
 export async function fetchDecoratedTeam(client: MongoClient, teamId: string, userId: string) {
 
-  const teamsMembers = client
-    .db(databaseName)
-    .collection<TeamMemberDbSchema>("teamUsers");
+  const teamsMembers = collections<TeamMemberDbSchema>(client, "team-users");
   const teamList = (await teamsMembers
     .aggregate([
       {
         $match: {
           user: new ObjectId(userId),
-          teamId: new ObjectId(teamId),
+          team: new ObjectId(teamId),
         },
       },
       {
         $lookup: {
           from: "teams",
-          localField: "teamId",
+          localField: "team",
           foreignField: "_id",
           as: "team",
         },
@@ -35,9 +33,9 @@ export async function fetchDecoratedTeam(client: MongoClient, teamId: string, us
       },
       {
         $lookup: {
-          from: "teamUsers",
+          from: DbCollections.TEAM_USER,
           localField: "team._id",
-          foreignField: "teamId",
+          foreignField: "team",
           as: "members",
         },
       },
@@ -72,13 +70,9 @@ export async function fetchDecoratedTeam(client: MongoClient, teamId: string, us
     ])
     .toArray()) as any[];
 
-  const pageCollection = client
-    .db(databaseName)
-    .collection<CollectionDbSchema>("collections");
+  const pageCollection = collections<CollectionDbSchema>(client, "collections");
 
-  const workspaceCollection = client
-    .db(databaseName)
-    .collection<CollectionDbSchema>("workspaces");
+  const workspaceCollection = collections<CollectionDbSchema>(client, "workspaces");
   const pageCount = await pageCollection.countDocuments({ team: new ObjectId(teamId), object: 'item' });
 
   const workspaceCount = await workspaceCollection.countDocuments({ team: new ObjectId(teamId) });
@@ -100,18 +94,14 @@ export async function fetchDecoratedTeam(client: MongoClient, teamId: string, us
 
 // Remove all team members
 export async function removeAllTeamMembers(client: MongoClient, teamId: string) {
-  const teamMembersCol = client
-    .db(databaseName)
-    .collection<TeamMemberDbSchema>("teamUsers");
-  return await teamMembersCol.deleteMany({ teamId: new ObjectId(teamId) });
+  const teamMembersCol = collections<TeamMemberDbSchema>(client, "team-users");
+  return await teamMembersCol.deleteMany({ team: new ObjectId(teamId) });
 }
 
 // Fetch the all teams of a user
 export async function fetchAllTeamOwnedByUser(client: MongoClient, userId: string) {
 
-  const teamsMembers = client
-    .db(databaseName)
-    .collection<TeamMemberDbSchema>("teamUsers");
+  const teamsMembers = collections<TeamMemberDbSchema>(client, "team-users");
   const teamList = (await teamsMembers
     .aggregate([
       {
@@ -123,7 +113,7 @@ export async function fetchAllTeamOwnedByUser(client: MongoClient, userId: strin
       {
         $lookup: {
           from: "teams",
-          localField: "teamId",
+          localField: "team",
           foreignField: "_id",
           as: "team",
         },
@@ -136,9 +126,9 @@ export async function fetchAllTeamOwnedByUser(client: MongoClient, userId: strin
       },
       {
         $lookup: {
-          from: "teamUsers",
+          from: DbCollections.TEAM_USER,
           localField: "team._id",
-          foreignField: "teamId",
+          foreignField: "team",
           as: "members",
         },
       },
@@ -179,11 +169,11 @@ export async function fetchAllTeamOwnedByUser(client: MongoClient, userId: strin
 // Get the team owner
 export async function getTeamOwner(client: MongoClient, teamId: string) {
 
-  const teamUsersCollection = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
+  const teamUsersCollection = collections<TeamMemberDbSchema>(client, "team-users");
   const teamUsers = await teamUsersCollection.aggregate([
     {
       $match: {
-        teamId: new ObjectId(teamId),
+        team: new ObjectId(teamId),
         role: "owner",
       }
     },
@@ -219,11 +209,8 @@ export async function getTeamOwner(client: MongoClient, teamId: string) {
 
 // Get all teams for a user in which user is a member
 export async function fetchAllTeamsForUser(client: MongoClient, userId: string) {
-  const teamsMembers = client
-    .db(databaseName)
-    .collection<TeamMemberDbSchema>("teamUsers");
-
-  const teamList = (await teamsMembers
+  const teamsMembersCollection = collections<TeamMemberDbSchema>(client, 'team-users')
+  const teamList = (await teamsMembersCollection
     .aggregate([
       {
         $match: {
@@ -233,7 +220,7 @@ export async function fetchAllTeamsForUser(client: MongoClient, userId: string) 
       {
         $lookup: {
           from: "teams",
-          localField: "teamId",
+          localField: "team",
           foreignField: "_id",
           as: "team",
         },
@@ -246,9 +233,9 @@ export async function fetchAllTeamsForUser(client: MongoClient, userId: string) 
       },
       {
         $lookup: {
-          from: "teamUsers",
+          from: DbCollections.TEAM_USER,
           localField: "team._id",
-          foreignField: "teamId",
+          foreignField: "team",
           as: "members",
         },
       },

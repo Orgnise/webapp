@@ -106,7 +106,7 @@ export default function CollectionBoard({
     };
     const item = {
       id: draggableId,
-      teamId: workspace.team,
+      team: workspace.team,
       workspaceId: workspace._id,
       newParent: destinationCollectionId,
       index: destination.index,

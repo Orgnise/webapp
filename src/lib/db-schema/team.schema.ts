@@ -27,11 +27,13 @@ export interface MetaSchema {
 }
 
 export interface TeamMemberDbSchema {
-  _id?: string;
+  _id?: ObjectId;
   role: TeamRole;
   user: ObjectId;
-  // ToDo: Rename this to team
-  teamId: ObjectId;
+  team: ObjectId;
   createdAt: Date;
   updatedAt: Date;
+}
+export interface TeamInviteDbSchema extends Omit<TeamMemberDbSchema, 'updatedAt' | 'user'> {
+  expires: Date
 }

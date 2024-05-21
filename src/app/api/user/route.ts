@@ -46,7 +46,7 @@ export const PUT = withSession(async ({ req, session }) => {
 // DELETE /api/user – delete a specific user
 export const DELETE = withSession(async ({ session }) => {
   const client = await mongoDb;
-  const teamUsersDb = client.db(databaseName).collection("teamUsers");
+  const teamUsersDb = client.db(databaseName).collection("team-users");
   const userIsOwnerOfTeam = await teamUsersDb.find({
     user: new ObjectId(session.user.id),
     role: "owner",

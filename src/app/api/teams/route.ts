@@ -1,19 +1,17 @@
-import { NextResponse } from "next/server";
+import { fetchAllTeamOwnedByUser, fetchAllTeamsForUser } from "@/lib/api";
 import { withSession } from "@/lib/auth";
 import { APP_DOMAIN, DICEBEAR_AVATAR_URL } from "@/lib/constants/constants";
 import { FREE_PLAN, FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
+import { TeamDbSchema, TeamMemberDbSchema } from "@/lib/db-schema/team.schema";
 import { log } from "@/lib/functions/log";
-import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberDbSchema, TeamDbSchema } from "@/lib/db-schema/team.schema";
+import mongoDb, { collections } from "@/lib/mongodb";
 import { Team } from "@/lib/types/types";
 import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
-import { fetchAllTeamOwnedByUser, fetchAllTeamsForUser } from "@/lib/api";
+import { NextResponse } from "next/server";
 
 // GET /api/teams - get all teams for the current user
-export const GET = withSession(async ({ session }) => {
-  const client = await mongoDb;
-  await client.connect();
+export const GET = withSession(async ({ session, client }) => {
   try {
 
     if (!session || session?.user === null) {
@@ -62,10 +60,8 @@ export const POST = withSession(async ({ req, session }) => {
       );
     }
 
-    const teams = client.db(databaseName).collection<TeamDbSchema>("teams");
-    const teamUsersDb = client
-      .db(databaseName)
-      .collection<TeamMemberDbSchema>("teamUsers");
+    const teams = collections<TeamDbSchema>(client, "teams");
+    const teamUsersDb = collections<TeamMemberDbSchema>(client, "team-users");
 
     const allTeams = await fetchAllTeamOwnedByUser(client, session.user.id);
     const freeTeams = allTeams.filter((t) => t.plan === "free");
@@ -117,7 +113,7 @@ export const POST = withSession(async ({ req, session }) => {
 
     // Add user to team
     const teamUser = await teamUsersDb.insertOne({
-      teamId: teamResult.insertedId,
+      team: teamResult.insertedId,
       role: "owner",
       user: new ObjectId(session.user.id),
       createdAt: new Date(),

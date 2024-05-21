@@ -144,6 +144,7 @@ export default function useTeams(): ITeam {
     freeTeams,
     loading: !data?.teams && !error ? true : false,
     createTeamAsync,
+
     // deleteTeamAsync,
     // updateTeamAsync,
   };

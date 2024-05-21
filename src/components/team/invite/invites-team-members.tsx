@@ -6,12 +6,13 @@ import { ListView } from "@/components/ui/listview";
 import { Popover } from "@/components/ui/popover";
 import { TWO_WEEKS_IN_SECONDS } from "@/lib/constants/constants";
 import useTeamInvite from "@/lib/swr/use-team-invite";
-import { TeamMemberProps } from "@/lib/types/types";
 import { timeAgo } from "@/lib/utility/datetime";
+import { InviteTeamMemberSchema } from "@/lib/zod/schemas";
 import { PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { UserMinus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { z } from "zod";
 import RemoveTeamMemberModal from "./remove-member-model";
 
 export default function InvitedMembers() {
@@ -21,8 +22,8 @@ export default function InvitedMembers() {
       <ListView
         items={Array.isArray(users) ? users : []}
         loading={loading}
-        renderItem={(user: TeamMemberProps) => (
-          <UserCard key={user.email} user={user} isOwner={false} />
+        renderItem={(user: z.infer<typeof InviteTeamMemberSchema>) => (
+          <UserCard key={user.email} user={user} />
         )}
         noItemsElement={
           <div className="flex flex-col items-center justify-center py-10">
@@ -41,15 +42,12 @@ export default function InvitedMembers() {
 
 const UserCard = ({
   user,
-  isOwner,
 }: {
-  user: TeamMemberProps;
-
-  isOwner: boolean;
+  user: z.infer<typeof InviteTeamMemberSchema>;
 }) => {
   const [openPopover, setOpenPopover] = useState(false);
   const [showRemoveTeammateModal, setShowRemoveTeammateModal] = useState(false);
-  const { name, email, createdAt } = user;
+  const { email, createdAt } = user;
 
   const { data: session } = useSession();
 
@@ -68,7 +66,7 @@ const UserCard = ({
           <div className="flex items-center space-x-3">
             <Avatar user={user} />
             <div className="flex flex-col">
-              <h3 className="text-sm font-medium">{name || email}</h3>
+              <h3 className="text-sm font-medium">{email}</h3>
               <p className="text-xs text-muted-foreground">
                 {
                   <p

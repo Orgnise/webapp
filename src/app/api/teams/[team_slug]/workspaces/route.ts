@@ -1,21 +1,18 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { withTeam } from "@/lib/auth";
-import mongoDb, { databaseName } from "@/lib/mongodb";
 import { TeamMemberDbSchema } from "@/lib/db-schema";
-import { WorkspaceMemberDBSchema, WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
+import { WorkspaceDbSchema, WorkspaceMemberDBSchema } from "@/lib/db-schema/workspace.schema";
+import mongoDb, { collections } from "@/lib/mongodb";
 import { generateSlug } from "@/lib/utils";
 import { createWorkspaceSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
-import { log } from "@/lib/functions";
 
 // GET /api/teams/:team_slug/workspaces - Get all workspaces for a team
 export const GET = withTeam(async ({ team, session }) => {
   const client = await mongoDb;
   try {
-    const workspaceUsersCol = client
-      .db(databaseName)
-      .collection<WorkspaceDbSchema>("workspace_users");
+    const workspaceUsersCol = collections<WorkspaceDbSchema>(client, "workspace_users");
 
     const list = await workspaceUsersCol.aggregate([
       {
@@ -78,9 +75,7 @@ export const POST = withTeam(
       const { name, description, defaultAccess, visibility } = await createWorkspaceSchema.parseAsync(await req.json());
 
       const userId = session?.user?.id;
-      const workspaces = client
-        .db(databaseName)
-        .collection<WorkspaceDbSchema>("workspaces");
+      const workspaces = collections<WorkspaceDbSchema>(client, "workspaces");
       const slug = await generateSlug({
         title: name,
         didExist: async (val: string) => {
@@ -112,11 +107,11 @@ export const POST = withTeam(
 
       let workspaceUsersCount: number = 0;
 
-      const workspaceUserCollection = client.db(databaseName).collection<WorkspaceMemberDBSchema>("workspace_users");
-      const teamsUsersColl = client.db(databaseName).collection<TeamMemberDbSchema>("teamUsers");
+      const workspaceUserCollection = collections<WorkspaceMemberDBSchema>(client, "workspace_users");
+      const teamsUsersColl = collections<TeamMemberDbSchema>(client, "team-users");
       if (visibility === "public") {
         // Fetch all the members of the team
-        const teamMembers = await teamsUsersColl.find({ teamId: new ObjectId(team._id) }).toArray();
+        const teamMembers = await teamsUsersColl.find({ team: new ObjectId(team._id) }).toArray();
         // console.log(`Found ${teamMembers.length} members in the team ${team._id}`)
         if (teamMembers.length > 0) {
 
@@ -172,9 +167,10 @@ export const POST = withTeam(
         workspaceUsersCount = 1;
 
         // Add the team owner to the workspace users as editor
-        const teamOwner = await teamsUsersColl.findOne({ teamId: new ObjectId(team._id), role: "owner" });
+        const teamOwner = await teamsUsersColl.findOne({ team: new ObjectId(team._id), role: "owner" });
 
-        if (teamOwner) {
+        // If the team owner is not the creator of the workspace, add the team owner to the workspace users
+        if (teamOwner && teamOwner.user.toHexString() !== userId) {
           const ownerWorkspaceUser = {
             role: "editor",
             user: new ObjectId(teamOwner.user),
@@ -185,12 +181,8 @@ export const POST = withTeam(
           } as WorkspaceMemberDBSchema;
           workspaceMembers.push(ownerWorkspaceUser);
           workspaceUsersCount++;
-        } else {
-          log({ message: `No team owner found for the team ${team._id}`, type: 'errors' })
         }
-
         const res = await workspaceUserCollection.insertMany(workspaceMembers);
-
       }
 
       return NextResponse.json({
@@ -207,6 +199,6 @@ export const POST = withTeam(
     }
   },
   {
-    requiredRole: ["owner", "moderator", "member"],
+    requiredRole: ["owner", "moderator"],
   },
 );

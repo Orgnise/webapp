@@ -12,23 +12,6 @@ export interface Member {
   role: TeamRole;
   _id: string;
 }
-export interface TeamUsers {
-  _id: string;
-  role: TeamRole;
-  user: User;
-  teamId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-export interface TeamMemberProps {
-  _id: string;
-  name: string;
-  email: string;
-  image?: string;
-  createdAt: Date;
-  role: TeamRole;
-}
-
 export interface WorkspaceMemberProps {
   _id: string;
   name: string;

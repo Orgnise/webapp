@@ -1,9 +1,9 @@
 import { TeamRole } from "@/lib/constants/team-role";
-import mongodb, { databaseName } from "@/lib/mongodb";
+import mongodb, { collections, databaseName } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { OrgniseApiError, handleAndReturnErrorResponse } from "../api/errors";
-import { TeamMemberDbSchema, TeamDbSchema } from "../db-schema/team.schema";
+import { TeamMemberDbSchema, TeamDbSchema, TeamInviteDbSchema } from "../db-schema/team.schema";
 import { Invite, Plan, Team } from "../types/types";
 import { getSearchParams } from "../url";
 import { hasValue } from "../utils";
@@ -61,14 +61,14 @@ export const withTeam =
           );
         }
         const client = await mongodb;
-        const session = await generateSession(req);
+        const session = await generateSession(req, client);
 
         const teamsCollection = client
           .db(databaseName)
           .collection<TeamDbSchema>("teams");
         const teamsMembers = client
           .db(databaseName)
-          .collection<TeamMemberDbSchema>("teamUsers");
+          .collection<TeamMemberDbSchema>("team-users");
 
         const teamInDb = (await teamsCollection
           .aggregate([
@@ -90,21 +90,19 @@ export const withTeam =
 
         // const team = teamList[0] as unknown as Team;
         if (!team) {
-          const teamInviteCollection = client
-            .db(databaseName)
-            .collection("teamInvites");
-          const invites = (await teamInviteCollection
+          const inviteCollection = collections<TeamInviteDbSchema>(client, "team-invites");;
+          const invites = (await inviteCollection
             .aggregate([
               {
                 $match: {
                   email: session.user.email,
-                  teamId: new ObjectId(teamInDb[0]._id),
+                  team: new ObjectId(teamInDb[0]._id),
                 },
               },
               {
                 $lookup: {
                   from: "teams",
-                  localField: "teamId",
+                  localField: "team",
                   foreignField: "_id",
                   as: "team",
                 },
