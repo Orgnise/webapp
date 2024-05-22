@@ -21,7 +21,7 @@ export const POST = async (req: Request) => {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
     let event: Stripe.Event;
 
-    console.log('👉 Stripe webhook event received:', webhookSecret);
+
 
     try {
       if (!sig || !webhookSecret) return;
@@ -33,19 +33,19 @@ export const POST = async (req: Request) => {
       });
     }
     if (relevantEvents.has(event.type)) {
-      console.log('Stripe webhook event type:', event);
+      console.log('👉 Stripe webhook event type:', event.type);
       const client = await mongodb;
       if (event.type === "checkout.session.completed") {
         await checkoutSessionCompleted(event, client);
       }
 
       // for subscription updates
-      if (event.type === "customer.subscription.updated") {
+      else if (event.type === "customer.subscription.updated") {
         await customerSubscriptionUpdated(event, client);
       }
 
       // If team cancels their subscription
-      if (event.type === "customer.subscription.deleted") {
+      else if (event.type === "customer.subscription.deleted") {
         await customerSubscriptionDeleted(event, client);
       }
     }

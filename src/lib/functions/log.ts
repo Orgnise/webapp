@@ -11,7 +11,7 @@ export const log = async ({
   mention = false,
 }: {
   message: string;
-  type: "alerts" | 'tada' | "errors" | "waitlist" | 'success'
+  type?: "alerts" | 'tada' | "errors" | "waitlist" | 'success'
   mention?: boolean;
 }) => {
   if (
@@ -22,7 +22,7 @@ export const log = async ({
     console.log(message);
   }
 
-  function switchType(type: string) {
+  function switchType(type: string | undefined) {
     switch (type) {
       case "alerts":
         return "🚨 ";

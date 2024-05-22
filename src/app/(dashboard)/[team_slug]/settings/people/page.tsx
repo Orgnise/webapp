@@ -6,6 +6,7 @@ import InviteViaEmail from "@/components/team/invite/invite-via-email";
 import InviteViaLink from "@/components/team/invite/invite-via-link";
 import InvitedMembers from "@/components/team/invite/invites-team-members";
 import TeamMembers from "@/components/team/invite/team-members";
+import { CustomTooltipContent, ToolTipWrapper } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +14,8 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { getNextPlan } from "@/lib/constants";
+import useUsage from "@/lib/hooks/use-usage";
 import useTeam from "@/lib/swr/use-team";
 import { Team } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
@@ -26,7 +29,8 @@ export default function ProjectPeopleClient() {
     "Members",
   );
 
-  const { activeTeam } = useTeam();
+  const { activeTeam, plan, meta } = useTeam();
+  const { exceedingMembersLimit, limit, usage } = useUsage();
 
   return (
     <>
@@ -40,9 +44,29 @@ export default function ProjectPeopleClient() {
           </div>
 
           <TeamPermissionView permission="INVITE_MANAGE_REMOVE_TEAM_MEMBER">
-            <CopyInviteToTeamLinkCodeModel team={activeTeam}>
-              <Button className="h-9">Invite</Button>
-            </CopyInviteToTeamLinkCodeModel>
+            <Fold
+              value={!exceedingMembersLimit}
+              ifPresent={(value: unknown) => (
+                <CopyInviteToTeamLinkCodeModel team={activeTeam}>
+                  <Button className="h-9">Invite</Button>
+                </CopyInviteToTeamLinkCodeModel>
+              )}
+              ifAbsent={() => (
+                <ToolTipWrapper
+                  content={
+                    <CustomTooltipContent
+                      title={`Current plan can have upto ${limit?.users} members in team. Additional members require ${getNextPlan(plan)?.name} plan.`}
+                      cta={`Upgrade to ${getNextPlan(plan)?.name}`}
+                      href={`/${meta?.slug}/settings/billing?upgrade=pro`}
+                    />
+                  }
+                >
+                  <Button size={"sm"} variant={"subtle"}>
+                    Invite
+                  </Button>
+                </ToolTipWrapper>
+              )}
+            />
           </TeamPermissionView>
         </div>
         <div className="flex space-x-3 border-b border-border px-3 sm:px-7">

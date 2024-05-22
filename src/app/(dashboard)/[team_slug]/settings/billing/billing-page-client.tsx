@@ -53,7 +53,7 @@ export default function TeamBillingPageClient() {
         mutate(`/api/teams/${activeTeam?.meta.slug}`);
       }, 1000);
     }
-  }, [searchParams, activeTeam?.meta.slug]);
+  }, [searchParams, activeTeam?.meta?.slug]);
 
   if (loading) {
     return <TeamBillingSettingsLoading />;

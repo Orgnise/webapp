@@ -1,10 +1,10 @@
-import { DbCollections, databaseName, collections } from "@/lib/mongodb";
+import { DbCollections, collections } from "@/lib/mongodb";
 import { MongoClient, ObjectId } from "mongodb";
+import { z } from "zod";
+import { CollectionDbSchema } from "../db-schema";
 import { TeamDbSchema, TeamMemberDbSchema } from "../db-schema/team.schema";
 import { hasValue } from "../utils";
-import { CollectionDbSchema } from "../db-schema";
-import { TeamSchema, LimitSchema } from "../zod/schemas";
-import { z } from "zod";
+import { LimitSchema, TeamSchema } from "../zod/schemas";
 
 export async function fetchDecoratedTeam(client: MongoClient, teamId: string, userId: string) {
 
@@ -77,7 +77,7 @@ export async function fetchDecoratedTeam(client: MongoClient, teamId: string, us
 
   const workspaceCount = await workspaceCollection.countDocuments({ team: new ObjectId(teamId) });
   if (hasValue(teamList)) {
-    const team = TeamSchema.parse({
+    let team = TeamSchema.parse({
       ...teamList[0],
       _id: teamList[0]._id.toString(),
       usage: {
@@ -85,9 +85,11 @@ export async function fetchDecoratedTeam(client: MongoClient, teamId: string, us
         users: teamList[0].membersCount,
         workspaces: workspaceCount,
       } as z.infer<typeof LimitSchema>,
-    });
-
-    return team;
+    })
+    return {
+      ...team,
+      stripeId: teamList[0].stripeId,
+    };
   }
   return undefined;
 }
