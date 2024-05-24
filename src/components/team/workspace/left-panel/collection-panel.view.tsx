@@ -28,26 +28,11 @@ export default function CollectionPanel({
   leftPanelSize,
   setLeftPanelSize = () => {},
 }: CollectionPanelProps) {
-  // const {  loading, error } = useContext(WorkspaceContext);
   const [activeLayout, setActiveLayout] = React.useState<PanelLayout>("List");
   const { team_slug, workspace_slug } = useParams() as {
     team_slug: string;
     workspace_slug: string;
   };
-
-  // if (loading) {
-  //   return (
-  //     <div className="h-full w-full flex place-content-center items-center">
-  //       <Spinner />
-  //     </div>
-  //   );
-  // } else if (error) {
-  //   return (
-  //     <div className="h-full w-full flex place-content-center items-center">
-  //       <P>Something went wrong</P>
-  //     </div>
-  //   );
-  // }
 
   const { createCollection } = {
     createCollection: () => {},

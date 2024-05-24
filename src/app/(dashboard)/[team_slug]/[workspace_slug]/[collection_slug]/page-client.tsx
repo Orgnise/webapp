@@ -1,5 +1,6 @@
 "use client";
 
+import { UsageLimitView } from "@/components/molecule";
 import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import NotFoundView from "@/components/team/team-not-found";
 import { CollectionItemCard } from "@/components/team/workspace/collection/collection-items-card";
@@ -7,30 +8,22 @@ import { CreateItemCTA } from "@/components/team/workspace/collection/content/it
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ListView } from "@/components/ui/listview";
+import { getNextPlan } from "@/lib/constants";
 import { checkWorkspacePermissions } from "@/lib/constants/workspace-role";
+import useUsage from "@/lib/hooks/use-usage";
 import useCollections from "@/lib/swr/use-collections";
+import useTeam from "@/lib/swr/use-team";
 import useWorkspaces from "@/lib/swr/use-workspaces";
 import { Collection } from "@/lib/types/types";
-import { findInCollectionTree } from "@/lib/utility/collection-tree-structure";
 import { LightbulbIcon } from "lucide-react";
-import { useParams } from "next/navigation";
-import { useMemo } from "react";
 import Loading from "./loading";
 
 export default function CollectionContentPageClient() {
-  const { collections, loading, error, updateCollection } = useCollections();
+  const { collections, loading, error, updateCollection, activeCollection } =
+    useCollections();
   const { activeWorkspace } = useWorkspaces();
-  const param = useParams();
-  const activeCollectionSlug = param?.collection_slug;
-
-  // Get the active collection
-  const activeCollection = useMemo(() => {
-    if (!collections) return null;
-    return findInCollectionTree(
-      collections,
-      (collection) => collection.meta.slug === activeCollectionSlug,
-    ) as Collection;
-  }, [activeCollectionSlug, collections]);
+  const { limit, exceedingPageLimit } = useUsage();
+  const { meta, plan } = useTeam();
 
   if (loading) {
     return <Loading />;
@@ -77,15 +70,27 @@ export default function CollectionContentPageClient() {
           />
           {activeCollection!.children.length > 0 && (
             <WorkspacePermissionView permission="CREATE_CONTENT">
-              <Button
-                variant={"default"}
-                className="border-dotted  border-muted-foreground "
-                size={"sm"}
+              <UsageLimitView
+                exceedingLimit={exceedingPageLimit}
+                upgradeMessage={`Current plan can have upto ${limit?.pages} pages in all workspaces. For higher pages quota upgrade to ${getNextPlan(plan)?.name} plan.`}
+                plan={plan}
+                team_slug={meta?.slug}
+                placeholder={
+                  <Button size={"sm"} variant={"subtle"}>
+                    Create Page
+                  </Button>
+                }
               >
-                <CreateItemCTA activeCollection={activeCollection!}>
-                  &nbsp; Create Page
-                </CreateItemCTA>
-              </Button>
+                <Button
+                  variant={"default"}
+                  className="border-dotted  border-muted-foreground "
+                  size={"sm"}
+                >
+                  <CreateItemCTA activeCollection={activeCollection!}>
+                    &nbsp; Create Page
+                  </CreateItemCTA>
+                </Button>
+              </UsageLimitView>
             </WorkspacePermissionView>
           )}
         </div>
@@ -109,6 +114,8 @@ export default function CollectionContentPageClient() {
 }
 
 function NoItemsView({ activeCollection }: { activeCollection?: Collection }) {
+  const { limit, exceedingPageLimit } = useUsage();
+  const { meta, plan } = useTeam();
   return (
     <div className="NoItemsView h-full w-full flex-grow bg-background">
       <div className="mx-auto flex h-full max-w-xl flex-1 flex-col place-content-center items-center gap-10 pt-56 text-center">
@@ -122,15 +129,27 @@ function NoItemsView({ activeCollection }: { activeCollection?: Collection }) {
           inside <strong>collections</strong>.
         </span>
         <WorkspacePermissionView permission="CREATE_CONTENT">
-          <Button
-            variant={"default"}
-            className="border-dotted  border-muted-foreground "
-            size={"sm"}
+          <UsageLimitView
+            exceedingLimit={exceedingPageLimit}
+            upgradeMessage={`Current plan can have upto ${limit?.pages} pages in all workspaces. For higher pages quota upgrade to ${getNextPlan(plan)?.name} plan.`}
+            plan={plan}
+            team_slug={meta?.slug}
+            placeholder={
+              <Button size={"sm"} variant={"subtle"}>
+                Create Page
+              </Button>
+            }
           >
-            <CreateItemCTA activeCollection={activeCollection!}>
-              &nbsp; Create Page
-            </CreateItemCTA>
-          </Button>
+            <Button
+              variant={"default"}
+              className="border-dotted  border-muted-foreground "
+              size={"sm"}
+            >
+              <CreateItemCTA activeCollection={activeCollection!}>
+                &nbsp; Create Page
+              </CreateItemCTA>
+            </Button>
+          </UsageLimitView>
         </WorkspacePermissionView>
       </div>
     </div>
