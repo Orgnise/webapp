@@ -1,5 +1,6 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
-import { withTeam, withWorkspace } from "@/lib/auth";
+import { withWorkspace } from "@/lib/auth";
+import { WorkspaceMemberDBSchema } from "@/lib/db-schema";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { addWorkspaceMemberSchema, removeWorkspaceUserSchema, updateWorkspaceRoleSchema } from "@/lib/zod/schemas/workspaces";
 import { ObjectId } from "mongodb";
@@ -63,9 +64,9 @@ export const POST = withWorkspace(async ({ team, client, workspace, req }) => {
         workspace: new ObjectId(workspace._id),
         user: new ObjectId(user._id),
         role: member.role,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as WorkspaceMemberDBSchema;
     });
 
     const result = await workspaceUsersCol.insertMany(workspaceUsers);
@@ -100,7 +101,7 @@ export const PUT = withWorkspace(
         team: new ObjectId(team._id),
       };
       const response = await teamUserCollection.updateOne(query, {
-        $set: { role: role, updatedAt: new Date().toISOString(), },
+        $set: { role: role, updatedAt: new Date(), },
       });
 
       return NextResponse.json(

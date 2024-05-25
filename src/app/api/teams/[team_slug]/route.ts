@@ -4,7 +4,7 @@ import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api/errors"
 import { fetchDecoratedTeam } from "@/lib/api/team";
 import { removeAllTeamWorkspaceMembers, removeAllWorkspaces } from "@/lib/api/workspace";
 import { withTeam } from "@/lib/auth";
-import mongoDb, { databaseName } from "@/lib/mongodb";
+import mongoDb, { collections } from "@/lib/mongodb";
 import { cancelSubscription } from "@/lib/stripe";
 import { hasValue } from "@/lib/utils";
 import { updateTeamSchema } from "@/lib/zod/schemas/teams";
@@ -26,7 +26,7 @@ export const PUT = withTeam(
       const client = await mongoDb;
       const { name, description, slug, } = await updateTeamSchema.parseAsync(await req.json());
 
-      const teamsDb = client.db(databaseName).collection("teams");
+      const teamsDb = collections(client, "teams");
       const query = { _id: new ObjectId(team._id) };
 
       // let slug = team?.meta?.slug;
@@ -60,7 +60,7 @@ export const PUT = withTeam(
       const update = await teamsDb.updateOne(query, {
         $set: {
           ...updatedTeam,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date(),
           updatedBy: new ObjectId(session.user.id),
         },
       });

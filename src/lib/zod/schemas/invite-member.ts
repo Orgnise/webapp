@@ -27,6 +27,16 @@ export const InviteTeamMemberSchema = z.object({
   role: z.enum(roles).describe("Role of the team member."),
   expires: z.date().describe("Date when the invite expires."),
   createdAt: z.date().describe("Date when the invite was sent"),
+}).describe("Invite team member schema.").openapi({
+  description: "Invite team member schema.",
+  example: {
+    _id: "1",
+    email: "john@doe.com",
+    createdAt: new Date(),
+    expires: new Date(),
+    role: "member"
+  }
+
 });
 
 export const TeamInvitesSchema = z.object({

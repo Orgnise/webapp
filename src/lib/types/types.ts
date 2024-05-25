@@ -43,8 +43,8 @@ export interface Workspace {
    * Role of the current auth user in the workspace
    */
   role: WorkspaceRole;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   updatedBy: string;
   meta: Meta;
   /**
@@ -82,8 +82,8 @@ export interface Collection {
   name: string;
   content: any;
   sortIndex: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
   updatedBy: string;
   workspace: Workspace;
   meta: Meta;

@@ -17,6 +17,7 @@ export interface TeamDbSchema {
   billingCycleStart: number;
   inviteCode: string;
   logo: string;
+  updatedAt: Date;
   limit: z.infer<typeof LimitSchema>;
 }
 

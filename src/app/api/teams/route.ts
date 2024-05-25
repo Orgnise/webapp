@@ -105,6 +105,7 @@ export const POST = withSession(async ({ req, session }) => {
       },
       logo: DICEBEAR_AVATAR_URL + team.name,
       createdAt: new Date(),
+      updatedAt: new Date(),
 
     } as TeamDbSchema;
 
