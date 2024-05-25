@@ -47,7 +47,7 @@ export default function useCollections(): IWorkspaces {
     error,
     mutate,
   } = useSWR<any>(
-    `/api/teams/${team_slug}/${workspace_slug}/collections`,
+    workspace_slug && `/api/teams/${team_slug}/${workspace_slug}/collections`,
     fetcher,
     {
       dedupingInterval: 120000,

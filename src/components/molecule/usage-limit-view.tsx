@@ -1,11 +1,12 @@
 import { CustomTooltipContent, ToolTipWrapper } from "@/components/ui/";
 import { getNextPlan } from "@/lib/constants";
+import { Plan } from "@/lib/types";
 import { Fold } from "@/lib/utils";
 
 interface Props {
   exceedingLimit: boolean;
   upgradeMessage: string;
-  plan: any;
+  plan?: Plan;
   children: React.ReactNode;
   team_slug: string;
   placeholder: React.ReactNode;
@@ -27,7 +28,7 @@ export function UsageLimitView({
           content={
             <CustomTooltipContent
               title={upgradeMessage}
-              cta={`Upgrade to ${getNextPlan(plan)?.name}`}
+              cta={`Upgrade to ${plan ? getNextPlan(plan)?.name : "Pro"}`}
               href={`/${team_slug}/settings/billing?upgrade=pro`}
             />
           }

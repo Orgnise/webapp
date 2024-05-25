@@ -140,7 +140,10 @@ export function CreateWorkspaceModel({
                     </p>
                   }
                 >
-                  <HelpCircleIcon className="text-muted-foreground" size={16} />
+                  <HelpCircleIcon
+                    className="cursor-pointer text-muted-foreground"
+                    size={16}
+                  />
                 </ToolTipWrapper>
               </span>
             </span>
@@ -162,7 +165,10 @@ export function CreateWorkspaceModel({
                   </p>
                 }
               >
-                <HelpCircleIcon className="text-muted-foreground" size={16} />
+                <HelpCircleIcon
+                  className="cursor-pointer text-muted-foreground"
+                  size={16}
+                />
               </ToolTipWrapper>
             </span>
             <Select defaultValue="full" name="defaultAccess">

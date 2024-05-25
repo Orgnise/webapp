@@ -1,12 +1,12 @@
 "use client";
 
 import Tab from "@/components/atom/tab";
+import { UsageLimitView } from "@/components/molecule";
 import TeamPermissionView from "@/components/molecule/team-permission-view";
 import InviteViaEmail from "@/components/team/invite/invite-via-email";
 import InviteViaLink from "@/components/team/invite/invite-via-link";
 import InvitedMembers from "@/components/team/invite/invites-team-members";
 import TeamMembers from "@/components/team/invite/team-members";
-import { CustomTooltipContent, ToolTipWrapper } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -44,29 +44,21 @@ export default function ProjectPeopleClient() {
           </div>
 
           <TeamPermissionView permission="INVITE_MANAGE_REMOVE_TEAM_MEMBER">
-            <Fold
-              value={!exceedingMembersLimit}
-              ifPresent={(value: unknown) => (
-                <CopyInviteToTeamLinkCodeModel team={activeTeam}>
-                  <Button className="h-9">Invite</Button>
-                </CopyInviteToTeamLinkCodeModel>
-              )}
-              ifAbsent={() => (
-                <ToolTipWrapper
-                  content={
-                    <CustomTooltipContent
-                      title={`Current plan can have upto ${limit?.users} members in team. Additional members require ${getNextPlan(plan)?.name} plan.`}
-                      cta={`Upgrade to ${getNextPlan(plan)?.name}`}
-                      href={`/${meta?.slug}/settings/billing?upgrade=pro`}
-                    />
-                  }
-                >
-                  <Button size={"sm"} variant={"subtle"}>
-                    Invite
-                  </Button>
-                </ToolTipWrapper>
-              )}
-            />
+            <UsageLimitView
+              exceedingLimit={exceedingMembersLimit}
+              upgradeMessage={`Current plan can have upto ${limit?.users} members in team. Additional members require ${getNextPlan(plan)?.name} plan.`}
+              plan={plan}
+              team_slug={meta?.slug}
+              placeholder={
+                <Button size={"sm"} variant={"subtle"}>
+                  Invite
+                </Button>
+              }
+            >
+              <CopyInviteToTeamLinkCodeModel team={activeTeam}>
+                <Button className="h-9">Invite</Button>
+              </CopyInviteToTeamLinkCodeModel>
+            </UsageLimitView>
           </TeamPermissionView>
         </div>
         <div className="flex space-x-3 border-b border-border px-3 sm:px-7">

@@ -7,6 +7,7 @@ import Divider from "@/components/ui/divider";
 import { useUpgradePlanModal } from "@/components/ui/models/upgrade-plan-modal";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useRouterStuff } from "@/lib/hooks";
+import useUsage from "@/lib/hooks/use-usage";
 import useTeam from "@/lib/swr/use-team";
 import { getFirstAndLastDay } from "@/lib/utility/datetime";
 import { useSearchParams } from "next/navigation";
@@ -19,7 +20,8 @@ import TeamBillingSettingsLoading from "./loading";
 export default function TeamBillingPageClient() {
   const [isManageSubscriptionClicked, setManageSubscriptionClicked] =
     useState(false);
-  const { activeTeam, loading, nextPlan, stripeId, usage, limit } = useTeam();
+  const { activeTeam, loading, nextPlan, stripeId } = useTeam();
+  const { limit, usage } = useUsage();
   const plan = activeTeam?.plan ?? "free";
   const billingCycleStart = activeTeam?.billingCycleStart;
   const { queryParams, router } = useRouterStuff();
