@@ -23,7 +23,7 @@ export default function useTeam(): ITeam {
     team_slug && `/api/teams/${team_slug}`,
     fetcher,
     {
-      dedupingInterval: 120000,
+      dedupingInterval: 30000,
     },
   );
 

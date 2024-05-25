@@ -1,6 +1,7 @@
 "use client";
 
 import { Spinner } from "@/components/atom/spinner";
+import { LoadingSpinner } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Fold } from "@/lib/utils";
@@ -9,7 +10,7 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export function LoginForm() {
@@ -27,9 +28,21 @@ export function LoginForm() {
   const [showEmailOption, setShowEmailOption] = useState(false);
   const [noSuchAccount, setNoSuchAccount] = useState(false);
 
+  const [clickedGoogle, setClickedGoogle] = useState(false);
+  const [clickedGithub, setClickedGithub] = useState(false);
+  const [clickedSlack, setClickedSlack] = useState(false);
+
+  useEffect(() => {
+    // when leave page, reset state
+    return () => {
+      setClickedGoogle(false);
+      setClickedGithub(false);
+      setClickedSlack(false);
+    };
+  }, []);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-
     setError({});
     setIsLoading(true);
     const email = e.target?.email?.value;
@@ -42,20 +55,19 @@ export function LoginForm() {
       .then(async (res) => {
         const { exists } = await res.json();
         if (exists) {
-          signIn("email", {
+          const res = await signIn("email", {
             email,
             redirect: false,
             ...(next && next.length > 0 ? { callbackUrl: next } : {}),
-          }).then((res) => {
-            if (res?.ok && !res?.error) {
-              // Clear email value
-              if (emailRef.current) emailRef.current!.value = "";
-              toast.success("Email sent - check your inbox!");
-            } else {
-              toast.error("Error sending email - try again?");
-            }
-            setShowEmailOption(false);
           });
+          if (res?.ok && !res?.error) {
+            // Clear email value
+            if (emailRef.current) emailRef.current!.value = "";
+            toast.success("Email sent - check your inbox!");
+          } else {
+            toast.error("Error sending email - try again?");
+          }
+          setShowEmailOption(false);
         } else {
           toast.error("No account found with that email address.");
           setNoSuchAccount(true);
@@ -74,38 +86,50 @@ export function LoginForm() {
       <div className="mt-4 flex w-9/12 place-content-evenly gap-2">
         {/* GOOGLE LOGIN */}
         <button
+          disabled={clickedGoogle || clickedGithub || clickedSlack}
           onClick={async (e) => {
             e.preventDefault();
+            setClickedGoogle(true);
             // googleLogin();
             await signIn("google");
           }}
-          className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
+          className="flex w-1/3 place-content-center items-center rounded-sm border border-border bg-card p-1.5"
         >
-          <Image
-            unoptimized={true}
-            height={32}
-            width={32}
-            src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png"
-            className="h-6 w-6"
-            alt={"Google"}
-          />
+          {clickedGoogle ? (
+            <LoadingSpinner />
+          ) : (
+            <Image
+              unoptimized={true}
+              height={32}
+              width={32}
+              src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png"
+              className="h-6 w-6"
+              alt={"Google"}
+            />
+          )}
         </button>
         {/* Github Login */}
         <button
+          disabled={clickedGoogle || clickedGithub || clickedSlack}
           onClick={async (e) => {
+            setClickedGithub(true);
             e.preventDefault();
             await signIn("github");
           }}
           className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
         >
-          <Image
-            unoptimized={true}
-            src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"
-            className="h-6 w-6"
-            height={32}
-            width={32}
-            alt="Github"
-          />
+          {clickedGithub ? (
+            <LoadingSpinner />
+          ) : (
+            <Image
+              unoptimized={true}
+              src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"
+              className="h-6 w-6"
+              height={32}
+              width={32}
+              alt="Github"
+            />
+          )}
         </button>
         {/* X Login */}
         {/* <button
@@ -127,21 +151,26 @@ export function LoginForm() {
         </button> */}
         {/** Slack */}
         <button
+          disabled={clickedGoogle || clickedGithub || clickedSlack}
           className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
           onClick={async (e) => {
+            setClickedSlack(true);
             e.preventDefault();
-            // googleLogin();
             await signIn("slack");
           }}
         >
-          <Image
-            unoptimized={true}
-            height={32}
-            width={32}
-            src="_static/slack-logo.svg"
-            className="h-6 w-6 scale-150"
-            alt="Slack"
-          />
+          {clickedSlack ? (
+            <LoadingSpinner />
+          ) : (
+            <Image
+              unoptimized={true}
+              height={32}
+              width={32}
+              src="_static/slack-logo.svg"
+              className="h-6 w-6 scale-150"
+              alt="Slack"
+            />
+          )}
         </button>
       </div>
 

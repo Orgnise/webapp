@@ -30,7 +30,7 @@ export default function ProjectPeopleClient() {
   );
 
   const { activeTeam, plan, meta } = useTeam();
-  const { exceedingMembersLimit, limit, usage } = useUsage();
+  const { exceedingMembersLimit, limit } = useUsage();
 
   return (
     <>

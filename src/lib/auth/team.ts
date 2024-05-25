@@ -63,12 +63,7 @@ export const withTeam =
         const client = await mongodb;
         const session = await generateSession(req, client);
 
-        const teamsCollection = client
-          .db(databaseName)
-          .collection<TeamDbSchema>("teams");
-        const teamsMembers = client
-          .db(databaseName)
-          .collection<TeamMemberDbSchema>("team-users");
+        const teamsCollection = collections<TeamDbSchema>(client, "teams");
 
         const teamInDb = (await teamsCollection
           .aggregate([
@@ -81,10 +76,7 @@ export const withTeam =
           .toArray()) as TeamDbSchema[];
 
         if (!hasValue(teamInDb)) {
-          throw new OrgniseApiError({
-            code: "not_found",
-            message: "Team not found",
-          });
+          throw OrgniseApiError.NOT_FOUND("Team not found");
         }
         const team = await fetchDecoratedTeam(client, teamInDb[0]._id.toString(), session.user.id);
 

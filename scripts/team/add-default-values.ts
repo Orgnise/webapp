@@ -1,4 +1,4 @@
-import { BUSINESS_PLAN, FREE_PLAN } from "@/lib/constants";
+import { BUSINESS_PLAN, FREE_PLAN, PRO_PLAN } from "@/lib/constants";
 import { TeamDbSchema } from "@/lib/db-schema/team.schema";
 import mongodb, { databaseName } from "@/lib/mongodb";
 import "dotenv-flow/config";
@@ -18,9 +18,9 @@ async function main() {
       { "billingCycleStart": { $in: [null, undefined, ''] }, },
       { "plan": { $in: [null, undefined, ''] }, },
       { "createdAt": { $in: [null, undefined, ''] } },
-      { "membersCount": { $ne: [null, undefined, ''] } },
       { "plan": 'free' },
-      { "plan": 'business' }
+      { "plan": 'business' },
+      { "plan": 'pro' }
     ]
   }).toArray();
 
@@ -66,6 +66,21 @@ async function main() {
       },
       {
         updateMany: {
+          // @ts-ignore
+          filter: { "plan": 'pro' },
+          update: {
+            $set: {
+              limit: {
+                pages: PRO_PLAN.limits.pages!,
+                users: PRO_PLAN.limits.users!,
+                workspaces: PRO_PLAN.limits.workspaces!,
+              }
+            }
+          }
+        },
+      },
+      {
+        updateMany: {
           filter: { "plan": 'business' },
           update: {
             $set: {
@@ -96,8 +111,9 @@ async function main() {
             "pagesLimit": "",
             'workspaceLimit': "",
             'membersLimit': "",
+            'membersCount': "",
             'teamUsers': "",
-            "members": ""
+            "members": "",
           }
         }
       }

@@ -28,11 +28,12 @@ export default function useUsage(): IUsage {
   const freeTeams = teams?.filter((team: Team) => team.role === "owner" && team.plan === "free");
   const workspaceLimitInTeam = limit?.workspaces;
   const flatCollections = useMemo(() => flattenCollectionTree(collections).filter((collection) => collection?.object === "item"), [collections]);
-  const pagesCount = collections && flatCollections?.length;
+  const pagesCount = flatCollections?.length ?? 0;
+
 
   return {
     usage: {
-      pages: pagesCount ?? usage?.pages,
+      pages: usage?.pages,
       users: membersCount ?? usage?.users,
       workspaces: workspaces?.length ?? usage?.workspaces
     },
@@ -40,6 +41,6 @@ export default function useUsage(): IUsage {
     exceedingFreeTeam: freeTeams?.length > FREE_TEAMS_LIMIT,
     exceedingWorkspaceLimit: (workspaces?.length ?? usage?.workspaces) >= workspaceLimitInTeam,
     exceedingMembersLimit: (users?.length ?? usage?.users) >= limit?.users,
-    exceedingPageLimit: (pagesCount ?? usage?.pages) >= limit?.pages,
+    exceedingPageLimit: (usage?.pages - pagesCount) >= limit?.pages - pagesCount,
   };
 }

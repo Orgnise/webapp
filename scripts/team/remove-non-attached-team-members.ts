@@ -9,7 +9,7 @@ import "dotenv-flow/config";
 // Script to remove members from team users collection and are not linked to any team
 async function main() {
   const client = await mongodb;
-  const teamUsersColl = client.db(databaseName).collection<TeamDbSchema>("teamUsers");
+  const teamUsersColl = client.db(databaseName).collection<TeamDbSchema>("team-users");
 
   console.log("\n-------------------- Teams --------------------\n");
 
@@ -18,7 +18,7 @@ async function main() {
       {
         $lookup: {
           from: "teams",
-          localField: "teamId",
+          localField: "team",
           foreignField: "_id",
           as: "team",
         },
@@ -43,8 +43,8 @@ async function main() {
 
     for (let index = 0; index < teamsUsers.length; index++) {
       const team = teamsUsers[index];
-      await teamUsersColl.deleteOne({ teamId: team.teamId });
-      console.log(`Member removed from team ${team.teamId}`);
+      await teamUsersColl.deleteOne({ team: team.team });
+      console.log(`Member removed from team ${team.team}`);
     }
   } else {
     console.log("✅ All members are linked to at-least one team");

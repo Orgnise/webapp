@@ -25,7 +25,7 @@ export default function TeamsPageClient() {
     team_slug?: string;
   };
   const { workspaces, error, loading: workspacesLoading } = useWorkspaces();
-  const { exceedingWorkspaceLimit, limit, usage } = useUsage();
+  const { exceedingWorkspaceLimit, limit } = useUsage();
 
   const { setShowModal, DeleteAccountModal } = useCreateWorkspaceModal();
   if (loading) {
