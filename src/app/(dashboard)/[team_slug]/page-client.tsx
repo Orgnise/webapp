@@ -2,7 +2,7 @@
 import { HashIcon, LockIcon } from "lucide-react";
 
 import { H3 } from "@/components/atom/typography";
-import TeamPermissionView from "@/components/molecule/team-permisson-view";
+import TeamPermissionView from "@/components/molecule/team-permission-view";
 import EmptyWorkspaceView from "@/components/team/workspace/empty-workspace-view";
 import { WorkspaceSettingsDropDown } from "@/components/team/workspace/workspace-settings-dropdown";
 import { Button } from "@/components/ui/button";

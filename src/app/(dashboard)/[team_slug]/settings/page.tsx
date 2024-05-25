@@ -2,7 +2,7 @@
 import { Logo } from "@/components/atom/logo";
 import { Spinner } from "@/components/atom/spinner";
 import { P } from "@/components/atom/typography";
-import TeamPermissionView from "@/components/molecule/team-permisson-view";
+import TeamPermissionView from "@/components/molecule/team-permission-view";
 import NotFoundView from "@/components/team/team-not-found";
 import UploadLogo from "@/components/team/upload-logo";
 import { Button } from "@/components/ui/button";

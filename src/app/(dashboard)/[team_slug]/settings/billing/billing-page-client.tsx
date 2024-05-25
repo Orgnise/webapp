@@ -1,5 +1,5 @@
 "use client";
-import TeamPermissionView from "@/components/molecule/team-permisson-view";
+import TeamPermissionView from "@/components/molecule/team-permission-view";
 import { InfoTooltip, NumberTooltip } from "@/components/ui";
 import { Badge } from "@/components/ui/badge";
 import { Button2 } from "@/components/ui/button";

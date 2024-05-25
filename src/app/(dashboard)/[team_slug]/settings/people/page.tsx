@@ -1,7 +1,7 @@
 "use client";
 
 import Tab from "@/components/atom/tab";
-import TeamPermissionView from "@/components/molecule/team-permisson-view";
+import TeamPermissionView from "@/components/molecule/team-permission-view";
 import InviteViaEmail from "@/components/team/invite/invite-via-email";
 import InviteViaLink from "@/components/team/invite/invite-via-link";
 import InvitedMembers from "@/components/team/invite/invites-team-members";
