@@ -1,11 +1,12 @@
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
+import React, { useMemo } from "react";
 import { toast } from "sonner";
 import useSWR, { KeyedMutator } from "swr";
 import { fetcher } from "../fetcher";
 import { Collection } from "../types/types";
 import {
   addInCollectionTree,
+  findInCollectionTree,
   removeFromCollectionTree,
   updateInCollectionTree,
 } from "../utility/collection-tree-structure";
@@ -13,6 +14,7 @@ import { CreateCollectionSchema, UpdateCollectionSchema } from "../zod/schemas/c
 
 interface IWorkspaces {
   error: any;
+  activeCollection?: Collection;
   mutate: KeyedMutator<any>;
   loading: boolean;
   collections: Collection[];
@@ -38,14 +40,14 @@ export default function useCollections(): IWorkspaces {
     collection_slug?: string;
   };
 
-  const { team_slug, workspace_slug } = param;
+  const { team_slug, workspace_slug, collection_slug } = param;
   const router = useRouter();
   const {
     data: data,
     error,
     mutate,
   } = useSWR<any>(
-    `/api/teams/${team_slug}/${workspace_slug}/collections`,
+    workspace_slug && `/api/teams/${team_slug}/${workspace_slug}/collections`,
     fetcher,
     {
       dedupingInterval: 120000,
@@ -270,8 +272,17 @@ export default function useCollections(): IWorkspaces {
       });
   }
 
+  const activeCollection = useMemo(() => {
+    if (!data?.collections) return undefined;
+    return findInCollectionTree(
+      data?.collections,
+      (collection) => collection.meta.slug === collection_slug,
+    ) as Collection;
+  }, [collection_slug, data?.collections]);
+
   return {
     mutate,
+    activeCollection,
     collections: data?.collections,
     error,
     loading: !data && !error ? true : false,

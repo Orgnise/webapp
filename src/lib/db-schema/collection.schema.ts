@@ -19,8 +19,8 @@ export interface CollectionDbSchema {
   content: string;
   sortIndex: number;
   meta: MetaSchema;
-  createdAt: string;
+  createdAt: Date;
   createdBy: ObjectId;
   updatedBy?: ObjectId;
-  updatedAt: string;
+  updatedAt: Date;
 }

@@ -165,7 +165,7 @@ export const NextAuthOptions = {
               $set: {
                 ...(!userExists.name && { name: profile.name || profile.login }),
                 ...(newAvatar && { image: newAvatar }),
-                updatedAt: new Date().toISOString(),
+                updatedAt: new Date(),
               }
             },
           );

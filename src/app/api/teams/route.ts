@@ -1,18 +1,17 @@
-import { NextResponse } from "next/server";
+import { fetchAllTeamOwnedByUser, fetchAllTeamsForUser } from "@/lib/api";
 import { withSession } from "@/lib/auth";
-import { APP_DOMAIN } from "@/lib/constants/constants";
-import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
+import { APP_DOMAIN, DICEBEAR_AVATAR_URL } from "@/lib/constants/constants";
+import { FREE_PLAN, FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
+import { TeamDbSchema, TeamMemberDbSchema } from "@/lib/db-schema/team.schema";
 import { log } from "@/lib/functions/log";
-import mongoDb, { databaseName } from "@/lib/mongodb";
-import { TeamMemberDbSchema, TeamDbSchema } from "@/lib/db-schema/team.schema";
+import mongoDb, { collections } from "@/lib/mongodb";
 import { Team } from "@/lib/types/types";
 import { generateSlug, randomId } from "@/lib/utils";
 import { ObjectId } from "mongodb";
+import { NextResponse } from "next/server";
 
 // GET /api/teams - get all teams for the current user
-export const GET = withSession(async ({ session }) => {
-  const client = await mongoDb;
-  await client.connect();
+export const GET = withSession(async ({ session, client }) => {
   try {
 
     if (!session || session?.user === null) {
@@ -25,129 +24,7 @@ export const GET = withSession(async ({ session }) => {
         { status: 400 },
       );
     }
-    // const teams = client.db(databaseName).collection<TeamSchema>("teams");
-    const teamsMembers = client
-      .db(databaseName)
-      .collection<TeamMemberDbSchema>("teamUsers");
-
-    const teamList = (await teamsMembers
-      .aggregate([
-        {
-          $match: {
-            user: new ObjectId(session.user.id),
-          },
-        },
-        {
-          $lookup: {
-            from: "teams",
-            localField: "teamId",
-            foreignField: "_id",
-            as: "team",
-          },
-        },
-        {
-          $unwind: {
-            path: "$team",
-            preserveNullAndEmptyArrays: true,
-          },
-        },
-        {
-          $lookup: {
-            from: "teamUsers",
-            localField: "team._id",
-            foreignField: "teamId",
-            as: "members",
-          },
-        },
-        {
-          $addFields: { membersCount: { $size: "$members" } },
-        },
-        // Append team object in root object and make team_id and root id.
-        {
-          $addFields: {
-            _id: "$team._id",
-            name: "$team.name",
-            description: "$team.description",
-            createdBy: "$team.createdBy",
-            plan: "$team.plan",
-            meta: "$team.meta",
-            createdAt: "$team.createdAt",
-            billingCycleStart: "$team.billingCycleStart",
-            inviteCode: "$team.inviteCode",
-            membersLimit: "$team.membersLimit",
-            workspaceLimit: "$team.workspaceLimit",
-            logo: "$team.logo",
-            joinedAt: "$createdAt",
-          },
-        },
-        {
-          $sort:
-          {
-            joinedAt: -1,
-          },
-        },
-        // Remove team object from root object
-        {
-          $project: {
-            team: 0,
-            "teamId:": 0,
-            members: 0,
-          },
-        },
-      ])
-      .toArray()) as TeamDbSchema[];
-
-    // const teamList = await teams.aggregate([
-
-    //   {
-    //     $lookup: {
-    //       from: "teamUsers",
-    //       localField: "_id",
-    //       foreignField: "teamId",
-    //       as: "members",
-    //     },
-    //   },
-    //   {
-    //     $unwind: {
-    //       path: "$members",
-    //       preserveNullAndEmptyArrays: true,
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "users",
-    //       localField: "members.user",
-    //       foreignField: "_id",
-    //       as: "members.user",
-    //     },
-    //   },
-    //   {
-    //     $unwind: {
-    //       path: "$members.user",
-    //       preserveNullAndEmptyArrays: true,
-    //     },
-    //   },
-    //   // Search the session user from members and append with role in members
-    //   {
-    //     $project: {
-    //       name: 1,
-    //       plan: 1,
-    //       meta: 1,
-    //       description: 1,
-    //       inviteCode: 1,
-    //       members: 1,
-    //       membersCount: {
-    //         $size: "$members.users"
-
-    //       }
-    //     },
-    //   },
-    //   {
-    //     $match: {
-    //       "members.users.user": new ObjectId(session.user.id),
-    //     },
-    //   },
-    // ]).toArray() as TeamSchema[];
+    const teamList = await fetchAllTeamsForUser(client, session.user.id);
     return NextResponse.json({ teams: teamList });
   } catch (err: any) {
     return NextResponse.json(
@@ -183,26 +60,12 @@ export const POST = withSession(async ({ req, session }) => {
       );
     }
 
-    const teams = client.db(databaseName).collection<TeamDbSchema>("teams");
-    const teamUsersDb = client
-      .db(databaseName)
-      .collection<TeamMemberDbSchema>("teamUsers");
+    const teams = collections<TeamDbSchema>(client, "teams");
+    const teamUsersDb = collections<TeamMemberDbSchema>(client, "team-users");
 
-    const freeTeams = await teams
-      .find({
-        $and: [
-          { plan: "free" },
-          {
-            members: {
-              $elemMatch: {
-                user: new ObjectId(session.user.id),
-                role: "owner",
-              },
-            },
-          },
-        ],
-      })
-      .toArray();
+    const allTeams = await fetchAllTeamOwnedByUser(client, session.user.id);
+    const freeTeams = allTeams.filter((t) => t.plan === "free");
+
     if (freeTeams.length >= FREE_TEAMS_LIMIT) {
       return NextResponse.json(
         {
@@ -235,8 +98,15 @@ export const POST = withSession(async ({ req, session }) => {
       },
       billingCycleStart: new Date().getDate(),
       inviteCode: randomId(16),
-      membersLimit: 2,
-      workspaceLimit: 3,
+      limit: {
+        pages: FREE_PLAN.limits.pages!,
+        users: FREE_PLAN.limits.users!,
+        workspaces: FREE_PLAN.limits.workspaces!,
+      },
+      logo: DICEBEAR_AVATAR_URL + team.name,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+
     } as TeamDbSchema;
 
     // Create team
@@ -244,7 +114,7 @@ export const POST = withSession(async ({ req, session }) => {
 
     // Add user to team
     const teamUser = await teamUsersDb.insertOne({
-      teamId: teamResult.insertedId,
+      team: teamResult.insertedId,
       role: "owner",
       user: new ObjectId(session.user.id),
       createdAt: new Date(),
@@ -253,7 +123,7 @@ export const POST = withSession(async ({ req, session }) => {
 
     await log({
       message: `A New team <${APP_DOMAIN}/${freeTeam.meta.slug}|${freeTeam.name}> is created by ${session.user.email}`,
-      type: "newTeam",
+      type: "tada",
     });
     const customTeam = {
       ...freeTeam,

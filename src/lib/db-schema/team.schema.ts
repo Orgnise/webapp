@@ -2,6 +2,8 @@
 import { TeamRole } from "@/lib/constants/team-role";
 import { ObjectId } from "mongodb";
 import { Plan } from "../types/types";
+import { LimitSchema } from "../zod/schemas";
+import z from "../zod";
 
 export interface TeamDbSchema {
   _id: ObjectId;
@@ -9,14 +11,14 @@ export interface TeamDbSchema {
   description?: string;
   createdBy: ObjectId;
   plan: Plan;
-  teamUsers: ObjectId;
+  stripeId?: string;
   meta: MetaSchema;
   createdAt: Date;
   billingCycleStart: number;
   inviteCode: string;
-  membersLimit: number;
-  workspaceLimit: number;
   logo: string;
+  updatedAt: Date;
+  limit: z.infer<typeof LimitSchema>;
 }
 
 export interface MetaSchema {
@@ -26,11 +28,13 @@ export interface MetaSchema {
 }
 
 export interface TeamMemberDbSchema {
-  _id?: string;
+  _id?: ObjectId;
   role: TeamRole;
   user: ObjectId;
-  // ToDo: Rename this to team
-  teamId: ObjectId;
+  team: ObjectId;
   createdAt: Date;
   updatedAt: Date;
+}
+export interface TeamInviteDbSchema extends Omit<TeamMemberDbSchema, 'updatedAt' | 'user'> {
+  expires: Date
 }

@@ -143,3 +143,22 @@ export function findInCollectionTree(
   }
   return null;
 }
+
+/**
+ * Function to flatten the collection tree
+ * @param tree
+ * @returns
+ */
+export function flattenCollectionTree(
+  tree: Collection[] | undefined,
+): Collection[] {
+  if (!tree) return [];
+  let result: Collection[] = [];
+  tree.forEach((node) => {
+    result.push(node);
+    if (node.children.length > 0) {
+      result = result.concat(flattenCollectionTree(node.children));
+    }
+  });
+  return result;
+}

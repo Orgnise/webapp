@@ -13,9 +13,13 @@ import React from "react";
 // import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
 import { Spinner } from "@/components/atom/spinner";
 import { H5 } from "@/components/atom/typography";
+import { UsageLimitView } from "@/components/molecule";
 import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import { ListView } from "@/components/ui/listview";
+import { getNextPlan } from "@/lib/constants";
+import useUsage from "@/lib/hooks/use-usage";
 import useCollections from "@/lib/swr/use-collections";
+import useTeam from "@/lib/swr/use-team";
 import { Collection } from "@/lib/types/types";
 import { hasValue } from "@/lib/utils";
 import cx from "classnames";
@@ -70,6 +74,8 @@ function RenderCollection({ collection }: RenderCollectionProps) {
   const [createItemStatus, setCreateItemStatus] =
     React.useState<Status>("IDLE");
   const { createCollection, deleteCollection } = useCollections();
+  const { limit, exceedingPageLimit } = useUsage();
+  const { meta, plan } = useTeam();
 
   const { team_slug, workspace_slug } = useParams() as {
     team_slug?: string;
@@ -108,9 +114,19 @@ function RenderCollection({ collection }: RenderCollectionProps) {
           </H5>
         </Link>
         <WorkspacePermissionView permission="CREATE_CONTENT">
-          <div className="invisible absolute  -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background">
+          <div className="invisible absolute -right-3 bottom-0 top-0 rounded text-muted-foreground group-hover:visible group-hover:bg-background">
             <div className="flex h-full items-center gap-2 px-1">
-              <ToolTipWrapper content={<span>Create Page</span>}>
+              <UsageLimitView
+                exceedingLimit={exceedingPageLimit}
+                upgradeMessage={`Current plan can have upto ${limit?.pages} pages in all workspaces. For higher pages quota upgrade to ${getNextPlan(plan)?.name} plan.`}
+                plan={plan}
+                team_slug={meta?.slug}
+                placeholder={
+                  <button className="cursor-not-allowed">
+                    <PlusIcon size={15} />
+                  </button>
+                }
+              >
                 <button
                   onClick={() => {
                     handleCreateItem("item");
@@ -122,7 +138,8 @@ function RenderCollection({ collection }: RenderCollectionProps) {
                     <PlusIcon size={15} />
                   )}
                 </button>
-              </ToolTipWrapper>
+              </UsageLimitView>
+
               <ToolTipWrapper content={<span>Create Collection</span>}>
                 <button
                   onClick={() => {
@@ -230,7 +247,7 @@ function RenderItem({ item, collection }: RenderItemProps) {
           {hasValue(item.name) ? item.name : "Untitled item"}
         </span>
       </Link>
-      <WorkspacePermissionView permission="CREATE_CONTENT">
+      <WorkspacePermissionView permission="DELETE_CONTENT">
         <div className="invisible absolute  -right-3 bottom-0 top-0 text-muted-foreground group-hover:visible group-hover:bg-background">
           <div className="flex h-full items-center gap-2 px-1">
             <DropdownMenu>

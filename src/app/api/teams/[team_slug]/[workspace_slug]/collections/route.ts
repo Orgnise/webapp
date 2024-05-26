@@ -1,5 +1,5 @@
-import { OrgniseApiError, handleAndReturnErrorResponse } from "@/lib/api";
-import { withTeam, withWorkspace } from "@/lib/auth";
+import { handleAndReturnErrorResponse } from "@/lib/api";
+import { withWorkspace } from "@/lib/auth";
 import { CollectionDbSchema } from "@/lib/db-schema/collection.schema";
 import { databaseName } from "@/lib/mongodb";
 import { createTreeFromCollection } from "@/lib/utility/collection-tree-structure";
@@ -73,9 +73,9 @@ export const POST = withWorkspace(async ({ team, workspace, session, req, params
       children: [],
       updatedBy: new ObjectId(session.user.id),
       workspace: new ObjectId(workspace._id),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
       createdBy: new ObjectId(session.user.id),
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     } as CollectionDbSchema;
 
     const dbResult = await collectionsDb.insertOne(collection);

@@ -13,15 +13,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { TeamRole } from "@/lib/constants/team-role";
 import { fetcher } from "@/lib/fetcher";
 import { Team } from "@/lib/types/types";
+import { SendInviteSchema } from "@/lib/zod/schemas/invite-member";
 import clsx from "clsx";
 import { MinusCircleIcon, Plus } from "lucide-react";
 import { useState } from "react";
 import { mutate } from "swr";
-
-interface EmailInvite {
-  email: string;
-  role: TeamRole;
-}
 
 export default function InviteViaEmail({ team }: { team?: Team }) {
   const [resetLinkStatus, setResetLinkStatus] = useState<
@@ -31,12 +27,14 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
   const { toast } = useToast();
   const MAX_ALLOWED_EMAILS = 5;
 
-  const [emails, setEmails] = useState<EmailInvite[]>([
-    {
-      email: "",
-      role: "member",
-    },
-  ]);
+  const [invites, setInvites] = useState<typeof SendInviteSchema._type.invites>(
+    [
+      {
+        email: "",
+        role: "member",
+      },
+    ],
+  );
 
   function senInvitedMail(e: any) {
     e.preventDefault();
@@ -44,7 +42,7 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
     fetcher(`/api/teams/${team?.meta.slug}/invites`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emails: emails }),
+      body: JSON.stringify({ invites }),
     })
       .then(async (res) => {
         await mutate(`/api/teams/${team?.meta.slug}/invites`);
@@ -57,11 +55,10 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
         document.getElementById("InviteTeamCloseDialogButton")?.click();
       })
       .catch((error) => {
-        console.error(error);
         toast({
           title: "Error!",
           description:
-            error?.message ??
+            error?.error?.message ??
             "Sending invitation failed. Try agin in some time",
           variant: "destructive",
         });
@@ -85,7 +82,7 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
         className="flex w-full flex-col  overflow-hidden bg-accent px-4 py-8 text-left sm:px-8"
       >
         <div className="flex flex-col gap-4">
-          {emails.map((email, index) => (
+          {invites.map((email, index) => (
             <div key={index} className="flex flex-col gap-1">
               <label
                 htmlFor={`email-${index}`}
@@ -99,12 +96,12 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
                     type="email"
                     value={email.email}
                     onChange={(e) => {
-                      const updatedEmails = emails.map((email, i) =>
+                      const updatedEmails = invites.map((email, i) =>
                         i === index
                           ? { ...email, email: e.target.value }
                           : email,
                       );
-                      setEmails(updatedEmails);
+                      setInvites(updatedEmails);
                     }}
                     placeholder="enter email address"
                     required
@@ -115,19 +112,19 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
                     className={clsx(
                       "invisible mr-1 cursor-pointer text-destructive group-hover:visible",
                       {
-                        hidden: emails.length === 1,
+                        hidden: invites.length === 1,
                       },
                     )}
                     size="20"
                     onClick={() => {
-                      setEmails(emails.filter((_, i) => i !== index));
+                      setInvites(invites.filter((_, i) => i !== index));
                     }}
                   />
                   <Select
                     defaultValue={email.role}
                     onValueChange={(e) => {
-                      setEmails(
-                        emails.map((email, i) =>
+                      setInvites(
+                        invites.map((email, i) =>
                           i === index
                             ? { ...email, role: e as TeamRole }
                             : email,
@@ -152,13 +149,13 @@ export default function InviteViaEmail({ team }: { team?: Team }) {
 
         <button
           type="button"
-          disabled={emails.length >= MAX_ALLOWED_EMAILS}
+          disabled={invites.length >= MAX_ALLOWED_EMAILS}
           className="hover:bg-accent-hover hover:text-accent-hover disabled:hover:text-secondary-foreground/72 flex h-10 max-w-fit items-center justify-center gap-1.5  rounded-md text-sm text-secondary-foreground/70 hover:text-secondary-foreground disabled:cursor-not-allowed disabled:px-1 disabled:text-xs"
           onClick={() => {
-            setEmails([...emails, { email: "", role: "member" }]);
+            setInvites([...invites, { email: "", role: "member" }]);
           }}
         >
-          {emails.length < MAX_ALLOWED_EMAILS ? (
+          {invites.length < MAX_ALLOWED_EMAILS ? (
             <span className="flex items-center">
               <Plus className="h-4" />
               Add another

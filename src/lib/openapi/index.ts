@@ -1,12 +1,30 @@
 
 import { ZodOpenApiObject } from "zod-openapi";
-import { openApiErrorResponses } from "./responses";
-import { API_DOMAIN } from "../constants/constants";
-import { TeamSchema } from "../zod/schemas/teams";
-import { workspacePath } from "./workspace";
-import { teamsPath } from "./teams";
 import { collectionsPath } from "./collection";
-import { CollectionSchema, WorkspaceSchema } from "../zod/schemas";
+import { openApiErrorResponses } from "./responses";
+import { teamsPath } from "./teams";
+import { workspacePath } from "./workspace";
+import {
+  WorkspaceSchema,
+  CollectionSchema,
+  TeamSchema,
+  CreateCollectionSchema,
+  InviteTeamMemberSchema,
+  SendInviteSchema,
+  TeamInvitesSchema,
+  TeamMemberSchema,
+  TeamUsersListSchema,
+  UpdateCollectionSchema,
+  addWorkspaceMemberSchema,
+  createWorkspaceSchema,
+  deleteWorkspaceUserSchema,
+  removeUserFromTeamSchema,
+  updateTeamSchema,
+  removeWorkspaceUserSchema,
+  updateUserInTeamRoleSchema,
+  updateWorkspaceRoleSchema,
+  updateWorkspaceSchema,
+} from "../zod/schemas";
 
 export const openApiObject: ZodOpenApiObject = {
   openapi: "3.0.3",
@@ -40,6 +58,22 @@ export const openApiObject: ZodOpenApiObject = {
       TeamSchema,
       WorkspaceSchema,
       CollectionSchema,
+      CreateCollectionSchema,
+      InviteTeamMemberSchema,
+      SendInviteSchema,
+      TeamInvitesSchema,
+      TeamMemberSchema,
+      TeamUsersListSchema,
+      UpdateCollectionSchema,
+      addWorkspaceMemberSchema,
+      createWorkspaceSchema,
+      deleteWorkspaceUserSchema,
+      removeUserFromTeamSchema,
+      updateTeamSchema,
+      removeWorkspaceUserSchema,
+      updateUserInTeamRoleSchema,
+      updateWorkspaceRoleSchema,
+      updateWorkspaceSchema,
     },
     securitySchemes: {
       token: {

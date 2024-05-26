@@ -1,4 +1,4 @@
-import mongoDb, { databaseName } from "@/lib/mongodb";
+import mongoDb, { collections, databaseName } from "@/lib/mongodb";
 import { withSession } from "@/lib/auth";
 import { trim } from "@/lib/functions/trim";
 import z from "@/lib/zod";
@@ -28,13 +28,13 @@ export const PUT = withSession(async ({ req, session }) => {
     if (email) obj.email = email;
     if (image) obj.image = image;
     const client = await mongoDb;
-    const usersCollection = client.db(databaseName).collection("users");
+    const usersCollection = collections(client, "users");
     const result = await usersCollection.updateOne({
       _id: new ObjectId(session.user.id,)
     }, {
       $set: {
         ...obj,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
     return NextResponse.json(result);
@@ -46,7 +46,7 @@ export const PUT = withSession(async ({ req, session }) => {
 // DELETE /api/user – delete a specific user
 export const DELETE = withSession(async ({ session }) => {
   const client = await mongoDb;
-  const teamUsersDb = client.db(databaseName).collection("teamUsers");
+  const teamUsersDb = client.db(databaseName).collection("team-users");
   const userIsOwnerOfTeam = await teamUsersDb.find({
     user: new ObjectId(session.user.id),
     role: "owner",

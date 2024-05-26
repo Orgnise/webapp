@@ -1,7 +1,8 @@
 "use client";
 
 import Tab from "@/components/atom/tab";
-import TeamPermissionView from "@/components/molecule/team-permisson-view";
+import { UsageLimitView } from "@/components/molecule";
+import TeamPermissionView from "@/components/molecule/team-permission-view";
 import InviteViaEmail from "@/components/team/invite/invite-via-email";
 import InviteViaLink from "@/components/team/invite/invite-via-link";
 import InvitedMembers from "@/components/team/invite/invites-team-members";
@@ -13,6 +14,8 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { getNextPlan } from "@/lib/constants";
+import useUsage from "@/lib/hooks/use-usage";
 import useTeam from "@/lib/swr/use-team";
 import { Team } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
@@ -26,7 +29,8 @@ export default function ProjectPeopleClient() {
     "Members",
   );
 
-  const { activeTeam } = useTeam();
+  const { activeTeam, plan, meta } = useTeam();
+  const { exceedingMembersLimit, limit } = useUsage();
 
   return (
     <>
@@ -40,9 +44,21 @@ export default function ProjectPeopleClient() {
           </div>
 
           <TeamPermissionView permission="INVITE_MANAGE_REMOVE_TEAM_MEMBER">
-            <CopyInviteToTeamLinkCodeModel team={activeTeam}>
-              <Button className="h-9">Invite</Button>
-            </CopyInviteToTeamLinkCodeModel>
+            <UsageLimitView
+              exceedingLimit={exceedingMembersLimit}
+              upgradeMessage={`Current plan can have upto ${limit?.users} members in team. Additional members require ${getNextPlan(plan)?.name} plan.`}
+              plan={plan}
+              team_slug={meta?.slug}
+              placeholder={
+                <Button size={"sm"} variant={"subtle"}>
+                  Invite
+                </Button>
+              }
+            >
+              <CopyInviteToTeamLinkCodeModel team={activeTeam}>
+                <Button className="h-9">Invite</Button>
+              </CopyInviteToTeamLinkCodeModel>
+            </UsageLimitView>
           </TeamPermissionView>
         </div>
         <div className="flex space-x-3 border-b border-border px-3 sm:px-7">

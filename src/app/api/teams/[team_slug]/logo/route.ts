@@ -18,7 +18,7 @@ export const POST = withTeam(
     const client = await mongoDb;
     const teamsDb = client.db(databaseName).collection("teams");
     const query = { _id: new ObjectId(team._id) };
-    await teamsDb.updateOne(query, { $set: { logo: url, updatedAt: new Date().toISOString() } });
+    await teamsDb.updateOne(query, { $set: { logo: url, updatedAt: new Date() } });
     return NextResponse.json({
       message: "Logo uploaded successfully!",
     }, {

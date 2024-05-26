@@ -6,9 +6,10 @@ import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
 import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
-import { TeamMemberProps } from "@/lib/types/types";
+import { TeamMemberSchema } from "@/lib/zod/schemas";
 import { Dispatch, SetStateAction, useState } from "react";
 import { mutate } from "swr";
+import { z } from "zod";
 
 export default function EditRoleModal({
   showEditRoleModal,
@@ -18,7 +19,7 @@ export default function EditRoleModal({
 }: {
   showEditRoleModal: boolean;
   setShowEditRoleModal: Dispatch<SetStateAction<boolean>>;
-  user: TeamMemberProps;
+  user: z.infer<typeof TeamMemberSchema>;
   role: TeamRole;
 }) {
   const [editing, setEditing] = useState(false);

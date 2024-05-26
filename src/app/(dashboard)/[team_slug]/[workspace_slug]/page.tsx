@@ -1,5 +1,6 @@
 "use client";
 import { Spinner } from "@/components/atom/spinner";
+import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import { Button } from "@/components/ui/button";
 import useCollections from "@/lib/swr/use-collections";
 import { Collection } from "@/lib/types/types";
@@ -39,19 +40,21 @@ export default function WorkspacePage() {
             </div>
           )}
           ifAbsent={() => (
-            <Button
-              variant={"default"}
-              className="mt-2 "
-              size={"sm"}
-              onClick={handleCreateCollection}
-            >
-              {status === "LOADING" ? (
-                <Spinner className="theme-text-primary h-6" />
-              ) : (
-                <PlusIcon size={18} />
-              )}
-              &nbsp; Create collection
-            </Button>
+            <WorkspacePermissionView permission="CREATE_CONTENT">
+              <Button
+                variant={"default"}
+                className="mt-2 "
+                size={"sm"}
+                onClick={handleCreateCollection}
+              >
+                {status === "LOADING" ? (
+                  <Spinner className="theme-text-primary h-6" />
+                ) : (
+                  <PlusIcon size={18} />
+                )}
+                &nbsp; Create collection
+              </Button>
+            </WorkspacePermissionView>
           )}
         />
       </div>

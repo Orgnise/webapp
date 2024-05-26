@@ -4,7 +4,7 @@ import { Fold } from "@/lib/utils";
 import cx from "classnames";
 import React from "react";
 
-export interface Props {
+interface Props {
   className?: string;
   permission: TeamPermission;
   unAuthorized?: React.ReactNode | JSX.Element;

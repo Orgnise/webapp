@@ -1,5 +1,20 @@
 import { MongoClient } from "mongodb";
 
+export const DbCollections = {
+  USER: "users",
+  TEAM: "teams",
+  TEAM_USER: "team-users",
+  TEAM_INVITE: "team-invites",
+  WORKSPACE: "workspaces",
+  WORKSPACE_USER: "workspace_users",
+  COLLECTION: "collections",
+} as const;
+
+type CollectionType = typeof DbCollections[keyof typeof DbCollections];
+export function collections<T extends object>(client: MongoClient, c: CollectionType) {
+  return client.db(databaseName).collection<T>(c);
+}
+
 export const databaseName = process.env.DATABASE_NAME ?? "pulse-db";
 const uri = process.env.MONGODB_URI ?? "mongodb://localhost:27017/pulse-db" as string; // your mongodb connection string
 const options = {};

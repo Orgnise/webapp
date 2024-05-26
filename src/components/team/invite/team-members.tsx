@@ -1,7 +1,6 @@
 import { IconMenu } from "@/components/atom/icon-menu";
 import ThreeDots from "@/components/icons/three-dots";
 import { Avatar } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { ListView } from "@/components/ui/listview";
 import {
   Popover,
@@ -11,11 +10,12 @@ import {
 import { TeamRole } from "@/lib/constants/team-role";
 import useTeam from "@/lib/swr/use-team";
 import useUsers from "@/lib/swr/use-users";
-import { TeamMemberProps } from "@/lib/types/types";
 import { cn } from "@/lib/utils";
+import { TeamMemberSchema } from "@/lib/zod/schemas";
 import { UserMinus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { z } from "zod";
 import EditRoleModal from "./edit-role-modal";
 import RemoveTeamMemberModal from "./remove-member-model";
 
@@ -28,7 +28,7 @@ export default function TeamMembers() {
       <ListView
         items={Array.isArray(users) ? users : []}
         loading={loading}
-        renderItem={(user: TeamMemberProps) => (
+        renderItem={(user: z.infer<typeof TeamMemberSchema>) => (
           <UserCard
             key={user.email}
             user={user}
@@ -54,23 +54,18 @@ const UserCard = ({
   user,
   isOwner,
 }: {
-  user: TeamMemberProps;
+  user: z.infer<typeof TeamMemberSchema>;
   isOwner: boolean;
 }) => {
   const [openPopover, setOpenPopover] = useState(false);
 
-  const { name, email, createdAt, role: currentRole } = user;
+  const { name, email, role: currentRole } = user;
 
   const [role, setRole] = useState<TeamRole>(currentRole);
 
   const { data: session } = useSession();
   const [showRemoveTeammateModal, setShowRemoveTeammateModal] = useState(false);
   const [showEditRoleModal, setShowEditRoleModal] = useState(false);
-
-  // invites expire after 14 days of being sent
-  const expiredInvite =
-    createdAt &&
-    Date.now() - new Date(createdAt).getTime() > 14 * 24 * 60 * 60 * 1000;
 
   const self = session?.user?.email === email;
 
@@ -94,8 +89,6 @@ const UserCard = ({
               <p className="text-xs text-muted-foreground">{email}</p>
             </div>
           </div>
-
-          {expiredInvite && <Badge variant="secondary">Expired</Badge>}
         </div>
 
         <div className="flex flex-row items-center gap-2">

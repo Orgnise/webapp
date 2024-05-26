@@ -15,16 +15,16 @@ export const CollectionSchema = z.object({
     title: z.string().describe("The title of the collection/page"),
     slug: z.string().describe("The slug of the collection/page."),
   }).describe("The meta of the team."),
-  created_at: z.string().describe("The date and time the collection/page was created."),
-  updated_at: z.string().describe("The date and time the collection/page was last updated."),
+  createdAt: z.date().describe("The date and time the collection/page was created."),
+  updatedAt: z.date().describe("The date and time the collection/page was last updated."),
 }).openapi({
   description: "A collection.",
   example: {
     id: "1",
     name: "My Collection",
     object: "collection",
-    created_at: "2021-01-01T00:00:00.000Z",
-    updated_at: "2021-01-01T00:00:00.000Z",
+    createdAt: new Date("2021-01-01T00:00:00.000Z"),
+    updatedAt: new Date("2021-01-01T00:00:00.000Z"),
     team: "some-team-id",
     workspace: "some-workspace-id",
     meta: {
@@ -38,8 +38,8 @@ export const CollectionSchema = z.object({
     id: "1",
     name: "My Collection",
     object: "collection",
-    created_at: "2021-01-01T00:00:00.000Z",
-    updated_at: "2021-01-01T00:00:00.000Z",
+    createdAt: new Date("2021-01-01T00:00:00.000Z"),
+    updatedAt: new Date("2021-01-01T00:00:00.000Z"),
     team: "some-team-id",
     workspace: "some-workspace-id",
     meta: {

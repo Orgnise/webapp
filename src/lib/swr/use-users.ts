@@ -1,13 +1,14 @@
 import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { fetcher } from "../fetcher";
-import { TeamMemberProps } from "../types/types";
+import { TeamMemberSchema } from "../zod/schemas";
+import { z } from "zod";
+
 
 interface Props {
-  users: TeamMemberProps[],
+  users: z.infer<typeof TeamMemberSchema>[],
   loading: boolean,
   error: any
-
 }
 export default function useUsers(): Props {
   const { team_slug } = useParams() as {

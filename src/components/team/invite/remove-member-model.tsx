@@ -6,11 +6,12 @@ import { Modal } from "@/components/ui/model";
 import { useToast } from "@/components/ui/use-toast";
 import { fetcher } from "@/lib/fetcher";
 import useTeam from "@/lib/swr/use-team";
-import { TeamMemberProps } from "@/lib/types/types";
+import { InviteTeamMemberSchema, TeamMemberSchema } from "@/lib/zod/schemas";
 import { useSession } from "next-auth/react";
 import { Dispatch, SetStateAction, useState } from "react";
 
 import { mutate } from "swr";
+import { z } from "zod";
 
 export default function RemoveTeamMemberModal({
   showRemoveTeammateModal,
@@ -20,14 +21,16 @@ export default function RemoveTeamMemberModal({
 }: {
   showRemoveTeammateModal: boolean;
   setShowRemoveTeammateModal: Dispatch<SetStateAction<boolean>>;
-  user: TeamMemberProps;
+  user:
+    | z.infer<typeof TeamMemberSchema>
+    | z.infer<typeof InviteTeamMemberSchema>;
   invite?: boolean;
 }) {
   // const router = useRouter();
   const [removing, setRemoving] = useState(false);
   const { activeTeam } = useTeam();
   const { data: session } = useSession();
-  const { _id, name, email } = user;
+  const { _id, email } = user;
   const { toast } = useToast();
 
   const handleRemoveTeammate = async () => {
@@ -98,7 +101,10 @@ export default function RemoveTeamMemberModal({
               ? "You're about to leave "
               : "This will remove "}
           <span className="font-semibold ">
-            {session?.user?.email === email ? activeTeam?.name : name || email}
+            {session?.user?.email === email
+              ? activeTeam?.name
+              : /* @ts-ignore */
+                user?.name || email}
           </span>
           {invite
             ? "'s invitation to join your team. "
@@ -113,7 +119,8 @@ export default function RemoveTeamMemberModal({
         <div className="flex items-center space-x-3 rounded-md border border-border bg-background p-3">
           <Avatar user={user} />
           <div className="scrollbar-hide flex flex-col overflow-scroll">
-            <h3 className="text-sm font-medium">{name || email}</h3>
+            {/* @ts-ignore */}
+            <h3 className="text-sm font-medium">{user?.name || email}</h3>
             <p className="text-xs text-secondary-foreground/70">{email}</p>
           </div>
         </div>

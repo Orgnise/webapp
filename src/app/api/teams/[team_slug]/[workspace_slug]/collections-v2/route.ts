@@ -131,8 +131,8 @@ export const POST = withTeam(async ({ team, session, req, params }) => {
         : undefined,
       updatedBy: new ObjectId(session.user.id),
       workspace: new ObjectId(workspace._id),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
       createdBy: new ObjectId(session.user.id),
     } as CollectionDbSchema;
 

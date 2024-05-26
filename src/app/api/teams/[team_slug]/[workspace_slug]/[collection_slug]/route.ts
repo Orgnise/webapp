@@ -61,9 +61,8 @@ export const PATCH = withWorkspace(async ({ req, session, client, params, team, 
 
     const update = await collectionsColl.updateOne(query, {
       $set: {
-
         ...collectionToUpdate,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
         updatedBy: new ObjectId(session.user.id),
       },
     });

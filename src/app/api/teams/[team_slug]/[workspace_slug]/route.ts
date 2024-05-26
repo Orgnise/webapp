@@ -44,7 +44,7 @@ export const PUT = withTeam(async ({ req, session, team, params }) => {
       description: description ?? workspaceInDb.description,
       visibility: visibility ?? workspaceInDb.visibility,
       defaultAccess: defaultAccess ?? workspaceInDb.defaultAccess,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
       updatedBy: new ObjectId(session.user.id),
     };
     const update = await workspaceDb.updateOne(query, {

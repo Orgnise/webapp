@@ -3,10 +3,11 @@ import {
   handleAndReturnErrorResponse,
 } from "@/lib/api/errors";
 import { withSession } from "@/lib/auth";
-import mongoDb, { databaseName } from "@/lib/mongodb";
-import { WorkspaceMemberDBSchema, WorkspaceDbSchema } from "@/lib/db-schema/workspace.schema";
-import { Invite, Team } from "@/lib/types/types";
-import { InsertManyResult, ObjectId } from "mongodb";
+import { TeamDbSchema, TeamInviteDbSchema, TeamMemberDbSchema } from "@/lib/db-schema";
+import { WorkspaceDbSchema, WorkspaceMemberDBSchema } from "@/lib/db-schema/workspace.schema";
+import mongoDb, { collections, databaseName } from "@/lib/mongodb";
+import { Invite } from "@/lib/types/types";
+import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // POST /api/teams/[slug]/invites/accept – accept a team invite
@@ -14,25 +15,20 @@ export const POST = withSession(async ({ session, params }) => {
   const { team_slug } = params;
 
   const client = await mongoDb;
-  const teamCollection = client.db(databaseName).collection("teams");
-  const teamUserCollection = client.db(databaseName).collection("teamUsers");
-  const teamInviteCollection = client
-    .db(databaseName)
-    .collection("teamInvites");
+  const teamCollection = collections<TeamDbSchema>(client, "teams");
+  const inviteCollection = collections<TeamInviteDbSchema>(client, "team-invites");
+  const teamUserCollection = collections<TeamMemberDbSchema>(client, "team-users");
 
   try {
     const team = (await teamCollection.findOne({
       "meta.slug": team_slug,
-    })) as unknown as Team;
+    }))
     if (!team) {
-      throw new OrgniseApiError({
-        code: "not_found",
-        message: "Team not found",
-      });
+      throw OrgniseApiError.NOT_FOUND("Team not found");
     }
-    const invite = (await teamInviteCollection.findOne({
+    const invite = (await inviteCollection.findOne({
       email: session.user.email,
-      teamId: team._id,
+      team: team._id,
     })) as unknown as Invite;
 
     if (!invite) {
@@ -45,15 +41,15 @@ export const POST = withSession(async ({ session, params }) => {
 
     const response = await Promise.all([
       await teamUserCollection.insertOne({
-        teamId: team._id,
+        team: team._id,
         role: invite.role,
         user: new ObjectId(session.user.id),
         createdAt: new Date(),
         updatedAt: new Date(),
       }),
-      await teamInviteCollection.deleteOne({
+      await inviteCollection.deleteOne({
         email: session.user.email,
-        teamId: team._id,
+        team: team._id,
       }),
     ]);
 

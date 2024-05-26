@@ -23,7 +23,6 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { WorkspaceRole } from "@/lib/constants/workspace-role";
-import { TeamMemberProps } from "@/lib/types/types";
 import { Fold } from "@/lib/utils";
 import { MinusCircleIcon } from "lucide-react";
 import {
@@ -35,11 +34,13 @@ import {
 } from "../select";
 
 import useWorkspaces from "@/lib/swr/use-workspaces";
+import { TeamMemberSchema } from "@/lib/zod/schemas";
 import clsx from "clsx";
+import { z } from "zod";
 import { Badge } from "../badge";
 
 interface SelectUser {
-  user: TeamMemberProps;
+  user: z.infer<typeof TeamMemberSchema>;
   role: WorkspaceRole;
 }
 
@@ -65,7 +66,9 @@ function AddWorkspaceMembersModal({
   const { activeWorkspace } = useWorkspaces();
 
   const [selectedUsers, setSelectedUsers] = useState<SelectUser[]>([]);
-  const [unJoinedMembers, setUnJoinedMembers] = useState<TeamMemberProps[]>([]);
+  const [unJoinedMembers, setUnJoinedMembers] = useState<
+    z.infer<typeof TeamMemberSchema>[]
+  >([]);
 
   useEffect(() => {
     if (teamLoading || workspaceLoading) return;
@@ -291,8 +294,8 @@ function UsersPlaceholders() {
 }
 
 interface SearchUserBox {
-  users: TeamMemberProps[];
-  onUserSelect: (user: TeamMemberProps) => void;
+  users: z.infer<typeof TeamMemberSchema>[];
+  onUserSelect: (user: z.infer<typeof TeamMemberSchema>) => void;
 }
 export function SearchUserBox({ users, onUserSelect }: SearchUserBox) {
   if (users.length === 0) {

@@ -4,12 +4,17 @@ import { planSchema } from "./misc";
 import { validSlugRegex } from "@/lib/utils";
 import { DEFAULT_REDIRECTS } from "@/lib/constants/constants";
 import { trim } from "@/lib/functions/trim";
+import { TeamRole } from "@/lib/constants";
 
+export const LimitSchema = z.object({
+  pages: z.number().default(0).describe('The limit of pages for the team'),
+  users: z.number().default(0).describe('The limit of users for the team'),
+  workspaces: z.number().default(0).describe('The limit of workspaces for the team'),
+});
 export const TeamSchema = z
   .object({
     _id: z.string().describe("The unique ID of the team."),
     name: z.string().describe("The name of the team."),
-    slug: z.string().describe("The slug of the team."),
     logo: z
       .string()
       .nullable()
@@ -19,10 +24,8 @@ export const TeamSchema = z
       .string().max(120)
       .nullable()
       .describe("The description of the team."),
-    role: z.string().describe("The role of the authenticated user in the team."),
+    role: z.custom<TeamRole>().describe("The role of the authenticated user in the team."),
     membersCount: z.number().describe("The members count of the team."),
-    membersLimit: z.number().describe("The members limit of the team."),
-    workspaceLimit: z.number().describe("The workspace limit of the team."),
     meta: z.object({
       title: z.string().describe("The title of the team."),
       description: z.string().describe("The description of the team."),
@@ -35,6 +38,8 @@ export const TeamSchema = z
       .describe(
         "The date and time when the billing cycle starts for the team.",
       ),
+    usage: LimitSchema.describe("The usage of the resource of a team."),
+    limit: LimitSchema.describe("The limit of the team resources."),
     createdAt: z
       .date()
       .describe("The date and time when the team was created."),
