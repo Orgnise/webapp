@@ -41,12 +41,10 @@ export const middleware = async (req: NextRequest) => {
   const loggedIn = session?.user ? true : false;
 
 
-  if (["/terms", "/policy"].includes(path)) {
-    return NextResponse.next();
-  }
+
   // Redirect to login if not logged in
-  else if (
-    !["/login", "/signup", "terms", "policy", "/credential"].includes(path) &&
+  if (
+    !["/login", "/signup", "/credential"].includes(path) &&
     !loggedIn
   ) {
     return NextResponse.redirect(
