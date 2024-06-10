@@ -3,6 +3,8 @@ import { log } from "@/lib/functions";
 import mongoDb, { databaseName } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { sendEmailV2 } from "../../../../emails";
+import WaitingList from "../../../../emails/waitlist";
 
 // Add and setting up the OPTIONS method
 export async function OPTIONS(request: Request) {
@@ -55,6 +57,11 @@ export async function POST(request: Request) {
     const user = await waitListCollection.insertOne({
       email: parsedCredentials.data.email,
       createdAt: new Date(),
+    });
+    sendEmailV2({
+      subject: `Thanks for joining waiting list on ${process.env.NEXT_PUBLIC_APP_NAME}`,
+      identifier: parsedCredentials.data.email,
+      react: WaitingList(),
     });
     return NextResponse.json({ user }, { status: 200 });
   } catch (err: any) {
