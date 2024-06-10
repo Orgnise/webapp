@@ -22,7 +22,8 @@ export const API_DOMAIN =
       ? `https://api-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
       : "http://api.localhost:8888";
 
-export const ORGNISE_LOGO = "https://app.orgnise.in/_static/logo.png";
+export const ORGNISE_LOGO =
+  "https://pub-3152a61af92e4405922f4ec571534d9b.r2.dev/website%2Flogo.png";
 
 export const TWO_WEEKS_IN_SECONDS = 60 * 60 * 24 * 14;
 

@@ -1,3 +1,4 @@
+import { ORGNISE_LOGO } from "@/lib/constants";
 import {
   Body,
   Container,
@@ -29,7 +30,7 @@ export default function LoginLink({
           <Container className="mx-auto my-10 max-w-[500px] rounded border border-solid border-gray-200 px-10 py-5">
             <Section className="mt-8">
               <Img
-                src={"https://app.orgnise.in/_static/logo.png"}
+                src={ORGNISE_LOGO}
                 width="40"
                 height="40"
                 alt="Orgnise"

@@ -267,18 +267,18 @@ export function LoginForm() {
       </div>
 
       {/* Terms & Conditions and Privacy Policy */}
-      {/* <div className="flex w-9/12 flex-col place-content-center items-center pt-3 text-center text-xs text-muted-foreground/90">
+      <div className="mt-6 flex w-9/12 flex-col place-content-center items-center pt-3 text-center text-xs text-muted-foreground/90">
         <span className="">
-          By signing in, you agree to our{" "}
+          By continue, you agree to our{" "}
           <span className="cursor-pointer underline">
-            <Link href="terms">Terms & Conditions</Link>
+            <Link href="https://orgnise.in/terms">Terms & Conditions</Link>
           </span>{" "}
           and{" "}
           <span className="cursor-pointer underline">
-            <Link href="policy">Privacy Policy</Link>
+            <Link href="https://orgnise.in/policy">Privacy Policy</Link>
           </span>
         </span>
-      </div> */}
+      </div>
     </div>
   );
 }
