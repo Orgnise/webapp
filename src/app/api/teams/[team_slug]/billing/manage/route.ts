@@ -5,11 +5,11 @@ import { NextResponse } from "next/server";
 
 // POST /api/teams/[team_slug]/billing/manage - create a Stripe billing portal session
 export const POST = withTeam(async ({ team }) => {
-  if (!team.stripeId) {
+  if (!team.subscriptionId) {
     return new Response("No Stripe customer ID", { status: 400 });
   }
   const { url } = await stripe.billingPortal.sessions.create({
-    customer: team.stripeId,
+    customer: team.subscriptionId,
     return_url: `${APP_DOMAIN}/${team.meta.slug}/settings/billing`,
   });
   return NextResponse.json(url);

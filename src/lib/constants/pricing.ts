@@ -101,8 +101,10 @@ export const PLANS = [
       monthly: 24,
       yearly: 19,
       ids: [
-        'price_1PH267SHsqzoawbHfT36lPoJ',
-        'price_1PH267SHsqzoawbHcYuCeSlZ'
+        'pri_01j0tq0tb7g3e8mwe0rfgr43r2',
+        'pri_01j11nqqw758hpfkkdkp5ejngz'
+        // 'price_1PH267SHsqzoawbHfT36lPoJ',
+        // 'price_1PH267SHsqzoawbHcYuCeSlZ'
       ] as string[],
     },
     limits: {
@@ -135,15 +137,17 @@ export const PLANS = [
     pages: 600,
     workspaces: 30,
     ids: [
-      'price_1PH29GSHsqzoawbHsqk5dD3y',
-      'price_1PH29GSHsqzoawbHTTQ1WGbb'
+      'pri_01j11p1sga7scd3tn59pv8zzq6',
+      'pri_01j11pf34t068ntj7533t35sad'
+      // 'price_1PH29GSHsqzoawbHsqk5dD3y',
+      // 'price_1PH29GSHsqzoawbHTTQ1WGbb'
     ]
   }),
   ,
   {
     name: "Enterprise",
     tagline:
-      "Custom tailored plans for large enterprises. Whether you're running a SMS campaign with millions of short links or a large marketing campaign with billions of clicks, we've got you covered.",
+      "Tailored plans for large corporations are available. Whether you are managing a multinational company or a local business, it is important to have a plan that fits your specific needs and goals. Our team of experts will work with you to create a customized strategy that maximizes efficiency and drives success in your industry",
     link: "https://organise.in/enterprise",
     price: {
       monthly: null,

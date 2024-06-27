@@ -1,18 +1,18 @@
-import { Badge, Button2, LoadingSpinner, Modal } from "@/components/ui/";
-import { getStripe } from "@/lib/stripe/client";
-
 import { IconMenu } from "@/components/atom/icon-menu";
 import { Logo } from "@/components/atom/logo";
+import { Badge, Button2, LoadingSpinner, Modal } from "@/components/ui/";
 import { APP_DOMAIN } from "@/lib/constants/constants";
 import { STAGGER_CHILD_VARIANTS } from "@/lib/constants/framer-motion";
 import { SELF_SERVE_PAID_PLANS } from "@/lib/constants/pricing";
 import { capitalize } from "@/lib/functions/capitalize";
 import { useRouterStuff } from "@/lib/hooks";
+import { getPaddle } from "@/lib/paddle/paddle-client";
 import useTeam from "@/lib/swr/use-team";
 import { Plan } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
   useParams,
@@ -29,6 +29,7 @@ import {
   useState,
 } from "react";
 import Confetti from "react-dom-confetti";
+import { toast } from "sonner";
 import CheckCircleFill from "../icons/check-circle-fill";
 import { Popover2 } from "../popover-2";
 
@@ -37,9 +38,11 @@ const PERIODS = ["monthly", "yearly"] as const;
 function UpgradePlanModal({
   showUpgradePlanModal,
   setShowUpgradePlanModal,
+  PADDLE_SECRET_CLIENT_KEY,
 }: {
   showUpgradePlanModal: boolean;
   setShowUpgradePlanModal: Dispatch<SetStateAction<boolean>>;
+  PADDLE_SECRET_CLIENT_KEY?: string;
 }) {
   const router = useRouter();
   const params = useParams() as { team_slug: string };
@@ -48,7 +51,9 @@ function UpgradePlanModal({
   const welcomeFlow = pathname === "/welcome";
   const slug = welcomeFlow ? searchParams?.get("team_slug") : params.team_slug;
 
-  const { activeTeam } = useTeam();
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const { activeTeam, mutate } = useTeam();
   const { plan: currentPlan } = activeTeam!;
   const plan = (searchParams.get("upgrade") ?? "pro") as Plan;
   const selectedPlan =
@@ -260,44 +265,84 @@ function UpgradePlanModal({
           <Button2
             text={`Upgrade to ${selectedPlan.name} ${capitalize(period)}`}
             loading={clicked}
-            onClick={() => {
+            onClick={async () => {
               setClicked(true);
-              fetch(`/api/teams/${slug}/billing/upgrade`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  plan,
-                  period,
-                  baseUrl: `${APP_DOMAIN}${pathname}`,
-                }),
-              })
-                .then(async (res) => {
-                  if (res.status === 200) {
-                    if (currentPlan === "free") {
-                      const data = await res.json();
-                      const { id: sessionId } = data;
-                      const stripe = await getStripe();
-                      stripe?.redirectToCheckout({ sessionId });
+              if (activeTeam?.subscriptionId) {
+                fetch(`/api/teams/${slug}/billing/upgrade`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    priceId:
+                      selectedPlan.price.ids[period === "monthly" ? 0 : 1],
+                  }),
+                })
+                  .then(async (res) => {
+                    if (res.status === 200) {
+                      if (currentPlan === "free") {
+                        const data = await res.json();
+                        console.log(data);
+                        toast.success("Upgrade success!");
+                        await mutate();
+                      }
                     } else {
                       const url = await res.json();
                       router.push(url);
                     }
-                  } else {
-                    console.error(res);
+                  })
+                  .catch((err) => {
+                    alert(err);
                     setClicked(false);
+                  });
+              } else {
+                const paddle = await getPaddle(
+                  activeTeam!.meta!.slug!,
+                  PADDLE_SECRET_CLIENT_KEY,
+                );
+                if (paddle) {
+                  try {
+                    setTimeout(() => {
+                      setShowUpgradePlanModal(false);
+                    }, 1000);
+                    paddle?.Checkout.open({
+                      items: [
+                        {
+                          priceId:
+                            selectedPlan.price.ids[
+                              period === "monthly" ? 0 : 1
+                            ],
+                          quantity: 1,
+                        },
+                      ],
+                      customData: {
+                        teamId: activeTeam!._id ?? "",
+                        team: activeTeam!.name ?? "",
+                        url: `${APP_DOMAIN}/${activeTeam!.meta!.slug!}`,
+                      },
+                      customer: {
+                        // id: user?.id ?? "",
+                        // id: user?.id ?? "",
+                        // @ts-ignore
+                        email: user!.email ?? "",
+                        business: {
+                          id: activeTeam!._id ?? "",
+                          // @ts-ignore
+                          // name: activeTeam!.name ?? "",
+                        },
+                      },
+                    });
+                  } catch (error) {
+                    setClicked(false);
+                    console.error(error);
                   }
-                })
-                .catch((err) => {
-                  alert(err);
-                  setClicked(false);
-                });
+                }
+              }
             }}
           />
 
           <div className="mt-2 flex items-center justify-center space-x-2">
-            {currentPlan === "free" ? (
+            {true ? (
               <a
                 href="https://orgnise.in/pricing"
                 target="_blank"
@@ -373,7 +418,7 @@ function UpgradePlanModal({
   );
 }
 
-export function useUpgradePlanModal() {
+export function useUpgradePlanModal(PADDLE_SECRET_CLIENT_KEY?: string) {
   const [showUpgradePlanModal, setShowUpgradePlanModal] = useState(false);
   const searchParams = useSearchParams();
   useEffect(() => {
@@ -389,9 +434,10 @@ export function useUpgradePlanModal() {
       <UpgradePlanModal
         showUpgradePlanModal={showUpgradePlanModal}
         setShowUpgradePlanModal={setShowUpgradePlanModal}
+        PADDLE_SECRET_CLIENT_KEY={PADDLE_SECRET_CLIENT_KEY}
       />
     );
-  }, [showUpgradePlanModal, setShowUpgradePlanModal]);
+  }, [PADDLE_SECRET_CLIENT_KEY, showUpgradePlanModal, setShowUpgradePlanModal]);
 
   return useMemo(
     () => ({

@@ -95,7 +95,7 @@ export const DELETE = withTeam(
         await removeAllWorkspaces(client, team._id),
         await removeAllTeamUsers(client, team._id),
         await removeAllTeamInvites(client, team._id),
-        team.stripeId && cancelSubscription(team.stripeId),
+        team.subscriptionId && cancelSubscription(team.subscriptionId),
       ]);
 
 
