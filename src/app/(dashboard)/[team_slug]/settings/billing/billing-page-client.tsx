@@ -205,7 +205,7 @@ export default function TeamBillingPageClient({
           {plan ? (
             <p className="text-sm text-secondary-foreground/65">
               {plan === "pro"
-                ? "You're on the Pro plan."
+                ? "You're on the Pro plan. Upgrade to unlock more features."
                 : plan === "business"
                   ? "Need more workspaces or pages? Contact us for an Enterprise quote."
                   : `For higher limits, upgrade to the ${nextPlan.name} plan.`}
@@ -219,11 +219,19 @@ export default function TeamBillingPageClient({
                 {plan ? (
                   plan === "enterprise" || plan === "business" ? (
                     <a
-                      href="https://orgnise.in/enterprise"
+                      href="https://orgnise.in/contact"
                       target="_blank"
                       className="inline-flex items-center justify-center rounded-md border border-violet-600 bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-white hover:text-violet-600 focus:outline-none"
                     >
                       Contact Sales
+                    </a>
+                  ) : plan === "pro" ? (
+                    <a
+                      href="https://orgnise.in/enterprise"
+                      target="_blank"
+                      className="inline-flex items-center justify-center rounded-md border border-violet-600 bg-violet-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-white hover:text-violet-600 focus:outline-none"
+                    >
+                      Contact Us
                     </a>
                   ) : (
                     <Button2
