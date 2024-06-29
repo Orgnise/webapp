@@ -4,13 +4,13 @@ import { APP_DOMAIN } from '../constants';
 
 let paddlePromise: Promise<Paddle | undefined>;
 
-export async function getPaddle(slug: string, PADDLE_SECRET_CLIENT_KEY?: string) {
+export async function getPaddle(slug: string, PADDLE_SECRET_CLIENT_KEY?: string, PADDLE_ENV: string = 'sandbox') {
   if (!PADDLE_SECRET_CLIENT_KEY) {
     throw new Error("Paddle secret key is missing")
   }
   if (!paddlePromise) {
     paddlePromise = initializePaddle({
-      environment: process.env.PADDLE_ENV === 'production' ? 'production' : 'sandbox',
+      environment: PADDLE_ENV as any,//process.env.PADDLE_ENV === 'production' ? 'production' : 'sandbox',
       token: PADDLE_SECRET_CLIENT_KEY ?? "",
       checkout: {
         settings: {

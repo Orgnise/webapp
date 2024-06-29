@@ -39,10 +39,12 @@ function UpgradePlanModal({
   showUpgradePlanModal,
   setShowUpgradePlanModal,
   PADDLE_SECRET_CLIENT_KEY,
+  PADDLE_ENV,
 }: {
   showUpgradePlanModal: boolean;
   setShowUpgradePlanModal: Dispatch<SetStateAction<boolean>>;
   PADDLE_SECRET_CLIENT_KEY?: string;
+  PADDLE_ENV: "sandbox" | "production";
 }) {
   const router = useRouter();
   const params = useParams() as { team_slug: string };
@@ -305,7 +307,7 @@ function UpgradePlanModal({
                     setClicked(false);
                   });
               } else {
-                console.log({ isStaging, paddle: process.env.PADDLE_ENV });
+                console.log({ isStaging });
                 const paddle = await getPaddle(
                   activeTeam!.meta!.slug!,
                   PADDLE_SECRET_CLIENT_KEY,
@@ -437,7 +439,10 @@ function UpgradePlanModal({
   );
 }
 
-export function useUpgradePlanModal(PADDLE_SECRET_CLIENT_KEY?: string) {
+export function useUpgradePlanModal(
+  PADDLE_SECRET_CLIENT_KEY?: string,
+  PADDLE_ENV: "sandbox" | "production" = "sandbox",
+) {
   const [showUpgradePlanModal, setShowUpgradePlanModal] = useState(false);
   const searchParams = useSearchParams();
   useEffect(() => {
@@ -454,9 +459,15 @@ export function useUpgradePlanModal(PADDLE_SECRET_CLIENT_KEY?: string) {
         showUpgradePlanModal={showUpgradePlanModal}
         setShowUpgradePlanModal={setShowUpgradePlanModal}
         PADDLE_SECRET_CLIENT_KEY={PADDLE_SECRET_CLIENT_KEY}
+        PADDLE_ENV={PADDLE_ENV}
       />
     );
-  }, [PADDLE_SECRET_CLIENT_KEY, showUpgradePlanModal, setShowUpgradePlanModal]);
+  }, [
+    PADDLE_ENV,
+    PADDLE_SECRET_CLIENT_KEY,
+    showUpgradePlanModal,
+    setShowUpgradePlanModal,
+  ]);
 
   return useMemo(
     () => ({

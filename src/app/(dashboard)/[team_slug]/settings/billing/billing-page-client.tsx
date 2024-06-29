@@ -19,8 +19,10 @@ import TeamBillingSettingsLoading from "./loading";
 
 export default function TeamBillingPageClient({
   PADDLE_SECRET_CLIENT_KEY,
+  PADDLE_ENV,
 }: {
   PADDLE_SECRET_CLIENT_KEY?: string;
+  PADDLE_ENV: "sandbox" | "production";
 }) {
   const [isManageSubscriptionClicked, setManageSubscriptionClicked] =
     useState(false);
@@ -33,6 +35,7 @@ export default function TeamBillingPageClient({
 
   const { UpgradePlanModal, setShowUpgradePlanModal } = useUpgradePlanModal(
     PADDLE_SECRET_CLIENT_KEY,
+    PADDLE_ENV,
   );
 
   const [billingStart, billingEnd] = useMemo(() => {
