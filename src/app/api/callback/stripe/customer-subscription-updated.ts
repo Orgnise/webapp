@@ -27,12 +27,12 @@ export async function customerSubscriptionUpdated(event: Stripe.Event, client: M
     return;
   }
 
-  const stripeId = subscriptionUpdated.customer.toString();
+  const subscriptionId = subscriptionUpdated.customer.toString();
 
-  const team = await teamsCollection.findOne({ stripeId: stripeId }) as TeamDbSchema;
+  const team = await teamsCollection.findOne({ subscriptionId: subscriptionId }) as TeamDbSchema;
   if (!team) {
     await log({
-      message: "Team with  Stripe ID `" + stripeId + "` not found in Stripe webhook `customer.subscription.updated` callback",
+      message: "Team with  Stripe ID `" + subscriptionId + "` not found in Stripe webhook `customer.subscription.updated` callback",
       type: "errors",
     });
     return;
@@ -57,7 +57,7 @@ export async function customerSubscriptionUpdated(event: Stripe.Event, client: M
   // If a team upgrades/downgrades their subscription, update their usage limit in the database.
   else if (team.plan !== newPlan) {
     const result = await teamsCollection.updateOne(
-      { stripeId: stripeId },
+      { subscriptionId: subscriptionId },
       {
         $set: {
           plan: plan.name.toLowerCase() as any,

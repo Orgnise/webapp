@@ -2,9 +2,13 @@ import { TeamRole } from "@/lib/constants/team-role";
 import { WorkspaceRole } from "@/lib/constants/workspace-role";
 import { TeamSchema } from "@/lib/zod/schemas";
 import z from "../zod";
+import { Interval, SubscriptionScheduledChangeNotification, SubscriptionTimePeriodNotification } from "@paddle/paddle-node-sdk";
 
 export interface Team extends z.infer<typeof TeamSchema> {
-  stripeId?: string;
+  subscriptionId?: string;
+  billingInterval?: Interval;
+  currentBillingPeriod?: SubscriptionTimePeriodNotification;
+  scheduledChange?: SubscriptionScheduledChangeNotification;
 }
 
 export interface Member {

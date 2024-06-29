@@ -4,6 +4,7 @@ import { ObjectId } from "mongodb";
 import { Plan } from "../types/types";
 import { LimitSchema } from "../zod/schemas";
 import z from "../zod";
+import { CollectionMode, Interval, SubscriptionManagement, SubscriptionScheduledChangeNotification, SubscriptionStatus, SubscriptionTimePeriodNotification } from "@paddle/paddle-node-sdk";
 
 export interface TeamDbSchema {
   _id: ObjectId;
@@ -11,13 +12,14 @@ export interface TeamDbSchema {
   description?: string;
   createdBy: ObjectId;
   plan: Plan;
-  stripeId?: string;
+  subscriptionId?: string;
   meta: MetaSchema;
   createdAt: Date;
   billingCycleStart: number;
   inviteCode: string;
   logo: string;
   updatedAt: Date;
+  subscription: Subscription;
   limit: z.infer<typeof LimitSchema>;
 }
 
@@ -38,3 +40,20 @@ export interface TeamMemberDbSchema {
 export interface TeamInviteDbSchema extends Omit<TeamMemberDbSchema, 'updatedAt' | 'user'> {
   expires: Date
 }
+
+
+export interface Subscription {
+  id: string;
+  priceId: string;
+  status: SubscriptionStatus;
+  productId: string;
+  canceledAt?: Date | null;
+  scheduledChange?: SubscriptionScheduledChangeNotification | null;
+  nextBilledAt?: Date | null;
+  pausedAt?: Date | null;
+  interval?: Interval;
+  SubscriptionManagementUrls?: SubscriptionManagement | null;
+  collectionMode?: CollectionMode;
+  currentBillingPeriod: SubscriptionTimePeriodNotification | null;
+}
+

@@ -21,6 +21,47 @@ export const getFirstAndLastDay = (day: number) => {
     };
   }
 };
+
+export const getFirstAndLastDay2 = (day: number, interval: "month" | "year") => {
+  const today = new Date();
+  const currentDay = today.getDate();
+  const currentMonth = today.getMonth();
+  const currentYear = today.getFullYear();
+
+  if (interval === "month") {
+    if (currentDay >= day) {
+      // if the current day is greater than target day, it means that we just passed it
+      return {
+        firstDay: new Date(currentYear, currentMonth, day),
+        lastDay: new Date(currentYear, currentMonth + 1, day - 1),
+      };
+    } else {
+      // if the current day is less than target day, it means that we haven't passed it yet
+      const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+      return {
+        firstDay: new Date(currentYear, lastMonth, day),
+        lastDay: new Date(currentYear, currentMonth, day - 1),
+      };
+    }
+  } else if (interval === "year") {
+    if (currentDay >= day) {
+      // if the current day is greater than target day, it means that we just passed it
+      return {
+        firstDay: new Date(currentYear, currentMonth, day),
+        lastDay: new Date(currentYear + 1, currentMonth, day - 1),
+      };
+    } else {
+      // if the current day is less than target day, it means that we haven't passed it yet
+      const lastYear = currentYear - 1;
+      return {
+        firstDay: new Date(lastYear, currentMonth, day),
+        lastDay: new Date(currentYear, currentMonth, day - 1),
+      };
+    }
+  } else {
+    throw new Error("Invalid interval. It must be either 'month' or 'year'.");
+  }
+};
 /**
  * Returns a string representing the time elapsed since the given timestamp.
  * @param timestamp - The timestamp to compare to the current time.

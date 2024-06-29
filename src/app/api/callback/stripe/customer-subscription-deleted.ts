@@ -17,29 +17,29 @@ export async function customerSubscriptionDeleted(event: Stripe.Event, client: M
 
   const subscriptionDeleted = event.data.object as Stripe.Subscription;
 
-  const stripeId = subscriptionDeleted.customer.toString();
+  const subscriptionId = subscriptionDeleted.customer.toString();
 
   // If a team deletes their subscription, reset their usage limit in the database to 1000.
   // Also remove the root domain redirect for all their domains from Redis.
-  console.log('\n 👉 Cancelling subscription for team:', stripeId)
-  const team = await teamsCollection.findOne({ stripeId: stripeId });
+  console.log('\n 👉 Cancelling subscription for team:', subscriptionId)
+  const team = await teamsCollection.findOne({ subscriptionId: subscriptionId });
   if (!team) {
     await log({
       message:
         "Team with Stripe ID *`" +
-        stripeId +
+        subscriptionId +
         "`* not found in Stripe webhook `customer.subscription.deleted` callback",
       type: "errors",
     });
     return;
   }
-  console.log('\n 👉 Cancelling subscription for team:', team._id, team.meta.slug, team.plan, team.stripeId)
+  console.log('\n 👉 Cancelling subscription for team:', team._id, team.meta.slug, team.plan, team.subscriptionId)
   const teamOwner = await getTeamOwner(client, team._id.toString());
   if (!teamOwner) {
     await log({
       message:
         "Team with Stripe ID *`" +
-        stripeId +
+        subscriptionId +
         "`* does not have an owner in Stripe webhook `customer.subscription.deleted` callback",
       type: "errors",
     });
@@ -48,7 +48,7 @@ export async function customerSubscriptionDeleted(event: Stripe.Event, client: M
   console.log('\n 👉 Updating the database for team:', teamOwner.email)
   await Promise.allSettled([
     await teamsCollection.updateOne(
-      { stripeId: stripeId },
+      { subscriptionId: subscriptionId },
       {
         $set: {
           plan: "free",

@@ -44,7 +44,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event, client: Mong
     return;
   }
 
-  const stripeId = checkoutSession.customer.toString();
+  const subscriptionId = checkoutSession.customer.toString();
 
   const team = await teamsCollection.findOne({ _id: new ObjectId(checkoutSession.client_reference_id) });
 
@@ -52,7 +52,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event, client: Mong
     await log({
       message:
         "Team with Stripe ID *`" +
-        stripeId +
+        subscriptionId +
         "`* not found in Stripe webhook `checkout.session.completed` callback",
       type: "errors",
     });
@@ -67,7 +67,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event, client: Mong
     { _id: team._id },
     {
       $set: {
-        stripeId,
+        subscriptionId,
         billingCycleStart: new Date().getDate(),
         plan: plan.name.toLowerCase() as any,
         limit: {
@@ -87,7 +87,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event, client: Mong
       await log({
         message:
           "Team" + `<${APP_DOMAIN}/${team.meta.slug}|${team.name}>` + " with Stripe ID *`" +
-          stripeId +
+          subscriptionId +
           "`* does not have an owner in Stripe webhook `checkout.session.completed` callback",
         type: "errors",
       });

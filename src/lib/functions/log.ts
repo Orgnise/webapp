@@ -54,7 +54,7 @@ export const log = async ({
             text: {
               type: "mrkdwn",
               // prettier-ignore
-              text: `${mention ? "<#D06Q02G3Y9L> " : ""}${switchType(type)}${message}`,
+              text: `${switchType(type)}${message}`,
             },
           },
         ],

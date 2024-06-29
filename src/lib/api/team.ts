@@ -56,7 +56,10 @@ export async function fetchDecoratedTeam(client: MongoClient, teamId: string, us
           inviteCode: "$team.inviteCode",
           logo: "$team.logo",
           limit: "$team.limit",
-          stripeId: "$team.stripeId",
+          subscriptionId: "$team.subscriptionId",
+          scheduledChange: "$team.subscription.scheduledChange",
+          interval: "$team.subscription.interval",
+          currentBillingPeriod: "$team.subscription.currentBillingPeriod"
         },
       },
       // Remove team object from root object
@@ -88,7 +91,10 @@ export async function fetchDecoratedTeam(client: MongoClient, teamId: string, us
     })
     return {
       ...team,
-      stripeId: teamList[0].stripeId,
+      billingInterval: teamList[0].interval,
+      subscriptionId: teamList[0].subscriptionId,
+      scheduledChange: teamList[0].scheduledChange,
+      currentBillingPeriod: teamList[0].currentBillingPeriod
     };
   }
   return undefined;
@@ -151,7 +157,8 @@ export async function fetchAllTeamOwnedByUser(client: MongoClient, userId: strin
           inviteCode: "$team.inviteCode",
           limit: "$team.limit",
           logo: "$team.logo",
-          stripeId: "$team.stripeId",
+          subscriptionId: "$team.subscriptionId",
+          scheduledChange: "$team.subscription.scheduledChange",
         },
       },
       // Remove team object from root object
