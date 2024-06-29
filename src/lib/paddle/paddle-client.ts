@@ -22,7 +22,7 @@ export async function getPaddle(slug: string, PADDLE_SECRET_CLIENT_KEY?: string)
       },
       debug: true,
       eventCallback(event) {
-        console.log(event);
+        // console.log(event);
       },
 
     })

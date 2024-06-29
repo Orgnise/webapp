@@ -101,10 +101,10 @@ export const PLANS = [
       monthly: 24,
       yearly: 19,
       ids: [
-        'pri_01j0tq0tb7g3e8mwe0rfgr43r2',
-        'pri_01j11nqqw758hpfkkdkp5ejngz'
-        // 'price_1PH267SHsqzoawbHfT36lPoJ',
-        // 'price_1PH267SHsqzoawbHcYuCeSlZ'
+        'pri_01j1d2wt5755sy0891nwev4jbs', // Monthly
+        'pri_01j1d34bwgh6c3fx33hq0kbat6', // Yearly
+        'pri_01j0tq0tb7g3e8mwe0rfgr43r2', // Monthly
+        'pri_01j11nqqw758hpfkkdkp5ejngz' // Yearly
       ] as string[],
     },
     limits: {
@@ -137,10 +137,10 @@ export const PLANS = [
     pages: 600,
     workspaces: 30,
     ids: [
-      'pri_01j11p1sga7scd3tn59pv8zzq6',
-      'pri_01j11pf34t068ntj7533t35sad'
-      // 'price_1PH29GSHsqzoawbHsqk5dD3y',
-      // 'price_1PH29GSHsqzoawbHTTQ1WGbb'
+      'pri_01j1d383r3rynxr3v5k9w1t7j9',// Monthly
+      'pri_01j1d39wx7x4kxadhmnmy30x3t',// Yearly
+      'pri_01j11p1sga7scd3tn59pv8zzq6',// Monthly
+      'pri_01j11pf34t068ntj7533t35sad'// Yearly
     ]
   }),
   ,

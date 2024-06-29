@@ -67,6 +67,7 @@ function UpgradePlanModal({
   const [clicked, setClicked] = useState(false);
   const [clickedCompare, setClickedCompare] = useState(false);
   const { queryParams } = useRouterStuff();
+  const isStaging = process.env.NEXT_PUBLIC_VERCEL_ENV !== "production";
 
   return (
     <Modal
@@ -267,6 +268,7 @@ function UpgradePlanModal({
             loading={clicked}
             onClick={async () => {
               setClicked(true);
+
               if (activeTeam?.subscriptionId) {
                 fetch(`/api/teams/${slug}/billing/upgrade`, {
                   method: "POST",
@@ -275,14 +277,21 @@ function UpgradePlanModal({
                   },
                   body: JSON.stringify({
                     priceId:
-                      selectedPlan.price.ids[period === "monthly" ? 0 : 1],
+                      selectedPlan.price.ids[
+                        period === "monthly"
+                          ? isStaging
+                            ? 2
+                            : 0
+                          : isStaging
+                            ? 3
+                            : 1
+                      ],
                   }),
                 })
                   .then(async (res) => {
                     if (res.status === 200) {
                       if (currentPlan === "free") {
                         const data = await res.json();
-                        console.log(data);
                         toast.success("Upgrade success!");
                         await mutate();
                       }
@@ -296,6 +305,7 @@ function UpgradePlanModal({
                     setClicked(false);
                   });
               } else {
+                console.log({ isStaging, paddle: process.env.PADDLE_ENV });
                 const paddle = await getPaddle(
                   activeTeam!.meta!.slug!,
                   PADDLE_SECRET_CLIENT_KEY,
@@ -303,14 +313,23 @@ function UpgradePlanModal({
                 if (paddle) {
                   try {
                     setTimeout(() => {
-                      setShowUpgradePlanModal(false);
+                      queryParams({
+                        del: "upgrade",
+                      });
                     }, 1000);
+
                     paddle?.Checkout.open({
                       items: [
                         {
                           priceId:
                             selectedPlan.price.ids[
-                              period === "monthly" ? 0 : 1
+                              period === "monthly"
+                                ? isStaging
+                                  ? 2
+                                  : 0
+                                : isStaging
+                                  ? 3
+                                  : 1
                             ],
                           quantity: 1,
                         },
@@ -333,11 +352,11 @@ function UpgradePlanModal({
                       },
                     });
                   } catch (error) {
-                    setClicked(false);
                     console.error(error);
                   }
                 }
               }
+              setClicked(false);
             }}
           />
 
