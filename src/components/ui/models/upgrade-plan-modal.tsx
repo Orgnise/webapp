@@ -311,6 +311,7 @@ function UpgradePlanModal({
                 const paddle = await getPaddle(
                   activeTeam!.meta!.slug!,
                   PADDLE_SECRET_CLIENT_KEY,
+                  PADDLE_ENV,
                 );
                 if (paddle) {
                   try {
