@@ -3,7 +3,10 @@ import { Logo } from "@/components/atom/logo";
 import { Badge, Button2, LoadingSpinner, Modal } from "@/components/ui/";
 import { APP_DOMAIN } from "@/lib/constants/constants";
 import { STAGGER_CHILD_VARIANTS } from "@/lib/constants/framer-motion";
-import { SELF_SERVE_PAID_PLANS } from "@/lib/constants/pricing";
+import {
+  SELF_SERVE_PAID_PLANS,
+  getPlanFromPriceId,
+} from "@/lib/constants/pricing";
 import { capitalize } from "@/lib/functions/capitalize";
 import { useRouterStuff } from "@/lib/hooks";
 import { getPaddle } from "@/lib/paddle/paddle-client";
@@ -69,7 +72,7 @@ function UpgradePlanModal({
   const [clicked, setClicked] = useState(false);
   const [clickedCompare, setClickedCompare] = useState(false);
   const { queryParams } = useRouterStuff();
-  const isStaging = process.env.NEXT_PUBLIC_VERCEL_ENV !== "production";
+  const isProduction = PADDLE_ENV == "production";
 
   return (
     <Modal
@@ -269,6 +272,17 @@ function UpgradePlanModal({
             text={`Upgrade to ${selectedPlan.name} ${capitalize(period)}`}
             loading={clicked}
             onClick={async () => {
+              const priceIdIndex =
+                period === "monthly"
+                  ? isProduction
+                    ? 0
+                    : 2
+                  : isProduction
+                    ? 1
+                    : 3;
+              const priceId = selectedPlan.price.ids[priceIdIndex];
+              const plan = getPlanFromPriceId(priceId);
+
               setClicked(true);
 
               if (activeTeam?.subscriptionId) {
@@ -278,16 +292,7 @@ function UpgradePlanModal({
                     "Content-Type": "application/json",
                   },
                   body: JSON.stringify({
-                    priceId:
-                      selectedPlan.price.ids[
-                        period === "monthly"
-                          ? isStaging
-                            ? 2
-                            : 0
-                          : isStaging
-                            ? 3
-                            : 1
-                      ],
+                    priceId: priceId,
                   }),
                 })
                   .then(async (res) => {
@@ -302,15 +307,16 @@ function UpgradePlanModal({
                       router.push(url);
                     }
                   })
-                  .catch((err) => {
+                  .catch((err: any) => {
                     alert(err);
                     setClicked(false);
                   });
               } else {
-                console.log({ isStaging });
+                console.log({ isProduction });
                 const paddle = await getPaddle(
                   activeTeam!.meta!.slug!,
                   PADDLE_SECRET_CLIENT_KEY,
+                  PADDLE_ENV,
                 );
                 if (paddle) {
                   try {
@@ -323,16 +329,7 @@ function UpgradePlanModal({
                     paddle?.Checkout.open({
                       items: [
                         {
-                          priceId:
-                            selectedPlan.price.ids[
-                              period === "monthly"
-                                ? isStaging
-                                  ? 2
-                                  : 0
-                                : isStaging
-                                  ? 3
-                                  : 1
-                            ],
+                          priceId: priceId,
                           quantity: 1,
                         },
                       ],

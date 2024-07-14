@@ -17,7 +17,7 @@ const WaitingList = () => {
       <Preview>Thanks for joining Orgnise waiting list</Preview>
       <Tailwind>
         <Body className="my-auto bg-white font-sans">
-          <Section className="my-10 px-2 py-5">
+          <Section className="px-2 py-5">
             <Section className="mt-8">
               <Text className="text-sm leading-6 text-black">
                 Hello,

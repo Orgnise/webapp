@@ -8,6 +8,7 @@ import { CreateItemCTA } from "@/components/team/workspace/collection/content/it
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ListView } from "@/components/ui/listview";
+import { useToast } from "@/components/ui/use-toast";
 import { getNextPlan } from "@/lib/constants";
 import { checkWorkspacePermissions } from "@/lib/constants/workspace-role";
 import useUsage from "@/lib/hooks/use-usage";
@@ -24,6 +25,7 @@ export default function CollectionContentPageClient() {
   const { activeWorkspace } = useWorkspaces();
   const { limit, exceedingPageLimit } = useUsage();
   const { meta, plan } = useTeam();
+  const { toast } = useToast();
 
   if (loading) {
     return <Loading />;
@@ -65,7 +67,16 @@ export default function CollectionContentPageClient() {
               !checkWorkspacePermissions(activeWorkspace?.role, "EDIT_CONTENT")
             }
             onUpdateName={(name: string) => {
-              updateCollection(activeCollection!._id, { name });
+              updateCollection(activeCollection!._id, { name }).then(
+                (isUpdated) => {
+                  if (isUpdated) {
+                    toast({
+                      title: "Success!",
+                      description: "Collection name updated successfully",
+                    });
+                  }
+                },
+              );
             }}
           />
           {activeCollection!.children.length > 0 && (
@@ -167,7 +178,7 @@ function CollectionNameField({
 }) {
   return (
     <form
-      className="flex-grow"
+      className="group mr-4 flex flex-grow items-center rounded  border border-transparent focus-within:border-border"
       onSubmit={(e: any) => {
         e.preventDefault();
         const value = e.target.name.value;
@@ -180,13 +191,20 @@ function CollectionNameField({
         type="text"
         autoFocus
         disabled={disabled}
-        className="border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
+        className="flex-grow border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
         maxLength={70}
         defaultValue={name}
         required
         name="name"
         placeholder="Untitled collection"
       />
+      <Button
+        type="submit"
+        size={"sm"}
+        className="invisible mr-2 h-auto px-2 py-0.5 text-sm group-focus-within:visible"
+      >
+        Save
+      </Button>
     </form>
   );
 }

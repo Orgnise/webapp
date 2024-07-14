@@ -23,8 +23,8 @@ interface IWorkspaces {
    * To create Page, pass the parent collection slug
    */
   createCollection(data: typeof CreateCollectionSchema._type): Promise<void>;
-  updateCollection: (id: string, collection: typeof UpdateCollectionSchema._type) => void;
-  UpdateItem: (item: Collection, parent: Collection) => Promise<void>;
+  updateCollection: (id: string, collection: typeof UpdateCollectionSchema._type) => Promise<Boolean>;
+  UpdateItem: (item: Collection, parent: Collection) => Promise<Boolean>;
   deleteCollection(id: string, collectionSlug: string): Promise<void>;
   deleteItem(
     id: string,
@@ -109,7 +109,7 @@ export default function useCollections(): IWorkspaces {
   }
 
   // Update the active item in database
-  async function UpdateItem(item: Collection, parent: Collection) {
+  async function UpdateItem(item: Collection, parent: Collection): Promise<Boolean> {
     console.log("Updating active item", item.name);
     const teamSlug = param?.team_slug;
     const collectionSlug = parent?.meta?.slug;
@@ -145,13 +145,15 @@ export default function useCollections(): IWorkspaces {
           optimisticData: collectionTree,
         },
       );
+      return Promise.resolve(true);
     } catch (error) {
       console.error("error", error);
+      return Promise.reject(false);
     }
   }
 
   // Update collection name
-  async function updateCollection(id: string, collection: typeof UpdateCollectionSchema._type) {
+  async function updateCollection(id: string, collection: typeof UpdateCollectionSchema._type): Promise<Boolean> {
     const teamSlug = param?.team_slug;
     const workspaceSlug = param?.workspace_slug;
     const collectionSlug = param?.collection_slug;
@@ -182,9 +184,10 @@ export default function useCollections(): IWorkspaces {
         { collections: collectionTree },
         { revalidate: false, optimisticData: collectionTree },
       );
+      return Promise.resolve(true);
     } catch (error) {
       console.error("error", error);
-      throw error;
+      return Promise.resolve(false);
     }
   }
 

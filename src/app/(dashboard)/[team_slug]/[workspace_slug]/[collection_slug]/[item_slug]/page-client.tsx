@@ -3,7 +3,9 @@
 import { SmallLabel } from "@/components/atom/typography";
 import NotFoundView from "@/components/team/team-not-found";
 import ItemContent from "@/components/team/workspace/collection/content/content";
+import { Button } from "@/components/ui";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { checkWorkspacePermissions } from "@/lib/constants/workspace-role";
 import useCollections from "@/lib/swr/use-collections";
 import useWorkspaces from "@/lib/swr/use-workspaces";
@@ -28,6 +30,8 @@ export default function ItemPageClient() {
   } = useCollections();
 
   const { activeWorkspace } = useWorkspaces();
+
+  const { toast } = useToast();
 
   const content = useRef<any>(undefined);
   const { team_slug, workspace_slug, collection_slug, item_slug } =
@@ -60,7 +64,14 @@ export default function ItemPageClient() {
           content: content.current,
         },
         activeCollection!,
-      );
+      ).then((isUpdated) => {
+        if (isUpdated) {
+          toast({
+            title: "Success!",
+            description: "Page content updated successfully",
+          });
+        }
+      });
     }
   };
 
@@ -114,7 +125,14 @@ export default function ItemPageClient() {
                 UpdateActiveItem(
                   { ...activeItem!, name: name },
                   activeCollection!,
-                );
+                ).then((isUpdated) => {
+                  if (isUpdated) {
+                    toast({
+                      title: "Success!",
+                      description: "Page name updated successfully",
+                    });
+                  }
+                });
               }}
             />
             <button
@@ -159,7 +177,7 @@ function CollectionNameField({
 }) {
   return (
     <form
-      className="flex-grow"
+      className="group flex flex-grow items-center rounded border  border-transparent focus-within:border-border "
       onSubmit={(e: any) => {
         e.preventDefault();
         const value = e.target.name.value;
@@ -172,13 +190,20 @@ function CollectionNameField({
         type="text"
         autoFocus
         disabled={disabled}
-        className=" border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
+        className="flex-grow border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
         maxLength={70}
         defaultValue={name}
         required
         name="name"
         placeholder="Untitled collection"
       />
+      <Button
+        type="submit"
+        size={"sm"}
+        className="invisible mr-2 h-auto px-2 py-0.5 text-sm group-focus-within:visible"
+      >
+        Save
+      </Button>
     </form>
   );
 }

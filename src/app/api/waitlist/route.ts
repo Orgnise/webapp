@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       email: parsedCredentials.data.email,
       createdAt: new Date(),
     });
-    sendEmailV2({
+    await sendEmailV2({
       subject: `Thanks for joining waiting list on ${process.env.NEXT_PUBLIC_APP_NAME}`,
       identifier: parsedCredentials.data.email,
       react: WaitingList(),

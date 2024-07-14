@@ -38,13 +38,12 @@ interface EditorProp {
 }
 const Editor = ({
   content,
-
   storageKey,
   onDebouncedUpdate,
   editorClassName,
   ...props
 }: EditorProp & Partial<EditorProviderProps>) => {
-  const [saveStatus, setSaveStatus] = useState("Saved");
+  // const [saveStatus, setSaveStatus] = useState("Saved");
   const [openNode, setOpenNode] = useState(false);
   const [openColor, setOpenColor] = useState(false);
   const [openLink, setOpenLink] = useState(false);
@@ -52,9 +51,9 @@ const Editor = ({
   const debouncedUpdates = useDebouncedCallback(
     async (editor: EditorInstance) => {
       onDebouncedUpdate?.(editor);
-      const json = editor.getJSON();
-      window.localStorage.setItem("novel-content", JSON.stringify(json));
-      setSaveStatus("Saved");
+      // const json = editor.getJSON();
+      // window.localStorage.setItem("novel-content", JSON.stringify(json));
+      // setSaveStatus("Saved");
     },
     500,
   );
@@ -85,8 +84,12 @@ const Editor = ({
   return (
     <div className="relative h-full w-full max-w-screen-lg flex-grow">
       {props.editable ? (
-        <div className="absolute right-5 top-5 z-10 mb-5 rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground">
-          {saveStatus}
+        <div className="absolute right-5 top-5 z-10 mb-5 text-xs">
+          Press{" "}
+          <kbd className="rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground">
+            cmd + s
+          </kbd>{" "}
+          to save
         </div>
       ) : (
         <></>
