@@ -107,7 +107,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
           href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}`}
           className="w-full"
         >
-          <H5 className="line-clamp-1 py-1 ">
+          <H5 className="line-clamp-1 py-1.5 ">
             {hasValue(collection.name)
               ? collection.name
               : "Untitled collection"}
@@ -199,7 +199,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
         }}
         noItemsElement={
           <div className="-mx-px flex items-center gap-2  border-l border-border py-1  pl-4 text-sm font-medium text-muted-foreground/70">
-            No items
+            No pages
           </div>
         }
       />
@@ -244,7 +244,7 @@ function RenderItem({ item, collection }: RenderItemProps) {
         )}
       >
         <span className="text-sm font-medium ">
-          {hasValue(item.name) ? item.name : "Untitled item"}
+          {hasValue(item.name) ? item.name : "Untitled page"}
         </span>
       </Link>
       <WorkspacePermissionView permission="DELETE_CONTENT">

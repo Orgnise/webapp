@@ -177,7 +177,7 @@ function CollectionNameField({
 }) {
   return (
     <form
-      className="group flex flex-grow items-center rounded border  border-transparent focus-within:border-border "
+      className="group flex flex-grow items-center"
       onSubmit={(e: any) => {
         e.preventDefault();
         const value = e.target.name.value;

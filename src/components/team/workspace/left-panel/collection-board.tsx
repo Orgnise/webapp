@@ -231,7 +231,7 @@ function CollectionColumn({
                         }}
                       >
                         <Label size="body">
-                          {hasValue(item.name) ? item.name : "Untitled item"}
+                          {hasValue(item.name) ? item.name : "Untitled page"}
                         </Label>
                       </Link>
                     </div>
@@ -250,7 +250,7 @@ function CollectionColumn({
 export function NoCollectionView() {
   return (
     <div className="flex flex-1 flex-col place-content-center items-center">
-      <P>No items or collections</P>
+      <P>No pages or collections</P>
       <P className="text-muted-foreground">Start by creating your first item</P>
     </div>
   );

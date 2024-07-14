@@ -2,6 +2,7 @@
 // import { WorkspaceContext } from "@/app/(dashboard)/[team_slug]/[workspace_slug]/providers";
 import { Spinner } from "@/components/atom/spinner";
 import { H5 } from "@/components/atom/typography";
+import { UsageLimitView } from "@/components/molecule";
 import { WorkspacePermissionView } from "@/components/molecule/workspace-permission-view";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,12 @@ import { useParams } from "next/navigation";
 
 type Status = "Idle" | "Saving" | "Deleting";
 
+import { ToolTipWrapper } from "@/components/ui";
+import { getNextPlan } from "@/lib/constants";
+import useUsage from "@/lib/hooks/use-usage";
+import useTeam from "@/lib/swr/use-team";
 import { useState } from "react";
+import { CreateItemCTA } from "./content/item/create-item-cta";
 export function CollectionItemCard({
   index,
   item,
@@ -84,7 +90,7 @@ export function CollectionItemCard({
 
           <Button
             variant={"ghost"}
-            className="inline-flex  h-7 w-7 cursor-pointer place-content-center items-center rounded bg-accent p-1 text-center "
+            className="inline-flex  h-7 w-7 cursor-pointer place-content-center items-center rounded bg-accent p-1 text-center focus-within:scale-90"
             onClick={() => {}}
           >
             {status === "Saving" ? (
@@ -94,14 +100,14 @@ export function CollectionItemCard({
             )}
           </Button>
         </form>
-        <div
-          className="inline-flex cursor-pointer place-content-center items-center rounded bg-accent p-1 text-center "
+        <button
+          className="inline-flex cursor-pointer place-content-center items-center rounded bg-accent p-1 text-center focus-within:scale-90"
           onClick={() => {
             setIsEditEnabled(false);
           }}
         >
           <X />
-        </div>
+        </button>
       </div>
     );
   }
@@ -124,7 +130,7 @@ export function CollectionItemCard({
         {hasValue(item.name) ? (
           <div className="font-sans ">{item.name}</div>
         ) : (
-          <div className="font-sans ">Untitled item</div>
+          <div className="font-sans ">Untitled page</div>
         )}
       </Link>
       <WorkspacePermissionView permission="EDIT_CONTENT">
@@ -140,7 +146,7 @@ export function CollectionItemCard({
           <div className="flex h-full place-content-center items-center gap-2 px-2">
             <Button
               variant={"ghost"}
-              className="h-7 w-7 p-1 transition-all duration-75 hover:scale-105 hover:shadow group-hover:bg-accent-foreground/50"
+              className="h-7 w-7 p-1 transition-all duration-75 focus-within:scale-90  hover:shadow group-hover:bg-accent-foreground/50"
               onClick={() => {
                 if (status !== "Idle") {
                   return;
@@ -152,7 +158,7 @@ export function CollectionItemCard({
             </Button>
             <Button
               variant={"destructive"}
-              className="h-7 w-7 p-1 transition-all duration-75 hover:scale-105 hover:shadow"
+              className="h-7 w-7 p-1 transition-all duration-75 focus-within:scale-90 hover:shadow"
               onClick={handleDeleteItem}
             >
               {status === "Deleting" ? (
@@ -174,10 +180,12 @@ function CollectionCard({ collection }: { collection: Collection }) {
     workspace_slug?: string;
     collection_slug?: string;
   };
+  const { limit, exceedingPageLimit } = useUsage();
+  const { meta, plan } = useTeam();
 
   return (
     <div className="flex flex-col ">
-      <div className=" flex place-content-between items-center gap-1 pl-2 ">
+      <div className="group flex place-content-between items-center gap-1 rounded border border-transparent pl-2 hover:border-border">
         <ChevronRight size={20} />
         <Link
           href={`/${team_slug}/${workspace_slug}/${collection?.meta?.slug}`}
@@ -189,6 +197,34 @@ function CollectionCard({ collection }: { collection: Collection }) {
               : "Untitled collection"}
           </H5>
         </Link>
+        <WorkspacePermissionView
+          permission="CREATE_CONTENT"
+          className="invisible group-hover:visible"
+        >
+          <UsageLimitView
+            exceedingLimit={exceedingPageLimit}
+            upgradeMessage={`Current plan can have upto ${limit?.pages} pages in all workspaces. For higher pages quota upgrade to ${getNextPlan(plan)?.name} plan.`}
+            plan={plan}
+            team_slug={meta?.slug}
+            placeholder={
+              <Button size={"icon"} variant={"link"}>
+                Create Page
+              </Button>
+            }
+          >
+            <ToolTipWrapper content={"Create page"}>
+              <Button
+                className="m-0.5 h-7 w-7 focus-within:scale-90"
+                variant={"ghost"}
+                size={"icon"}
+              >
+                <CreateItemCTA activeCollection={collection!}>
+                  &nbsp;
+                </CreateItemCTA>
+              </Button>
+            </ToolTipWrapper>
+          </UsageLimitView>
+        </WorkspacePermissionView>
       </div>
       <ListView
         items={collection!.children}
@@ -205,7 +241,7 @@ function CollectionCard({ collection }: { collection: Collection }) {
         noItemsElement={
           <div className="pl-4 text-muted-foreground/40">
             <div className="flex items-center gap-1 border-l border-border pl-4 ">
-              <p className="line-clamp-1 py-0.5 ">No items</p>
+              <p className="line-clamp-1 py-0.5 ">No pages</p>
             </div>
           </div>
         }

@@ -132,7 +132,7 @@ export default function CollectionTable({
                     )}
                   >
                     <Label size="body">
-                      {hasValue(item.name) ? item.name : "Untitled item"}
+                      {hasValue(item.name) ? item.name : "Untitled page"}
                     </Label>
                   </Link>
                   <Link
@@ -160,7 +160,7 @@ export default function CollectionTable({
           }}
           noItemsElement={
             <div className="flex h-96 flex-1 flex-col place-content-center items-center">
-              <Label variant="s1">No items or collections</Label>
+              <Label variant="s1">No pages or collections</Label>
               <Label variant="s2">Start by creating your first item</Label>
             </div>
           }
