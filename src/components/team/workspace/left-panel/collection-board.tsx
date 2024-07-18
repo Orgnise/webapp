@@ -3,6 +3,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import Label from "@/components/atom/label";
 import { P } from "@/components/atom/typography";
+import BoardCollectionView from "@/components/drag-n-drop/board-collections-view";
 import { ListView } from "@/components/ui/listview";
 import useCollections from "@/lib/swr/use-collections";
 import { hasValue } from "@/lib/utils";
@@ -114,6 +115,8 @@ export default function CollectionBoard({
     };
     // setCollection(workValue);
   }
+  if (collections && collections.length > 0)
+    return <BoardCollectionView collections={collections} />;
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="ROOT" type="group">
