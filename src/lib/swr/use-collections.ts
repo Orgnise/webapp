@@ -10,7 +10,7 @@ import {
   removeFromCollectionTree,
   updateInCollectionTree,
 } from "../utility/collection-tree-structure";
-import { CreateCollectionSchema, UpdateCollectionSchema, reorderCollectionSchema } from "../zod/schemas/collection";
+import { CreateCollectionSchema, UpdateCollectionSchema, ReorderCollectionSchema } from "../zod/schemas/collection";
 import { z } from "zod";
 
 interface IWorkspaces {
@@ -26,7 +26,7 @@ interface IWorkspaces {
   createCollection(data: typeof CreateCollectionSchema._type): Promise<void>;
   updateCollection: (id: string, collection: typeof UpdateCollectionSchema._type) => Promise<Boolean>;
   UpdateItem: (item: Collection, parent: Collection) => Promise<Boolean>;
-  reorder: (args: z.infer<typeof reorderCollectionSchema>) => Promise<Boolean>;
+  reorder: (args: z.infer<typeof ReorderCollectionSchema>) => Promise<Boolean>;
   deleteCollection(id: string, collectionSlug: string): Promise<void>;
   deleteItem(
     id: string,
@@ -278,7 +278,7 @@ export default function useCollections(): IWorkspaces {
   }
 
   // Reorder collection/page
-  async function reorder(args: z.infer<typeof reorderCollectionSchema>): Promise<Boolean> {
+  async function reorder(args: z.infer<typeof ReorderCollectionSchema>): Promise<Boolean> {
     const { team_slug, workspace_slug } = param;
     try {
       const response = await fetcher(

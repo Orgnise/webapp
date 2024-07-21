@@ -3,14 +3,14 @@ import { withWorkspace } from "@/lib/auth";
 import { CollectionDbSchema } from "@/lib/db-schema";
 import { collections } from "@/lib/mongodb";
 import { Collection } from "@/lib/types/types";
-import { reorderCollectionSchema } from "@/lib/zod/schemas";
+import { ReorderCollectionSchema } from "@/lib/zod/schemas";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 // POST /api/teams/:team_slug/:workspace_slug/collections/reorder - Reorder a collection/page
 export const POST = withWorkspace(async ({ req, client, workspace, team }) => {
   try {
-    const { id, index: newIndex, parent, object, newParent } = await reorderCollectionSchema.parseAsync(await req.json());
+    const { id, index: newIndex, parent, object, newParent } = await ReorderCollectionSchema.parseAsync(await req.json());
 
 
     if (!ObjectId.isValid(id)) {

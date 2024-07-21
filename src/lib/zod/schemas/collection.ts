@@ -56,7 +56,7 @@ export const UpdateCollectionSchema = z.object({
   }
 });
 
-export const reorderCollectionSchema = z.object({
+export const ReorderCollectionSchema = z.object({
   id: z.string().describe("The id of the collection/page to reorder."),
   parent: z.string().optional().describe("The parent collection/page id."),
   newParent: z.string().optional().describe("The new parent collection/page id."),
@@ -71,3 +71,7 @@ export const reorderCollectionSchema = z.object({
     object: 'item'
   }
 });
+
+export const reorderCollectionResponseSchema = z.object({
+  message: z.string().optional().default(""),
+})
