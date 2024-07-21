@@ -1,3 +1,4 @@
+import useCollections from "@/lib/swr/use-collections";
 import { Collection } from "@/lib/types";
 import { triggerPostMoveFlash } from "@atlaskit/pragmatic-drag-and-drop-flourish/trigger-post-move-flash";
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
@@ -16,7 +17,7 @@ import {
   ColumnType,
 } from "./board-context";
 import { Column } from "./column";
-import { getBasicData } from "./data";
+import { getBasicData as getBoardData } from "./data";
 import { createRegistry } from "./registery";
 
 type Outcome =
@@ -52,13 +53,15 @@ type BoardState = {
   lastOperation: Operation | null;
 };
 
-export default function BoardCollectionView({
-  collections,
-}: {
-  collections: Collection[];
-}) {
+export default function BoardCollectionView({}: {}) {
+  const {
+    collections,
+    loading,
+    error,
+    reorder: reorderAsync,
+  } = useCollections();
   const [data, setData] = useState<BoardState>(() => {
-    const base = getBasicData(collections);
+    const base = getBoardData(collections);
     return {
       ...base,
       lastOperation: null,
@@ -196,7 +199,13 @@ export default function BoardCollectionView({
       finishIndex: number;
       trigger?: Trigger;
     }) => {
-      console.log({ columnId, startIndex, finishIndex });
+      const card = data.columnMap[columnId].items[startIndex];
+      reorderAsync({
+        id: card._id,
+        index: finishIndex,
+        parent: card.parent,
+        object: card.object!,
+      });
       setData((data) => {
         const sourceColumn = data.columnMap[columnId];
         const updatedItems = reorder({
@@ -232,7 +241,7 @@ export default function BoardCollectionView({
         };
       });
     },
-    [],
+    [data?.columnMap, reorderAsync],
   );
 
   const moveCard = useCallback(
@@ -259,6 +268,14 @@ export default function BoardCollectionView({
       if (startColumnId === finishColumnId) {
         return;
       }
+      const card = data.columnMap[startColumnId].items[itemIndexInStartColumn];
+      reorderAsync({
+        id: card._id,
+        index: itemIndexInFinishColumn ?? 0,
+        parent: startColumnId,
+        object: card.object!,
+        newParent: finishColumnId,
+      });
       setData((data) => {
         const sourceColumn = data.columnMap[startColumnId];
         const destinationColumn = data.columnMap[finishColumnId];
@@ -298,7 +315,7 @@ export default function BoardCollectionView({
         };
       });
     },
-    [],
+    [data?.columnMap, reorderAsync],
   );
 
   const [instanceId] = useState(() => Symbol("instance-id"));

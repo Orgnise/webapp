@@ -25,11 +25,11 @@ import {
 import { preserveOffsetOnSource } from "@atlaskit/pragmatic-drag-and-drop/element/preserve-offset-on-source";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
 import { dropTargetForExternal } from "@atlaskit/pragmatic-drag-and-drop/external/adapter";
-import { Box, Stack, xcss } from "@atlaskit/primitives";
 
 import { Collection } from "@/lib/types";
 import { hasValue } from "@/lib/utils";
 import clsx from "clsx";
+import { CopyIcon } from "lucide-react";
 import { H4 } from "../atom/typography";
 import { useBoardContext } from "./board-context";
 
@@ -41,38 +41,11 @@ type State =
 const idleState: State = { type: "idle" };
 const draggingState: State = { type: "dragging" };
 
-const noMarginStyles = xcss({ margin: "space.0" });
-const baseStyles = xcss({
-  width: "100%",
-  padding: "space.100",
-  backgroundColor: "elevation.surface",
-  borderRadius: "border.radius.200",
-  position: "relative",
-  ":hover": {
-    backgroundColor: "elevation.surface.hovered",
-  },
-});
-
-const stateStyles: {
-  [Key in State["type"]]: ReturnType<typeof xcss> | undefined;
-} = {
-  idle: xcss({
-    cursor: "grab",
-    boxShadow: "elevation.shadow.raised",
-  }),
-  dragging: xcss({
-    opacity: 0.4,
-    boxShadow: "elevation.shadow.raised",
-  }),
-  // no shadow for preview - the platform will add it's own drop shadow
-  preview: undefined,
-};
-
 type CardPrimitiveProps = {
   closestEdge: Edge | null;
   item: Collection;
   state: State;
-  actionMenuTriggerRef?: Ref<HTMLButtonElement>;
+  actionMenuTriggerRef?: Ref<HTMLDivElement>;
 };
 
 const CardPrimitive = forwardRef<HTMLDivElement, CardPrimitiveProps>(
@@ -86,8 +59,9 @@ const CardPrimitive = forwardRef<HTMLDivElement, CardPrimitiveProps>(
       <div
         ref={ref}
         id={`item-${_id}`}
-        className="relative flex flex-col gap-1"
+        className="group relative flex flex-col gap-1"
       >
+        {/* DIVIDER */}
         {closestEdge && (
           <div
             className={clsx(
@@ -107,14 +81,36 @@ const CardPrimitive = forwardRef<HTMLDivElement, CardPrimitiveProps>(
             </div>
           </div>
         )}
-        <div className="rounded bg-card p-2 shadow hover:bg-accent">
-          <Stack space="space.050" grow="fill" ref={actionMenuTriggerRef}>
+        <div
+          className={clsx(
+            "rounded bg-card  p-2 py-3.5 text-card-foreground shadow hover:bg-info/10",
+            {
+              "border-2 border-secondary-foreground/50 opacity-85 shadow-none":
+                state.type === "dragging",
+            },
+          )}
+        >
+          <div
+            ref={actionMenuTriggerRef}
+            className="flex flex-row items-center gap-2"
+          >
             {hasValue(name) ? (
-              <H4>{name}</H4>
+              <H4 className="flex-grow">{name}</H4>
             ) : (
-              <H4 className="text-secondary-foreground/60">Untitled Page</H4>
+              <H4 className="flex-grow text-secondary-foreground/60">
+                {item.object === "item"
+                  ? "Untitled Page"
+                  : "Untitled collection"}
+              </H4>
             )}
-          </Stack>
+            <CopyIcon
+              className={clsx("text-sm text-secondary-foreground/60 ", {
+                "hidden group-hover:flex ": item.object == "collection",
+                hidden: item.object !== "collection",
+              })}
+              size={18}
+            />
+          </div>
         </div>
       </div>
     );
@@ -127,7 +123,7 @@ export const Card = memo(function Card({ item }: { item: Collection }) {
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const [state, setState] = useState<State>(idleState);
 
-  const actionMenuTriggerRef = useRef<HTMLButtonElement>(null);
+  const actionMenuTriggerRef = useRef<HTMLDivElement>(null);
   const { instanceId, registerCard } = useBoardContext();
   useEffect(() => {
     invariant(actionMenuTriggerRef.current);
@@ -218,7 +214,7 @@ export const Card = memo(function Card({ item }: { item: Collection }) {
       />
       {state.type === "preview" &&
         ReactDOM.createPortal(
-          <Box
+          <div
             style={{
               /**
                * Ensuring the preview has the same dimensions as the original.
@@ -232,7 +228,7 @@ export const Card = memo(function Card({ item }: { item: Collection }) {
             }}
           >
             <CardPrimitive item={item} state={state} closestEdge={null} />
-          </Box>,
+          </div>,
           state.container,
         )}
     </Fragment>

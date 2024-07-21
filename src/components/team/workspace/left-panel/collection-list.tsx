@@ -39,6 +39,7 @@ export default function CollectionList(prop: Props) {
         className="flex flex-col gap-6 overflow-y-auto px-4 pb-28"
         items={collections}
         loading={loading}
+        sortBy={(a: Collection, b: Collection) => a.sortIndex - b.sortIndex}
         renderItem={(collection, index) => (
           <RenderCollection key={index} collection={collection} />
         )}
@@ -182,6 +183,7 @@ function RenderCollection({ collection }: RenderCollectionProps) {
 
       <ListView
         items={collection.children}
+        sortBy={(a: Collection, b: Collection) => a.sortIndex - b.sortIndex}
         className={cx(
           "ml-1 flex flex-col gap-2 border-l border-border transition-all  duration-150 ease-in-expo",
         )}

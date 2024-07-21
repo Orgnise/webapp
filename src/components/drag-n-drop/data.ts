@@ -13,10 +13,11 @@ export function getBasicData(collections: Collection[]) {
   const outputData: ColumnMap = {};
 
   columns.forEach((item) => {
+    const list = item.items.sort((a, b) => a.sortIndex - b.sortIndex);
     outputData[item.columnId] = {
       title: item.title,
       columnId: item.columnId,
-      items: item.items,
+      items: list,
     };
   });
 

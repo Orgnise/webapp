@@ -20,7 +20,7 @@ const Board = forwardRef<HTMLDivElement, BoardProps>(
     return (
       <div
         ref={ref}
-        className="Board flex h-full w-full flex-row  gap-4 overflow-auto p-4"
+        className="Board flex h-full w-full flex-row  gap-4 overflow-auto bg-background p-4"
       >
         {children}
       </div>

@@ -32,21 +32,6 @@ export const CollectionSchema = z.object({
       slug: "my-collection",
     },
   },
-}).openapi({
-  description: "A collection.",
-  example: {
-    id: "1",
-    name: "My Collection",
-    object: "collection",
-    createdAt: new Date("2021-01-01T00:00:00.000Z"),
-    updatedAt: new Date("2021-01-01T00:00:00.000Z"),
-    team: "some-team-id",
-    workspace: "some-workspace-id",
-    meta: {
-      title: "My Collection",
-      slug: "my-collection",
-    },
-  },
 });
 
 export const CreateCollectionSchema = z.object({
@@ -68,5 +53,21 @@ export const UpdateCollectionSchema = z.object({
   description: "Update a collection.",
   example: {
     name: "My updated Collection",
+  }
+});
+
+export const reorderCollectionSchema = z.object({
+  id: z.string().describe("The id of the collection/page to reorder."),
+  parent: z.string().optional().describe("The parent collection/page id."),
+  newParent: z.string().optional().describe("The new parent collection/page id."),
+  index: z.number().describe("The index to move the collection to."),
+  object: z.custom<CollectionType>().describe("Object describes the type of the collection/page . Collections will be of type 'collection' and pages will be of type 'item'."),
+}).openapi({
+  description: "Reorder a collection/page.",
+  example: {
+    id: "1",
+    parent: "2",
+    index: 3,
+    object: 'item'
   }
 });

@@ -82,6 +82,7 @@ export default function CollectionContentPageClient() {
         </div>
         <ListView
           items={activeCollection!.children}
+          sortBy={(a: Collection, b: Collection) => a.sortIndex - b.sortIndex}
           className="flex flex-col  overflow-y-auto pb-28 pt-4"
           renderItem={(item, index) => (
             <CollectionItemCard
@@ -109,7 +110,10 @@ export default function CollectionContentPageClient() {
                     className="my-4 w-full border border-dashed p-4"
                     variant={"ghost"}
                   >
-                    <CreateItemCTA activeCollection={activeCollection!}>
+                    <CreateItemCTA
+                      activeCollection={activeCollection!}
+                      className="w-full place-content-center"
+                    >
                       &nbsp; Create Page
                     </CreateItemCTA>
                   </Button>

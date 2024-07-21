@@ -115,8 +115,7 @@ export default function CollectionBoard({
     };
     // setCollection(workValue);
   }
-  if (collections && collections.length > 0)
-    return <BoardCollectionView collections={collections} />;
+  if (collections && collections.length > 0) return <BoardCollectionView />;
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="ROOT" type="group">

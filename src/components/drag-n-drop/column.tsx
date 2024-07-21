@@ -13,7 +13,7 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import { centerUnderPointer } from "@atlaskit/pragmatic-drag-and-drop/element/center-under-pointer";
 import { setCustomNativeDragPreview } from "@atlaskit/pragmatic-drag-and-drop/element/set-custom-native-drag-preview";
-import { Box, Stack, xcss } from "@atlaskit/primitives";
+import { Box, xcss } from "@atlaskit/primitives";
 import { createPortal } from "react-dom";
 import invariant from "tiny-invariant";
 
@@ -22,15 +22,8 @@ import { hasValue } from "@/lib/utils";
 import clsx from "clsx";
 import { H2, H3 } from "../atom/typography";
 import { ColumnType, useBoardContext } from "./board-context";
-import { Card } from "./card";
+import { Card } from "./column-card";
 import { ColumnContext, type ColumnContextProps } from "./column-context";
-
-const cardListStyles = xcss({
-  boxSizing: "border-box",
-  minHeight: "100%",
-  padding: "space.100",
-  gap: "space.100",
-});
 
 const columnHeaderStyles = xcss({
   paddingInlineStart: "space.200",
@@ -240,7 +233,7 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
           id={`column-${columnId}`}
           ref={columnRef}
           className={clsx(
-            " flex h-[calc(100%-64px)] w-64 min-w-64 cursor-grab flex-col gap-1 overflow-y-auto rounded-lg bg-accent/70 transition-colors duration-200",
+            " flex h-[calc(100%-64px)] w-64 min-w-64 cursor-grab flex-col gap-1 overflow-y-auto rounded-lg bg-accent transition-colors duration-200",
             {
               "opacity-40": isDragging,
               "bg-info/30": state.type === "is-card-over",
@@ -261,7 +254,7 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
               <div
                 ref={headerRef}
                 id={`column-header-${columnId}`}
-                className="Header sticky top-0 flex items-center justify-between rounded-t-lg bg-accent p-2 text-secondary-foreground/60"
+                className="Header sticky top-0 z-10 flex items-center justify-between rounded-t-lg bg-accent p-2 text-secondary-foreground/60"
               >
                 <H3 id={`column-header-title-${columnId}`}>
                   {hasValue(column.title) ? column.title : "Untitled Column"}
@@ -269,11 +262,17 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
                 {/* <ActionMenu /> */}
               </div>
               <div className="h-full overflow-y-auto" ref={scrollableRef}>
-                <Stack xcss={cardListStyles} space="space.100">
+                <div
+                  className="flex flex-col gap-2 px-2 pb-4"
+                  style={{
+                    minHeight: "100%",
+                    boxSizing: "border-box",
+                  }}
+                >
                   {column.items.map((item: Collection) => (
                     <Card item={item} key={item._id} />
                   ))}
-                </Stack>
+                </div>
               </div>
             </div>
           </div>
@@ -282,7 +281,7 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
         {state.type === "is-column-over" && state.closestEdge && (
           <div
             className={clsx(
-              "flex h-[calc(100%-64px)]   flex-col items-center",
+              "flex h-[calc(100%-64px)]   flex-col items-center scroll-smooth",
               {
                 invisible: state.type !== "is-column-over",
                 "absolute -left-2 bottom-0 top-0 ":
