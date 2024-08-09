@@ -2,6 +2,7 @@
 import { Spinner } from "@/components/atom/spinner";
 import useCollections from "@/lib/swr/use-collections";
 import { Collection } from "@/lib/types/types";
+import clsx from "clsx";
 import { PlusIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -9,8 +10,13 @@ import { useState } from "react";
 interface CreateItemProps {
   activeCollection?: Collection;
   children: React.ReactNode;
+  className?: string;
 }
-export function CreateItemCTA({ activeCollection, children }: CreateItemProps) {
+export function CreateItemCTA({
+  activeCollection,
+  children,
+  className,
+}: CreateItemProps) {
   const { createCollection } = useCollections();
   const param = useParams();
   const router = useRouter();
@@ -24,7 +30,7 @@ export function CreateItemCTA({ activeCollection, children }: CreateItemProps) {
 
   return (
     <div
-      className="flex items-center"
+      className={clsx("flex items-center", className)}
       onClick={() => {
         if (!activeCollection || isLoading) {
           return;

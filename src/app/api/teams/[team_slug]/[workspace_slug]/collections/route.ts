@@ -59,13 +59,20 @@ export const POST = withWorkspace(async ({ team, workspace, session, req, params
       suffixLength: 6,
     });
 
+    // Total documents in the collection
+    const count = await collectionsDb.countDocuments({
+      team: new ObjectId(team._id),
+      workspace: new ObjectId(workspace._id),
+      parent: parent ? new ObjectId(parent) : null,
+    });
+
     const collection = {
       team: new ObjectId(team._id),
       meta: {
         slug: slug,
         title: name,
       },
-      sortIndex: 0,
+      sortIndex: count,
       name: name ?? "",
       object: object,
       parent: parent && new ObjectId(parent),

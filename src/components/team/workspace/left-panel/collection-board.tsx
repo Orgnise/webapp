@@ -3,6 +3,7 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import Label from "@/components/atom/label";
 import { P } from "@/components/atom/typography";
+import BoardCollectionView from "@/components/drag-n-drop/board-collections-view";
 import { ListView } from "@/components/ui/listview";
 import useCollections from "@/lib/swr/use-collections";
 import { hasValue } from "@/lib/utils";
@@ -114,6 +115,7 @@ export default function CollectionBoard({
     };
     // setCollection(workValue);
   }
+  if (collections && collections.length > 0) return <BoardCollectionView />;
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="ROOT" type="group">
@@ -231,7 +233,7 @@ function CollectionColumn({
                         }}
                       >
                         <Label size="body">
-                          {hasValue(item.name) ? item.name : "Untitled item"}
+                          {hasValue(item.name) ? item.name : "Untitled page"}
                         </Label>
                       </Link>
                     </div>
@@ -250,7 +252,7 @@ function CollectionColumn({
 export function NoCollectionView() {
   return (
     <div className="flex flex-1 flex-col place-content-center items-center">
-      <P>No items or collections</P>
+      <P>No pages or collections</P>
       <P className="text-muted-foreground">Start by creating your first item</P>
     </div>
   );

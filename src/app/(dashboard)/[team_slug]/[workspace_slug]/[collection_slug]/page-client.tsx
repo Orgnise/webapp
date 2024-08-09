@@ -79,34 +79,10 @@ export default function CollectionContentPageClient() {
               );
             }}
           />
-          {activeCollection!.children.length > 0 && (
-            <WorkspacePermissionView permission="CREATE_CONTENT">
-              <UsageLimitView
-                exceedingLimit={exceedingPageLimit}
-                upgradeMessage={`Current plan can have upto ${limit?.pages} pages in all workspaces. For higher pages quota upgrade to ${getNextPlan(plan)?.name} plan.`}
-                plan={plan}
-                team_slug={meta?.slug}
-                placeholder={
-                  <Button size={"sm"} variant={"subtle"}>
-                    Create Page
-                  </Button>
-                }
-              >
-                <Button
-                  variant={"default"}
-                  className="border-dotted  border-muted-foreground "
-                  size={"sm"}
-                >
-                  <CreateItemCTA activeCollection={activeCollection!}>
-                    &nbsp; Create Page
-                  </CreateItemCTA>
-                </Button>
-              </UsageLimitView>
-            </WorkspacePermissionView>
-          )}
         </div>
         <ListView
           items={activeCollection!.children}
+          sortBy={(a: Collection, b: Collection) => a.sortIndex - b.sortIndex}
           className="flex flex-col  overflow-y-auto pb-28 pt-4"
           renderItem={(item, index) => (
             <CollectionItemCard
@@ -116,7 +92,35 @@ export default function CollectionContentPageClient() {
               collection={activeCollection}
             />
           )}
-          footerElement={<div className="w-full"></div>}
+          footerElement={
+            activeCollection!.children.length > 0 && (
+              <WorkspacePermissionView permission="CREATE_CONTENT">
+                <UsageLimitView
+                  exceedingLimit={exceedingPageLimit}
+                  upgradeMessage={`Current plan can have upto ${limit?.pages} pages in all workspaces. For higher pages quota upgrade to ${getNextPlan(plan)?.name} plan.`}
+                  plan={plan}
+                  team_slug={meta?.slug}
+                  placeholder={
+                    <Button size={"sm"} variant={"subtle"}>
+                      Create Page
+                    </Button>
+                  }
+                >
+                  <Button
+                    className="my-4 w-full border border-dashed p-4"
+                    variant={"ghost"}
+                  >
+                    <CreateItemCTA
+                      activeCollection={activeCollection!}
+                      className="w-full place-content-center"
+                    >
+                      &nbsp; Create Page
+                    </CreateItemCTA>
+                  </Button>
+                </UsageLimitView>
+              </WorkspacePermissionView>
+            )
+          }
           noItemsElement={<NoItemsView activeCollection={activeCollection} />}
         />
       </div>
@@ -178,7 +182,7 @@ function CollectionNameField({
 }) {
   return (
     <form
-      className="group mr-4 flex flex-grow items-center rounded  border border-transparent focus-within:border-border"
+      className="group mr-4 flex flex-grow items-center rounded   border-transparent focus-within:border-border"
       onSubmit={(e: any) => {
         e.preventDefault();
         const value = e.target.name.value;
@@ -192,7 +196,7 @@ function CollectionNameField({
         autoFocus
         disabled={disabled}
         className="flex-grow border-none bg-transparent  text-2xl font-bold placeholder:text-2xl placeholder:text-muted-foreground placeholder:opacity-50 focus-visible:outline-none focus-visible:ring-0"
-        maxLength={70}
+        maxLength={32}
         defaultValue={name}
         required
         name="name"

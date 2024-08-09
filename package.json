@@ -13,6 +13,12 @@
     "script": "tsx ./scripts/run.ts"
   },
   "dependencies": {
+    "@atlaskit/pragmatic-drag-and-drop": "^1.2.1",
+    "@atlaskit/pragmatic-drag-and-drop-auto-scroll": "^1.4.0",
+    "@atlaskit/pragmatic-drag-and-drop-flourish": "^1.1.0",
+    "@atlaskit/pragmatic-drag-and-drop-hitbox": "^1.0.3",
+    "@atlaskit/primitives": "^11.0.1",
+    "@atlaskit/tokens": "^1.55.0",
     "@auth/core": "^0.19.0",
     "@auth/mongodb-adapter": "^2.0.10",
     "@paddle/paddle-js": "^1.2.0",

@@ -58,7 +58,6 @@ export default function ItemContent({
       </div>
     );
   }
-  console.log("Editable:", editable);
   return (
     <NovelEditor
       content={activeItem?.content}

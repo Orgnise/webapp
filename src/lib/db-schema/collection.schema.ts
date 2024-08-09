@@ -5,12 +5,12 @@ import { ObjectId } from "mongodb";
 import { MetaSchema } from "./team.schema";
 
 export interface CollectionDbSchema {
-  _id: string;
+  _id: ObjectId;
   object: "item" | "collection";
   workspace: ObjectId;
   children: any;
   team: ObjectId;
-  parent: ObjectId;
+  parent: ObjectId | null;
   /**
    * @deprecated title is deprecated, use name instead
    */

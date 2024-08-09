@@ -10,7 +10,8 @@ import {
   removeFromCollectionTree,
   updateInCollectionTree,
 } from "../utility/collection-tree-structure";
-import { CreateCollectionSchema, UpdateCollectionSchema } from "../zod/schemas/collection";
+import { CreateCollectionSchema, UpdateCollectionSchema, ReorderCollectionSchema } from "../zod/schemas/collection";
+import { z } from "zod";
 
 interface IWorkspaces {
   error: any;
@@ -25,6 +26,7 @@ interface IWorkspaces {
   createCollection(data: typeof CreateCollectionSchema._type): Promise<void>;
   updateCollection: (id: string, collection: typeof UpdateCollectionSchema._type) => Promise<Boolean>;
   UpdateItem: (item: Collection, parent: Collection) => Promise<Boolean>;
+  reorder: (args: z.infer<typeof ReorderCollectionSchema>) => Promise<Boolean>;
   deleteCollection(id: string, collectionSlug: string): Promise<void>;
   deleteItem(
     id: string,
@@ -275,6 +277,53 @@ export default function useCollections(): IWorkspaces {
       });
   }
 
+  // Reorder collection/page
+  async function reorder(args: z.infer<typeof ReorderCollectionSchema>): Promise<Boolean> {
+    const { team_slug, workspace_slug } = param;
+    try {
+      const response = await fetcher(
+        `/api/teams/${team_slug}/${workspace_slug}/collections/reorder`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(args),
+        },
+      );
+      let collectionTree: Collection[] = data?.collections;
+      const node = findInCollectionTree(data?.collections, (node) => node._id === args.id) as Collection;
+      if (!args.newParent) {
+        const collectionTree = updateInCollectionTree(
+          data?.collections,
+          args.id,
+          {
+            ...node,
+            sortIndex: args.index,
+          }
+        );
+      } else {
+        collectionTree = removeFromCollectionTree(data?.collections, args.id) as Collection[];
+        collectionTree = addInCollectionTree(data?.collections, args.newParent, {
+          ...node,
+          parent: args.newParent,
+          sortIndex: args.index,
+        }) as Collection[];
+      }
+      mutate(
+        { collections: collectionTree },
+        {
+          revalidate: false,
+          optimisticData: collectionTree,
+        },
+      );
+      return Promise.resolve(true);
+    } catch (error) {
+      console.error("error", error);
+      return Promise.reject(false);
+    }
+  }
+
   const activeCollection = useMemo(() => {
     if (!data?.collections) return undefined;
     return findInCollectionTree(
@@ -294,6 +343,7 @@ export default function useCollections(): IWorkspaces {
     UpdateItem,
     deleteCollection,
     deleteItem,
+    reorder,
   };
 }
 

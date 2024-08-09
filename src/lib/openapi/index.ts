@@ -24,6 +24,7 @@ import {
   updateUserInTeamRoleSchema,
   updateWorkspaceRoleSchema,
   updateWorkspaceSchema,
+  ReorderCollectionSchema,
 } from "../zod/schemas";
 
 export const openApiObject: ZodOpenApiObject = {
@@ -60,6 +61,7 @@ export const openApiObject: ZodOpenApiObject = {
       CollectionSchema,
       CreateCollectionSchema,
       InviteTeamMemberSchema,
+      ReorderCollectionSchema,
       SendInviteSchema,
       TeamInvitesSchema,
       TeamMemberSchema,
