@@ -18,6 +18,7 @@ export function getBasicData(collections: Collection[]) {
       title: item.title,
       columnId: item.columnId,
       items: list,
+      collection: collections.find((coll) => coll._id === item.columnId)!,
     };
   });
 

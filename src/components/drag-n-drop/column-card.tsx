@@ -30,6 +30,7 @@ import { Collection } from "@/lib/types";
 import { hasValue } from "@/lib/utils";
 import clsx from "clsx";
 import { CopyIcon } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { H4 } from "../atom/typography";
 import { useBoardContext } from "./board-context";
 
@@ -44,16 +45,24 @@ const draggingState: State = { type: "dragging" };
 type CardPrimitiveProps = {
   closestEdge: Edge | null;
   item: Collection;
+  collection: Collection;
   state: State;
   actionMenuTriggerRef?: Ref<HTMLDivElement>;
 };
 
 const CardPrimitive = forwardRef<HTMLDivElement, CardPrimitiveProps>(
   function CardPrimitive(
-    { closestEdge, item, state, actionMenuTriggerRef },
+    { closestEdge, item, collection, state, actionMenuTriggerRef },
     ref,
   ) {
     const { name, _id } = item;
+    const { team_slug, workspace_slug } = useParams() as {
+      team_slug?: string;
+      workspace_slug?: string;
+      collection_slug?: string;
+    };
+
+    const router = useRouter();
 
     return (
       <div
@@ -83,12 +92,23 @@ const CardPrimitive = forwardRef<HTMLDivElement, CardPrimitiveProps>(
         )}
         <div
           className={clsx(
-            "rounded bg-card  p-2 py-3.5 text-card-foreground shadow hover:bg-info/10",
+            "rounded  bg-card p-2 py-3.5 text-card-foreground shadow hover:bg-info/10",
             {
               "border-2 border-secondary-foreground/50 opacity-85 shadow-none":
                 state.type === "dragging",
             },
           )}
+          onClick={() => {
+            if (item.object === "collection") {
+              router.push(
+                `/${team_slug}/${workspace_slug}/${item.meta?.slug}/`,
+              );
+            } else {
+              router.push(
+                `/${team_slug}/${workspace_slug}/${collection?.meta?.slug}/${item.meta?.slug}/`,
+              );
+            }
+          }}
         >
           <div
             ref={actionMenuTriggerRef}
@@ -105,10 +125,9 @@ const CardPrimitive = forwardRef<HTMLDivElement, CardPrimitiveProps>(
             )}
             <CopyIcon
               className={clsx("text-sm text-secondary-foreground/60 ", {
-                "hidden group-hover:flex ": item.object == "collection",
                 hidden: item.object !== "collection",
               })}
-              size={18}
+              size={15}
             />
           </div>
         </div>
@@ -117,7 +136,13 @@ const CardPrimitive = forwardRef<HTMLDivElement, CardPrimitiveProps>(
   },
 );
 
-export const Card = memo(function Card({ item }: { item: Collection }) {
+export const Card = memo(function Card({
+  item,
+  collection,
+}: {
+  item: Collection;
+  collection: Collection;
+}) {
   const ref = useRef<HTMLDivElement | null>(null);
   const { _id } = item;
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
@@ -208,6 +233,7 @@ export const Card = memo(function Card({ item }: { item: Collection }) {
       <CardPrimitive
         ref={ref}
         item={item}
+        collection={collection}
         state={state}
         closestEdge={closestEdge}
         actionMenuTriggerRef={actionMenuTriggerRef}
@@ -227,7 +253,12 @@ export const Card = memo(function Card({ item }: { item: Collection }) {
               height: state.rect.height,
             }}
           >
-            <CardPrimitive item={item} state={state} closestEdge={null} />
+            <CardPrimitive
+              item={item}
+              state={state}
+              closestEdge={null}
+              collection={collection}
+            />
           </div>,
           state.container,
         )}
