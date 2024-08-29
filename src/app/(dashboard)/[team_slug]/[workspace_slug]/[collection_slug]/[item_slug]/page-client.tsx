@@ -56,7 +56,7 @@ export default function ItemPageClient() {
   );
 
   const onKeyDown = (e: any) => {
-    if ((e.metaKey && e.which === 83) || (e.ctrlKey && e.key === "s")) {
+    if ((e.metaKey || e.ctrlKey) && e.which === 83) {
       e.preventDefault();
       UpdateActiveItem(
         {
