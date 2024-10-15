@@ -1,4 +1,5 @@
 "use client";
+import { getOS } from "@/lib/functions";
 import { cn } from "@/lib/utils";
 import { Editor as Editor$1 } from "@tiptap/core";
 import { type EditorProviderProps } from "@tiptap/react";
@@ -84,10 +85,10 @@ const Editor = ({
   return (
     <div className="relative h-full w-full max-w-screen-lg flex-grow">
       {props.editable ? (
-        <div className="absolute right-5 top-5 z-10 mb-5 text-xs">
+        <div className="no-print absolute right-5 top-5 z-10 mb-5 text-xs">
           Press{" "}
           <kbd className="rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground">
-            cmd + s
+            {getOS() === "MacOS" ? "Cmd" : "Ctrl"} + s
           </kbd>{" "}
           to save
         </div>

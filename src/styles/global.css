@@ -105,3 +105,11 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@media print {
+
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+}
