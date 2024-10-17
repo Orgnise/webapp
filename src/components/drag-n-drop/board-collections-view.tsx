@@ -337,6 +337,16 @@ export default function BoardCollectionView({}: {}) {
   }, [data]);
 
   useEffect(() => {
+    setData((data) => {
+      const base = getBoardData(collections);
+      return {
+        ...base,
+        lastOperation: data.lastOperation,
+      };
+    });
+  }, [collections]);
+
+  useEffect(() => {
     return combine(
       monitorForElements({
         canMonitor({ source }) {
