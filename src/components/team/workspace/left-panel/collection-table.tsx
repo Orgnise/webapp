@@ -28,9 +28,9 @@ export default function CollectionTable({
   // isLoadingCollection,
   setLeftPanelSize = (i) => {},
 }: CollectionTableProps) {
-  type SortBy = "asc" | "desc";
+  type SortBy = "asc" | "desc" | undefined;
   const [sortBy, setSortBy] = React.useState<SortBy>("asc");
-  const [sortCollectionBy, setSortCollectionBy] = React.useState<SortBy>("asc");
+  const [sortCollectionBy, setSortCollectionBy] = React.useState<SortBy>();
   const { error, loading, collections, mutate } = useCollections();
 
   const { team_slug, workspace_slug, collection_slug, item_slug } =
@@ -44,7 +44,9 @@ export default function CollectionTable({
     () =>
       collections
         ?.sort?.((a: Collection, b: Collection) => {
-          if (sortCollectionBy == "asc") {
+          if (!sortCollectionBy) {
+            return 1;
+          } else if (sortCollectionBy == "asc") {
             return a.name.localeCompare(b.name);
           } else {
             return b.name.localeCompare(a.name);
@@ -60,7 +62,9 @@ export default function CollectionTable({
           ];
         }, [])
         .sort((a: Collection, b: Collection) => {
-          if (sortBy == "asc") {
+          if (!sortBy) {
+            return 1;
+          } else if (sortBy == "asc") {
             return a.name.localeCompare(b.name);
           } else {
             return b.name.localeCompare(a.name);
@@ -89,6 +93,7 @@ export default function CollectionTable({
                   className="h-6 w-6 p-1"
                   onClick={() => {
                     setSortBy(sortBy == "asc" ? "desc" : "asc");
+                    setSortCollectionBy(undefined);
                   }}
                 >
                   <ArrowUpAZ size={15} />
@@ -104,6 +109,7 @@ export default function CollectionTable({
               className="h-6 w-6 p-1"
               onClick={() => {
                 setSortCollectionBy(sortCollectionBy == "asc" ? "desc" : "asc");
+                setSortBy(undefined);
               }}
             >
               <ArrowUpAZ size={15} />
@@ -119,7 +125,6 @@ export default function CollectionTable({
               <div key={index}>
                 <div className="flex w-full  items-center divide-x divide-border  bg-background">
                   <Link
-                    key={index}
                     href={`/${team_slug}/${workspace_slug}/${item.collection?.meta?.slug}/${item.meta?.slug}/`}
                     className={cx(
                       "w-7/12  cursor-pointer  p-2 text-muted-foreground",
