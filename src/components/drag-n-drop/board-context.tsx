@@ -8,6 +8,7 @@ import type { CleanupFn } from "@atlaskit/pragmatic-drag-and-drop/types";
 export type ColumnType = {
   title: string;
   columnId: string;
+  collection: Collection;
   items: Collection[];
 };
 export type ColumnMap = { [columnId: string]: ColumnType };

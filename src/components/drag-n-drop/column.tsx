@@ -254,7 +254,7 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
               <div
                 ref={headerRef}
                 id={`column-header-${columnId}`}
-                className="Header sticky top-0 z-10 flex items-center justify-between rounded-t-lg bg-accent p-2 text-secondary-foreground/60"
+                className="Header sticky top-0 z-10 flex items-center justify-between rounded-t-lg bg-accent px-2 pt-2 text-secondary-foreground/60"
               >
                 <H3 id={`column-header-title-${columnId}`}>
                   {hasValue(column.title) ? column.title : "Untitled Column"}
@@ -263,14 +263,18 @@ export const Column = memo(function Column({ column }: { column: ColumnType }) {
               </div>
               <div className="h-full overflow-y-auto" ref={scrollableRef}>
                 <div
-                  className="flex flex-col gap-2 px-2 pb-4"
+                  className="flex flex-col gap-2 px-2 pb-4 pt-2"
                   style={{
                     minHeight: "100%",
                     boxSizing: "border-box",
                   }}
                 >
                   {column.items.map((item: Collection) => (
-                    <Card item={item} key={item._id} />
+                    <Card
+                      item={item}
+                      key={item._id}
+                      collection={column.collection}
+                    />
                   ))}
                 </div>
               </div>

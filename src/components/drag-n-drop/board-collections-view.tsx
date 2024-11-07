@@ -118,10 +118,10 @@ export default function BoardCollectionView({}: {}) {
       const destinationColumn = data.columnMap[finishColumnId];
       const item = destinationColumn.items[itemIndexInFinishColumn];
       if (!item) {
-        console.log("item not found", {
-          finishColumnId,
-          itemIndexInFinishColumn,
-        });
+        // console.log("item not found", {
+        //   finishColumnId,
+        //   itemIndexInFinishColumn,
+        // });
         return;
       }
       const finishPosition =
@@ -161,7 +161,7 @@ export default function BoardCollectionView({}: {}) {
       finishIndex: number;
       trigger?: Trigger;
     }) => {
-      console.log({ startIndex, finishIndex });
+      // console.log({ startIndex, finishIndex });
       setData((data) => {
         const outcome: Outcome = {
           type: "column-reorder",
@@ -258,12 +258,12 @@ export default function BoardCollectionView({}: {}) {
       itemIndexInFinishColumn?: number;
       trigger?: "pointer" | "keyboard";
     }) => {
-      console.log({
-        startColumnId,
-        finishColumnId,
-        itemIndexInStartColumn,
-        itemIndexInFinishColumn,
-      });
+      // console.log({
+      //   startColumnId,
+      //   finishColumnId,
+      //   itemIndexInStartColumn,
+      //   itemIndexInFinishColumn,
+      // });
       // invalid cross column movement
       if (startColumnId === finishColumnId) {
         return;
@@ -335,6 +335,16 @@ export default function BoardCollectionView({}: {}) {
   useEffect(() => {
     stableData.current = data;
   }, [data]);
+
+  useEffect(() => {
+    setData((data) => {
+      const base = getBoardData(collections);
+      return {
+        ...base,
+        lastOperation: data.lastOperation,
+      };
+    });
+  }, [collections]);
 
   useEffect(() => {
     return combine(
